@@ -1,18 +1,26 @@
 class Cartera {
   final int id;
   final String name;
-  Cartera({required this.id, required this.name});
+  List<Fondo>? fondos;
+  Cartera({required this.id, required this.name, this.fondos}) {
+    fondos ??= [];
+  }
 
-  List<Fondo> fondos = [];
+  Cartera.fromMap(Map<String, dynamic> map)
+      : id = map['id'],
+        name = map['name'],
+        fondos = map['fondos'];
+
+  Map<String, Object?> toMap() {
+    return {'id': id, 'name': name, 'fondos': fondos};
+  }
 }
 
 class Fondo {
   final String isin;
   final String name;
   String? divisa;
-  Fondo({required this.isin, required this.name, this.divisa});
-
-  List<Valor> valores = [];
+  List<Valor>? valores;
 
   double? precioMinimo;
   double? precioMaximo;
@@ -27,6 +35,10 @@ class Fondo {
   double? balance;
   double? rentabilidad;
   double? tae;
+
+  Fondo({required this.isin, required this.name, this.divisa, this.valores}) {
+    valores ??= [];
+  }
 }
 
 class Valor {
