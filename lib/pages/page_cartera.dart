@@ -5,6 +5,313 @@ import 'package:provider/provider.dart';
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
 import '../routes.dart';
+import '../services/database_helper.dart';
+import '../services/preferences_service.dart';
+import '../utils/konstantes.dart';
+import '../widgets/loading_progress.dart';
+import '../widgets/my_drawer.dart';
+
+enum MenuCartera { ordenar, eliminar }
+
+class PageCartera extends StatefulWidget {
+  const PageCartera({Key? key}) : super(key: key);
+
+  @override
+  State<PageCartera> createState() => _PageCarteraState();
+}
+
+class _PageCarteraState extends State<PageCartera> {
+  bool _isFondosByOrder = true;
+  bool _isAutoUpdate = true;
+  DatabaseHelper database = DatabaseHelper();
+  late CarteraProvider carteraProvider;
+  late Cartera carteraSelect;
+
+  getSharedPrefs() async {
+    bool? isFondosByOrder;
+    bool? isAutoUpdate;
+    await PreferencesService.getBool(keyByOrderFondosPref).then((value) => isFondosByOrder = value);
+    await PreferencesService.getBool(keyAutoUpdatePref).then((value) => isAutoUpdate = value);
+    setState(() {
+      _isFondosByOrder = isFondosByOrder ?? true;
+      _isAutoUpdate = isAutoUpdate ?? true;
+    });
+  }
+
+  setFondos(Cartera cartera) async {
+    carteraProvider.fondos = await database.getFondos(cartera, byOrder: _isFondosByOrder);
+    //carteraProvider.addFondos(cartera, carteraProvider.fondos);
+    carteraSelect.fondos = carteraProvider.fondos;
+  }
+
+  @override
+  void initState() {
+    carteraProvider = context.read<CarteraProvider>();
+    carteraSelect = carteraProvider.carteraSelect;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await getSharedPrefs();
+      await database.createTableCartera(carteraSelect).whenComplete(() async {
+        await setFondos(carteraSelect);
+      });
+    });
+    super.initState();
+  }
+
+  _ordenarFondos() async {
+    setState(() => _isFondosByOrder = !_isFondosByOrder);
+    await setFondos(carteraSelect);
+    PreferencesService.saveBool(keyByOrderFondosPref, _isFondosByOrder);
+  }
+
+  PopupMenuItem<MenuCartera> _buildMenuItem(MenuCartera menu, IconData iconData,
+      {bool divider = false}) {
+    return PopupMenuItem(
+      value: menu,
+      child: Column(
+        children: [
+          ListTile(
+            leading: Icon(iconData, color: const Color(0xFFFFFFFF)),
+            title: Text(
+              '${menu.name[0].toUpperCase()}${menu.name.substring(1)}',
+              style: const TextStyle(color: Color(0xFFFFFFFF)),
+            ),
+            trailing: menu == MenuCartera.ordenar
+                ? Icon(
+                    _isFondosByOrder ? Icons.check_box : Icons.check_box_outline_blank,
+                    color: const Color(0xFFFFFFFF),
+                  )
+                : null,
+          ),
+          if (divider) const Divider(height: 10, color: Color(0xFFFFFFFF)), // PopMenuDivider
+        ],
+      ),
+    );
+  }
+
+  SpeedDialChild _buildSpeedDialChild(BuildContext context,
+      {required IconData icono, required String label, required String page}) {
+    return SpeedDialChild(
+      child: Icon(icono),
+      label: label,
+      backgroundColor: const Color(0xFFFFC107),
+      foregroundColor: const Color(0xFF0D47A1),
+      onTap: () async {
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+        final newFondo = await Navigator.of(context).pushNamed(page);
+        newFondo != null
+            ? _addFondo(newFondo as Fondo)
+            : _showMsg(msg: 'Sin cambios en la cartera.');
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: database.getFondos(carteraSelect, byOrder: _isFondosByOrder),
+      builder: (BuildContext context, AsyncSnapshot<List<Fondo>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return Scaffold(
+            appBar: AppBar(
+              /*leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  Navigator.of(context).pushNamed(RouteGenerator.homePage);
+                },
+              ),*/
+              title: Chip(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                backgroundColor: const Color(0xFF0D47A1),
+                avatar: const Icon(Icons.business_center),
+                label: Text(
+                  carteraSelect.name,
+                  style: const TextStyle(color: Color(0xFFFFFFFF)),
+                ),
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () async {
+                    ///await _dialogUpdateAll(context);
+                  },
+                ),
+                PopupMenuButton(
+                  color: Colors.blue,
+                  offset: Offset(0.0, AppBar().preferredSize.height),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  ),
+                  itemBuilder: (ctx) => [
+                    _buildMenuItem(MenuCartera.ordenar, Icons.sort_by_alpha),
+                    _buildMenuItem(MenuCartera.eliminar, Icons.delete_forever)
+                  ],
+                  onSelected: (MenuCartera item) async {
+                    if (item == MenuCartera.ordenar) {
+                      _ordenarFondos();
+                    } else if (item == MenuCartera.eliminar) {
+                      _deleteAllConfirm(context);
+                    }
+                  },
+                ),
+              ],
+            ),
+            floatingActionButton: SpeedDial(
+              icon: Icons.addchart,
+              foregroundColor: const Color(0xFF0D47A1),
+              backgroundColor: const Color(0xFFFFC107),
+              spacing: 8,
+              spaceBetweenChildren: 4,
+              overlayColor: Colors.grey,
+              overlayOpacity: 0.4,
+              children: [
+                _buildSpeedDialChild(context,
+                    icono: Icons.search,
+                    label: 'Buscar online por ISIN',
+                    //page: RouteGenerator.inputFondo),
+                    page: RouteGenerator.searchFondo),
+                _buildSpeedDialChild(context,
+                    icono: Icons.storage,
+                    label: 'Base de Datos local',
+                    page: RouteGenerator.searchFondo),
+              ],
+            ),
+            body: Consumer<CarteraProvider>(
+              builder: (context, data, child) {
+                if (data.fondos.isEmpty) {
+                  return const Center(child: Text('No hay fondos guardados.'));
+                }
+                return ListView.builder(
+                  itemCount: data.fondos.length,
+                  itemBuilder: (context, index) {
+                    Fondo fondo = data.fondos[index];
+                    return Dismissible(
+                      key: UniqueKey(),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        color: Colors.red,
+                        margin: const EdgeInsets.symmetric(horizontal: 15),
+                        alignment: Alignment.centerRight,
+                        child: const Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: Icon(Icons.delete, color: Colors.white),
+                        ),
+                      ),
+                      onDismissed: (_) async {
+                        await _removeFondo(fondo);
+                      },
+                      child: Card(
+                        child: ListTile(
+                          leading: const Icon(Icons.assessment, size: 32),
+                          title: Text(fondo.name),
+                          subtitle: Text(fondo.isin),
+                          trailing: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text('${fondo.dateMaximo ?? ''}'),
+                            ],
+                          ),
+                          onTap: () {
+                            ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                            carteraProvider.fondoSelect = fondo;
+
+                            ///Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          );
+        } else {
+          return const LoadingProgress(titulo: 'Actualizando fondos...');
+        }
+      },
+    );
+  }
+
+  _removeFondo(Fondo fondo) async {
+    await database.deleteFondo(carteraSelect, fondo);
+    carteraProvider.removeFondo(carteraSelect, fondo);
+  }
+
+  _addFondo(Fondo newFondo) async {
+    var existe = [for (var fondo in carteraProvider.fondos) fondo.isin].contains(newFondo.isin);
+    if (existe) {
+      _showMsg(
+        msg: 'El fondo con ISIN ${newFondo.isin} ya existe en esta cartera.',
+        color: Colors.red,
+      );
+    } else {
+      await database.insertFondo(carteraSelect, newFondo);
+      await setFondos(carteraSelect);
+      /*if (_isAutoUpdate) {
+        if (!mounted) return;
+        await _dialogAutoUpdate(context, newFondo);
+      } else {
+        _showMsg(msg: 'Fondo añadido');
+      }*/
+    }
+  }
+
+  void _deleteAllConfirm(BuildContext context) {
+    if (carteraProvider.fondos.isEmpty) {
+      _showMsg(msg: 'Nada que eliminar');
+    } else {
+      showDialog(
+          context: context,
+          builder: (BuildContext ctx) {
+            return AlertDialog(
+              title: const Text('Eliminar todo'),
+              content: Text(
+                  'Esto eliminará todos los fondos almacenados en la cartera ${carteraSelect.name}'),
+              actions: [
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('CANCELAR'),
+                ),
+                ElevatedButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: const Color(0xFFF44336),
+                    primary: const Color(0xFFFFFFFF),
+                  ),
+                  onPressed: () async {
+                    await database.deleteAllFondos(carteraSelect);
+                    carteraProvider.removeAllFondos(carteraSelect);
+                    _pop();
+                  },
+                  child: const Text('ACEPTAR'),
+                ),
+              ],
+            );
+          });
+    }
+  }
+
+  void _showMsg({required String msg, MaterialColor color = Colors.grey}) =>
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(msg), backgroundColor: color),
+      );
+
+  void _pop() {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    Navigator.of(context).pop();
+  }
+}
+
+/*****
+
+import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:provider/provider.dart';
+
+import '../models/cartera.dart';
+import '../models/cartera_provider.dart';
+import '../routes.dart';
 import '../services/api_service.dart';
 import '../services/control_center.dart';
 import '../services/preferences_service.dart';
@@ -536,3 +843,5 @@ class _PageCarteraState extends State<PageCartera> {
     Navigator.of(context).pop();
   }
 }
+
+    ***/

@@ -1,3 +1,5 @@
+/****
+
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
@@ -51,7 +53,7 @@ class ControlCenter {
     carteraProvider.removeAllCarteras();
   }
 
-  /*providerGetNFondos(Cartera cartera) {
+  */ /*providerGetNFondos(Cartera cartera) {
     int nFondos = 0;
     var carteras = carteraProvider.carteras;
     for (var c in carteras) {
@@ -61,7 +63,7 @@ class ControlCenter {
       }
     }
     return nFondos;
-  }*/
+  }*/ /*
 
   updateCarteras(bool isCarterasByOrder, bool isFondosByOrder) async {
     var db = Sqlite();
@@ -183,3 +185,5 @@ class ControlCenter {
     providerAddFondo(cartera, fondo);
   }
 }
+
+***/

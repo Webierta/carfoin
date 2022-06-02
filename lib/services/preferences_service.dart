@@ -1,5 +1,11 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+const String keyByOrderCarterasPref = 'isByOrderCarteras';
+const String keyConfirmDeleteCarteraPref = 'isConfirmDeleteCartera';
+const String keyByOrderFondosPref = 'isByOrderFondos';
+const String keyAutoUpdatePref = 'isAutoAudate';
+const String keyConfirmDeletePref = 'isConfirmDelete';
+
 class PreferencesService {
   static Future<bool> saveBool(String key, bool value) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();

@@ -7,6 +7,7 @@ import 'models/cartera_provider.dart';
 import 'routes.dart';
 
 Future main() async {
+  Provider.debugCheckInvalidValueType = null;
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
   runApp(

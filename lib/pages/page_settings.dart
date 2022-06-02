@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../routes.dart';
 import '../services/preferences_service.dart';
 import '../utils/konstantes.dart';
+import '../widgets/my_drawer.dart';
 
 class PageSettings extends StatefulWidget {
   const PageSettings({Key? key}) : super(key: key);
@@ -12,6 +13,7 @@ class PageSettings extends StatefulWidget {
 
 class _PageSettingsState extends State<PageSettings> {
   bool _isCarterasByOrder = true;
+  bool _isConfirmDeleteCartera = true;
   bool _isFondosByOrder = true;
   bool _isAutoUpdate = true;
   bool _isConfirmDelete = true;
@@ -19,6 +21,9 @@ class _PageSettingsState extends State<PageSettings> {
   getSharedPrefs() async {
     await PreferencesService.getBool(keyByOrderCarterasPref).then((value) {
       setState(() => _isCarterasByOrder = value);
+    });
+    await PreferencesService.getBool(keyConfirmDeleteCarteraPref).then((value) {
+      setState(() => _isConfirmDeleteCartera = value);
     });
     await PreferencesService.getBool(keyByOrderFondosPref).then((value) {
       setState(() => _isFondosByOrder = value);
@@ -56,7 +61,7 @@ class _PageSettingsState extends State<PageSettings> {
             ),
           ],
         ),
-        //drawer: const MyDrawer(),
+        drawer: const MyDrawer(),
         body: ListView(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
           children: [
@@ -69,6 +74,19 @@ class _PageSettingsState extends State<PageSettings> {
                 onChanged: (value) {
                   setState(() => _isCarterasByOrder = value);
                   PreferencesService.saveBool(keyByOrderCarterasPref, _isCarterasByOrder);
+                },
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_forever, color: Color(0xFF0D47A1)),
+              title: const Text('Confirmar antes de eliminar una cartera y todos sus fondos'),
+              subtitle:
+                  const Text('La eliminación de todas las carteras siempre requiere confirmación'),
+              trailing: Switch(
+                value: _isConfirmDeleteCartera,
+                onChanged: (value) {
+                  setState(() => _isConfirmDeleteCartera = value);
+                  PreferencesService.saveBool(keyConfirmDeleteCarteraPref, _isConfirmDeleteCartera);
                 },
               ),
             ),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'pages/page_about.dart';
 import 'pages/page_cartera.dart';
 import 'pages/page_home.dart';
+import 'pages/page_info.dart';
 import 'pages/page_input_fondo.dart';
 import 'pages/page_search_fondo.dart';
 import 'pages/page_settings.dart';
@@ -27,18 +29,17 @@ class RouteGenerator {
       //case fondoPage:
       //return AnimatedRoute(const PageFondo());
       case searchFondo:
-        //return MaterialPageRoute(builder: (context) => const PageSearchFondo());
         return AnimatedRoute(const PageSearchFondo());
-      case inputFondo:
-        return AnimatedRoute(const PageInputFondo());
+      /*case inputFondo:
+        return AnimatedRoute(const PageInputFondo());*/
       /*case inputRange:
         return AnimatedRoute(const PageInputRange());
       case mercadoPage:
-        return AnimatedRoute(const PageMercado());
+        return AnimatedRoute(const PageMercado());*/
       case infoPage:
         return AnimatedRoute(const PageInfo());
       case aboutPage:
-        return AnimatedRoute(const PageAbout());*/
+        return AnimatedRoute(const PageAbout());
       case settingsPage:
         return AnimatedRoute(const PageSettings());
       default:

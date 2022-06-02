@@ -1,4 +1,5 @@
-import 'dart:io';
+/****
+ import 'dart:io';
 import 'package:async/async.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -118,10 +119,10 @@ class Sqlite {
     await _db.rawUpdate("DELETE FROM $table");
   }
 
-  /*Future<void> clearCarfoin() async {
+  */ /*Future<void> clearCarfoin() async {
     await openDb();
     await _db.delete(table);
-  }*/
+  }*/ /*
 
   // TABLA FONDOS
   Future<void> insertFondo(String tableFondos, Map<String, dynamic> row) async {
@@ -207,3 +208,4 @@ class Sqlite {
     await _db.execute("DROP TABLE IF EXISTS $nameTable");
   }
 }
+***/

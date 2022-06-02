@@ -5,10 +5,24 @@ import '../utils/fecha_util.dart';
 import 'cartera.dart';
 
 class CarteraProvider with ChangeNotifier {
+  /* SELECT */
+  late Cartera _carteraSelect;
+  Cartera get carteraSelect => _carteraSelect;
+  set carteraSelect(Cartera cartera) {
+    _carteraSelect = cartera;
+    notifyListeners();
+  }
+
+  Fondo? _fondoSelect;
+  Fondo? get fondoSelect => _fondoSelect;
+  set fondoSelect(Fondo? fondo) {
+    _fondoSelect = fondo;
+    notifyListeners();
+  }
+
+  /* CARTERAS */
   List<Cartera> _carteras = [];
-
   List<Cartera> get carteras => _carteras;
-
   set carteras(List<Cartera> carteras) {
     _carteras = carteras;
     notifyListeners();
@@ -56,15 +70,25 @@ class CarteraProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /* FONDOS */
+  List<Fondo> _fondos = [];
+  List<Fondo> get fondos => _fondos;
+  set fondos(List<Fondo> fondos) {
+    _fondos = fondos;
+    notifyListeners();
+  }
+
   void addFondo(Cartera cartera, Fondo fondo) {
     final index = _carteras.indexWhere((c) => c.id == cartera.id);
     if (index != -1) {
-      final indexIsin = _carteras[index].fondos!.indexWhere((f) => f.isin == fondo.isin);
-      if (indexIsin == -1) {
-        _carteras[index].fondos!.add(fondo);
+      if (cartera.fondos != null) {
+        final indexIsin = cartera.fondos?.indexWhere((f) => f.isin == fondo.isin);
+        if (indexIsin == -1) {
+          cartera.fondos!.add(fondo);
+          notifyListeners();
+        }
       }
     }
-    notifyListeners();
   }
 
   void addFondos(Cartera cartera, List<Fondo> fondos) {
@@ -76,10 +100,12 @@ class CarteraProvider with ChangeNotifier {
   void updateFondo(Cartera cartera, Fondo fondo) {
     final index = _carteras.indexWhere((c) => c.id == cartera.id);
     if (index != -1) {
-      final indexIsin = _carteras[index].fondos!.indexWhere((f) => f.isin == fondo.isin);
-      if (indexIsin != -1) {
-        _carteras[index].fondos![indexIsin] = fondo;
-        notifyListeners();
+      if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
+        final indexIsin = cartera.fondos!.indexWhere((f) => f.isin == fondo.isin);
+        if (indexIsin != -1) {
+          cartera.fondos![indexIsin] = fondo;
+          notifyListeners();
+        }
       }
     }
   }
@@ -103,12 +129,17 @@ class CarteraProvider with ChangeNotifier {
   }
 
   void sortFondos(Cartera cartera) {
-    cartera.fondos!.sort((a, b) => a.name.compareTo(b.name));
-    notifyListeners();
+    if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
+      cartera.fondos!.sort((a, b) => a.name.compareTo(b.name));
+      notifyListeners();
+    }
   }
 
   void removeFondo(Cartera cartera, Fondo fondo) {
-    cartera.fondos!.remove(fondo);
+    /*if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
+      cartera.fondos!.remove(fondo);
+    }*/
+    _fondos.remove(fondo);
     notifyListeners();
   }
 
@@ -118,10 +149,12 @@ class CarteraProvider with ChangeNotifier {
   }
 
   void removeAllFondos(Cartera cartera) {
-    cartera.fondos!.clear();
+    //cartera.fondos!.clear();
+    _fondos.clear();
     notifyListeners();
   }
 
+  /* VALORES */
   void addValor(Cartera cartera, Fondo fondo, Valor valor) {
     final index = _carteras.indexWhere((c) => c.id == cartera.id);
     if (index != -1) {
