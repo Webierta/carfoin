@@ -7,9 +7,7 @@ import '../models/cartera_provider.dart';
 import '../routes.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
-import '../utils/konstantes.dart';
 import '../widgets/loading_progress.dart';
-import '../widgets/my_drawer.dart';
 
 enum MenuCartera { ordenar, eliminar }
 
@@ -168,8 +166,7 @@ class _PageCarteraState extends State<PageCartera> {
                 _buildSpeedDialChild(context,
                     icono: Icons.search,
                     label: 'Buscar online por ISIN',
-                    //page: RouteGenerator.inputFondo),
-                    page: RouteGenerator.searchFondo),
+                    page: RouteGenerator.inputFondo),
                 _buildSpeedDialChild(context,
                     icono: Icons.storage,
                     label: 'Base de Datos local',
@@ -215,8 +212,7 @@ class _PageCarteraState extends State<PageCartera> {
                           onTap: () {
                             ScaffoldMessenger.of(context).removeCurrentSnackBar();
                             carteraProvider.fondoSelect = fondo;
-
-                            ///Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
+                            Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
                           },
                         ),
                       ),
@@ -236,6 +232,9 @@ class _PageCarteraState extends State<PageCartera> {
   _removeFondo(Fondo fondo) async {
     await database.deleteFondo(carteraSelect, fondo);
     carteraProvider.removeFondo(carteraSelect, fondo);
+
+    /// ???
+    await setFondos(carteraSelect);
   }
 
   _addFondo(Fondo newFondo) async {
@@ -281,6 +280,9 @@ class _PageCarteraState extends State<PageCartera> {
                   onPressed: () async {
                     await database.deleteAllFondos(carteraSelect);
                     carteraProvider.removeAllFondos(carteraSelect);
+
+                    /// ???
+                    await setFondos(carteraSelect);
                     _pop();
                   },
                   child: const Text('ACEPTAR'),

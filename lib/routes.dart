@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'pages/page_about.dart';
 import 'pages/page_cartera.dart';
+import 'pages/page_fondo.dart';
 import 'pages/page_home.dart';
 import 'pages/page_info.dart';
 import 'pages/page_input_fondo.dart';
@@ -26,12 +27,12 @@ class RouteGenerator {
         return AnimatedRoute(const PageHome());
       case carteraPage:
         return AnimatedRoute(const PageCartera());
-      //case fondoPage:
-      //return AnimatedRoute(const PageFondo());
+      case fondoPage:
+        return AnimatedRoute(const PageFondo());
       case searchFondo:
         return AnimatedRoute(const PageSearchFondo());
-      /*case inputFondo:
-        return AnimatedRoute(const PageInputFondo());*/
+      case inputFondo:
+        return AnimatedRoute(const PageInputFondo());
       /*case inputRange:
         return AnimatedRoute(const PageInputRange());
       case mercadoPage:

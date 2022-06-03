@@ -58,5 +58,19 @@ class Valor {
   final double precio;
   int? tipo;
   double? participaciones;
-  Valor({required this.date, required this.precio, this.tipo, this.participaciones});
+
+  Valor({required this.date, required this.precio, this.tipo, this.participaciones}) {
+    tipo ??= -1;
+    participaciones ??= 0;
+  }
+
+  Valor.fromMap(Map<String, dynamic> map)
+      : date = map['date'],
+        precio = map['precio'],
+        tipo = map['tipo'],
+        participaciones = map['participaciones'];
+
+  Map<String, Object?> toDb() {
+    return {'date': date, 'precio': precio, 'tipo': tipo, 'participaciones': participaciones};
+  }
 }

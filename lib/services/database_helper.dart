@@ -128,4 +128,72 @@ class DatabaseHelper {
   }
 
   /* TABLA _CARTERA.ID DE FONDOS */
+
+  Future<void> createTableFondo(Cartera cartera, Fondo fondo) async {
+    Database db = await database;
+    var nameTable = '_${cartera.id}${fondo.isin}';
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS $nameTable (
+        $columnDate INTEGER PRIMARY KEY,
+        $columnPrecio REAL NOT NULL,
+        $columnTipoOperacion INTEGER,
+        $columnParticipaciones REAL)
+      ''');
+  }
+
+  Future<void> insertValor(Cartera cartera, Fondo fondo, Valor valor) async {
+    Database db = await database;
+    var nameTable = '_${cartera.id}${fondo.isin}';
+    await db.insert(nameTable, valor.toDb());
+  }
+
+  Future<List<Valor>> getValores(Cartera cartera, Fondo fondo) async {
+    Database db = await database;
+    var nameTable = '_${cartera.id}${fondo.isin}';
+    final List<Map<String, dynamic>> query = await db.query(nameTable, orderBy: '$columnDate DESC');
+    return query.map((e) => Valor.fromMap(e)).toList();
+  }
+
+  Future<List<Valor>> getOperaciones(Cartera cartera, Fondo fondo) async {
+    Database db = await database;
+    var nameTable = '_${cartera.id}${fondo.isin}';
+    final List<Map<String, dynamic>> query = await db.query(nameTable,
+        orderBy: '$columnDate ASC', where: '$columnTipoOperacion IN (?, ?)', whereArgs: [1, 0]);
+    return query.map((e) => Valor.fromMap(e)).toList();
+  }
+
+  Future<void> updateValor(Cartera cartera, Fondo fondo, Valor valor) async {
+    Database db = await database;
+    var nameTable = '_${cartera.id}${fondo.isin}';
+    await db.update(nameTable, valor.toDb(), where: '$columnDate = ?', whereArgs: [valor.date]);
+  }
+
+  Future<void> deleteValor(Cartera cartera, Fondo fondo, Valor valor) async {
+    Database db = await database;
+    var nameTable = '_${cartera.id}${fondo.isin}';
+    await db.delete(nameTable, where: '$columnDate = ?', whereArgs: [valor.date]);
+  }
+
+  Future<void> deleteValorByDate(Cartera cartera, Fondo fondo, int date) async {
+    Database db = await database;
+    var nameTable = '_${cartera.id}${fondo.isin}';
+    await db.delete(nameTable, where: '$columnDate = ?', whereArgs: [date]);
+  }
+
+  Future<void> deleteAllValores(Cartera cartera, Fondo fondo) async {
+    Database db = await database;
+    var nameTable = '_${cartera.id}${fondo.isin}';
+    await db.delete(nameTable);
+  }
+
+  Future<void> deleteOperacion(Cartera cartera, Fondo fondo, Valor op) async {
+    Valor newValor = Valor(date: op.date, precio: op.precio, tipo: null, participaciones: null);
+    await updateValor(cartera, fondo, newValor);
+  }
+
+  Future<void> deleteAllOperaciones(Cartera cartera, Fondo fondo) async {
+    Database db = await database;
+    var nameTable = '_${cartera.id}${fondo.isin}';
+    await db.delete(nameTable, where: '$columnTipoOperacion IN (?, ?)', whereArgs: [1, 0]);
+  }
 }

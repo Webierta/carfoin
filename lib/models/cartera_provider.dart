@@ -13,9 +13,9 @@ class CarteraProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Fondo? _fondoSelect;
-  Fondo? get fondoSelect => _fondoSelect;
-  set fondoSelect(Fondo? fondo) {
+  late Fondo _fondoSelect;
+  Fondo get fondoSelect => _fondoSelect;
+  set fondoSelect(Fondo fondo) {
     _fondoSelect = fondo;
     notifyListeners();
   }
@@ -51,8 +51,10 @@ class CarteraProvider with ChangeNotifier {
   }
 
   void sortCarteras() {
-    _carteras.sort((a, b) => a.name.compareTo(b.name));
-    notifyListeners();
+    if (_carteras.length > 1) {
+      _carteras.sort((a, b) => a.name.compareTo(b.name));
+      notifyListeners();
+    }
   }
 
   void removeCartera(Cartera cartera) {
@@ -129,7 +131,7 @@ class CarteraProvider with ChangeNotifier {
   }
 
   void sortFondos(Cartera cartera) {
-    if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
+    if (cartera.fondos != null && cartera.fondos!.length > 1) {
       cartera.fondos!.sort((a, b) => a.name.compareTo(b.name));
       notifyListeners();
     }
@@ -155,18 +157,38 @@ class CarteraProvider with ChangeNotifier {
   }
 
   /* VALORES */
+  List<Valor> _valores = [];
+  List<Valor> get valores => _valores;
+  set valores(List<Valor> valores) {
+    _valores = valores;
+    notifyListeners();
+  }
+
+  List<Valor> _operaciones = [];
+  List<Valor> get operaciones => _operaciones;
+  set operaciones(List<Valor> operaciones) {
+    _operaciones = operaciones;
+    notifyListeners();
+  }
+
   void addValor(Cartera cartera, Fondo fondo, Valor valor) {
     final index = _carteras.indexWhere((c) => c.id == cartera.id);
     if (index != -1) {
-      final indexIsin = _carteras[index].fondos!.indexWhere((f) => f.isin == fondo.isin);
-      if (indexIsin != -1) {
-        final indexDate =
-            _carteras[index].fondos![indexIsin].valores!.indexWhere((v) => v.date == valor.date);
-        if (indexDate == -1) {
-          _carteras[index].fondos![indexIsin].valores!.add(valor);
-          sortValores(fondo);
-          calculaIndices(fondo);
-          notifyListeners();
+      if (cartera.fondos != null) {
+        final indexIsin = _carteras[index].fondos!.indexWhere((f) => f.isin == fondo.isin);
+        if (indexIsin != -1) {
+          if (cartera.fondos![indexIsin].valores != null) {
+            final indexDate = _carteras[index]
+                .fondos![indexIsin]
+                .valores!
+                .indexWhere((v) => v.date == valor.date);
+            if (indexDate == -1) {
+              _carteras[index].fondos![indexIsin].valores!.add(valor);
+              sortValores(fondo);
+              calculaIndices(fondo);
+              notifyListeners();
+            }
+          }
         }
       }
     }
@@ -181,15 +203,21 @@ class CarteraProvider with ChangeNotifier {
   void updateValor(Cartera cartera, Fondo fondo, Valor valor) {
     final index = _carteras.indexWhere((c) => c.id == cartera.id);
     if (index != -1) {
-      final indexIsin = _carteras[index].fondos!.indexWhere((f) => f.isin == fondo.isin);
-      if (indexIsin != -1) {
-        final indexDate =
-            _carteras[index].fondos![indexIsin].valores!.indexWhere((v) => v.date == valor.date);
-        if (indexDate != -1) {
-          _carteras[index].fondos![indexIsin].valores![indexDate] = valor;
-          sortValores(fondo);
-          calculaIndices(fondo);
-          notifyListeners();
+      if (cartera.fondos != null) {
+        final indexIsin = _carteras[index].fondos!.indexWhere((f) => f.isin == fondo.isin);
+        if (indexIsin != -1) {
+          if (cartera.fondos![indexIsin].valores != null) {
+            final indexDate = _carteras[index]
+                .fondos![indexIsin]
+                .valores!
+                .indexWhere((v) => v.date == valor.date);
+            if (indexDate != -1) {
+              _carteras[index].fondos![indexIsin].valores![indexDate] = valor;
+              sortValores(fondo);
+              calculaIndices(fondo);
+              notifyListeners();
+            }
+          }
         }
       }
     }
@@ -214,12 +242,16 @@ class CarteraProvider with ChangeNotifier {
   }
 
   void sortValores(Fondo fondo) {
-    fondo.valores!.sort((a, b) => b.date.compareTo(a.date));
-    notifyListeners();
+    if (fondo.valores != null && fondo.valores!.length > 1) {
+      fondo.valores!.sort((a, b) => b.date.compareTo(a.date));
+      notifyListeners();
+    }
   }
 
   void removeValor(Fondo fondo, Valor valor) {
-    fondo.valores!.remove(valor);
+    //fondo.valores!.remove(valor);
+    //calculaIndices(fondo);
+    _valores.remove(valor);
     calculaIndices(fondo);
     notifyListeners();
   }
@@ -230,12 +262,26 @@ class CarteraProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void removeAllValores(Fondo fondo) {
-    fondo.valores!.clear();
+  void removeOperacion(Fondo fondo, Valor valor) {
+    _operaciones.remove(valor);
     calculaIndices(fondo);
     notifyListeners();
   }
 
+  void removeAllValores(Fondo fondo) {
+    //fondo.valores!.clear();
+    _valores.clear();
+    calculaIndices(fondo);
+    notifyListeners();
+  }
+
+  void removeAllOperaciones(Fondo fondo) {
+    _operaciones.clear();
+    calculaIndices(fondo);
+    notifyListeners();
+  }
+
+  // TODO: cambiar fondo.valores por _valores
   void calculaStats(Fondo fondo) {
     int? dateMinimo;
     int? dateMaximo;

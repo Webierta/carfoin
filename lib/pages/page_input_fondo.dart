@@ -1,4 +1,3 @@
-/****
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -38,7 +37,7 @@ class _PageInputFondoState extends State<PageInputFondo> {
 
   @override
   Widget build(BuildContext context) {
-    var carteraOn = context.read<CarteraProvider>().carteraOn!;
+    Cartera carteraSelect = context.read<CarteraProvider>().carteraSelect;
     return Scaffold(
       appBar: AppBar(title: const Text('Añadir Fondo')),
       body: ListView(
@@ -58,7 +57,7 @@ class _PageInputFondoState extends State<PageInputFondo> {
                     child: Chip(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       avatar: const Icon(Icons.business_center),
-                      label: Text(carteraOn.name),
+                      label: Text(carteraSelect.name),
                     ),
                   ),
                 ),
@@ -236,5 +235,3 @@ class _PageInputFondoState extends State<PageInputFondo> {
     }
   }
 }
-
- ***/
