@@ -39,7 +39,15 @@ class _PageCarteraState extends State<PageCartera> {
   setFondos(Cartera cartera) async {
     carteraProvider.fondos = await database.getFondos(cartera, byOrder: _isFondosByOrder);
     //carteraProvider.addFondos(cartera, carteraProvider.fondos);
+    /// ????
     carteraSelect.fondos = carteraProvider.fondos;
+    for (var fondo in carteraProvider.fondos) {
+      await database.createTableFondo(cartera, fondo).whenComplete(() async {
+        carteraProvider.valores = await database.getValores(cartera, fondo);
+        fondo.valores = carteraProvider.valores;
+        carteraProvider.operaciones = await database.getOperaciones(cartera, fondo);
+      });
+    }
   }
 
   @override

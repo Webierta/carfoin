@@ -20,6 +20,20 @@ class CarteraProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  late List<Valor> _valoresSelect;
+  List<Valor> get valoresSelect => _valoresSelect;
+  set valoresSelect(List<Valor> valores) {
+    _valoresSelect = valores;
+    notifyListeners();
+  }
+
+  late List<Valor> _operacionesSelect;
+  List<Valor> get operacionesSelect => _operacionesSelect;
+  set operacionesSelect(List<Valor> valores) {
+    _operacionesSelect = valores;
+    notifyListeners();
+  }
+
   /* CARTERAS */
   List<Cartera> _carteras = [];
   List<Cartera> get carteras => _carteras;
@@ -281,7 +295,7 @@ class CarteraProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // TODO: cambiar fondo.valores por _valores
+  // TODO: cambiar fondo.valores por _valores ??
   void calculaStats(Fondo fondo) {
     int? dateMinimo;
     int? dateMaximo;

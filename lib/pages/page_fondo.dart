@@ -8,39 +8,53 @@ import '../routes.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../utils/fecha_util.dart';
+import '../widgets/grafico_fondo.dart';
 import '../widgets/loading_progress.dart';
+import '../widgets/main_fondo.dart';
+import '../widgets/tabla_fondo.dart';
 
 enum Menu { editar, suscribir, reembolsar, eliminar, exportar }
 
 class PageFondo extends StatefulWidget {
   const PageFondo({Key? key}) : super(key: key);
-
   @override
   State<PageFondo> createState() => _PageFondoState();
 }
 
-class _PageFondoState extends State<PageFondo> {
+class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMixin {
   DatabaseHelper database = DatabaseHelper();
   late CarteraProvider carteraProvider;
   late Cartera carteraSelect;
   late Fondo fondoSelect;
+  late List<Valor> valoresSelect;
+  late List<Valor> operacionesSelect;
   late ApiService apiService;
   late TabController _tabController;
 
   setValores(Cartera cartera, Fondo fondo) async {
     carteraProvider.valores = await database.getValores(cartera, fondo);
-  }
+    fondo.valores = carteraProvider.valores;
+    valoresSelect = carteraProvider.valores;
 
-  setOperaciones(Cartera cartera, Fondo fondo) async {
     carteraProvider.operaciones = await database.getOperaciones(cartera, fondo);
+    operacionesSelect = carteraProvider.operaciones;
   }
 
   @override
   void initState() {
-    //_tabController = TabController(vsync: this, length: 3);
+    _tabController = TabController(vsync: this, length: 3);
     carteraProvider = context.read<CarteraProvider>();
     carteraSelect = carteraProvider.carteraSelect;
     fondoSelect = carteraProvider.fondoSelect;
+
+    //valoresSelect = [];
+    //operacionesSelect = [];
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      database.createTableFondo(carteraSelect, fondoSelect).whenComplete(() async {
+        await setValores(carteraSelect, fondoSelect);
+      });
+    });
     apiService = ApiService();
     super.initState();
   }
@@ -91,6 +105,14 @@ class _PageFondoState extends State<PageFondo> {
         if (snapshot.connectionState == ConnectionState.done) {
           return Scaffold(
             appBar: AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  // TODO: set carteraOn antes de navigator??
+                  Navigator.of(context).pushNamed(RouteGenerator.carteraPage, arguments: true);
+                },
+              ),
               title: Chip(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 backgroundColor: const Color(0xFF0D47A1),
@@ -132,10 +154,10 @@ class _PageFondoState extends State<PageFondo> {
                 ),
               ],
             ),
-            /*body: TabBarView(
+            body: TabBarView(
               controller: _tabController,
-              children: const [MainFondo(), TablaFondo(), GraficoChart()],
-            ),*/
+              children: const [MainFondo(), TablaFondo(), GraficoFondo()],
+            ),
             bottomNavigationBar: BottomAppBar(
               color: const Color(0xFF0D47A1),
               shape: const CircularNotchedRectangle(),

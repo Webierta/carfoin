@@ -1,3 +1,4 @@
+import 'package:carfoin/pages/page_mercado.dart';
 import 'package:flutter/material.dart';
 
 import 'pages/page_about.dart';
@@ -6,6 +7,7 @@ import 'pages/page_fondo.dart';
 import 'pages/page_home.dart';
 import 'pages/page_info.dart';
 import 'pages/page_input_fondo.dart';
+import 'pages/page_input_range.dart';
 import 'pages/page_search_fondo.dart';
 import 'pages/page_settings.dart';
 
@@ -33,10 +35,10 @@ class RouteGenerator {
         return AnimatedRoute(const PageSearchFondo());
       case inputFondo:
         return AnimatedRoute(const PageInputFondo());
-      /*case inputRange:
+      case inputRange:
         return AnimatedRoute(const PageInputRange());
       case mercadoPage:
-        return AnimatedRoute(const PageMercado());*/
+        return AnimatedRoute(const PageMercado());
       case infoPage:
         return AnimatedRoute(const PageInfo());
       case aboutPage:
