@@ -170,14 +170,28 @@ class _MainFondoState extends State<MainFondo> {
               children: [
                 ListTile(
                   //contentPadding: const EdgeInsets.all(10),
-                  leading: const Icon(Icons.assessment, size: 32, color: Color(0xFF0D47A1)),
+                  //leading: const Icon(Icons.assessment, size: 32, color: Color(0xFF0D47A1)),
                   title: Text(
                     fondoSelect.name,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  subtitle: Text(
-                    fondoSelect.isin,
-                    style: Theme.of(context).textTheme.titleMedium,
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        fondoSelect.isin,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      Chip(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        backgroundColor: const Color(0xFF0D47A1),
+                        avatar: const Icon(Icons.business_center, color: Color(0xFFFFFFFF)),
+                        label: Text(
+                          carteraSelect.name,
+                          style: const TextStyle(color: Color(0xFFFFFFFF)),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 valores.isEmpty

@@ -110,15 +110,16 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
                 onPressed: () {
                   ScaffoldMessenger.of(context).removeCurrentSnackBar();
                   // TODO: set carteraOn antes de navigator??
-                  Navigator.of(context).pushNamed(RouteGenerator.carteraPage, arguments: true);
+                  //Navigator.of(context).pushNamed(RouteGenerator.carteraPage, arguments: true);
+                  Navigator.of(context).pushNamed(RouteGenerator.carteraPage);
                 },
               ),
               title: Chip(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 backgroundColor: const Color(0xFF0D47A1),
-                avatar: const Icon(Icons.business_center),
+                avatar: const Icon(Icons.poll),
                 label: Text(
-                  carteraSelect.name,
+                  fondoSelect.name,
                   style: const TextStyle(color: Color(0xFFFFFFFF)),
                 ),
               ),

@@ -119,13 +119,13 @@ class _PageCarteraState extends State<PageCartera> {
         if (snapshot.connectionState == ConnectionState.done) {
           return Scaffold(
             appBar: AppBar(
-              /*leading: IconButton(
+              leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () {
                   ScaffoldMessenger.of(context).removeCurrentSnackBar();
                   Navigator.of(context).pushNamed(RouteGenerator.homePage);
                 },
-              ),*/
+              ),
               title: Chip(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 backgroundColor: const Color(0xFF0D47A1),
@@ -207,7 +207,7 @@ class _PageCarteraState extends State<PageCartera> {
                       },
                       child: Card(
                         child: ListTile(
-                          leading: const Icon(Icons.assessment, size: 32),
+                          leading: const Icon(Icons.assessment, size: 32, color: Color(0xFF0D47A1)),
                           title: Text(fondo.name),
                           subtitle: Text(fondo.isin),
                           trailing: Column(
