@@ -16,7 +16,6 @@ enum MenuCartera { ordenar, eliminar }
 
 class PageCartera extends StatefulWidget {
   const PageCartera({Key? key}) : super(key: key);
-
   @override
   State<PageCartera> createState() => _PageCarteraState();
 }
@@ -376,15 +375,7 @@ class _PageCarteraState extends State<PageCartera> {
         );
       },
     );
-  }
-
-  _removeFondo(Fondo fondo) async {
-    await database.deleteFondo(carteraSelect, fondo);
-    carteraProvider.removeFondo(carteraSelect, fondo);
-
-    /// ???
-    await setFondos(carteraSelect);
-  }
+  }  
 
   _getDataApi(Fondo fondo) async {
     //await carfoin.createTableFondo(fondo);
@@ -439,6 +430,14 @@ class _PageCarteraState extends State<PageCartera> {
         _showMsg(msg: 'Fondo añadido');
       }
     }
+  }
+  
+  _removeFondo(Fondo fondo) async {
+    await database.deleteFondo(carteraSelect, fondo);
+    carteraProvider.removeFondo(carteraSelect, fondo);
+
+    /// ???
+    await setFondos(carteraSelect);
   }
 
   void _deleteAllConfirm(BuildContext context) {

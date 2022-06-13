@@ -1,11 +1,14 @@
 class Cartera {
   final int? id;
-  final String name;
+  String name;
   List<Fondo>? fondos;
 
   Cartera({this.id, required this.name, this.fondos}) {
     fondos ??= [];
   }
+
+  //List<Fondo> fondos;
+  //Cartera({this.id, required this.name, this.fondos = []});
 
   Cartera.fromMap(Map<String, dynamic> map)
       : id = map['id'],

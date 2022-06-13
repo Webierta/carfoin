@@ -9,7 +9,7 @@ import '../services/preferences_service.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/my_drawer.dart';
 
-enum Menu { renombrar, ordenar, exportar, eliminar }
+enum Menu { ordenar, exportar, eliminar }
 
 class PageHome extends StatefulWidget {
   const PageHome({Key? key}) : super(key: key);
@@ -130,9 +130,7 @@ class _PageHomeState extends State<PageHome> {
                   ],
                   onSelected: (item) async {
                     //TODO: ACCIONES PENDIENTES
-                    if (item == Menu.renombrar) {
-                      print('RENAME');
-                    } else if (item == Menu.ordenar) {
+                    if (item == Menu.ordenar) {
                       _ordenarCarteras();
                     } else if (item == Menu.exportar) {
                       print('EXPORTAR');
@@ -221,6 +219,7 @@ class _PageHomeState extends State<PageHome> {
                             onSelected: (value) {
                               if (value == 1) {
                                 print('RENOMBRAR');
+                                _carteraInput(context, cartera: cartera);
                               } else if (value == 2) {
                                 _deleteCartera(cartera);
                               }
@@ -258,7 +257,8 @@ class _PageHomeState extends State<PageHome> {
     }
   }
 
-  Future<void> _carteraInput(BuildContext context) async {
+  Future<void> _carteraInput(BuildContext context, {Cartera? cartera}) async {
+    String title = cartera?.name ?? 'Nueva Cartera';
     return showDialog(
         context: context,
         builder: (context) {
@@ -268,7 +268,7 @@ class _PageHomeState extends State<PageHome> {
                 builder: (context, TextEditingValue value, __) {
                   return SingleChildScrollView(
                     child: AlertDialog(
-                      title: const Text('Nueva Cartera'),
+                      title: Text(title),
                       content: TextField(
                         controller: _controller,
                         decoration: InputDecoration(
@@ -286,7 +286,10 @@ class _PageHomeState extends State<PageHome> {
                           },
                         ),
                         ElevatedButton(
-                          onPressed: _controller.value.text.trim().isNotEmpty ? _submit : null,
+                          //onPressed: _controller.value.text.trim().isNotEmpty ? _submit : null,
+                          onPressed: () {
+                            _controller.value.text.trim().isNotEmpty ? _submit(cartera) : null;
+                          },
                           child: const Text('ACEPTAR'),
                         ),
                       ],
@@ -308,7 +311,7 @@ class _PageHomeState extends State<PageHome> {
     return null;
   }
 
-  void _submit() async {
+  void _submit(Cartera? cartera) async {
     if (_errorText == null) {
       var input = _controller.value.text.trim();
       var existe = [for (var cartera in carteraProvider.carteras) cartera.name].contains(input);
@@ -316,6 +319,14 @@ class _PageHomeState extends State<PageHome> {
         _controller.clear();
         _pop();
         _showMsg(msg: 'Ya existe una cartera con ese nombre.', color: Colors.red);
+      } else if (cartera != null) {
+        print('RENAME RENAME');
+        print('${cartera.id}');
+        cartera.name = input;
+        await database.updateCartera(cartera);
+        await setCarteras();
+        _controller.clear();
+        _pop();
       } else {
         Cartera cartera = Cartera(name: input);
         await database.insertCartera(cartera);

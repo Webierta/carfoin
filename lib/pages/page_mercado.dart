@@ -37,6 +37,7 @@ class _MercadoState extends State<PageMercado> {
   @override
   void initState() {
     carteraProvider = context.read<CarteraProvider>();
+    // mejor? => carteraSelect = carteraProvider.carteraSelect;
     carteraSelect = context.read<CarteraProvider>().carteraSelect;
     fondoSelect = context.read<CarteraProvider>().fondoSelect;
     WidgetsBinding.instance.addPostFrameCallback((_) async {

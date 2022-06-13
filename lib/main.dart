@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
       ],
       supportedLocales: const [Locale('es', 'ES')],
       debugShowCheckedModeBanner: false,
-      title: 'Cartera Fondos',
+      title: 'Carfoin',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,

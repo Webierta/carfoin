@@ -14,7 +14,6 @@ import '../utils/stats.dart';
 
 class MainFondo extends StatefulWidget {
   const MainFondo({Key? key}) : super(key: key);
-
   @override
   State<MainFondo> createState() => _MainFondoState();
 }
@@ -168,19 +167,15 @@ class _MainFondoState extends State<MainFondo> {
           DataRow(cells: [
             DataCell(Align(
               alignment: Alignment.centerRight,
-              child:
-                  Text(FechaUtil.epochToString(op.date, formato: 'dd/MM/yy')),
+              child: Text(FechaUtil.epochToString(op.date, formato: 'dd/MM/yy')),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
-                NumberFormat.decimalPattern('es').format(op.tipo == 1
-                    ? op.participaciones
-                    : (op.participaciones ?? 0) * -1),
+                NumberFormat.decimalPattern('es')
+                    .format(op.tipo == 1 ? op.participaciones : (op.participaciones ?? 0) * -1),
                 style: TextStyle(
-                  color: op.tipo == 1
-                      ? const Color(0xFF4CAF50)
-                      : const Color(0xFFF44336),
+                  color: op.tipo == 1 ? const Color(0xFF4CAF50) : const Color(0xFFF44336),
                 ),
               ),
             )),
@@ -190,8 +185,8 @@ class _MainFondoState extends State<MainFondo> {
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
-              child: Text(NumberFormat.decimalPattern('es').format(double.parse(
-                  ((op.participaciones ?? 0) * op.precio).toStringAsFixed(2)))),
+              child: Text(NumberFormat.decimalPattern('es').format(
+                  double.parse(((op.participaciones ?? 0) * op.precio).toStringAsFixed(2)))),
             )),
             DataCell(IconButton(
               onPressed: () async {
@@ -200,8 +195,7 @@ class _MainFondoState extends State<MainFondo> {
                   // TODO: AÑADIR OPCION AL MENU
                   print('OPEN DIALOGO CONFIRMAR');
                 } else {
-                  await database.deleteOperacion(
-                      carteraSelect, fondoSelect, op);
+                  await database.deleteOperacion(carteraSelect, fondoSelect, op);
                   carteraProvider.removeOperacion(fondoSelect, op);
                   await setValores(carteraSelect, fondoSelect);
                 }
@@ -215,10 +209,8 @@ class _MainFondoState extends State<MainFondo> {
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
-                FechaUtil.epochToString(valores.first.date,
-                    formato: 'dd/MM/yy'),
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                FechaUtil.epochToString(valores.first.date, formato: 'dd/MM/yy'),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
               ),
             )),
             DataCell(Align(
@@ -226,18 +218,15 @@ class _MainFondoState extends State<MainFondo> {
               child: Text(
                 /* NumberFormat.decimalPattern('es')
                     .format(fondoSelect.totalParticipaciones ?? 0), */
-                NumberFormat.decimalPattern('es')
-                    .format(stats.totalParticipaciones()),
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                NumberFormat.decimalPattern('es').format(stats.totalParticipaciones()),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
               ),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
                 NumberFormat.decimalPattern('es').format(valores.first.precio),
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
               ),
             )),
             DataCell(Align(
@@ -248,8 +237,7 @@ class _MainFondoState extends State<MainFondo> {
                         double.parse(fondoSelect.resultado!.toStringAsFixed(2)))
                     : '0.0', */
                 NumberFormat.decimalPattern('es').format(stats.resultado()),
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
               ),
             )),
             const DataCell(Text('')),
@@ -284,8 +272,7 @@ class _MainFondoState extends State<MainFondo> {
                       Chip(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         backgroundColor: const Color(0xFF0D47A1),
-                        avatar: const Icon(Icons.business_center,
-                            color: Color(0xFFFFFFFF)),
+                        avatar: const Icon(Icons.business_center, color: Color(0xFFFFFFFF)),
                         label: Text(
                           carteraSelect.name,
                           style: const TextStyle(color: Color(0xFFFFFFFF)),
@@ -300,8 +287,7 @@ class _MainFondoState extends State<MainFondo> {
                     : Container(
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
-                          border: Border.all(
-                              color: const Color(0xFF0D47A1), width: 2),
+                          border: Border.all(color: const Color(0xFF0D47A1), width: 2),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(
@@ -336,17 +322,14 @@ class _MainFondoState extends State<MainFondo> {
                         children: [
                           Row(
                             children: [
-                              const Text('Mínimo',
-                                  style: TextStyle(fontSize: 16)),
+                              const Text('Mínimo', style: TextStyle(fontSize: 16)),
                               const Spacer(),
                               /* Text(
                                   FechaUtil.epochToString(
                                       fondoSelect.dateMinimo!,
                                       formato: 'dd/MM/yy'),
                                   style: const TextStyle(fontSize: 16)), */
-                              Text(
-                                  FechaUtil.epochToString(valores.last.date,
-                                      formato: 'dd/MM/yy'),
+                              Text(FechaUtil.epochToString(valores.last.date, formato: 'dd/MM/yy'),
                                   style: const TextStyle(fontSize: 16)),
                               const Spacer(),
                               /* Text(
@@ -356,9 +339,7 @@ class _MainFondoState extends State<MainFondo> {
                                     : '',
                                 style: const TextStyle(fontSize: 16),
                               ), */
-                              Text(
-                                  NumberFormat.decimalPattern('es')
-                                      .format(valores.last.precio),
+                              Text(NumberFormat.decimalPattern('es').format(valores.last.precio),
                                   style: const TextStyle(fontSize: 16)),
                               /* Text(
                                   NumberFormat.decimalPattern('es')
@@ -369,17 +350,14 @@ class _MainFondoState extends State<MainFondo> {
                           const SizedBox(height: 10),
                           Row(
                             children: [
-                              const Text('Máximo',
-                                  style: TextStyle(fontSize: 16)),
+                              const Text('Máximo', style: TextStyle(fontSize: 16)),
                               const Spacer(),
                               /* Text(
                                   FechaUtil.epochToString(
                                       fondoSelect.dateMaximo!,
                                       formato: 'dd/MM/yy'),
                                   style: const TextStyle(fontSize: 16)), */
-                              Text(
-                                  FechaUtil.epochToString(valores.first.date,
-                                      formato: 'dd/MM/yy'),
+                              Text(FechaUtil.epochToString(valores.first.date, formato: 'dd/MM/yy'),
                                   style: const TextStyle(fontSize: 16)),
                               const Spacer(),
                               /* Text(
@@ -387,9 +365,7 @@ class _MainFondoState extends State<MainFondo> {
                                     .format(fondoSelect.precioMaximo),
                                 style: const TextStyle(fontSize: 16),
                               ), */
-                              Text(
-                                  NumberFormat.decimalPattern('es')
-                                      .format(valores.first.precio),
+                              Text(NumberFormat.decimalPattern('es').format(valores.first.precio),
                                   style: const TextStyle(fontSize: 16)),
                               /* Text(fondoSelect.precioMaximo!.toStringAsFixed(2),
                                   style: const TextStyle(fontSize: 16)), */
@@ -398,8 +374,7 @@ class _MainFondoState extends State<MainFondo> {
                           const SizedBox(height: 10),
                           Row(
                             children: [
-                              const Text('Media',
-                                  style: TextStyle(fontSize: 16)),
+                              const Text('Media', style: TextStyle(fontSize: 16)),
                               const Spacer(),
                               /* Text(
                                 NumberFormat.decimalPattern('es')
@@ -413,17 +388,14 @@ class _MainFondoState extends State<MainFondo> {
                               ), */
                               /* Text(fondoSelect.precioMedio!.toStringAsFixed(2),
                                   style: const TextStyle(fontSize: 16)), */
-                              Text(
-                                  NumberFormat.decimalPattern('es')
-                                      .format(stats.precioMedio()),
+                              Text(NumberFormat.decimalPattern('es').format(stats.precioMedio()),
                                   style: const TextStyle(fontSize: 16)),
                             ],
                           ),
                           const SizedBox(height: 10),
                           Row(
                             children: [
-                              const Text('Volatilidad',
-                                  style: TextStyle(fontSize: 16)),
+                              const Text('Volatilidad', style: TextStyle(fontSize: 16)),
                               const Spacer(),
                               /* Text(
                                 NumberFormat.decimalPattern('es')
@@ -431,8 +403,7 @@ class _MainFondoState extends State<MainFondo> {
                                 style: const TextStyle(fontSize: 16),
                               ), */
                               Text(
-                                NumberFormat.decimalPattern('es')
-                                    .format(stats.volatilidad()),
+                                NumberFormat.decimalPattern('es').format(stats.volatilidad()),
                                 style: const TextStyle(fontSize: 16),
                               ),
                               /* Text(fondoSelect.volatilidad!.toStringAsFixed(2),
@@ -455,17 +426,13 @@ class _MainFondoState extends State<MainFondo> {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.compare_arrows,
-                      size: 32, color: Color(0xFF0D47A1)),
-                  title: Text('OPERACIONES',
-                      style: Theme.of(context).textTheme.titleLarge),
+                  leading: const Icon(Icons.compare_arrows, size: 32, color: Color(0xFF0D47A1)),
+                  title: Text('OPERACIONES', style: Theme.of(context).textTheme.titleLarge),
                   trailing: CircleAvatar(
                     backgroundColor: const Color(0xFFFFC107),
                     child: IconButton(
-                      icon: const Icon(Icons.shopping_cart,
-                          color: Color(0xFF0D47A1)),
-                      onPressed: () => Navigator.of(context)
-                          .pushNamed(RouteGenerator.mercadoPage),
+                      icon: const Icon(Icons.shopping_cart, color: Color(0xFF0D47A1)),
+                      onPressed: () => Navigator.of(context).pushNamed(RouteGenerator.mercadoPage),
                     ),
                   ),
                 ),
@@ -479,23 +446,21 @@ class _MainFondoState extends State<MainFondo> {
                             fit: BoxFit.fill,
                             child: DataTable(
                               decoration: BoxDecoration(
-                                border:
-                                    Border.all(color: Colors.blue, width: 2),
+                                border: Border.all(color: Colors.blue, width: 2),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               //headingRowHeight: 0,
                               columnSpacing: 20,
                               dataRowHeight: 70,
                               //horizontalMargin: 10,
-                              headingRowColor: MaterialStateColor.resolveWith(
-                                  (states) => Colors.blue),
+                              headingRowColor:
+                                  MaterialStateColor.resolveWith((states) => Colors.blue),
                               headingTextStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
-                              dataTextStyle: const TextStyle(
-                                  fontSize: 18, color: Colors.black),
+                              dataTextStyle: const TextStyle(fontSize: 18, color: Colors.black),
                               columns: _createColumns(),
                               rows: _createRows(),
                             ),
@@ -520,13 +485,11 @@ class _MainFondoState extends State<MainFondo> {
                       size: 32,
                       color: Color(0xFF0D47A1),
                     ), // Icons.balance
-                    title: Text('BALANCE',
-                        style: Theme.of(context).textTheme.titleLarge),
+                    title: Text('BALANCE', style: Theme.of(context).textTheme.titleLarge),
                     trailing: Chip(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       backgroundColor: const Color(0xFF0D47A1),
-                      avatar: const Icon(Icons.calendar_today,
-                          size: 20, color: Color(0xFFFFFFFF)),
+                      avatar: const Icon(Icons.calendar_today, size: 20, color: Color(0xFFFFFFFF)),
                       label: Text(
                         FechaUtil.epochToString(
                           valores.first.date,
@@ -545,8 +508,7 @@ class _MainFondoState extends State<MainFondo> {
                         children: [
                           Row(
                             children: [
-                              const Text('Inversión',
-                                  style: TextStyle(fontSize: 16)),
+                              const Text('Inversión', style: TextStyle(fontSize: 16)),
                               const Spacer(),
                               /* Text(
                                   fondoSelect.inversion != null
@@ -559,15 +521,15 @@ class _MainFondoState extends State<MainFondo> {
                                     fontWeight: FontWeight.w900,
                                     fontSize: 16,
                                   )) */
-                              Text(NumberFormat.decimalPattern('es')
-                                  .format(stats.inversion())),
+                              Text(stats.inversion() != null
+                                  ? NumberFormat.decimalPattern('es').format(stats.inversion())
+                                  : ''),
                             ],
                           ),
                           const SizedBox(height: 10),
                           Row(
                             children: [
-                              const Text('Resultado',
-                                  style: TextStyle(fontSize: 16)),
+                              const Text('Resultado', style: TextStyle(fontSize: 16)),
                               const Spacer(),
                               /* Text(
                                   fondoSelect.resultado != null
@@ -580,57 +542,59 @@ class _MainFondoState extends State<MainFondo> {
                                       fontWeight: FontWeight.w900,
                                       fontSize: 16)) */
                               Text(
-                                  NumberFormat.decimalPattern('es')
-                                      .format(stats.resultado()),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 16)),
+                                stats.resultado() != null
+                                    ? NumberFormat.decimalPattern('es').format(stats.resultado())
+                                    : '',
+                                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 10),
                           Row(
                             children: [
-                              const Text('Rendimiento',
-                                  style: TextStyle(fontSize: 16)),
+                              const Text('Rendimiento', style: TextStyle(fontSize: 16)),
                               const Spacer(),
                               Text(
-                                  /* fondoSelect.balance != null
+                                /* fondoSelect.balance != null
                                       ? NumberFormat.decimalPattern('es')
                                           .format(double.parse(fondoSelect
                                               .balance!
                                               .toStringAsFixed(2)))
                                       : '0.0', */
-                                  NumberFormat.decimalPattern('es').format(
-                                      double.parse(
-                                          stats.balance()!.toStringAsFixed(2))),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    color: fondoSelect.balance != null &&
-                                            fondoSelect.balance! < 0
-                                        ? Colors.red
-                                        : Colors.green,
-                                    fontSize: 16,
-                                  ))
+                                stats.balance() != null
+                                    ? NumberFormat.decimalPattern('es')
+                                        .format(double.parse(stats.balance()!.toStringAsFixed(2)))
+                                    : '',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  color: fondoSelect.balance != null && fondoSelect.balance! < 0
+                                      ? Colors.red
+                                      : Colors.green,
+                                  fontSize: 16,
+                                ),
+                              )
                             ],
                           ),
                           const SizedBox(height: 10),
                           Row(
                             children: [
-                              const Text('Rentabilidad',
-                                  style: TextStyle(fontSize: 16)),
+                              const Text('Rentabilidad', style: TextStyle(fontSize: 16)),
                               const Spacer(),
                               Text(
-                                  NumberFormat.decimalPercentPattern(
-                                    locale: 'es',
-                                    decimalDigits: 2,
-                                  ).format(stats.rentabilidad()),
-                                  style: TextStyle(
-                                    color: fondoSelect.rentabilidad != null &&
-                                            fondoSelect.rentabilidad! < 0
-                                        ? Colors.red
-                                        : Colors.green,
-                                    fontSize: 16,
-                                  )),
+                                stats.rentabilidad() != null
+                                    ? NumberFormat.decimalPercentPattern(
+                                        locale: 'es',
+                                        decimalDigits: 2,
+                                      ).format(stats.rentabilidad())
+                                    : '',
+                                style: TextStyle(
+                                  color: fondoSelect.rentabilidad != null &&
+                                          fondoSelect.rentabilidad! < 0
+                                      ? Colors.red
+                                      : Colors.green,
+                                  fontSize: 16,
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 10),
@@ -638,19 +602,19 @@ class _MainFondoState extends State<MainFondo> {
                             children: [
                               const Text('TAE', style: TextStyle(fontSize: 16)),
                               const Spacer(),
-                              FittedBox(
-                                child: Text(
-                                    NumberFormat.decimalPercentPattern(
-                                      locale: 'es',
-                                      decimalDigits: 2,
-                                    ).format(stats.tae()),
-                                    style: TextStyle(
-                                      color: fondoSelect.tae != null &&
-                                              fondoSelect.tae! < 0
-                                          ? Colors.red
-                                          : Colors.green,
-                                      fontSize: 16,
-                                    )),
+                              Text(
+                                stats.tae() != null
+                                    ? NumberFormat.decimalPercentPattern(
+                                        locale: 'es',
+                                        decimalDigits: 2,
+                                      ).format(stats.tae())
+                                    : '',
+                                style: TextStyle(
+                                  color: fondoSelect.tae != null && fondoSelect.tae! < 0
+                                      ? Colors.red
+                                      : Colors.green,
+                                  fontSize: 16,
+                                ),
                               ),
                             ],
                           ),
