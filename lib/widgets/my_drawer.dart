@@ -31,7 +31,10 @@ class MyDrawer extends StatelessWidget {
                           fit: BoxFit.fitWidth,
                           child: Text(
                             'CARFOIN',
-                            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .displaySmall
+                                ?.copyWith(
                                   color: const Color(0xFFFFFFFF),
                                   fontWeight: FontWeight.w100,
                                 ),
@@ -89,7 +92,8 @@ class MyDrawer extends StatelessWidget {
                   title: const Text('Ajustes'),
                   onTap: () {
                     Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed(RouteGenerator.settingsPage);
+                    Navigator.of(context)
+                        .pushNamed(RouteGenerator.settingsPage);
                   },
                 ),
                 const Divider(color: Colors.grey),
@@ -101,7 +105,7 @@ class MyDrawer extends StatelessWidget {
                     Navigator.of(context).pushNamed(RouteGenerator.infoPage);
                   },
                 ),
-                const AboutListTile(
+                /* const AboutListTile(
                   icon: Icon(Icons.code),
                   applicationIcon: Icon(Icons.local_play),
                   applicationName: 'My Cool App',
@@ -111,7 +115,7 @@ class MyDrawer extends StatelessWidget {
                     ///Content goes here...
                   ],
                   child: Text('About app'),
-                ),
+                ), */
                 ListTile(
                   leading: const Icon(Icons.code),
                   title: const Text('About'),
@@ -141,7 +145,8 @@ class MyDrawer extends StatelessWidget {
           const Divider(color: Color(0xFF9E9E9E)),
           Container(
             padding: const EdgeInsets.all(10),
-            child: Text('Versión 1.0.0', style: Theme.of(context).textTheme.labelSmall),
+            child: Text('Versión 1.0.0',
+                style: Theme.of(context).textTheme.labelSmall),
           ),
         ],
       ),

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
 import '../routes.dart';
+import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
+import '../utils/fecha_util.dart';
 import '../widgets/loading_progress.dart';
 
 enum MenuCartera { ordenar, eliminar }
@@ -21,9 +24,12 @@ class PageCartera extends StatefulWidget {
 class _PageCarteraState extends State<PageCartera> {
   bool _isFondosByOrder = true;
   bool _isAutoUpdate = true;
+  late ApiService apiService;
   DatabaseHelper database = DatabaseHelper();
   late CarteraProvider carteraProvider;
   late Cartera carteraSelect;
+  final GlobalKey _dialogKey = GlobalKey();
+  String _loadingText = '';
 
   getSharedPrefs() async {
     bool? isFondosByOrder;
@@ -60,6 +66,7 @@ class _PageCarteraState extends State<PageCartera> {
         await setFondos(carteraSelect);
       });
     });
+    apiService = ApiService();
     super.initState();
   }
 
@@ -139,11 +146,11 @@ class _PageCarteraState extends State<PageCartera> {
                 IconButton(
                   icon: const Icon(Icons.refresh),
                   onPressed: () async {
-                    ///await _dialogUpdateAll(context);
+                    await _dialogUpdateAll(context);
                   },
                 ),
                 PopupMenuButton(
-                  color: Colors.blue,
+                  color: const Color(0xFF2196F3),
                   offset: Offset(0.0, AppBar().preferredSize.height),
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -168,7 +175,7 @@ class _PageCarteraState extends State<PageCartera> {
               backgroundColor: const Color(0xFFFFC107),
               spacing: 8,
               spaceBetweenChildren: 4,
-              overlayColor: Colors.grey,
+              overlayColor: const Color(0xFF9E9E9E),
               overlayOpacity: 0.4,
               children: [
                 _buildSpeedDialChild(context,
@@ -190,16 +197,31 @@ class _PageCarteraState extends State<PageCartera> {
                   itemCount: data.fondos.length,
                   itemBuilder: (context, index) {
                     Fondo fondo = data.fondos[index];
+                    //List<Valor> valores = await database.getValores(carteraSelect, fondo);
+                    //final valores = context.read<CarteraProvider>().valores;
+                    List<Valor>? valores = data.fondos[index].valores;
+                    String lastDate = '';
+                    String lastPrecio = '';
+                    double? diferencia;
+                    if (valores != null && valores.isNotEmpty) {
+                      int lastEpoch = valores.first.date;
+                      lastDate = FechaUtil.epochToString(lastEpoch);
+                      lastPrecio = NumberFormat.decimalPattern('es').format(valores.first.precio);
+                      if (valores.length > 1) {
+                        diferencia = valores.first.precio - valores[1].precio;
+                      }
+                    }
+
                     return Dismissible(
                       key: UniqueKey(),
                       direction: DismissDirection.endToStart,
                       background: Container(
-                        color: Colors.red,
+                        color: const Color(0xFFF44336),
                         margin: const EdgeInsets.symmetric(horizontal: 15),
                         alignment: Alignment.centerRight,
                         child: const Padding(
                           padding: EdgeInsets.all(10.0),
-                          child: Icon(Icons.delete, color: Colors.white),
+                          child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
                         ),
                       ),
                       onDismissed: (_) async {
@@ -211,10 +233,24 @@ class _PageCarteraState extends State<PageCartera> {
                           title: Text(fondo.name),
                           subtitle: Text(fondo.isin),
                           trailing: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Text('${fondo.dateMaximo ?? ''}'),
+                              // lastDate / lastPrecio / diferencia
+                              //Text('${fondo.dateMaximo ?? ''}'),
+                              Text(lastDate),
+                              Text(
+                                lastPrecio,
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              if (diferencia != null)
+                                Text(
+                                  diferencia.toStringAsFixed(2),
+                                  style: TextStyle(
+                                      color: diferencia < 0
+                                          ? const Color(0xFFF44336)
+                                          : const Color(0xFF4CAF50)),
+                                ),
                             ],
                           ),
                           onTap: () {
@@ -237,12 +273,153 @@ class _PageCarteraState extends State<PageCartera> {
     );
   }
 
+  _dialogUpdateAll(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          key: _dialogKey,
+          builder: (context, setState) {
+            // return Dialog(child: Loading(...); ???
+            return Loading(titulo: 'ACTUALIZANDO FONDOS...', subtitulo: _loadingText);
+          },
+        );
+      },
+    );
+    var mapResultados = await _updateAll(context);
+    _pop();
+    mapResultados.isNotEmpty
+        ? await _showResultados(mapResultados)
+        : _showMsg(msg: 'Nada que actualizar');
+  }
+
+  _setStateDialog(String newText) {
+    if (_dialogKey.currentState != null && _dialogKey.currentState!.mounted) {
+      _dialogKey.currentState!.setState(() {
+        _loadingText = newText;
+      });
+    }
+  }
+
+  Future<Map<String, Icon>> _updateAll(BuildContext context) async {
+    //var carteraOn = context.read<CarfoinProvider>().getCartera!;
+    //var fondosOn = carteraOn.fondos;
+
+    var fondosOn = carteraSelect.fondos;
+
+    _setStateDialog('Conectando...');
+    var mapResultados = <String, Icon>{};
+    //await carfoin.getFondosCartera(_isFondosByOrder);
+    //if (carfoin.getFondos.isNotEmpty) {
+    if (fondosOn != null && fondosOn.isNotEmpty) {
+      for (var fondo in fondosOn) {
+        _setStateDialog(fondo.name);
+        //TODO: NECESARIO  createTable ?
+        ///await carfoin.createTableFondo(fondo);
+        await database.createTableFondo(carteraSelect, fondo);
+        final getDataApi = await apiService.getDataApi(fondo.isin);
+        if (getDataApi != null) {
+          var newValor = Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
+          //TODO valor divisa??
+          fondo.divisa = getDataApi.market;
+          // cambiar insertar por update para no duplicar el fondo en la cartera
+          //await carfoin.insertFondoCartera(fondo);
+
+          //await carfoin.updateFondoCartera(fondo);
+          //await carfoin.insertValorFondo(fondo, newValor);
+          await database.updateFondo(carteraSelect, fondo);
+          await database.insertValor(carteraSelect, fondo, newValor);
+          mapResultados[fondo.name] = const Icon(Icons.check_box, color: Colors.green);
+        } else {
+          mapResultados[fondo.name] = const Icon(Icons.disabled_by_default, color: Colors.red);
+        }
+      }
+      //TODO: check si es necesario update (si no ha habido cambios porque todos los fondos han dado error)
+      ///await carfoin.updateFondos(_isFondosByOrder);
+
+      //await carfoin.updateDbCarteras(_isCarterasByOrder);
+      await setFondos(carteraSelect);
+    }
+    return mapResultados;
+  }
+
+  _showResultados(Map<String, Icon> mapResultados) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: AlertDialog(
+            insetPadding: const EdgeInsets.all(10),
+            title: const Text('Resultado'),
+            actions: [
+              TextButton(
+                child: const Text('Cerrar'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+            content: SingleChildScrollView(
+              child: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (var res in mapResultados.entries)
+                      ListTile(dense: true, title: Text(res.key), trailing: res.value),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   _removeFondo(Fondo fondo) async {
     await database.deleteFondo(carteraSelect, fondo);
     carteraProvider.removeFondo(carteraSelect, fondo);
 
     /// ???
     await setFondos(carteraSelect);
+  }
+
+  _getDataApi(Fondo fondo) async {
+    //await carfoin.createTableFondo(fondo);
+    await database.createTableFondo(carteraSelect, fondo);
+    final getDataApi = await apiService.getDataApi(fondo.isin);
+    if (getDataApi != null) {
+      var newValor = Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
+      fondo.divisa = getDataApi.market;
+
+      ///await carfoin.insertFondoCartera(fondo);
+      //await carfoin.updateFondoCartera(fondo);
+      //await carfoin.insertValorFondo(fondo, newValor);
+
+      await database.updateFondo(carteraSelect, fondo);
+      await database.insertValor(carteraSelect, fondo, newValor);
+      await setFondos(carteraSelect);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  _dialogAutoUpdate(BuildContext context, Fondo newFondo) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Loading(titulo: 'FONDO AÑADIDO', subtitulo: 'Cargando último valor...');
+      },
+    );
+    var update = await _getDataApi(newFondo);
+    _pop();
+    update
+        ? _showMsg(msg: 'Fondo actualizado')
+        : _showMsg(msg: 'Error al actualizar el fondo', color: Colors.red);
   }
 
   _addFondo(Fondo newFondo) async {
@@ -255,12 +432,12 @@ class _PageCarteraState extends State<PageCartera> {
     } else {
       await database.insertFondo(carteraSelect, newFondo);
       await setFondos(carteraSelect);
-      /*if (_isAutoUpdate) {
+      if (_isAutoUpdate) {
         if (!mounted) return;
         await _dialogAutoUpdate(context, newFondo);
       } else {
         _showMsg(msg: 'Fondo añadido');
-      }*/
+      }
     }
   }
 

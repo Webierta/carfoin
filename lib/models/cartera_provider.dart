@@ -98,7 +98,8 @@ class CarteraProvider with ChangeNotifier {
     final index = _carteras.indexWhere((c) => c.id == cartera.id);
     if (index != -1) {
       if (cartera.fondos != null) {
-        final indexIsin = cartera.fondos?.indexWhere((f) => f.isin == fondo.isin);
+        final indexIsin =
+            cartera.fondos?.indexWhere((f) => f.isin == fondo.isin);
         if (indexIsin == -1) {
           cartera.fondos!.add(fondo);
           notifyListeners();
@@ -117,7 +118,8 @@ class CarteraProvider with ChangeNotifier {
     final index = _carteras.indexWhere((c) => c.id == cartera.id);
     if (index != -1) {
       if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
-        final indexIsin = cartera.fondos!.indexWhere((f) => f.isin == fondo.isin);
+        final indexIsin =
+            cartera.fondos!.indexWhere((f) => f.isin == fondo.isin);
         if (indexIsin != -1) {
           cartera.fondos![indexIsin] = fondo;
           notifyListeners();
@@ -189,7 +191,8 @@ class CarteraProvider with ChangeNotifier {
     final index = _carteras.indexWhere((c) => c.id == cartera.id);
     if (index != -1) {
       if (cartera.fondos != null) {
-        final indexIsin = _carteras[index].fondos!.indexWhere((f) => f.isin == fondo.isin);
+        final indexIsin =
+            _carteras[index].fondos!.indexWhere((f) => f.isin == fondo.isin);
         if (indexIsin != -1) {
           if (cartera.fondos![indexIsin].valores != null) {
             final indexDate = _carteras[index]
@@ -218,7 +221,8 @@ class CarteraProvider with ChangeNotifier {
     final index = _carteras.indexWhere((c) => c.id == cartera.id);
     if (index != -1) {
       if (cartera.fondos != null) {
-        final indexIsin = _carteras[index].fondos!.indexWhere((f) => f.isin == fondo.isin);
+        final indexIsin =
+            _carteras[index].fondos!.indexWhere((f) => f.isin == fondo.isin);
         if (indexIsin != -1) {
           if (cartera.fondos![indexIsin].valores != null) {
             final indexDate = _carteras[index]
@@ -305,15 +309,16 @@ class CarteraProvider with ChangeNotifier {
     double? volatilidad;
     if (fondo.valores != null && fondo.valores!.isNotEmpty) {
       sortValores(fondo);
-      dateMinimo = fondo.valores!.first.date;
-      dateMaximo = fondo.valores!.last.date;
+      dateMinimo = fondo.valores!.last.date;
+      dateMaximo = fondo.valores!.first.date;
       final List<double> precios = fondo.valores!.map((v) => v.precio).toList();
       precioMinimo = precios.reduce((curr, next) => curr < next ? curr : next);
       precioMaximo = precios.reduce((curr, next) => curr > next ? curr : next);
       precioMedio = precios.reduce((a, b) => a + b) / precios.length;
       var diferencialesCuadrados = 0.0;
       for (var valor in fondo.valores!) {
-        diferencialesCuadrados += (valor.precio - precioMedio) * (valor.precio - precioMedio);
+        diferencialesCuadrados +=
+            (valor.precio - precioMedio) * (valor.precio - precioMedio);
       }
       var varianza = diferencialesCuadrados / fondo.valores!.length;
       volatilidad = sqrt(varianza);
@@ -346,7 +351,9 @@ class CarteraProvider with ChangeNotifier {
 
   void calculaInversion(Fondo fondo) {
     double? inversion;
-    if (fondo.valores != null && fondo.valores!.isNotEmpty && fondo.totalParticipaciones != null) {
+    if (fondo.valores != null &&
+        fondo.valores!.isNotEmpty &&
+        fondo.totalParticipaciones != null) {
       double inv = 0.0;
       for (var valor in fondo.valores!) {
         if (valor.tipo == 1) {
@@ -363,8 +370,12 @@ class CarteraProvider with ChangeNotifier {
 
   void calculaResultado(Fondo fondo) {
     double? resultado;
-    if (fondo.valores != null && fondo.valores!.isNotEmpty && fondo.totalParticipaciones != null) {
+    if (fondo.valores != null &&
+        fondo.valores!.isNotEmpty &&
+        fondo.totalParticipaciones != null) {
       sortValores(fondo);
+      print('RESULTADO');
+      print('${fondo.valores!.first.precio}');
       resultado = fondo.totalParticipaciones! * fondo.valores!.first.precio;
     }
     fondo.resultado = resultado;
@@ -382,7 +393,9 @@ class CarteraProvider with ChangeNotifier {
 
   void calculaRentabilidad(Fondo fondo) {
     double? rentabilidad;
-    if (fondo.balance != null && fondo.inversion != null && fondo.inversion! > 0) {
+    if (fondo.balance != null &&
+        fondo.inversion != null &&
+        fondo.inversion! > 0) {
       rentabilidad = fondo.balance! / fondo.inversion!;
     }
     fondo.rentabilidad = rentabilidad;
@@ -391,7 +404,9 @@ class CarteraProvider with ChangeNotifier {
 
   void calculaTae(Fondo fondo) {
     double? tae;
-    if (fondo.resultado != null && fondo.inversion != null && fondo.inversion! > 0) {
+    if (fondo.resultado != null &&
+        fondo.inversion != null &&
+        fondo.inversion! > 0) {
       sortValores(fondo);
       int? dateFirstOp;
       for (var valor in fondo.valores!.reversed) {

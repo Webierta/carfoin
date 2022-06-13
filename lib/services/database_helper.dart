@@ -144,7 +144,7 @@ class DatabaseHelper {
   Future<void> insertValor(Cartera cartera, Fondo fondo, Valor valor) async {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
-    await db.insert(nameTable, valor.toDb());
+    await db.insert(nameTable, valor.toDb(), conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<Valor>> getValores(Cartera cartera, Fondo fondo) async {
