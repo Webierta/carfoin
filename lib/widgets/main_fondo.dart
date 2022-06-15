@@ -248,7 +248,7 @@ class _MainFondoState extends State<MainFondo> {
 
     return ListView(
       shrinkWrap: true,
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(12),
       children: [
         Card(
           child: Padding(
@@ -256,29 +256,15 @@ class _MainFondoState extends State<MainFondo> {
             child: Column(
               children: [
                 ListTile(
-                  //contentPadding: const EdgeInsets.all(10),
-                  //leading: const Icon(Icons.assessment, size: 32, color: Color(0xFF0D47A1)),
+                  contentPadding: const EdgeInsets.only(bottom: 12, left: 12, right: 12, top: 0),
+                  leading: const Icon(Icons.assessment, size: 32, color: Color(0xFF0D47A1)),
                   title: Text(
                     fondoSelect.name,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        fondoSelect.isin,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      Chip(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        backgroundColor: const Color(0xFF0D47A1),
-                        avatar: const Icon(Icons.business_center, color: Color(0xFFFFFFFF)),
-                        label: Text(
-                          carteraSelect.name,
-                          style: const TextStyle(color: Color(0xFFFFFFFF)),
-                        ),
-                      ),
-                    ],
+                  subtitle: Text(
+                    fondoSelect.isin,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
                 valores.isEmpty
@@ -426,6 +412,7 @@ class _MainFondoState extends State<MainFondo> {
             child: Column(
               children: [
                 ListTile(
+                  contentPadding: const EdgeInsets.all(12),
                   leading: const Icon(Icons.compare_arrows, size: 32, color: Color(0xFF0D47A1)),
                   title: Text('OPERACIONES', style: Theme.of(context).textTheme.titleLarge),
                   trailing: CircleAvatar(

@@ -65,7 +65,7 @@ class _PageSettingsState extends State<PageSettings> {
         body: ListView(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
           children: [
-            const Text('Carteras'),
+            const Text('CARTERAS'),
             ListTile(
               leading: const Icon(Icons.sort_by_alpha, color: Color(0xFF0D47A1)),
               title: const Text('Carteras ordenadas por nombre'),
@@ -90,8 +90,8 @@ class _PageSettingsState extends State<PageSettings> {
                 },
               ),
             ),
-            const Divider(color: Color(0xFF9E9E9E), height: 20),
-            const Text('Fondos'),
+            const Divider(color: Color(0xFF9E9E9E), height: 30),
+            const Text('FONDOS'),
             ListTile(
               leading: const Icon(Icons.sort_by_alpha, color: Color(0xFF0D47A1)),
               title: const Text('Fondos ordenados por nombre'),
@@ -104,8 +104,8 @@ class _PageSettingsState extends State<PageSettings> {
                 },
               ),
             ),
-            const Divider(color: Color(0xFF9E9E9E), height: 20),
-            const Text('Valores'),
+            const Divider(color: Color(0xFF9E9E9E), height: 30),
+            const Text('VALORES'),
             ListTile(
               leading: const Icon(Icons.sync, color: Color(0xFF0D47A1)),
               title: const Text('Actualizar último valor al añadir Fondo'),
@@ -118,8 +118,8 @@ class _PageSettingsState extends State<PageSettings> {
                 },
               ),
             ),
-            const Divider(color: Color(0xFF9E9E9E), height: 20),
-            const Text('Operaciones'),
+            const Divider(color: Color(0xFF9E9E9E), height: 30),
+            const Text('OPERACIONES'),
             ListTile(
               leading: const Icon(Icons.check, color: Color(0xFF0D47A1)),
               title: const Text('Confirmar antes de eliminar operación'),

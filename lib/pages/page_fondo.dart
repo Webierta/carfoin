@@ -8,6 +8,7 @@ import '../routes.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../utils/fecha_util.dart';
+import '../utils/konstantes.dart';
 import '../widgets/grafico_fondo.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/main_fondo.dart';
@@ -97,113 +98,123 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
     );
   }
 
+  /*Chip(
+  padding: const EdgeInsets.symmetric(horizontal: 10),
+  backgroundColor: const Color(0xFF0D47A1),
+  avatar: const Icon(Icons.business_center, color: Color(0xFFFFFFFF)),
+  label: Text(
+  carteraSelect.name,
+  style: const TextStyle(color: Color(0xFFFFFFFF)),
+  ),
+  ),
+  ),*/
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: database.getValores(carteraSelect, fondoSelect),
       builder: (BuildContext context, AsyncSnapshot<List<Valor>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                  // TODO: set carteraOn antes de navigator??
-                  //Navigator.of(context).pushNamed(RouteGenerator.carteraPage, arguments: true);
-                  Navigator.of(context).pushNamed(RouteGenerator.carteraPage);
-                },
-              ),
-              title: Chip(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                backgroundColor: const Color(0xFF0D47A1),
-                avatar: const Icon(Icons.poll),
-                label: Text(
-                  fondoSelect.name,
-                  style: const TextStyle(color: Color(0xFFFFFFFF)),
-                ),
-              ),
-              actions: [
-                PopupMenuButton(
-                  color: const Color(0xFF2196F3),
-                  offset: Offset(0.0, AppBar().preferredSize.height),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                  ),
-                  itemBuilder: (ctx) => [
-                    _buildMenuItem(Menu.editar, Icons.edit, divider: true),
-                    _buildMenuItem(Menu.suscribir, Icons.login),
-                    _buildMenuItem(Menu.reembolsar, Icons.logout, divider: true),
-                    _buildMenuItem(Menu.eliminar, Icons.delete_forever),
-                    _buildMenuItem(Menu.exportar, Icons.download),
-                  ],
-                  onSelected: (Menu item) {
-                    //TODO: ACCIONES PENDIENTES
-                    if (item == Menu.editar) {
-                      print('EDITAR');
-                      //TODO SUBPAGE de operar con suscribir y reembolsar
-                    } else if (item == Menu.suscribir) {
-                      print('SUSCRIBIR');
-                    } else if (item == Menu.reembolsar) {
-                      print('REEMBOLSAR');
-                    } else if (item == Menu.eliminar) {
-                      _deleteConfirm(context);
-                    } else if (item == Menu.exportar) {
-                      print('EXPORTAR');
-                    }
+          return Container(
+            decoration: scaffoldGradient,
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: AppBar(
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                    // TODO: set carteraOn antes de navigator??
+                    //Navigator.of(context).pushNamed(RouteGenerator.carteraPage, arguments: true);
+                    Navigator.of(context).pushNamed(RouteGenerator.carteraPage);
                   },
                 ),
-              ],
-            ),
-            body: TabBarView(
-              controller: _tabController,
-              children: const [MainFondo(), TablaFondo(), GraficoFondo()],
-            ),
-            bottomNavigationBar: BottomAppBar(
-              color: const Color(0xFF0D47A1),
-              shape: const CircularNotchedRectangle(),
-              notchMargin: 5,
-              child: FractionallySizedBox(
-                widthFactor: 0.7,
-                alignment: FractionalOffset.bottomLeft,
-                child: TabBar(
-                  controller: _tabController,
-                  labelColor: const Color(0xFFFFFFFF),
-                  unselectedLabelColor: const Color(0x62FFFFFF),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  indicatorPadding: const EdgeInsets.all(5.0),
-                  indicatorColor: const Color(0xFF2196F3),
-                  tabs: const [
-                    Tab(icon: Icon(Icons.assessment, size: 32)),
-                    Tab(icon: Icon(Icons.table_rows_outlined, size: 32)),
-                    Tab(icon: Icon(Icons.timeline, size: 32)),
-                  ],
+                title: ListTile(
+                  title: Text(fondoSelect.name),
+                  subtitle: Text(carteraSelect.name),
+                ),
+                actions: [
+                  PopupMenuButton(
+                    color: const Color(0xFF2196F3),
+                    offset: Offset(0.0, AppBar().preferredSize.height),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                    ),
+                    itemBuilder: (ctx) => [
+                      _buildMenuItem(Menu.editar, Icons.edit, divider: true),
+                      _buildMenuItem(Menu.suscribir, Icons.login),
+                      _buildMenuItem(Menu.reembolsar, Icons.logout, divider: true),
+                      _buildMenuItem(Menu.eliminar, Icons.delete_forever),
+                      _buildMenuItem(Menu.exportar, Icons.download),
+                    ],
+                    onSelected: (Menu item) {
+                      //TODO: ACCIONES PENDIENTES
+                      if (item == Menu.editar) {
+                        print('EDITAR');
+                        //TODO SUBPAGE de operar con suscribir y reembolsar
+                      } else if (item == Menu.suscribir) {
+                        print('SUSCRIBIR');
+                      } else if (item == Menu.reembolsar) {
+                        print('REEMBOLSAR');
+                      } else if (item == Menu.eliminar) {
+                        _deleteConfirm(context);
+                      } else if (item == Menu.exportar) {
+                        print('EXPORTAR');
+                      }
+                    },
+                  ),
+                ],
+              ),
+              body: TabBarView(
+                controller: _tabController,
+                children: const [MainFondo(), TablaFondo(), GraficoFondo()],
+              ),
+              bottomNavigationBar: BottomAppBar(
+                color: const Color(0xFF0D47A1),
+                shape: const CircularNotchedRectangle(),
+                notchMargin: 5,
+                child: FractionallySizedBox(
+                  widthFactor: 0.7,
+                  alignment: FractionalOffset.bottomLeft,
+                  child: TabBar(
+                    controller: _tabController,
+                    labelColor: const Color(0xFFFFFFFF),
+                    unselectedLabelColor: const Color(0x62FFFFFF),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicatorPadding: const EdgeInsets.all(5.0),
+                    indicatorColor: const Color(0xFF2196F3),
+                    tabs: const [
+                      Tab(icon: Icon(Icons.assessment, size: 32)),
+                      Tab(icon: Icon(Icons.table_rows_outlined, size: 32)),
+                      Tab(icon: Icon(Icons.timeline, size: 32)),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-            floatingActionButton: SpeedDial(
-              icon: Icons.refresh,
-              foregroundColor: const Color(0xFF0D47A1),
-              backgroundColor: const Color(0xFFFFC107),
-              spacing: 8,
-              spaceBetweenChildren: 4,
-              overlayColor: const Color(0xFF9E9E9E),
-              overlayOpacity: 0.4,
-              children: [
-                _buildSpeedDialChild(
-                  context,
-                  icono: Icons.date_range,
-                  label: 'Descargar valores históricos',
-                  action: _getRangeApi,
-                ),
-                _buildSpeedDialChild(
-                  context,
-                  icono: Icons.update,
-                  label: 'Actualizar último valor',
-                  action: _getDataApi,
-                ),
-              ],
+              floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+              floatingActionButton: SpeedDial(
+                icon: Icons.refresh,
+                foregroundColor: const Color(0xFF0D47A1),
+                backgroundColor: const Color(0xFFFFC107),
+                spacing: 8,
+                spaceBetweenChildren: 4,
+                overlayColor: const Color(0xFF9E9E9E),
+                overlayOpacity: 0.4,
+                children: [
+                  _buildSpeedDialChild(
+                    context,
+                    icono: Icons.date_range,
+                    label: 'Descargar valores históricos',
+                    action: _getRangeApi,
+                  ),
+                  _buildSpeedDialChild(
+                    context,
+                    icono: Icons.update,
+                    label: 'Actualizar último valor',
+                    action: _getDataApi,
+                  ),
+                ],
+              ),
             ),
           );
         } else {

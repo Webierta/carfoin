@@ -105,6 +105,20 @@ class _PageInputRangeState extends State<PageInputRange> {
   _datePicker(BuildContext context, DatePickerEntryMode mode) async {
     final DateTimeRange? newRange = await showDateRangePicker(
       context: context,
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData(
+            primarySwatch: Colors.blue,
+            dialogBackgroundColor: Colors.white,
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF2196F3),
+              elevation: 10,
+              foregroundColor: Color(0xFFFFFFFF),
+            ),
+          ),
+          child: child ?? const Text(''),
+        );
+      },
       initialDateRange: DateTimeRange(
         //start: DateTime.now().subtract(const Duration(days: 5)),
         //end: DateTime.now(),
@@ -129,7 +143,6 @@ class _PageInputRangeState extends State<PageInputRange> {
       errorInvalidText: 'Fuera de rango.',
       errorInvalidRangeText: 'Período no válido.',
     );
-
     return newRange;
   }
 }

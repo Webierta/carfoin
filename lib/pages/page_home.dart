@@ -6,6 +6,7 @@ import '../models/cartera_provider.dart';
 import '../routes.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
+import '../utils/konstantes.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/my_drawer.dart';
 
@@ -107,130 +108,158 @@ class _PageHomeState extends State<PageHome> {
       future: database.getCarteras(byOrder: _isCarterasByOrder),
       builder: (BuildContext context, AsyncSnapshot<List<Cartera>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('MIS CARTERAS'),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.settings),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(RouteGenerator.settingsPage);
-                  },
-                ),
-                PopupMenuButton(
-                  color: Colors.blue,
-                  offset: Offset(0.0, AppBar().preferredSize.height),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                  ),
-                  itemBuilder: (ctx) => [
-                    _buildMenuItem(Menu.ordenar, Icons.sort_by_alpha, divider: true),
-                    _buildMenuItem(Menu.exportar, Icons.save, divider: false),
-                    _buildMenuItem(Menu.eliminar, Icons.delete_forever, divider: false),
-                  ],
-                  onSelected: (item) async {
-                    //TODO: ACCIONES PENDIENTES
-                    if (item == Menu.ordenar) {
-                      _ordenarCarteras();
-                    } else if (item == Menu.exportar) {
-                      print('EXPORTAR');
-                    } else if (item == Menu.eliminar) {
-                      _deleteConfirm(context);
-                    }
-                  },
-                ),
-              ],
-            ),
-            drawer: const MyDrawer(),
-            floatingActionButton: FloatingActionButton(
-              backgroundColor: const Color(0xFFFFC107),
-              child: const Icon(Icons.add, color: Color(0xFF0D47A1)),
-              onPressed: () => _carteraInput(context),
-            ),
-            /*body: carteras.isEmpty
-                      ? const Center(child: Text('No hay carteras guardadas.')) : Consumer...*/
-            body: Consumer<CarteraProvider>(
-              builder: (context, data, child) {
-                if (data.carteras.isEmpty) {
-                  return const Center(child: Text('No hay carteras guardadas.'));
-                }
-                return ListView.builder(
-                  itemCount: data.carteras.length,
-                  itemBuilder: (context, index) {
-                    Cartera cartera = data.carteras[index];
-                    //List<Fondo> fondos = cartera.fondos ?? [];
-                    return Dismissible(
-                      key: UniqueKey(),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        color: const Color(0xFFF44336),
-                        margin: const EdgeInsets.symmetric(horizontal: 15),
-                        alignment: Alignment.centerRight,
-                        child: const Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
-                        ),
+          return Center(
+            child: Container(
+              decoration: scaffoldGradient,
+              child: Scaffold(
+                backgroundColor: Colors.transparent,
+                appBar: AppBar(
+                  title: const Text('MIS CARTERAS'),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.settings),
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(RouteGenerator.settingsPage);
+                      },
+                    ),
+                    PopupMenuButton(
+                      color: const Color(0xFF2196F3),
+                      offset: Offset(0.0, AppBar().preferredSize.height),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
                       ),
-                      onDismissed: (_) => _deleteCartera(cartera),
-                      child: Card(
-                        child: ListTile(
-                          onTap: () {
-                            ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                            carteraProvider.carteraSelect = cartera;
-                            Navigator.of(context).pushNamed(RouteGenerator.carteraPage);
-                          },
-                          //leading: const Icon(Icons.business_center, size: 32),
-                          //leading: Text('${carteras[index].id}'),
-                          leading: Text('${cartera.id}'),
-                          title: Text(cartera.name),
-                          subtitle: Align(
-                            alignment: Alignment.topLeft,
-                            child: Chip(
-                              padding: const EdgeInsets.only(left: 10, right: 20),
-                              backgroundColor: const Color(0xFFFFC107),
-                              avatar: const Icon(
-                                Icons.poll,
-                                color: Color(0xFF0D47A1),
-                              ),
-                              label: Text(
-                                '${cartera.fondos?.length ?? 'Sin fondos'}',
-                                style: const TextStyle(color: Color(0xFF0D47A1)),
+                      itemBuilder: (ctx) => [
+                        _buildMenuItem(Menu.ordenar, Icons.sort_by_alpha, divider: true),
+                        _buildMenuItem(Menu.exportar, Icons.save, divider: false),
+                        _buildMenuItem(Menu.eliminar, Icons.delete_forever, divider: false),
+                      ],
+                      onSelected: (item) async {
+                        //TODO: ACCIONES PENDIENTES
+                        if (item == Menu.ordenar) {
+                          _ordenarCarteras();
+                        } else if (item == Menu.exportar) {
+                          print('EXPORTAR');
+                        } else if (item == Menu.eliminar) {
+                          _deleteConfirm(context);
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                drawer: const MyDrawer(),
+                floatingActionButton: FloatingActionButton(
+                  backgroundColor: const Color(0xFFFFC107),
+                  child: const Icon(Icons.add, color: Color(0xFF0D47A1)),
+                  onPressed: () => _carteraInput(context),
+                ),
+                /*body: carteras.isEmpty
+                          ? const Center(child: Text('No hay carteras guardadas.')) : Consumer...*/
+                body: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Consumer<CarteraProvider>(
+                    builder: (context, data, child) {
+                      if (data.carteras.isEmpty) {
+                        return const Center(child: Text('No hay carteras guardadas.'));
+                      }
+                      return ListView.builder(
+                        //padding: const EdgeInsets.all(10),
+                        itemCount: data.carteras.length,
+                        itemBuilder: (context, index) {
+                          Cartera cartera = data.carteras[index];
+                          //List<Fondo> fondos = cartera.fondos ?? [];
+                          return Dismissible(
+                            key: UniqueKey(),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              color: const Color(0xFFF44336),
+                              margin: const EdgeInsets.symmetric(horizontal: 15),
+                              alignment: Alignment.centerRight,
+                              child: const Padding(
+                                padding: EdgeInsets.all(10.0),
+                                child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
                               ),
                             ),
-                          ),
-                          trailing: PopupMenuButton(
-                            icon: const Icon(Icons.more_vert, color: Color(0xFF2196F3)),
-                            itemBuilder: (context) => const [
-                              PopupMenuItem(
-                                value: 1,
+                            onDismissed: (_) => _deleteCartera(cartera),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Card(
                                 child: ListTile(
-                                  leading: Icon(Icons.edit, color: Color(0xFF2196F3)),
-                                  title: Text('Renombrar'),
+                                  contentPadding: const EdgeInsets.all(12.0),
+                                  onTap: () {
+                                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                    carteraProvider.carteraSelect = cartera;
+                                    Navigator.of(context).pushNamed(RouteGenerator.carteraPage);
+                                  },
+                                  leading: const Icon(
+                                    Icons.business_center,
+                                    size: 32,
+                                    color: Color(0xFF2196F3),
+                                  ),
+                                  //leading: Text('${carteras[index].id}'),
+                                  //leading: Text('${cartera.id}'),
+                                  title: Text(cartera.name),
+                                  subtitle: Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Chip(
+                                      padding: const EdgeInsets.only(left: 10, right: 20),
+                                      //backgroundColor: const Color(0xFFFFC107),
+                                      backgroundColor: const Color(0xFFBBDEFB),
+                                      //shape: const StadiumBorder(side: BorderSide()),
+                                      avatar: const Icon(
+                                        Icons.poll,
+                                        color: Color(0xFF0D47A1),
+                                      ),
+                                      label: Text(
+                                        '${cartera.fondos?.length ?? 'Sin fondos'}',
+                                        style: const TextStyle(color: Color(0xFF0D47A1)),
+                                      ),
+                                    ),
+                                  ),
+                                  trailing: PopupMenuButton(
+                                    color: const Color(0xFF2196F3),
+                                    icon: const Icon(Icons.more_vert, color: Color(0xFF2196F3)),
+                                    itemBuilder: (context) => const [
+                                      PopupMenuItem(
+                                        value: 1,
+                                        child: ListTile(
+                                          leading: Icon(Icons.edit, color: Color(0xFFFFFFFF)),
+                                          title: Text(
+                                            'Renombrar',
+                                            style: TextStyle(color: Color(0xFFFFFFFF)),
+                                          ),
+                                        ),
+                                      ),
+                                      PopupMenuItem(
+                                        value: 2,
+                                        child: ListTile(
+                                          leading:
+                                              Icon(Icons.delete_forever, color: Color(0xFFFFFFFF)),
+                                          title: Text(
+                                            'Eliminar',
+                                            style: TextStyle(color: Color(0xFFFFFFFF)),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                    onSelected: (value) {
+                                      if (value == 1) {
+                                        print('RENOMBRAR');
+                                        _carteraInput(context, cartera: cartera);
+                                      } else if (value == 2) {
+                                        _deleteCartera(cartera);
+                                      }
+                                    },
+                                  ),
                                 ),
                               ),
-                              PopupMenuItem(
-                                value: 2,
-                                child: ListTile(
-                                  leading: Icon(Icons.delete_forever, color: Color(0xFF2196F3)),
-                                  title: Text('Eliminar'),
-                                ),
-                              )
-                            ],
-                            onSelected: (value) {
-                              if (value == 1) {
-                                print('RENOMBRAR');
-                                _carteraInput(context, cartera: cartera);
-                              } else if (value == 2) {
-                                _deleteCartera(cartera);
-                              }
-                            },
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
             ),
           );
         } else {
