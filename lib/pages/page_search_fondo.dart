@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../models/cartera.dart';
+import '../utils/konstantes.dart';
 
 class PageSearchFondo extends StatefulWidget {
   const PageSearchFondo({Key? key}) : super(key: key);
@@ -44,51 +45,54 @@ class _PageSearchFondoState extends State<PageSearchFondo> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Buscar Fondo')),
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            TextField(
-              onChanged: (value) => _runFilter(value),
-              textCapitalization: TextCapitalization.characters,
-              decoration: const InputDecoration(
-                labelText: 'Busca por ISIN o por nombre',
-                suffixIcon: Icon(Icons.search),
+    return Container(
+      decoration: scaffoldGradient,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(title: const Text('Buscar Fondo')),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            children: [
+              TextField(
+                onChanged: (value) => _runFilter(value),
+                textCapitalization: TextCapitalization.characters,
+                decoration: const InputDecoration(
+                  labelText: 'Busca por ISIN o por nombre',
+                  suffixIcon: Icon(Icons.search),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _filterFondos.isNotEmpty
-                      ? ListView.builder(
-                          itemCount: _filterFondos.length,
-                          itemBuilder: (context, index) => Card(
-                            key: ValueKey(_filterFondos[index]['isin']),
-                            color: Colors.amber,
-                            elevation: 4,
-                            margin: const EdgeInsets.symmetric(vertical: 10),
-                            child: ListTile(
-                              title: Text(_filterFondos[index]['name']),
-                              subtitle: Text(_filterFondos[index]['isin'].toString()),
-                              onTap: () {
-                                var fondo = Fondo(
-                                    name: _filterFondos[index]['name'],
-                                    isin: _filterFondos[index]['isin']);
-                                Navigator.pop(context, fondo);
-                              },
+              const SizedBox(height: 20),
+              Expanded(
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _filterFondos.isNotEmpty
+                        ? ListView.builder(
+                            itemCount: _filterFondos.length,
+                            itemBuilder: (context, index) => Card(
+                              key: ValueKey(_filterFondos[index]['isin']),
+                              color: Colors.amber,
+                              elevation: 4,
+                              margin: const EdgeInsets.symmetric(vertical: 10),
+                              child: ListTile(
+                                title: Text(_filterFondos[index]['name']),
+                                subtitle: Text(_filterFondos[index]['isin'].toString()),
+                                onTap: () {
+                                  var fondo = Fondo(
+                                      name: _filterFondos[index]['name'],
+                                      isin: _filterFondos[index]['isin']);
+                                  Navigator.pop(context, fondo);
+                                },
+                              ),
                             ),
+                          )
+                        : const Text(
+                            'No se ha encontrado coincidencia con ningún fondo.',
+                            style: TextStyle(fontSize: 24),
                           ),
-                        )
-                      : const Text(
-                          'No se ha encontrado coincidencia con ningún fondo.',
-                          style: TextStyle(fontSize: 24),
-                        ),
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

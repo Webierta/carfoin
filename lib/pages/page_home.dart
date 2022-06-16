@@ -269,23 +269,6 @@ class _PageHomeState extends State<PageHome> {
     );
   }
 
-  _deleteCartera(Cartera cartera) async {
-    _eliminar() async {
-      await database.deleteAllFondos(cartera);
-      await database.deleteCartera(cartera);
-      carteraProvider.removeAllFondos(cartera);
-      carteraProvider.removeCartera(cartera);
-      await setCarteras();
-    }
-
-    if (_isConfirmDeleteCartera) {
-      var resp = await _dialogDeleteConfirm(context, cartera.name);
-      resp ? _eliminar() : setState(() {});
-    } else {
-      _eliminar();
-    }
-  }
-
   Future<void> _carteraInput(BuildContext context, {Cartera? cartera}) async {
     String title = cartera?.name ?? 'Nueva Cartera';
     return showDialog(
@@ -394,6 +377,23 @@ class _PageHomeState extends State<PageHome> {
             ],
           );
         });
+  }
+
+  _deleteCartera(Cartera cartera) async {
+    _eliminar() async {
+      await database.deleteAllFondos(cartera);
+      await database.deleteCartera(cartera);
+      carteraProvider.removeAllFondos(cartera);
+      carteraProvider.removeCartera(cartera);
+      await setCarteras();
+    }
+
+    if (_isConfirmDeleteCartera) {
+      var resp = await _dialogDeleteConfirm(context, cartera.name);
+      resp ? _eliminar() : setState(() {});
+    } else {
+      _eliminar();
+    }
   }
 
   void _deleteConfirm(BuildContext context) async {

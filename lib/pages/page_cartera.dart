@@ -24,6 +24,7 @@ class PageCartera extends StatefulWidget {
 class _PageCarteraState extends State<PageCartera> {
   bool _isFondosByOrder = true;
   bool _isAutoUpdate = true;
+  bool _isConfirmDeleteFondo = true;
   late ApiService apiService;
   DatabaseHelper database = DatabaseHelper();
   late CarteraProvider carteraProvider;
@@ -34,11 +35,15 @@ class _PageCarteraState extends State<PageCartera> {
   getSharedPrefs() async {
     bool? isFondosByOrder;
     bool? isAutoUpdate;
+    bool? isConfirmDeleteFondo;
     await PreferencesService.getBool(keyByOrderFondosPref).then((value) => isFondosByOrder = value);
     await PreferencesService.getBool(keyAutoUpdatePref).then((value) => isAutoUpdate = value);
+    await PreferencesService.getBool(keyConfirmDeleteFondoPref)
+        .then((value) => isConfirmDeleteFondo = value);
     setState(() {
       _isFondosByOrder = isFondosByOrder ?? true;
       _isAutoUpdate = isAutoUpdate ?? true;
+      _isConfirmDeleteFondo = isConfirmDeleteFondo ?? true;
     });
   }
 
@@ -444,19 +449,71 @@ class _PageCarteraState extends State<PageCartera> {
     }
   }
 
-  _removeFondo(Fondo fondo) async {
-    await database.deleteFondo(carteraSelect, fondo);
-    carteraProvider.removeFondo(carteraSelect, fondo);
-
-    /// ???
-    await setFondos(carteraSelect);
+  _dialogDeleteConfirm(BuildContext context, [String? fondoName]) async {
+    return showDialog(
+        context: context,
+        builder: (BuildContext ctx) {
+          String title = fondoName == null ? 'Eliminar todos los fondos' : 'Eliminar $fondoName';
+          String content = fondoName == null
+              ? '¿Eliminar todos los fondos en la cartera ${carteraSelect.name}?'
+              : '¿Eliminar el fondo $fondoName y todos sus valores?';
+          return AlertDialog(
+            title: Text(title),
+            content: Text(content),
+            actions: [
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('CANCELAR'),
+              ),
+              ElevatedButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: const Color(0xFFF44336),
+                  primary: const Color(0xFFFFFFFF),
+                ),
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('ACEPTAR'),
+              ),
+            ],
+          );
+        });
   }
 
-  void _deleteAllConfirm(BuildContext context) {
+  _removeFondo(Fondo fondo) async {
+    _eliminarFondo() async {
+      await database.deleteAllValores(carteraSelect, fondo);
+
+      await database.deleteFondo(carteraSelect, fondo);
+      carteraProvider.removeFondo(carteraSelect, fondo);
+      await setFondos(carteraSelect);
+    }
+
+    if (_isConfirmDeleteFondo) {
+      var resp = await _dialogDeleteConfirm(context, fondo.name);
+      resp ? _eliminarFondo() : setState(() {});
+    } else {
+      _eliminarFondo();
+    }
+  }
+
+  void _deleteAllConfirm(BuildContext context) async {
+    _removeAllFondos() async {
+      //carteraSelect.fondos
+      for (var fondo in carteraProvider.fondos) {
+        await database.deleteAllValores(carteraSelect, fondo);
+      }
+      await database.deleteAllFondos(carteraSelect);
+      carteraProvider.removeAllFondos(carteraSelect);
+
+      /// ???
+      await setFondos(carteraSelect);
+    }
+
     if (carteraProvider.fondos.isEmpty) {
       _showMsg(msg: 'Nada que eliminar');
     } else {
-      showDialog(
+      var resp = await _dialogDeleteConfirm(context);
+      resp ? _removeAllFondos() : setState(() {});
+      /*showDialog(
           context: context,
           builder: (BuildContext ctx) {
             return AlertDialog(
@@ -485,7 +542,7 @@ class _PageCarteraState extends State<PageCartera> {
                 ),
               ],
             );
-          });
+          });*/
     }
   }
 

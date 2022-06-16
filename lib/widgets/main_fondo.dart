@@ -71,8 +71,8 @@ class _MainFondoState extends State<MainFondo> {
     //final carteraProvider = context.read<CarteraProvider>();
     //final carteraSelect = carteraProvider.carteraSelect;
     //final fondoSelect = carteraProvider.fondoSelect;
-    final valores = context.watch<CarteraProvider>().valores;
-    final operaciones = context.watch<CarteraProvider>().operaciones;
+    final List<Valor> valores = context.watch<CarteraProvider>().valores;
+    final List<Valor> operaciones = context.watch<CarteraProvider>().operaciones;
 
     stats = Stats(valores);
 
@@ -151,12 +151,45 @@ class _MainFondoState extends State<MainFondo> {
       return resultado;
     } */
 
+    _confirmDeleteOperacion(BuildContext context, Valor op) async {
+      return showDialog(
+          context: context,
+          builder: (BuildContext ctx) {
+            return AlertDialog(
+              title: const Text('Eliminar Operación'),
+              content: const Text(
+                  'Esta acción elimina esta operación (y eventualmente operaciones posteriores) '
+                  'pero mantiene los valores liquidativos de las fechas afectadas'),
+              actions: [
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('CANCELAR'),
+                ),
+                ElevatedButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: const Color(0xFFF44336),
+                    primary: const Color(0xFFFFFFFF),
+                  ),
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('ACEPTAR'),
+                ),
+              ],
+            );
+          });
+    }
+
+    _deleteOperacion(Valor op) async {
+      await database.deleteOperacion(carteraSelect, fondoSelect, op);
+      carteraProvider.removeOperacion(fondoSelect, op);
+      await setValores(carteraSelect, fondoSelect);
+    }
+
     List<DataColumn> _createColumns() {
       return const <DataColumn>[
         DataColumn(label: Text('FECHA')),
         DataColumn(label: Text('PART.')),
-        DataColumn(label: Text('PRECIO')),
-        DataColumn(label: Text('VALOR')),
+        DataColumn(label: Text('V.L.')),
+        DataColumn(label: Text('IMPORTE')),
         DataColumn(label: Text('')),
       ];
     }
@@ -194,10 +227,43 @@ class _MainFondoState extends State<MainFondo> {
                   // TODO: DIALOGO CONFIRMAR
                   // TODO: AÑADIR OPCION AL MENU
                   print('OPEN DIALOGO CONFIRMAR');
+                  var resp = await _confirmDeleteOperacion(context, op);
+                  if (resp) {
+                    _deleteOperacion(op);
+                  }
                 } else {
-                  await database.deleteOperacion(carteraSelect, fondoSelect, op);
+                  // TODO: EVITAR ELIMINAR Y DEJAR PARTICIPACIONES EN NEGATIVO
+                  if (op.tipo == 1) {
+                    var resp = await _confirmDeleteOperacion(context, op);
+                    if (resp) {
+                      _deleteOperacion(op);
+                    }
+                  } else {
+                    _deleteOperacion(op);
+                  }
+
+                  /*if (op.tipo == 0) {
+                    print('TIPO 0: REEMBOLSO');
+                    // ESTO ELIMINA TAMBIEN VALORES
+                    await database.deleteAllOperaciones(carteraSelect, fondoSelect);
+                    carteraProvider.removeAllOperaciones(fondoSelect);
+                  } else {
+                    print('TIPO 1: SUSCRIPCION');
+                    // elimina operaciones posteriores
+                    */ /*for (var ope in operaciones) {
+                      if (ope.date > op.date) {
+                        await database.deleteOperacion(carteraSelect, fondoSelect, ope);
+                        carteraProvider.removeOperacion(fondoSelect, ope);
+                      }
+                    }*/ /*
+
+                    // elimina op
+                    await database.deleteOperacion(carteraSelect, fondoSelect, op);
+                    carteraProvider.removeOperacion(fondoSelect, op);
+                  }*/
+                  /*await database.deleteOperacion(carteraSelect, fondoSelect, op);
                   carteraProvider.removeOperacion(fondoSelect, op);
-                  await setValores(carteraSelect, fondoSelect);
+                  await setValores(carteraSelect, fondoSelect);*/
                 }
               },
               icon: const Icon(Icons.delete_forever),

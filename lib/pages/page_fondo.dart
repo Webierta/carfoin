@@ -14,7 +14,7 @@ import '../widgets/loading_progress.dart';
 import '../widgets/main_fondo.dart';
 import '../widgets/tabla_fondo.dart';
 
-enum Menu { editar, suscribir, reembolsar, eliminar, exportar }
+enum Menu { mercado, eliminar, exportar }
 
 class PageFondo extends StatefulWidget {
   const PageFondo({Key? key}) : super(key: key);
@@ -98,17 +98,6 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
     );
   }
 
-  /*Chip(
-  padding: const EdgeInsets.symmetric(horizontal: 10),
-  backgroundColor: const Color(0xFF0D47A1),
-  avatar: const Icon(Icons.business_center, color: Color(0xFFFFFFFF)),
-  label: Text(
-  carteraSelect.name,
-  style: const TextStyle(color: Color(0xFFFFFFFF)),
-  ),
-  ),
-  ),*/
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -131,7 +120,13 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
                 ),
                 title: ListTile(
                   title: Text(fondoSelect.name),
-                  subtitle: Text(carteraSelect.name),
+                  subtitle: Row(
+                    children: [
+                      const Icon(Icons.business_center),
+                      const SizedBox(width: 10),
+                      Text(carteraSelect.name),
+                    ],
+                  ),
                 ),
                 actions: [
                   PopupMenuButton(
@@ -141,21 +136,16 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
                       borderRadius: BorderRadius.all(Radius.circular(8.0)),
                     ),
                     itemBuilder: (ctx) => [
-                      _buildMenuItem(Menu.editar, Icons.edit, divider: true),
-                      _buildMenuItem(Menu.suscribir, Icons.login),
-                      _buildMenuItem(Menu.reembolsar, Icons.logout, divider: true),
+                      //_buildMenuItem(Menu.editar, Icons.edit, divider: true),
+                      //_buildMenuItem(Menu.suscribir, Icons.login),
+                      _buildMenuItem(Menu.mercado, Icons.shopping_cart, divider: true),
                       _buildMenuItem(Menu.eliminar, Icons.delete_forever),
                       _buildMenuItem(Menu.exportar, Icons.download),
                     ],
                     onSelected: (Menu item) {
                       //TODO: ACCIONES PENDIENTES
-                      if (item == Menu.editar) {
-                        print('EDITAR');
-                        //TODO SUBPAGE de operar con suscribir y reembolsar
-                      } else if (item == Menu.suscribir) {
-                        print('SUSCRIBIR');
-                      } else if (item == Menu.reembolsar) {
-                        print('REEMBOLSAR');
+                      if (item == Menu.mercado) {
+                        Navigator.of(context).pushNamed(RouteGenerator.mercadoPage);
                       } else if (item == Menu.eliminar) {
                         _deleteConfirm(context);
                       } else if (item == Menu.exportar) {
@@ -244,9 +234,14 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
       //TODO check newvalor repetido por date ??
       //TODO: ESTE INSERT DESORDENA LOS FONDOS (pone al final el actualizado)
 
+      // TODO: si existe update si no existe insert
+
       ///?
       //await database.insertFondo(carteraSelect, fondoSelect);
-      await database.insertValor(carteraSelect, fondoSelect, newValor);
+
+      //await database.insertValor(carteraSelect, fondoSelect, newValor);
+
+      await database.updateOperacion(carteraSelect, fondoSelect, newValor);
       await setValores(carteraSelect, fondoSelect);
       _pop();
       _showMsg(msg: 'Descarga de datos completada.');
@@ -271,7 +266,8 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
           newListValores.add(Valor(date: dataApi.epochSecs, precio: dataApi.price));
         }
         for (var valor in newListValores) {
-          await database.insertValor(carteraSelect, fondoSelect, valor);
+          //await database.insertValor(carteraSelect, fondoSelect, valor);
+          await database.updateOperacion(carteraSelect, fondoSelect, valor);
         }
         await setValores(carteraSelect, fondoSelect);
 

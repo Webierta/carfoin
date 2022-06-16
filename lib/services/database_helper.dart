@@ -162,10 +162,50 @@ class DatabaseHelper {
     return query.map((e) => Valor.fromMap(e)).toList();
   }
 
+  /*Future<List<Valor>> getOperacionesPosteriores(Cartera cartera, Fondo fondo, Valor op) async {
+    Database db = await database;
+    var nameTable = '_${cartera.id}${fondo.isin}';
+    final List<Map<String, dynamic>> query = await db.query(nameTable,
+        orderBy: '$columnDate ASC', where: '$columnTipoOperacion IN (?, ?)', whereArgs: [1, 0]);
+    return query.map((e) => Valor.fromMap(e)).toList();
+  }*/
+
   Future<void> updateValor(Cartera cartera, Fondo fondo, Valor valor) async {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
     await db.update(nameTable, valor.toDb(), where: '$columnDate = ?', whereArgs: [valor.date]);
+  }
+
+  Future<Valor?> getValorByDate(Cartera cartera, Fondo fondo, Valor valor) async {
+    Database db = await database;
+    var nameTable = '_${cartera.id}${fondo.isin}';
+    var query = await db.query(nameTable, where: '$columnDate = ?', whereArgs: [valor.date]);
+    var value = query.map((e) => Valor.fromMap(e)).toList();
+    if (value.isNotEmpty) {
+      return value.first;
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> updateOperacion(Cartera cartera, Fondo fondo, Valor valor) async {
+    Database db = await database;
+    //var nameTable = '_${cartera.id}${fondo.isin}';
+    Valor? existeValor = await getValorByDate(cartera, fondo, valor);
+    if (existeValor == null) {
+      //await db.update(nameTable, valor.toDb(), where: '$columnDate = ?', whereArgs: [valor.date]);
+      print('NO EXISTE');
+      await insertValor(cartera, fondo, valor);
+    } else {
+      print('EXISTE');
+      var upValor = Valor(
+          date: valor.date,
+          precio: valor.precio,
+          participaciones: existeValor.participaciones,
+          tipo: existeValor.tipo);
+      //await db.update(nameTable, updateValor.toDb(), where: '$columnDate = ?', whereArgs: [valor.date]);
+      await updateValor(cartera, fondo, upValor);
+    }
   }
 
   Future<void> deleteValor(Cartera cartera, Fondo fondo, Valor valor) async {
@@ -187,6 +227,9 @@ class DatabaseHelper {
   }
 
   Future<void> deleteOperacion(Cartera cartera, Fondo fondo, Valor op) async {
+    if (op.tipo == 1) {
+      await deleteAllOperacionesPosteriores(cartera, fondo, op);
+    }
     Valor newValor = Valor(date: op.date, precio: op.precio, tipo: null, participaciones: null);
     await updateValor(cartera, fondo, newValor);
   }
@@ -195,5 +238,18 @@ class DatabaseHelper {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
     await db.delete(nameTable, where: '$columnTipoOperacion IN (?, ?)', whereArgs: [1, 0]);
+  }
+
+  Future<void> deleteAllOperacionesPosteriores(Cartera cartera, Fondo fondo, Valor op) async {
+    List<Valor> operaciones = await getOperaciones(cartera, fondo);
+    if (operaciones.isNotEmpty) {
+      for (var ope in operaciones) {
+        if (ope.date > op.date) {
+          Valor newValor =
+              Valor(date: ope.date, precio: ope.precio, tipo: null, participaciones: null);
+          await updateValor(cartera, fondo, newValor);
+        }
+      }
+    }
   }
 }

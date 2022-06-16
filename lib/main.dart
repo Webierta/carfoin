@@ -45,6 +45,16 @@ class MyApp extends StatelessWidget {
           foregroundColor: Color(0xFF0D47A1),
           //foregroundColor: Color(0xFFFFFFFF),
         ),
+        cardTheme: CardTheme(
+          color: const Color.fromRGBO(255, 255, 255, 0.5),
+          // 33 150 243
+          //color: const Color.fromRGBO(33, 150, 243, 0.1),
+          elevation: 0.0,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(color: Theme.of(context).colorScheme.outline),
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+          ),
+        ),
       ),
       initialRoute: '/',
       onGenerateRoute: RouteGenerator.generateRoute,

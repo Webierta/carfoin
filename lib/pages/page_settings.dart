@@ -15,6 +15,7 @@ class _PageSettingsState extends State<PageSettings> {
   bool _isCarterasByOrder = true;
   bool _isConfirmDeleteCartera = true;
   bool _isFondosByOrder = true;
+  bool _isConfirmDeleteFondo = true;
   bool _isAutoUpdate = true;
   bool _isConfirmDelete = true;
 
@@ -27,6 +28,9 @@ class _PageSettingsState extends State<PageSettings> {
     });
     await PreferencesService.getBool(keyByOrderFondosPref).then((value) {
       setState(() => _isFondosByOrder = value);
+    });
+    await PreferencesService.getBool(keyConfirmDeleteFondoPref).then((value) {
+      setState(() => _isConfirmDeleteFondo = value);
     });
     await PreferencesService.getBool(keyAutoUpdatePref).then((value) {
       setState(() => _isAutoUpdate = value);
@@ -104,6 +108,19 @@ class _PageSettingsState extends State<PageSettings> {
                 },
               ),
             ),
+            ListTile(
+              leading: const Icon(Icons.delete_forever, color: Color(0xFF0D47A1)),
+              title: const Text('Confirmar antes de eliminar'),
+              subtitle: const Text('La eliminación de todos los fondos de una cartera '
+                  'siempre requiere confirmación'),
+              trailing: Switch(
+                value: _isConfirmDeleteFondo,
+                onChanged: (value) {
+                  setState(() => _isConfirmDeleteFondo = value);
+                  PreferencesService.saveBool(keyConfirmDeleteFondoPref, _isConfirmDeleteFondo);
+                },
+              ),
+            ),
             const Divider(color: Color(0xFF9E9E9E), height: 30),
             const Text('VALORES'),
             ListTile(
@@ -121,8 +138,11 @@ class _PageSettingsState extends State<PageSettings> {
             const Divider(color: Color(0xFF9E9E9E), height: 30),
             const Text('OPERACIONES'),
             ListTile(
-              leading: const Icon(Icons.check, color: Color(0xFF0D47A1)),
-              title: const Text('Confirmar antes de eliminar operación'),
+              leading: const Icon(Icons.delete_forever, color: Color(0xFF0D47A1)),
+              title: const Text('Confirmar antes de eliminar'),
+              subtitle: const Text(
+                  'La eliminación de operaciones de suscripción siempre requiere confirmación '
+                  'porque conlleva la eliminación de todas las operaciones posteriores'),
               trailing: Switch(
                 value: _isConfirmDelete,
                 onChanged: (value) {
