@@ -1,4 +1,3 @@
-import 'package:carfoin/pages/page_mercado.dart';
 import 'package:flutter/material.dart';
 
 import 'pages/page_about.dart';
@@ -10,6 +9,8 @@ import 'pages/page_input_fondo.dart';
 import 'pages/page_input_range.dart';
 import 'pages/page_search_fondo.dart';
 import 'pages/page_settings.dart';
+import 'pages/page_mercado.dart';
+import 'pages/page_support.dart';
 
 class RouteGenerator {
   static const String homePage = '/';
@@ -21,6 +22,7 @@ class RouteGenerator {
   static const String mercadoPage = '/mercado';
   static const String infoPage = '/info';
   static const String aboutPage = '/about';
+  static const String supportPage = '/support';
   static const String settingsPage = '/settings';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -43,6 +45,8 @@ class RouteGenerator {
         return AnimatedRoute(const PageInfo());
       case aboutPage:
         return AnimatedRoute(const PageAbout());
+      case supportPage:
+        return AnimatedRoute(const PageSupport());
       case settingsPage:
         return AnimatedRoute(const PageSettings());
       default:

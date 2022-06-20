@@ -23,6 +23,30 @@ class Stats {
     return null;
   }
 
+  int? datePrecioMinimo() {
+    if (valores.isNotEmpty) {
+      for (var valor in valores) {
+        if (valor.precio == precioMinimo()) {
+          return valor.date;
+        }
+      }
+      return null;
+    }
+    return null;
+  }
+
+  int? datePrecioMaximo() {
+    if (valores.isNotEmpty) {
+      for (var valor in valores) {
+        if (valor.precio == precioMaximo()) {
+          return valor.date;
+        }
+      }
+      return null;
+    }
+    return null;
+  }
+
   double? precioMedio() {
     if (valores.isNotEmpty) {
       final List<double> precios = valores.map((v) => v.precio).toList();
@@ -37,8 +61,7 @@ class Stats {
       var precioMedio = precios.reduce((a, b) => a + b) / precios.length;
       var diferencialesCuadrados = 0.0;
       for (var valor in valores) {
-        diferencialesCuadrados +=
-            (valor.precio - precioMedio) * (valor.precio - precioMedio);
+        diferencialesCuadrados += (valor.precio - precioMedio) * (valor.precio - precioMedio);
       }
       var varianza = diferencialesCuadrados / valores.length;
       return sqrt(varianza);
