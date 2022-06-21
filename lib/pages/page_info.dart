@@ -94,6 +94,8 @@ Después de crear una Cartera, incorpora los Fondos de Inversión que te interes
 
 Después puedes seguir la evolución de los Fondos añadidos actualizando periódicamente su cotización y archivando el histórico de valores. El programa calcula algunos índices de rentabilidad y muestra los valores en una tabla y en un gráfico.
 
+---
+
 ## Funciones
 
 * Permite crear múltiples Carteras personalizadas de Fondos de Inversión y seguir su evolución.

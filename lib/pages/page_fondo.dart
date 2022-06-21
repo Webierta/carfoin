@@ -119,12 +119,12 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
                   },
                 ),
                 title: ListTile(
-                  title: Text(fondoSelect.name),
+                  title: Text(fondoSelect.name, style: const TextStyle(color: Color(0xFF0D47A1))),
                   subtitle: Row(
                     children: [
-                      const Icon(Icons.business_center),
+                      const Icon(Icons.business_center, color: Color(0xFF0D47A1)),
                       const SizedBox(width: 10),
-                      Text(carteraSelect.name),
+                      Text(carteraSelect.name, style: const TextStyle(color: Color(0xFF0D47A1))),
                     ],
                   ),
                 ),

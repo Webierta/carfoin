@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../routes.dart';
 
@@ -77,7 +78,7 @@ class MyDrawer extends StatelessWidget {
                   ),
                 ),
                 ListTile(
-                  leading: const Icon(Icons.home),
+                  leading: const Icon(Icons.home, color: Color(0xFF0D47A1)),
                   title: const Text('Inicio'),
                   onTap: () {
                     Navigator.of(context).pop();
@@ -85,7 +86,7 @@ class MyDrawer extends StatelessWidget {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.settings),
+                  leading: const Icon(Icons.settings, color: Color(0xFF0D47A1)),
                   title: const Text('Ajustes'),
                   onTap: () {
                     Navigator.of(context).pop();
@@ -94,26 +95,15 @@ class MyDrawer extends StatelessWidget {
                 ),
                 const Divider(color: Colors.grey),
                 ListTile(
-                  leading: const Icon(Icons.info_outline),
+                  leading: const Icon(Icons.info_outline, color: Color(0xFF0D47A1)),
                   title: const Text('Info'),
                   onTap: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).pushNamed(RouteGenerator.infoPage);
                   },
                 ),
-                /* const AboutListTile(
-                  icon: Icon(Icons.code),
-                  applicationIcon: Icon(Icons.local_play),
-                  applicationName: 'My Cool App',
-                  applicationVersion: '1.0.25',
-                  applicationLegalese: '© 2022 Company',
-                  aboutBoxChildren: [
-                    ///Content goes here...
-                  ],
-                  child: Text('About app'),
-                ), */
                 ListTile(
-                  leading: const Icon(Icons.code),
+                  leading: const Icon(Icons.code, color: Color(0xFF0D47A1)),
                   title: const Text('About'),
                   onTap: () {
                     Navigator.of(context).pop();
@@ -121,7 +111,7 @@ class MyDrawer extends StatelessWidget {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.local_cafe_outlined),
+                  leading: const Icon(Icons.local_cafe_outlined, color: Color(0xFF0D47A1)),
                   title: const Text('Donar'),
                   onTap: () {
                     Navigator.of(context).pop();
@@ -130,11 +120,9 @@ class MyDrawer extends StatelessWidget {
                 ),
                 const Divider(color: Color(0xFF9E9E9E)),
                 ListTile(
-                  leading: const Icon(Icons.exit_to_app),
+                  leading: const Icon(Icons.exit_to_app, color: Color(0xFF0D47A1)),
                   title: const Text('Salir'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
+                  onTap: () => SystemNavigator.pop(),
                 ),
               ],
             ),

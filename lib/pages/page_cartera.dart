@@ -241,8 +241,11 @@ class _PageCarteraState extends State<PageCartera> {
                             child: Card(
                               child: ListTile(
                                 contentPadding: const EdgeInsets.all(12.0),
-                                leading: const Icon(Icons.assessment,
-                                    size: 32, color: Color(0xFF0D47A1)),
+                                leading: const Icon(
+                                  Icons.assessment,
+                                  size: 32,
+                                  color: Color(0xFF2196F3),
+                                ),
                                 title: Text(fondo.name),
                                 subtitle: Text(fondo.isin),
                                 trailing: Column(

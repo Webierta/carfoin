@@ -38,7 +38,7 @@ class _PageInputRangeState extends State<PageInputRange> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ListTile(
-                        leading: const Icon(Icons.assessment, size: 32, color: Color(0xFF0D47A1)),
+                        leading: const Icon(Icons.assessment, size: 32, color: Color(0xFF2196F3)),
                         title: Text(fondoSelect.name),
                       ),
                       const SizedBox(height: 10),

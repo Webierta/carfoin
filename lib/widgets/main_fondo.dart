@@ -232,7 +232,7 @@ class _MainFondoState extends State<MainFondo> {
               children: [
                 ListTile(
                   contentPadding: const EdgeInsets.only(bottom: 12, left: 12, right: 12, top: 0),
-                  leading: const Icon(Icons.assessment, size: 32, color: Color(0xFF0D47A1)),
+                  leading: const Icon(Icons.assessment, size: 32, color: Color(0xFF2196F3)),
                   title: Text(
                     fondoSelect.name,
                     style: Theme.of(context).textTheme.titleLarge,
@@ -250,7 +250,7 @@ class _MainFondoState extends State<MainFondo> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFF0D47A1), width: 2),
+                            border: Border.all(color: const Color(0xFF2196F3), width: 2),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Row(
@@ -348,7 +348,7 @@ class _MainFondoState extends State<MainFondo> {
               children: [
                 ListTile(
                   contentPadding: const EdgeInsets.all(12),
-                  leading: const Icon(Icons.compare_arrows, size: 32, color: Color(0xFF0D47A1)),
+                  leading: const Icon(Icons.compare_arrows, size: 32, color: Color(0xFF2196F3)),
                   title: Text('OPERACIONES', style: Theme.of(context).textTheme.titleLarge),
                   trailing: CircleAvatar(
                     backgroundColor: const Color(0xFFFFC107),
@@ -405,7 +405,7 @@ class _MainFondoState extends State<MainFondo> {
                     leading: const Icon(
                       Icons.savings,
                       size: 32,
-                      color: Color(0xFF0D47A1),
+                      color: Color(0xFF2196F3),
                     ), // Icons.balance
                     title: Text('BALANCE', style: Theme.of(context).textTheme.titleLarge),
                     trailing: Chip(

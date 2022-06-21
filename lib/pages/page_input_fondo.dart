@@ -56,7 +56,7 @@ class _PageInputFondoState extends State<PageInputFondo> {
                       //leading: const Icon(Icons.business_center),
                       //title: Text(carteraOn.name),
                       //subtitle: const Text('Introduce el ISIN del nuevo Fondo'),
-                      leading: const Icon(Icons.add_chart, size: 32, color: Color(0xFF0D47A1)),
+                      leading: const Icon(Icons.add_chart, size: 32, color: Color(0xFF2196F3)),
                       title: const Text('Introduce el ISIN del nuevo Fondo'),
                       subtitle: Align(
                         alignment: Alignment.centerLeft,

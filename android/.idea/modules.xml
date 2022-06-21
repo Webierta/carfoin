@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/android.iml" filepath="$PROJECT_DIR$/.idea/modules/android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/android.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/android.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/android.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/android.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/android.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/android.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/android.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/android.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/338754485/android.shared_preferences_android.iml" filepath="$PROJECT_DIR$/.idea/modules/338754485/android.shared_preferences_android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/338754485/android.shared_preferences_android.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/338754485/android.shared_preferences_android.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/338754485/android.shared_preferences_android.main.iml" filepath="$PROJECT_DIR$/.idea/modules/338754485/android.shared_preferences_android.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/338754485/android.shared_preferences_android.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/338754485/android.shared_preferences_android.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-771342718/android.sqflite.iml" filepath="$PROJECT_DIR$/.idea/modules/-771342718/android.sqflite.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-771342718/android.sqflite.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-771342718/android.sqflite.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-771342718/android.sqflite.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-771342718/android.sqflite.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-771342718/android.sqflite.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-771342718/android.sqflite.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1013673244/android.url_launcher_android.iml" filepath="$PROJECT_DIR$/.idea/modules/-1013673244/android.url_launcher_android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1013673244/android.url_launcher_android.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-1013673244/android.url_launcher_android.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1013673244/android.url_launcher_android.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1013673244/android.url_launcher_android.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1013673244/android.url_launcher_android.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-1013673244/android.url_launcher_android.unitTest.iml" />
+    </modules>
+  </component>
+</project>
