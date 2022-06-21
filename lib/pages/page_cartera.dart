@@ -200,7 +200,12 @@ class _PageCarteraState extends State<PageCartera> {
                 child: Consumer<CarteraProvider>(
                   builder: (context, data, child) {
                     if (data.fondos.isEmpty) {
-                      return const Center(child: Text('No hay fondos guardados.'));
+                      return const Center(
+                        child: Text(
+                          'Añade fondos a esta cartera.',
+                          style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 22),
+                        ),
+                      );
                     }
                     return ListView.builder(
                       itemCount: data.fondos.length,

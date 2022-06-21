@@ -159,7 +159,12 @@ class _PageHomeState extends State<PageHome> {
                   child: Consumer<CarteraProvider>(
                     builder: (context, data, child) {
                       if (data.carteras.isEmpty) {
-                        return const Center(child: Text('No hay carteras guardadas.'));
+                        return const Center(
+                          child: Text(
+                            'Empieza creando una cartera.',
+                            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 22),
+                          ),
+                        );
                       }
                       return ListView.builder(
                         //padding: const EdgeInsets.all(10),

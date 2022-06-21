@@ -2,6 +2,12 @@
   "configVersion": 2,
   "packages": [
     {
+      "name": "archive",
+      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/archive-3.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "args",
       "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/args-2.3.1",
       "packageUri": "lib/",
@@ -42,6 +48,12 @@
       "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/collection-1.16.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
+    },
+    {
+      "name": "crypto",
+      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/crypto-3.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.14"
     },
     {
       "name": "cupertino_icons",
@@ -92,6 +104,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "flutter_launcher_icons",
+      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_launcher_icons-0.9.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "flutter_lints",
       "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_lints-2.0.1",
       "packageUri": "lib/",
@@ -138,6 +156,12 @@
       "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/http_parser-4.0.1",
       "packageUri": "lib/",
       "languageVersion": "2.12"
+    },
+    {
+      "name": "image",
+      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/image-3.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
     },
     {
       "name": "intl",
@@ -210,6 +234,12 @@
       "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_windows-2.1.0",
       "packageUri": "lib/",
       "languageVersion": "2.17"
+    },
+    {
+      "name": "petitparser",
+      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/petitparser-5.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.16"
     },
     {
       "name": "platform",
@@ -416,13 +446,25 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "xml",
+      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/xml-6.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "yaml",
+      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/yaml-3.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "carfoin",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2022-06-21T10:17:44.955873Z",
+  "generated": "2022-06-21T17:32:11.886691Z",
   "generator": "pub",
   "generatorVersion": "2.17.3"
 }
