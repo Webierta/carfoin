@@ -248,31 +248,40 @@ class _MainFondoState extends State<MainFondo> {
                     : FractionallySizedBox(
                         widthFactor: 0.9,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          //padding: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
                             border: Border.all(color: const Color(0xFF2196F3), width: 2),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                FechaUtil.epochToString(valores.first.date),
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              Text(
-                                '${valores.first.precio} ${fondoSelect.divisa}',
-                                style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                              if (_getDiferencia() != null)
-                                Text(_getDiferencia()!.toStringAsFixed(2),
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: _getDiferencia()! < 0
-                                          ? const Color(0xFFF44336)
-                                          : const Color(0xFF4CAF50),
-                                    )),
-                            ],
+                          child: IntrinsicHeight(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  FechaUtil.epochToString(valores.first.date),
+                                  //style: Theme.of(context).textTheme.titleMedium,
+                                ),
+                                const VerticalDivider(color: Color(0xFF2196F3), thickness: 2),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  child: Text(
+                                    '${valores.first.precio} ${fondoSelect.divisa}',
+                                    //style: Theme.of(context).textTheme.titleLarge,
+                                    style:
+                                        const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                const VerticalDivider(color: Color(0xFF2196F3), thickness: 2),
+                                if (_getDiferencia() != null)
+                                  Text(_getDiferencia()!.toStringAsFixed(2),
+                                      style: TextStyle(
+                                        //fontSize: 16,
+                                        color: _getDiferencia()! < 0
+                                            ? const Color(0xFFF44336)
+                                            : const Color(0xFF4CAF50),
+                                      )),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -349,7 +358,9 @@ class _MainFondoState extends State<MainFondo> {
                 ListTile(
                   contentPadding: const EdgeInsets.all(12),
                   leading: const Icon(Icons.compare_arrows, size: 32, color: Color(0xFF2196F3)),
-                  title: Text('OPERACIONES', style: Theme.of(context).textTheme.titleLarge),
+                  title: FittedBox(
+                    child: Text('OPERACIONES', style: Theme.of(context).textTheme.titleLarge),
+                  ),
                   trailing: CircleAvatar(
                     backgroundColor: const Color(0xFFFFC107),
                     child: IconButton(
@@ -408,16 +419,20 @@ class _MainFondoState extends State<MainFondo> {
                       color: Color(0xFF2196F3),
                     ), // Icons.balance
                     title: Text('BALANCE', style: Theme.of(context).textTheme.titleLarge),
-                    trailing: Chip(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      backgroundColor: const Color(0xFFBBDEFB),
-                      avatar: const Icon(Icons.calendar_today, size: 20, color: Color(0xFF0D47A1)),
-                      label: Text(
-                        FechaUtil.epochToString(
-                          valores.first.date,
-                          formato: 'dd/MM/yy',
+                    subtitle: Align(
+                      alignment: Alignment.topLeft,
+                      child: Chip(
+                        //padding: const EdgeInsets.symmetric(horizontal: 10),
+                        backgroundColor: const Color(0xFFBBDEFB),
+                        avatar:
+                            const Icon(Icons.calendar_today, size: 20, color: Color(0xFF0D47A1)),
+                        label: Text(
+                          FechaUtil.epochToString(
+                            valores.first.date,
+                            formato: 'dd/MM/yy',
+                          ),
+                          style: const TextStyle(color: Color(0xFF0D47A1)),
                         ),
-                        style: const TextStyle(color: Color(0xFF0D47A1)),
                       ),
                     ),
                   ),

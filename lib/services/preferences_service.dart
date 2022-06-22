@@ -18,6 +18,6 @@ class PreferencesService {
     if (sharedPreferences.containsKey(key)) {
       return sharedPreferences.getBool(key) ?? true;
     }
-    return false;
+    return true;
   }
 }

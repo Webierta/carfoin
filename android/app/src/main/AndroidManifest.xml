@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.github.webierta.carfoin.carfoin">
+    package="com.github.webierta.carfoin">
+    
+   <uses-permission android:name="android.permission.INTERNET"/>
+    
    <application
         android:label="Carfoin"
         android:name="${applicationName}"

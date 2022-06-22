@@ -73,119 +73,122 @@ class _TablaFondoState extends State<TablaFondo> {
 
     return valores.isEmpty
         ? const Center(child: Text('Sin datos'))
-        : Column(
-            children: [
-              Container(
-                color: const Color(0xFFFFC107),
-                child: Row(
-                  children: [
-                    Expanded(
+        : Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Column(
+              children: [
+                Container(
+                  color: const Color(0xFFFFC107),
+                  child: Row(
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: IconButton(
+                            icon: const Icon(Icons.swap_vert),
+                            onPressed: () => _changeSort(),
+                          )),
+                      const Expanded(
+                          flex: 3,
+                          child: Text(
+                            'FECHA',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )),
+                      const Expanded(
+                          flex: 3,
+                          child: Text(
+                            'PRECIO',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )),
+                      const Expanded(
+                          flex: 2,
+                          child: Text(
+                            '+/-',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )),
+                      const Expanded(
                         flex: 1,
-                        child: IconButton(
-                          icon: const Icon(Icons.swap_vert),
-                          onPressed: () => _changeSort(),
-                        )),
-                    const Expanded(
-                        flex: 3,
-                        child: Text(
-                          'FECHA',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                    const Expanded(
-                        flex: 3,
-                        child: Text(
-                          'PRECIO',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                    const Expanded(
-                        flex: 2,
-                        child: Text(
-                          '+/-',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                    const Expanded(
-                      flex: 1,
-                      child: Text(''),
-                    ),
-                  ],
+                        child: Text(''),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.only(top: 14),
-                  separatorBuilder: (context, index) => const Divider(
-                      color: Color(0xFF9E9E9E), height: 24, indent: 10, endIndent: 10),
-                  shrinkWrap: true,
-                  physics: const ClampingScrollPhysics(),
-                  itemCount: valores.length,
-                  itemBuilder: (context, index) {
-                    return Dismissible(
-                        key: UniqueKey(),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          color: Colors.red,
-                          margin: const EdgeInsets.symmetric(horizontal: 15),
-                          alignment: Alignment.centerRight,
-                          child: const Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: Icon(Icons.delete, color: Colors.white),
-                          ),
-                        ),
-                        onDismissed: (_) async {
-                          print('ELIMINAR VALOR');
-                          //var carfoin = context.read<CarfoinProvider>();
-                          //await carfoin.eliminarValor(valoresOn[index].date);
-                          //await carfoin.updateValores();
-                          //final carteraProvider = context.read<CarteraProvider>();
-                          /// TODO...
-                          await database.deleteValor(carteraSelect, fondoSelect, valores[index]);
-                          await setValores(carteraSelect, fondoSelect);
-
-                          //PageFondo page = PageFondo().eliminarValor() ;
-                        },
-                        child: Row(
-                          children: [
-                            Expanded(
-                                flex: 1,
-                                child: Text(
-                                  _isSortDesc ? '${valores.length - index}' : '${index + 1}',
-                                  textAlign: TextAlign.center,
-                                )),
-                            Expanded(
-                                flex: 3,
-                                child: Text(
-                                  //_epochFormat(valoresCopy[index].date),
-                                  FechaUtil.epochToString(valores[index].date),
-                                  textAlign: TextAlign.center,
-                                )),
-                            Expanded(
-                                flex: 3,
-                                child: Text(
-                                  '${valores[index].precio}',
-                                  textAlign: TextAlign.center,
-                                )),
-                            Expanded(
-                              flex: 2,
-                              child: _diferencia(valores[index]),
+                Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.only(top: 10),
+                    separatorBuilder: (context, index) => const Divider(
+                        color: Color(0xFF9E9E9E), height: 20, indent: 10, endIndent: 10),
+                    shrinkWrap: true,
+                    physics: const ClampingScrollPhysics(),
+                    itemCount: valores.length,
+                    itemBuilder: (context, index) {
+                      return Dismissible(
+                          key: UniqueKey(),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            color: Colors.red,
+                            margin: const EdgeInsets.symmetric(horizontal: 15),
+                            alignment: Alignment.centerRight,
+                            child: const Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: Icon(Icons.delete, color: Colors.white),
                             ),
-                            Expanded(
-                              flex: 1,
-                              child: IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () {
-                                  print('EDITAR');
-                                },
+                          ),
+                          onDismissed: (_) async {
+                            print('ELIMINAR VALOR');
+                            //var carfoin = context.read<CarfoinProvider>();
+                            //await carfoin.eliminarValor(valoresOn[index].date);
+                            //await carfoin.updateValores();
+                            //final carteraProvider = context.read<CarteraProvider>();
+                            /// TODO...
+                            await database.deleteValor(carteraSelect, fondoSelect, valores[index]);
+                            await setValores(carteraSelect, fondoSelect);
+
+                            //PageFondo page = PageFondo().eliminarValor() ;
+                          },
+                          child: Row(
+                            children: [
+                              Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    _isSortDesc ? '${valores.length - index}' : '${index + 1}',
+                                    textAlign: TextAlign.center,
+                                  )),
+                              Expanded(
+                                  flex: 3,
+                                  child: Text(
+                                    //_epochFormat(valoresCopy[index].date),
+                                    FechaUtil.epochToString(valores[index].date),
+                                    textAlign: TextAlign.center,
+                                  )),
+                              Expanded(
+                                  flex: 3,
+                                  child: Text(
+                                    '${valores[index].precio}',
+                                    textAlign: TextAlign.center,
+                                  )),
+                              Expanded(
+                                flex: 2,
+                                child: _diferencia(valores[index]),
                               ),
-                            )
-                          ],
-                        ));
-                  },
+                              Expanded(
+                                flex: 1,
+                                child: IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  onPressed: () {
+                                    print('EDITAR');
+                                  },
+                                ),
+                              )
+                            ],
+                          ));
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
   }
 }

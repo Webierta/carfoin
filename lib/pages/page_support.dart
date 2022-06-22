@@ -65,26 +65,23 @@ class PageSupport extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10.0),
-            Center(
-              child: RichText(
-                text: TextSpan(
-                  children: [
-                    const TextSpan(
-                        style: TextStyle(color: Colors.black, fontSize: 18),
-                        text:
-                            '¿Crees que has encontrado un problema? Identificar y corregir errores hace que '
-                            'esta App sea mejor para todos. Informa de un error o sugiere una nueva funcionalidad aquí: '),
-                    TextSpan(
-                      style: const TextStyle(
-                        color: Colors.blueAccent,
-                        fontSize: 18,
-                        decoration: TextDecoration.underline,
-                      ),
-                      text: 'GitHub issues.',
-                      recognizer: TapGestureRecognizer()..onTap = () => _launchUrl(urlGitHub),
+            Text.rich(
+              TextSpan(
+                style: const TextStyle(fontSize: 18),
+                text:
+                    '¿Crees que has encontrado un problema? Identificar y corregir errores hace que '
+                    'esta App sea mejor para todos. Informa de un error o sugiere una nueva funcionalidad aquí: ',
+                children: [
+                  TextSpan(
+                    style: const TextStyle(
+                      color: Colors.blueAccent,
+                      //fontSize: 18,
+                      decoration: TextDecoration.underline,
                     ),
-                  ],
-                ),
+                    text: 'GitHub issues.',
+                    recognizer: TapGestureRecognizer()..onTap = () => _launchUrl(urlGitHub),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 10.0),

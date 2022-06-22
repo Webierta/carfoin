@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../routes.dart';
 import '../services/preferences_service.dart';
-import '../utils/konstantes.dart';
 import '../widgets/my_drawer.dart';
 
 class PageSettings extends StatefulWidget {
@@ -20,30 +19,36 @@ class _PageSettingsState extends State<PageSettings> {
   bool _isConfirmDelete = true;
 
   getSharedPrefs() async {
-    await PreferencesService.getBool(keyByOrderCarterasPref).then((value) {
-      setState(() => _isCarterasByOrder = value);
-    });
-    await PreferencesService.getBool(keyConfirmDeleteCarteraPref).then((value) {
-      setState(() => _isConfirmDeleteCartera = value);
-    });
-    await PreferencesService.getBool(keyByOrderFondosPref).then((value) {
-      setState(() => _isFondosByOrder = value);
-    });
-    await PreferencesService.getBool(keyConfirmDeleteFondoPref).then((value) {
-      setState(() => _isConfirmDeleteFondo = value);
-    });
-    await PreferencesService.getBool(keyAutoUpdatePref).then((value) {
-      setState(() => _isAutoUpdate = value);
-    });
-    await PreferencesService.getBool(keyConfirmDeletePref).then((value) {
-      setState(() => _isConfirmDelete = value);
+    bool isCarterasByOrder = true;
+    bool isConfirmDeleteCartera = true;
+    bool isFondosByOrder = true;
+    bool isConfirmDeleteFondo = true;
+    bool isAutoUpdate = true;
+    bool isConfirmDelete = true;
+
+    await PreferencesService.getBool(keyByOrderCarterasPref)
+        .then((value) => isCarterasByOrder = value);
+    await PreferencesService.getBool(keyConfirmDeleteCarteraPref)
+        .then((value) => isConfirmDeleteCartera = value);
+    await PreferencesService.getBool(keyByOrderFondosPref).then((value) => isFondosByOrder = value);
+    await PreferencesService.getBool(keyConfirmDeleteFondoPref)
+        .then((value) => isConfirmDeleteFondo = value);
+    await PreferencesService.getBool(keyAutoUpdatePref).then((value) => isAutoUpdate = value);
+    await PreferencesService.getBool(keyConfirmDeletePref).then((value) => isConfirmDelete = value);
+    setState(() {
+      _isCarterasByOrder = isCarterasByOrder;
+      _isConfirmDeleteCartera = isConfirmDeleteCartera;
+      _isFondosByOrder = isFondosByOrder;
+      _isConfirmDeleteFondo = isConfirmDeleteFondo;
+      _isAutoUpdate = isAutoUpdate;
+      _isConfirmDelete = isConfirmDelete;
     });
   }
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      getSharedPrefs();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await getSharedPrefs();
     });
     super.initState();
   }
@@ -67,12 +72,17 @@ class _PageSettingsState extends State<PageSettings> {
         ),
         drawer: const MyDrawer(),
         body: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+          padding: const EdgeInsets.symmetric(vertical: 10),
           children: [
-            const Text('CARTERAS'),
+            const Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: Text('CARTERAS'),
+            ),
             ListTile(
-              leading: const Icon(Icons.sort_by_alpha, color: Color(0xFF0D47A1)),
-              title: const Text('Carteras ordenadas por nombre'),
+              dense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+              leading: const Icon(Icons.sort_by_alpha, color: Color(0xFF2196F3)),
+              title: const Text('Ordenadas por nombre'),
               trailing: Switch(
                 value: _isCarterasByOrder,
                 onChanged: (value) {
@@ -82,10 +92,11 @@ class _PageSettingsState extends State<PageSettings> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.delete_forever, color: Color(0xFF0D47A1)),
-              title: const Text('Confirmar antes de eliminar una cartera y todos sus fondos'),
-              subtitle:
-                  const Text('La eliminación de todas las carteras siempre requiere confirmación'),
+              dense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+              leading: const Icon(Icons.delete_forever, color: Color(0xFF2196F3)),
+              title: const Text('Confirmar antes de eliminar una cartera y sus fondos'),
+              subtitle: const Text('Eliminar todas las carteras siempre requiere confirmación'),
               trailing: Switch(
                 value: _isConfirmDeleteCartera,
                 onChanged: (value) {
@@ -94,12 +105,17 @@ class _PageSettingsState extends State<PageSettings> {
                 },
               ),
             ),
-            const Divider(color: Color(0xFF9E9E9E), height: 30),
-            const Text('FONDOS'),
+            const Divider(color: Color(0xFF9E9E9E), height: 30, indent: 20, endIndent: 20),
+            const Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: Text('FONDOS'),
+            ),
             ListTile(
-              leading: const Icon(Icons.sort_by_alpha, color: Color(0xFF0D47A1)),
-              title: const Text('Fondos ordenados por nombre'),
-              subtitle: const Text('Por defecto se ordenan por fecha de creación o actualización'),
+              dense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+              leading: const Icon(Icons.sort_by_alpha, color: Color(0xFF2196F3)),
+              title: const Text('Ordenados por nombre'),
+              subtitle: const Text('Por defecto por fecha de creación o actualización'),
               trailing: Switch(
                 value: _isFondosByOrder,
                 onChanged: (value) {
@@ -109,9 +125,11 @@ class _PageSettingsState extends State<PageSettings> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.delete_forever, color: Color(0xFF0D47A1)),
+              dense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+              leading: const Icon(Icons.delete_forever, color: Color(0xFF2196F3)),
               title: const Text('Confirmar antes de eliminar'),
-              subtitle: const Text('La eliminación de todos los fondos de una cartera '
+              subtitle: const Text('Eliminar todos los fondos de una cartera '
                   'siempre requiere confirmación'),
               trailing: Switch(
                 value: _isConfirmDeleteFondo,
@@ -121,10 +139,15 @@ class _PageSettingsState extends State<PageSettings> {
                 },
               ),
             ),
-            const Divider(color: Color(0xFF9E9E9E), height: 30),
-            const Text('VALORES'),
+            const Divider(color: Color(0xFF9E9E9E), height: 30, indent: 20, endIndent: 20),
+            const Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: Text('VALORES'),
+            ),
             ListTile(
-              leading: const Icon(Icons.sync, color: Color(0xFF0D47A1)),
+              dense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+              leading: const Icon(Icons.sync, color: Color(0xFF2196F3)),
               title: const Text('Actualizar último valor al añadir Fondo'),
               subtitle: const Text('Recomendado para obtener la divisa del fondo'),
               trailing: Switch(
@@ -135,14 +158,19 @@ class _PageSettingsState extends State<PageSettings> {
                 },
               ),
             ),
-            const Divider(color: Color(0xFF9E9E9E), height: 30),
-            const Text('OPERACIONES'),
+            const Divider(color: Color(0xFF9E9E9E), height: 30, indent: 20, endIndent: 20),
+            const Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: Text('OPERACIONES'),
+            ),
             ListTile(
-              leading: const Icon(Icons.delete_forever, color: Color(0xFF0D47A1)),
+              dense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+              leading: const Icon(Icons.delete_forever, color: Color(0xFF2196F3)),
               title: const Text('Confirmar antes de eliminar'),
-              subtitle: const Text(
-                  'La eliminación de operaciones de suscripción siempre requiere confirmación '
-                  'porque conlleva la eliminación de todas las operaciones posteriores'),
+              subtitle:
+                  const Text('Eliminar operaciones de suscripción siempre requiere confirmación '
+                      'y conlleva la eliminación de todas las operaciones posteriores'),
               trailing: Switch(
                 value: _isConfirmDelete,
                 onChanged: (value) {

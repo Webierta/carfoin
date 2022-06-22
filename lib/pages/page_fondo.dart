@@ -72,6 +72,7 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
       child: Column(
         children: [
           ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
             leading: Icon(iconData, color: const Color(0xFFFFFFFF)),
             title: Text(
               '${menu.name[0].toUpperCase()}${menu.name.substring(1)}',
@@ -119,12 +120,24 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
                   },
                 ),
                 title: ListTile(
-                  title: Text(fondoSelect.name, style: const TextStyle(color: Color(0xFF0D47A1))),
+                  title: Text(
+                    fondoSelect.name,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: const TextStyle(color: Color(0xFF0D47A1)),
+                  ),
                   subtitle: Row(
                     children: [
                       const Icon(Icons.business_center, color: Color(0xFF0D47A1)),
                       const SizedBox(width: 10),
-                      Text(carteraSelect.name, style: const TextStyle(color: Color(0xFF0D47A1))),
+                      Flexible(
+                        child: Text(
+                          carteraSelect.name,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: const TextStyle(color: Color(0xFF0D47A1)),
+                        ),
+                      ),
                     ],
                   ),
                 ),

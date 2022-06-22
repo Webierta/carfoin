@@ -88,6 +88,7 @@ class _PageCarteraState extends State<PageCartera> {
       child: Column(
         children: [
           ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
             leading: Icon(iconData, color: const Color(0xFFFFFFFF)),
             title: Text(
               '${menu.name[0].toUpperCase()}${menu.name.substring(1)}',
@@ -146,7 +147,9 @@ class _PageCarteraState extends State<PageCartera> {
                   children: [
                     const Icon(Icons.business_center),
                     const SizedBox(width: 10),
-                    Text(carteraSelect.name),
+                    Flexible(
+                      child: Text(carteraSelect.name, overflow: TextOverflow.ellipsis, maxLines: 1),
+                    ),
                   ],
                 ),
                 actions: [
@@ -254,24 +257,30 @@ class _PageCarteraState extends State<PageCartera> {
                                 title: Text(fondo.name),
                                 subtitle: Text(fondo.isin),
                                 trailing: Column(
+                                  //mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     // lastDate / lastPrecio / diferencia
                                     //Text('${fondo.dateMaximo ?? ''}'),
-                                    Text(lastDate),
-                                    Text(
-                                      lastPrecio,
-                                      style: const TextStyle(fontWeight: FontWeight.bold),
-                                    ),
-                                    if (diferencia != null)
-                                      Text(
-                                        diferencia.toStringAsFixed(2),
-                                        style: TextStyle(
-                                            color: diferencia < 0
-                                                ? const Color(0xFFF44336)
-                                                : const Color(0xFF4CAF50)),
+                                    Expanded(child: Text(lastDate)),
+                                    Expanded(
+                                      child: Text(
+                                        lastPrecio,
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
                                       ),
+                                    ),
+                                    diferencia != null
+                                        ? Expanded(
+                                            child: Text(
+                                              diferencia.toStringAsFixed(2),
+                                              style: TextStyle(
+                                                  color: diferencia < 0
+                                                      ? const Color(0xFFF44336)
+                                                      : const Color(0xFF4CAF50)),
+                                            ),
+                                          )
+                                        : const Spacer(),
                                   ],
                                 ),
                                 onTap: () {

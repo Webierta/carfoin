@@ -195,7 +195,7 @@ class GraficoFondo extends StatelessWidget {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Container(
-        padding: const EdgeInsets.only(top: 40, left: 5, right: 5, bottom: 10),
+        padding: const EdgeInsets.only(top: 30, left: 5, right: 5, bottom: 10),
         width: spots.length < 100
             ? MediaQuery.of(context).size.width
             : MediaQuery.of(context).size.height * 2,

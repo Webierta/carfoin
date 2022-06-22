@@ -1,4 +1,4 @@
-package com.github.webierta.carfoin.carfoin
+package com.github.webierta.carfoin
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -82,6 +82,7 @@ class _PageHomeState extends State<PageHome> {
       child: Column(
         children: [
           ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
             leading: Icon(iconData, color: const Color(0xFFFFFFFF)),
             title: Text(
               '${menu.name[0].toUpperCase()}${menu.name.substring(1)}',
