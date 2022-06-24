@@ -105,6 +105,21 @@ class _PageHomeState extends State<PageHome> {
 
   @override
   Widget build(BuildContext context) {
+    _buildChipFondo(int? lengthFondos) {
+      return Align(
+        alignment: Alignment.topLeft,
+        child: Chip(
+          padding: const EdgeInsets.only(left: 10, right: 20),
+          backgroundColor: const Color(0xFFBBDEFB),
+          avatar: const Icon(Icons.poll, color: Color(0xFF0D47A1), size: 32),
+          label: Text(
+            '${lengthFondos ?? 'Sin'} Fondos',
+            style: const TextStyle(color: Color(0xFF0D47A1), fontSize: 18),
+          ),
+        ),
+      );
+    }
+
     return FutureBuilder(
       future: database.getCarteras(byOrder: _isCarterasByOrder),
       builder: (BuildContext context, AsyncSnapshot<List<Cartera>> snapshot) {
@@ -153,8 +168,6 @@ class _PageHomeState extends State<PageHome> {
                   child: const Icon(Icons.add, color: Color(0xFF0D47A1)),
                   onPressed: () => _carteraInput(context),
                 ),
-                /*body: carteras.isEmpty
-                          ? const Center(child: Text('No hay carteras guardadas.')) : Consumer...*/
                 body: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Consumer<CarteraProvider>(
@@ -168,11 +181,10 @@ class _PageHomeState extends State<PageHome> {
                         );
                       }
                       return ListView.builder(
-                        //padding: const EdgeInsets.all(10),
                         itemCount: data.carteras.length,
                         itemBuilder: (context, index) {
                           Cartera cartera = data.carteras[index];
-                          //List<Fondo> fondos = cartera.fondos ?? [];
+                          List<Fondo> fondos = cartera.fondos ?? [];
                           return Dismissible(
                             key: UniqueKey(),
                             direction: DismissDirection.endToStart,
@@ -188,74 +200,125 @@ class _PageHomeState extends State<PageHome> {
                             onDismissed: (_) => _deleteCartera(cartera),
                             child: Padding(
                               padding: const EdgeInsets.all(12.0),
-                              child: Card(
-                                child: ListTile(
-                                  contentPadding: const EdgeInsets.all(12.0),
-                                  onTap: () {
-                                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                    carteraProvider.carteraSelect = cartera;
-                                    Navigator.of(context).pushNamed(RouteGenerator.carteraPage);
-                                  },
-                                  leading: const Icon(
-                                    Icons.business_center,
-                                    size: 32,
-                                    color: Color(0xFF2196F3),
-                                  ),
-                                  //leading: Text('${carteras[index].id}'),
-                                  //leading: Text('${cartera.id}'),
-                                  title: Text(cartera.name),
-                                  subtitle: Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Chip(
-                                      padding: const EdgeInsets.only(left: 10, right: 20),
-                                      //backgroundColor: const Color(0xFFFFC107),
-                                      backgroundColor: const Color(0xFFBBDEFB),
-                                      //shape: const StadiumBorder(side: BorderSide()),
-                                      avatar: const Icon(
-                                        Icons.poll,
-                                        color: Color(0xFF0D47A1),
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromRGBO(255, 255, 255, 0.5),
+                                  border: Border.all(color: Colors.white, width: 2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  children: [
+                                    ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundColor: const Color(0xFFFFC107),
+                                        child: IconButton(
+                                          onPressed: () {
+                                            ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                            carteraProvider.carteraSelect = cartera;
+                                            Navigator.of(context)
+                                                .pushNamed(RouteGenerator.carteraPage);
+                                          },
+                                          icon: const Icon(
+                                            Icons.business_center,
+                                            color: Color(0xFF0D47A1),
+                                          ),
+                                        ),
                                       ),
-                                      label: Text(
-                                        '${cartera.fondos?.length ?? 'Sin fondos'}',
-                                        style: const TextStyle(color: Color(0xFF0D47A1)),
+                                      title: Text(
+                                        cartera.name,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 24,
+                                          color: Color(0xFF2196F3),
+                                        ),
+                                      ),
+                                      trailing: PopupMenuButton(
+                                        color: const Color(0xFF2196F3),
+                                        icon: const Icon(Icons.more_vert, color: Color(0xFF2196F3)),
+                                        itemBuilder: (context) => const [
+                                          PopupMenuItem(
+                                            value: 1,
+                                            child: ListTile(
+                                              leading: Icon(Icons.edit, color: Color(0xFFFFFFFF)),
+                                              title: Text(
+                                                'Renombrar',
+                                                style: TextStyle(color: Color(0xFFFFFFFF)),
+                                              ),
+                                            ),
+                                          ),
+                                          PopupMenuItem(
+                                            value: 2,
+                                            child: ListTile(
+                                              leading: Icon(Icons.delete_forever,
+                                                  color: Color(0xFFFFFFFF)),
+                                              title: Text(
+                                                'Eliminar',
+                                                style: TextStyle(color: Color(0xFFFFFFFF)),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                        onSelected: (value) {
+                                          if (value == 1) {
+                                            _carteraInput(context, cartera: cartera);
+                                          } else if (value == 2) {
+                                            _deleteCartera(cartera);
+                                          }
+                                        },
                                       ),
                                     ),
-                                  ),
-                                  trailing: PopupMenuButton(
-                                    color: const Color(0xFF2196F3),
-                                    icon: const Icon(Icons.more_vert, color: Color(0xFF2196F3)),
-                                    itemBuilder: (context) => const [
-                                      PopupMenuItem(
-                                        value: 1,
-                                        child: ListTile(
-                                          leading: Icon(Icons.edit, color: Color(0xFFFFFFFF)),
-                                          title: Text(
-                                            'Renombrar',
-                                            style: TextStyle(color: Color(0xFFFFFFFF)),
-                                          ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Container(
+                                        padding: const EdgeInsets.only(right: 12),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFBBDEFB),
+                                          border: Border.all(color: Colors.white, width: 2),
+                                          borderRadius: BorderRadius.circular(12),
                                         ),
+                                        //child: (cartera.fondos != null && cartera.fondos!.isNotEmpty)
+                                        child: fondos.isNotEmpty
+                                            ? Theme(
+                                                data: Theme.of(context)
+                                                    .copyWith(dividerColor: Colors.transparent),
+                                                child: ExpansionTile(
+                                                  childrenPadding:
+                                                      const EdgeInsets.only(bottom: 10, left: 20),
+                                                  expandedCrossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  expandedAlignment: Alignment.topLeft,
+                                                  maintainState: true,
+                                                  iconColor: Colors.blue,
+                                                  collapsedIconColor: Colors.blue,
+                                                  tilePadding: const EdgeInsets.all(0.0),
+                                                  backgroundColor: const Color(0xFFBBDEFB),
+                                                  title: _buildChipFondo(fondos.length),
+                                                  children: [
+                                                    for (var fondo in fondos)
+                                                      Padding(
+                                                        padding: const EdgeInsets.symmetric(
+                                                            vertical: 10),
+                                                        child: Text(
+                                                          fondo.name,
+                                                          overflow: TextOverflow.ellipsis,
+                                                          maxLines: 1,
+                                                          style: const TextStyle(
+                                                              color: Color(0xFF0D47A1)),
+                                                        ),
+                                                      )
+                                                  ],
+                                                ),
+                                              )
+                                            : Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 6),
+                                                child: _buildChipFondo(null),
+                                              ),
                                       ),
-                                      PopupMenuItem(
-                                        value: 2,
-                                        child: ListTile(
-                                          leading:
-                                              Icon(Icons.delete_forever, color: Color(0xFFFFFFFF)),
-                                          title: Text(
-                                            'Eliminar',
-                                            style: TextStyle(color: Color(0xFFFFFFFF)),
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                    onSelected: (value) {
-                                      if (value == 1) {
-                                        print('RENOMBRAR');
-                                        _carteraInput(context, cartera: cartera);
-                                      } else if (value == 2) {
-                                        _deleteCartera(cartera);
-                                      }
-                                    },
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
