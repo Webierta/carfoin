@@ -11,6 +11,7 @@ import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../utils/fecha_util.dart';
 import '../utils/konstantes.dart';
+import '../utils/stats.dart';
 import '../widgets/loading_progress.dart';
 
 enum MenuCartera { ordenar, eliminar }
@@ -31,6 +32,8 @@ class _PageCarteraState extends State<PageCartera> {
   late Cartera carteraSelect;
   final GlobalKey _dialogKey = GlobalKey();
   String _loadingText = '';
+
+  late Stats stats;
 
   getSharedPrefs() async {
     bool? isFondosByOrder;
@@ -218,16 +221,24 @@ class _PageCarteraState extends State<PageCartera> {
                         //final valores = context.read<CarteraProvider>().valores;
                         List<Valor>? valores = data.fondos[index].valores;
                         String lastDate = '';
+                        int dia = 0;
+                        String mesYear = '';
                         String lastPrecio = '';
+                        String divisa = fondo.divisa ?? '';
                         double? diferencia;
                         if (valores != null && valores.isNotEmpty) {
                           int lastEpoch = valores.first.date;
                           lastDate = FechaUtil.epochToString(lastEpoch);
+                          dia = FechaUtil.epochToDate(lastEpoch).day;
+                          //mes = FechaUtil.epochToDate(lastEpoch).month;
+                          //ano = FechaUtil.epochToDate(lastEpoch).year;
+                          mesYear = FechaUtil.epochToString(lastEpoch, formato: 'MMM yy');
                           lastPrecio =
                               NumberFormat.decimalPattern('es').format(valores.first.precio);
                           if (valores.length > 1) {
                             diferencia = valores.first.precio - valores[1].precio;
                           }
+                          stats = Stats(valores);
                         }
                         return Dismissible(
                           key: UniqueKey(),
@@ -246,48 +257,130 @@ class _PageCarteraState extends State<PageCartera> {
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(12.0),
-                            child: Card(
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.all(12.0),
-                                leading: const Icon(
-                                  Icons.assessment,
-                                  size: 32,
-                                  color: Color(0xFF2196F3),
-                                ),
-                                title: Text(fondo.name),
-                                subtitle: Text(fondo.isin),
-                                trailing: Column(
-                                  //mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    // lastDate / lastPrecio / diferencia
-                                    //Text('${fondo.dateMaximo ?? ''}'),
-                                    Expanded(child: Text(lastDate)),
-                                    Expanded(
-                                      child: Text(
-                                        lastPrecio,
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: const Color.fromRGBO(255, 255, 255, 0.5),
+                                border: Border.all(color: Colors.white, width: 2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    //contentPadding: const EdgeInsets.all(12.0),
+                                    leading: CircleAvatar(
+                                      backgroundColor: const Color(0xFFFFC107),
+                                      child: IconButton(
+                                        onPressed: () {
+                                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                          carteraProvider.fondoSelect = fondo;
+                                          Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
+                                        },
+                                        icon: const Icon(
+                                          Icons.poll,
+                                          color: Color(0xFF0D47A1),
+                                        ),
                                       ),
                                     ),
-                                    diferencia != null
-                                        ? Expanded(
-                                            child: Text(
-                                              diferencia.toStringAsFixed(2),
-                                              style: TextStyle(
-                                                  color: diferencia < 0
-                                                      ? const Color(0xFFF44336)
-                                                      : const Color(0xFF4CAF50)),
+                                    title: Text(
+                                      fondo.name,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                        color: Color(0xFF2196F3),
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      fondo.isin,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Color(0xFF0D47A1),
+                                      ),
+                                    ),
+                                    trailing: const Icon(Icons.more_vert),
+                                  ),
+                                  if (valores != null && valores.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                                      child: Container(
+                                        //padding: const EdgeInsets.all(16),
+                                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFBBDEFB),
+                                          border: Border.all(color: Colors.white, width: 2),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: ListTile(
+                                          //leading: Text(lastDate),
+                                          contentPadding: const EdgeInsets.all(0),
+                                          dense: true,
+                                          leading: Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF2196F3),
+                                              shape: BoxShape.rectangle,
+                                              //border: Border.all(width: 1.0, color: Colors.blue),
+                                              borderRadius: BorderRadius.circular(2),
                                             ),
-                                          )
-                                        : const Spacer(),
-                                  ],
-                                ),
-                                onTap: () {
-                                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                  carteraProvider.fondoSelect = fondo;
-                                  Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
-                                },
+                                            child: FittedBox(
+                                              fit: BoxFit.fill,
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    mesYear,
+                                                    style:
+                                                        const TextStyle(color: Color(0xFFFFFFFF)),
+                                                  ),
+                                                  Text(
+                                                    '$dia',
+                                                    style: const TextStyle(
+                                                      color: Color(0xFFFFFFFF),
+                                                      fontSize: 32,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          title: Text(
+                                            'V.L. $lastPrecio $divisa',
+                                            style: const TextStyle(
+                                              color: Color(0xFF0D47A1),
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          subtitle: (stats.resultado() != null &&
+                                                  stats.resultado() != 0)
+                                              ? Text(
+                                                  'Capital: ${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} $divisa',
+                                                  style: const TextStyle(color: Color(0xFF0D47A1)),
+                                                )
+                                              : const Text('Sin inversiones'),
+                                          trailing: diferencia != null
+                                              ? Column(
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  children: [
+                                                    const SizedBox(height: 10),
+                                                    Text(
+                                                      diferencia.toStringAsFixed(2),
+                                                      style: TextStyle(
+                                                          color: diferencia < 0
+                                                              ? const Color(0xFFF44336)
+                                                              : const Color(0xFF4CAF50)),
+                                                    ),
+                                                  ],
+                                                )
+                                              : const Text(''),
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               ),
                             ),
                           ),

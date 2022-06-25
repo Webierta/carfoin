@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +9,8 @@ import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../utils/fecha_util.dart';
 import '../utils/stats.dart';
+import 'hoja_calendario.dart';
+//import 'hoja_calendario.dart';
 
 class MainFondo extends StatefulWidget {
   const MainFondo({Key? key}) : super(key: key);
@@ -73,6 +73,13 @@ class _MainFondoState extends State<MainFondo> {
     //final fondoSelect = carteraProvider.fondoSelect;
     final List<Valor> valores = context.watch<CarteraProvider>().valores;
     final List<Valor> operaciones = context.watch<CarteraProvider>().operaciones;
+
+    int dia = 0;
+    String mesYear = '';
+    if (valores.isNotEmpty) {
+      dia = FechaUtil.epochToDate(valores.first.date).day;
+      mesYear = FechaUtil.epochToString(valores.first.date, formato: 'MMM yy');
+    }
 
     stats = Stats(valores);
 
@@ -231,7 +238,7 @@ class _MainFondoState extends State<MainFondo> {
             child: Column(
               children: [
                 ListTile(
-                  contentPadding: const EdgeInsets.only(bottom: 12, left: 12, right: 12, top: 0),
+                  //contentPadding: const EdgeInsets.only(bottom: 12, left: 12, right: 12, top: 0),
                   leading: const Icon(Icons.assessment, size: 32, color: Color(0xFF2196F3)),
                   title: Text(
                     fondoSelect.name,
@@ -245,7 +252,99 @@ class _MainFondoState extends State<MainFondo> {
                 valores.isEmpty
                     ? const Text(
                         'Sin datos. Descarga el último valor o un intervalo de valores históricos.')
-                    : FractionallySizedBox(
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFBBDEFB),
+                            border: Border.all(color: Colors.white, width: 2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: IntrinsicHeight(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    HojaCalendario(epoch: valores.first.date),
+                                    /*Container(
+                                      height: 80, // or AspectRadio() parent
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFFFFFF),
+                                        border: Border.all(
+                                          color: const Color(0xFF0D47A1),
+                                          width: 1,
+                                        ),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(6),
+                                            color: Colors.blue,
+                                            child: Text(
+                                              mesYear,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFFFFFFFF),
+                                              ),
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          Text(
+                                            '$dia',
+                                            style: const TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.blue,
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                        ],
+                                      ),
+                                    ),*/
+                                  ],
+                                ),
+                                const Spacer(),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      'V.L. ${valores.first.precio} ${fondoSelect.divisa}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    if (_getDiferencia() != null)
+                                      Text(_getDiferencia()!.toStringAsFixed(2),
+                                          style: TextStyle(
+                                            //fontSize: 16,
+                                            color: _getDiferencia()! < 0
+                                                ? const Color(0xFFF44336)
+                                                : const Color(0xFF4CAF50),
+                                          )),
+                                    const Spacer(),
+                                    (stats.resultado() != null && stats.resultado() != 0)
+                                        ? Text(
+                                            '${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} ${fondoSelect.divisa}',
+                                            style: const TextStyle(
+                                                color: Color(0xFF0D47A1), fontSize: 18),
+                                          )
+                                        : const Text('Sin inversiones'),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                /*: FractionallySizedBox(
                         widthFactor: 0.9,
                         child: Container(
                           //padding: const EdgeInsets.symmetric(vertical: 10),
@@ -284,7 +383,7 @@ class _MainFondoState extends State<MainFondo> {
                             ),
                           ),
                         ),
-                      ),
+                      ),*/
                 if (valores.isNotEmpty) const SizedBox(height: 20),
                 if (valores.length > 1)
                   FractionallySizedBox(
@@ -358,8 +457,14 @@ class _MainFondoState extends State<MainFondo> {
                 ListTile(
                   contentPadding: const EdgeInsets.all(12),
                   leading: const Icon(Icons.compare_arrows, size: 32, color: Color(0xFF2196F3)),
-                  title: FittedBox(
+                  /*title: FittedBox(
                     child: Text('OPERACIONES', style: Theme.of(context).textTheme.titleLarge),
+                  ),*/
+                  title: const Text(
+                    'OPERACIONES',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: TextStyle(fontSize: 20),
                   ),
                   trailing: CircleAvatar(
                     backgroundColor: const Color(0xFFFFC107),
@@ -412,14 +517,14 @@ class _MainFondoState extends State<MainFondo> {
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
               child: Column(
                 children: [
-                  ListTile(
-                    leading: const Icon(
-                      Icons.savings,
+                  const ListTile(
+                    leading: Icon(
+                      Icons.balance,
                       size: 32,
                       color: Color(0xFF2196F3),
                     ), // Icons.balance
-                    title: Text('BALANCE', style: Theme.of(context).textTheme.titleLarge),
-                    subtitle: Align(
+                    title: Text('BALANCE', style: TextStyle(fontSize: 20)),
+                    /*subtitle: Align(
                       alignment: Alignment.topLeft,
                       child: Chip(
                         //padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -434,7 +539,8 @@ class _MainFondoState extends State<MainFondo> {
                           style: const TextStyle(color: Color(0xFF0D47A1)),
                         ),
                       ),
-                    ),
+                    ),*/
+                    //trailing: HojaCalendario(epoch: valores.first.date),
                   ),
                   Align(
                     alignment: Alignment.center,
