@@ -238,15 +238,23 @@ class _MainFondoState extends State<MainFondo> {
             child: Column(
               children: [
                 ListTile(
-                  //contentPadding: const EdgeInsets.only(bottom: 12, left: 12, right: 12, top: 0),
                   leading: const Icon(Icons.assessment, size: 32, color: Color(0xFF2196F3)),
                   title: Text(
                     fondoSelect.name,
-                    style: Theme.of(context).textTheme.titleLarge,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Color(0xFF2196F3),
+                    ),
                   ),
                   subtitle: Text(
                     fondoSelect.isin,
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF0D47A1),
+                    ),
                   ),
                 ),
                 valores.isEmpty
@@ -263,55 +271,15 @@ class _MainFondoState extends State<MainFondo> {
                           ),
                           child: IntrinsicHeight(
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              //crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    HojaCalendario(epoch: valores.first.date),
-                                    /*Container(
-                                      height: 80, // or AspectRadio() parent
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFFFFFF),
-                                        border: Border.all(
-                                          color: const Color(0xFF0D47A1),
-                                          width: 1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.all(6),
-                                            color: Colors.blue,
-                                            child: Text(
-                                              mesYear,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: Color(0xFFFFFFFF),
-                                              ),
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          Text(
-                                            '$dia',
-                                            style: const TextStyle(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.blue,
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                        ],
-                                      ),
-                                    ),*/
-                                  ],
-                                ),
+                                //mainAxisAlignment: MainAxisAlignment.start,
+                                //crossAxisAlignment: CrossAxisAlignment.start,
+                                DiaCalendario(epoch: valores.first.date),
                                 const Spacer(),
                                 Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  //mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
@@ -332,7 +300,7 @@ class _MainFondoState extends State<MainFondo> {
                                     const Spacer(),
                                     (stats.resultado() != null && stats.resultado() != 0)
                                         ? Text(
-                                            '${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} ${fondoSelect.divisa}',
+                                            'Capital: ${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} ${fondoSelect.divisa}',
                                             style: const TextStyle(
                                                 color: Color(0xFF0D47A1), fontSize: 18),
                                           )
@@ -344,104 +312,72 @@ class _MainFondoState extends State<MainFondo> {
                           ),
                         ),
                       ),
-                /*: FractionallySizedBox(
-                        widthFactor: 0.9,
-                        child: Container(
-                          //padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFF2196F3), width: 2),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: IntrinsicHeight(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text(
-                                  FechaUtil.epochToString(valores.first.date),
-                                  //style: Theme.of(context).textTheme.titleMedium,
-                                ),
-                                const VerticalDivider(color: Color(0xFF2196F3), thickness: 2),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 10),
-                                  child: Text(
-                                    '${valores.first.precio} ${fondoSelect.divisa}',
-                                    //style: Theme.of(context).textTheme.titleLarge,
-                                    style:
-                                        const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                const VerticalDivider(color: Color(0xFF2196F3), thickness: 2),
-                                if (_getDiferencia() != null)
-                                  Text(_getDiferencia()!.toStringAsFixed(2),
-                                      style: TextStyle(
-                                        //fontSize: 16,
-                                        color: _getDiferencia()! < 0
-                                            ? const Color(0xFFF44336)
-                                            : const Color(0xFF4CAF50),
-                                      )),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),*/
-                if (valores.isNotEmpty) const SizedBox(height: 20),
+                if (valores.isNotEmpty) const SizedBox(height: 10),
                 if (valores.length > 1)
-                  FractionallySizedBox(
-                    widthFactor: 0.9,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text('Mínimo', style: TextStyle(fontSize: 16)),
-                            Text('Máximo', style: TextStyle(fontSize: 16)),
-                            Text('Media', style: TextStyle(fontSize: 16)),
-                            Text('Volatilidad', style: TextStyle(fontSize: 16)),
-                          ],
-                        ),
-                        const Spacer(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                stats.datePrecioMinimo() != null
-                                    ? FechaUtil.epochToString(stats.datePrecioMinimo()!,
-                                        formato: 'dd/MM/yy')
-                                    : '',
-                                style: const TextStyle(fontSize: 16)),
-                            Text(
-                                stats.datePrecioMaximo() != null
-                                    ? FechaUtil.epochToString(stats.datePrecioMaximo()!,
-                                        formato: 'dd/MM/yy')
-                                    : '',
-                                style: const TextStyle(fontSize: 16)),
-                          ],
-                        ),
-                        const Spacer(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(NumberFormat.decimalPattern('es').format(stats.precioMinimo()),
-                                style: const TextStyle(fontSize: 16)),
-                            Text(NumberFormat.decimalPattern('es').format(stats.precioMaximo()),
-                                style: const TextStyle(fontSize: 16)),
-                            Text(
-                                stats.precioMedio() != null
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFBBDEFB),
+                        border: Border.all(color: Colors.white, width: 2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Text('Mínimo', style: TextStyle(fontSize: 16)),
+                              Text('Máximo', style: TextStyle(fontSize: 16)),
+                              Text('Media', style: TextStyle(fontSize: 16)),
+                              Text('Volatilidad', style: TextStyle(fontSize: 16)),
+                            ],
+                          ),
+                          const Spacer(),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  stats.datePrecioMinimo() != null
+                                      ? FechaUtil.epochToString(stats.datePrecioMinimo()!,
+                                          formato: 'dd/MM/yy')
+                                      : '',
+                                  style: const TextStyle(fontSize: 16)),
+                              Text(
+                                  stats.datePrecioMaximo() != null
+                                      ? FechaUtil.epochToString(stats.datePrecioMaximo()!,
+                                          formato: 'dd/MM/yy')
+                                      : '',
+                                  style: const TextStyle(fontSize: 16)),
+                            ],
+                          ),
+                          const Spacer(),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(NumberFormat.decimalPattern('es').format(stats.precioMinimo()),
+                                  style: const TextStyle(fontSize: 16)),
+                              Text(NumberFormat.decimalPattern('es').format(stats.precioMaximo()),
+                                  style: const TextStyle(fontSize: 16)),
+                              Text(
+                                  stats.precioMedio() != null
+                                      ? NumberFormat.decimalPattern('es').format(
+                                          double.parse(stats.precioMedio()!.toStringAsFixed(2)))
+                                      : '',
+                                  style: const TextStyle(fontSize: 16)),
+                              Text(
+                                stats.volatilidad() != null
                                     ? NumberFormat.decimalPattern('es').format(
-                                        double.parse(stats.precioMedio()!.toStringAsFixed(2)))
+                                        double.parse(stats.volatilidad()!.toStringAsFixed(2)))
                                     : '',
-                                style: const TextStyle(fontSize: 16)),
-                            Text(
-                              stats.volatilidad() != null
-                                  ? NumberFormat.decimalPattern('es')
-                                      .format(double.parse(stats.volatilidad()!.toStringAsFixed(2)))
-                                  : '',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      ],
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
               ],
@@ -467,10 +403,15 @@ class _MainFondoState extends State<MainFondo> {
                     style: TextStyle(fontSize: 20),
                   ),
                   trailing: CircleAvatar(
-                    backgroundColor: const Color(0xFFFFC107),
-                    child: IconButton(
-                      icon: const Icon(Icons.shopping_cart, color: Color(0xFF0D47A1)),
-                      onPressed: () => Navigator.of(context).pushNamed(RouteGenerator.mercadoPage),
+                    radius: 22,
+                    backgroundColor: const Color(0xFFFFFFFF),
+                    child: CircleAvatar(
+                      backgroundColor: const Color(0xFFFFC107),
+                      child: IconButton(
+                        icon: const Icon(Icons.shopping_cart, color: Color(0xFF0D47A1)),
+                        onPressed: () =>
+                            Navigator.of(context).pushNamed(RouteGenerator.mercadoPage),
+                      ),
                     ),
                   ),
                 ),
@@ -542,10 +483,15 @@ class _MainFondoState extends State<MainFondo> {
                     ),*/
                     //trailing: HojaCalendario(epoch: valores.first.date),
                   ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: FractionallySizedBox(
-                      widthFactor: 0.9,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFBBDEFB),
+                        border: Border.all(color: Colors.white, width: 2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [

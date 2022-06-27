@@ -12,6 +12,7 @@ import '../services/preferences_service.dart';
 import '../utils/fecha_util.dart';
 import '../utils/konstantes.dart';
 import '../utils/stats.dart';
+import '../widgets/hoja_calendario.dart';
 import '../widgets/loading_progress.dart';
 
 enum MenuCartera { ordenar, eliminar }
@@ -267,18 +268,22 @@ class _PageCarteraState extends State<PageCartera> {
                               child: Column(
                                 children: [
                                   ListTile(
-                                    //contentPadding: const EdgeInsets.all(12.0),
                                     leading: CircleAvatar(
-                                      backgroundColor: const Color(0xFFFFC107),
-                                      child: IconButton(
-                                        onPressed: () {
-                                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                          carteraProvider.fondoSelect = fondo;
-                                          Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
-                                        },
-                                        icon: const Icon(
-                                          Icons.poll,
-                                          color: Color(0xFF0D47A1),
+                                      radius: 22,
+                                      backgroundColor: const Color(0xFFFFFFFF),
+                                      child: CircleAvatar(
+                                        backgroundColor: const Color(0xFFFFC107),
+                                        child: IconButton(
+                                          onPressed: () {
+                                            ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                            carteraProvider.fondoSelect = fondo;
+                                            Navigator.of(context)
+                                                .pushNamed(RouteGenerator.fondoPage);
+                                          },
+                                          icon: const Icon(
+                                            Icons.poll,
+                                            color: Color(0xFF0D47A1),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -305,7 +310,6 @@ class _PageCarteraState extends State<PageCartera> {
                                     Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 12),
                                       child: Container(
-                                        //padding: const EdgeInsets.all(16),
                                         padding: const EdgeInsets.symmetric(horizontal: 10),
                                         decoration: BoxDecoration(
                                           color: const Color(0xFFBBDEFB),
@@ -313,40 +317,9 @@ class _PageCarteraState extends State<PageCartera> {
                                           borderRadius: BorderRadius.circular(12),
                                         ),
                                         child: ListTile(
-                                          //leading: Text(lastDate),
                                           contentPadding: const EdgeInsets.all(0),
                                           dense: true,
-                                          leading: Container(
-                                            padding: const EdgeInsets.all(4),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFF2196F3),
-                                              shape: BoxShape.rectangle,
-                                              //border: Border.all(width: 1.0, color: Colors.blue),
-                                              borderRadius: BorderRadius.circular(2),
-                                            ),
-                                            child: FittedBox(
-                                              fit: BoxFit.fill,
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Text(
-                                                    mesYear,
-                                                    style:
-                                                        const TextStyle(color: Color(0xFFFFFFFF)),
-                                                  ),
-                                                  Text(
-                                                    '$dia',
-                                                    style: const TextStyle(
-                                                      color: Color(0xFFFFFFFF),
-                                                      fontSize: 32,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
+                                          leading: DiaCalendario(epoch: valores.first.date),
                                           title: Text(
                                             'V.L. $lastPrecio $divisa',
                                             style: const TextStyle(
@@ -363,18 +336,15 @@ class _PageCarteraState extends State<PageCartera> {
                                                 )
                                               : const Text('Sin inversiones'),
                                           trailing: diferencia != null
-                                              ? Column(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  children: [
-                                                    const SizedBox(height: 10),
-                                                    Text(
-                                                      diferencia.toStringAsFixed(2),
-                                                      style: TextStyle(
-                                                          color: diferencia < 0
-                                                              ? const Color(0xFFF44336)
-                                                              : const Color(0xFF4CAF50)),
-                                                    ),
-                                                  ],
+                                              ? Chip(
+                                                  backgroundColor: const Color(0xFFFFFFFF),
+                                                  label: Text(
+                                                    diferencia.toStringAsFixed(2),
+                                                    style: TextStyle(
+                                                        color: diferencia < 0
+                                                            ? const Color(0xFFF44336)
+                                                            : const Color(0xFF4CAF50)),
+                                                  ),
                                                 )
                                               : const Text(''),
                                         ),

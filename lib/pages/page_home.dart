@@ -211,17 +211,21 @@ class _PageHomeState extends State<PageHome> {
                                   children: [
                                     ListTile(
                                       leading: CircleAvatar(
-                                        backgroundColor: const Color(0xFFFFC107),
-                                        child: IconButton(
-                                          onPressed: () {
-                                            ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                            carteraProvider.carteraSelect = cartera;
-                                            Navigator.of(context)
-                                                .pushNamed(RouteGenerator.carteraPage);
-                                          },
-                                          icon: const Icon(
-                                            Icons.business_center,
-                                            color: Color(0xFF0D47A1),
+                                        radius: 22,
+                                        backgroundColor: const Color(0xFFFFFFFF),
+                                        child: CircleAvatar(
+                                          backgroundColor: const Color(0xFFFFC107),
+                                          child: IconButton(
+                                            onPressed: () {
+                                              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                              carteraProvider.carteraSelect = cartera;
+                                              Navigator.of(context)
+                                                  .pushNamed(RouteGenerator.carteraPage);
+                                            },
+                                            icon: const Icon(
+                                              Icons.business_center,
+                                              color: Color(0xFF0D47A1),
+                                            ),
                                           ),
                                         ),
                                       ),
