@@ -261,7 +261,7 @@ class _MainFondoState extends State<MainFondo> {
                     ? const Text(
                         'Sin datos. Descarga el último valor o un intervalo de valores históricos.')
                     : Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
@@ -269,51 +269,121 @@ class _MainFondoState extends State<MainFondo> {
                             border: Border.all(color: Colors.white, width: 2),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: IntrinsicHeight(
-                            child: Row(
-                              //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              //crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                //mainAxisAlignment: MainAxisAlignment.start,
-                                //crossAxisAlignment: CrossAxisAlignment.start,
-                                DiaCalendario(epoch: valores.first.date),
-                                const Spacer(),
-                                Column(
-                                  //mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+                          child: Column(
+                            children: [
+                              IntrinsicHeight(
+                                child: Row(
+                                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  //crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      'V.L. ${valores.first.precio} ${fondoSelect.divisa}',
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    if (_getDiferencia() != null)
-                                      Text(_getDiferencia()!.toStringAsFixed(2),
-                                          style: TextStyle(
-                                            //fontSize: 16,
-                                            color: _getDiferencia()! < 0
-                                                ? const Color(0xFFF44336)
-                                                : const Color(0xFF4CAF50),
-                                          )),
+                                    //mainAxisAlignment: MainAxisAlignment.start,
+                                    //crossAxisAlignment: CrossAxisAlignment.start,
+                                    DiaCalendario(epoch: valores.first.date),
                                     const Spacer(),
-                                    (stats.resultado() != null && stats.resultado() != 0)
-                                        ? Text(
-                                            'Capital: ${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} ${fondoSelect.divisa}',
-                                            style: const TextStyle(
-                                                color: Color(0xFF0D47A1), fontSize: 18),
-                                          )
-                                        : const Text('Sin inversiones'),
+                                    Column(
+                                      //mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          'V.L. ${valores.first.precio} ${fondoSelect.divisa}',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF0D47A1),
+                                          ),
+                                        ),
+                                        if (_getDiferencia() != null)
+                                          Text(_getDiferencia()!.toStringAsFixed(2),
+                                              style: TextStyle(
+                                                //fontSize: 16,
+                                                color: _getDiferencia()! < 0
+                                                    ? const Color(0xFFF44336)
+                                                    : const Color(0xFF4CAF50),
+                                              )),
+                                        /*const Spacer(),
+                                        (stats.resultado() != null && stats.resultado() != 0)
+                                            ? Text(
+                                                'Capital: ${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} ${fondoSelect.divisa}',
+                                                style: const TextStyle(
+                                                  color: Color(0xFF0D47A1),
+                                                  fontSize: 18,
+                                                ),
+                                              )
+                                            : const Text('Sin inversiones'),*/
+                                      ],
+                                    ),
                                   ],
                                 ),
-                              ],
-                            ),
+                              ),
+                              if (valores.isNotEmpty) const SizedBox(height: 10),
+                              if (valores.length > 1)
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: const [
+                                        Text('Mínimo', style: TextStyle(fontSize: 16)),
+                                        Text('Máximo', style: TextStyle(fontSize: 16)),
+                                        Text('Media', style: TextStyle(fontSize: 16)),
+                                        Text('Volatilidad', style: TextStyle(fontSize: 16)),
+                                      ],
+                                    ),
+                                    const Spacer(),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                            stats.datePrecioMinimo() != null
+                                                ? FechaUtil.epochToString(stats.datePrecioMinimo()!,
+                                                    formato: 'dd/MM/yy')
+                                                : '',
+                                            style: const TextStyle(fontSize: 16)),
+                                        Text(
+                                            stats.datePrecioMaximo() != null
+                                                ? FechaUtil.epochToString(stats.datePrecioMaximo()!,
+                                                    formato: 'dd/MM/yy')
+                                                : '',
+                                            style: const TextStyle(fontSize: 16)),
+                                      ],
+                                    ),
+                                    const Spacer(),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                            NumberFormat.decimalPattern('es')
+                                                .format(stats.precioMinimo()),
+                                            style: const TextStyle(fontSize: 16)),
+                                        Text(
+                                            NumberFormat.decimalPattern('es')
+                                                .format(stats.precioMaximo()),
+                                            style: const TextStyle(fontSize: 16)),
+                                        Text(
+                                            stats.precioMedio() != null
+                                                ? NumberFormat.decimalPattern('es').format(
+                                                    double.parse(
+                                                        stats.precioMedio()!.toStringAsFixed(2)))
+                                                : '',
+                                            style: const TextStyle(fontSize: 16)),
+                                        Text(
+                                          stats.volatilidad() != null
+                                              ? NumberFormat.decimalPattern('es').format(
+                                                  double.parse(
+                                                      stats.volatilidad()!.toStringAsFixed(2)))
+                                              : '',
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                            ],
                           ),
                         ),
                       ),
-                if (valores.isNotEmpty) const SizedBox(height: 10),
-                if (valores.length > 1)
+                //if (valores.isNotEmpty) const SizedBox(height: 10),
+                /*if (valores.length > 1)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Container(
@@ -379,7 +449,7 @@ class _MainFondoState extends State<MainFondo> {
                         ],
                       ),
                     ),
-                  ),
+                  ),*/
               ],
             ),
           ),

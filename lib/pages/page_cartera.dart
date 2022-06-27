@@ -310,13 +310,68 @@ class _PageCarteraState extends State<PageCartera> {
                                     Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 12),
                                       child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                                        padding: const EdgeInsets.symmetric(horizontal: 12),
                                         decoration: BoxDecoration(
                                           color: const Color(0xFFBBDEFB),
                                           border: Border.all(color: Colors.white, width: 2),
                                           borderRadius: BorderRadius.circular(12),
                                         ),
-                                        child: ListTile(
+                                        child: IntrinsicHeight(
+                                          child: Row(
+                                            //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            //crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              //mainAxisAlignment: MainAxisAlignment.start,
+                                              //crossAxisAlignment: CrossAxisAlignment.start,
+                                              DiaCalendario(epoch: valores.first.date),
+                                              const Spacer(),
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                children: [
+                                                  const Spacer(),
+                                                  Text(
+                                                    'V.L. $lastPrecio $divisa',
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Color(0xFF0D47A1),
+                                                    ),
+                                                  ),
+                                                  if (diferencia != null)
+                                                    Text(
+                                                      diferencia.toStringAsFixed(2),
+                                                      style: TextStyle(
+                                                        color: diferencia < 0
+                                                            ? const Color(0xFFF44336)
+                                                            : const Color(0xFF4CAF50),
+                                                      ),
+                                                    ),
+                                                  const Spacer(),
+                                                  (stats.resultado() != null &&
+                                                          stats.resultado() != 0)
+                                                      ? Row(
+                                                          children: [
+                                                            const Icon(
+                                                              Icons.savings,
+                                                              color: Color(0xFF2196F3),
+                                                            ),
+                                                            const SizedBox(width: 6),
+                                                            Text(
+                                                              '${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} $divisa',
+                                                              style: const TextStyle(
+                                                                  color: Color(0xFF0D47A1),
+                                                                  fontSize: 14),
+                                                            ),
+                                                          ],
+                                                        )
+                                                      : const Text('Sin inversiones'),
+                                                  const Spacer(),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        /*child: ListTile(
                                           contentPadding: const EdgeInsets.all(0),
                                           dense: true,
                                           leading: DiaCalendario(epoch: valores.first.date),
@@ -347,7 +402,7 @@ class _PageCarteraState extends State<PageCartera> {
                                                   ),
                                                 )
                                               : const Text(''),
-                                        ),
+                                        ),*/
                                       ),
                                     ),
                                 ],
