@@ -324,7 +324,8 @@ class _MercadoState extends State<PageMercado> {
       if (tipoOp == 0 && _participaciones > participaciones) {
         print('operacion no permitida');
         _showMsg(
-          msg: 'Operación no permitida: no puedes reembolsar las participaciones que no tienes.',
+          //msg: 'Operación no permitida: no puedes reembolsar las participaciones que no tienes.',
+          msg: 'Máximo de participaciones: $participaciones',
           color: Colors.red,
         );
       } else {

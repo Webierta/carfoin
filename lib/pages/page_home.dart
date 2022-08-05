@@ -130,7 +130,7 @@ class _PageHomeState extends State<PageHome> {
               child: Scaffold(
                 backgroundColor: Colors.transparent,
                 appBar: AppBar(
-                  title: const Text('MIS CARTERAS'),
+                  title: const Text('Mis Carteras'),
                   actions: [
                     IconButton(
                       icon: const Icon(Icons.settings),
@@ -174,9 +174,13 @@ class _PageHomeState extends State<PageHome> {
                     builder: (context, data, child) {
                       if (data.carteras.isEmpty) {
                         return const Center(
-                          child: Text(
-                            'Empieza creando una cartera.',
-                            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 22),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              'Empieza creando una cartera',
+                              style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 22),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         );
                       }
@@ -235,7 +239,7 @@ class _PageHomeState extends State<PageHome> {
                                         maxLines: 1,
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 24,
+                                          fontSize: 20,
                                           color: Color(0xFF2196F3),
                                         ),
                                       ),
@@ -302,9 +306,14 @@ class _PageHomeState extends State<PageHome> {
                                                   title: _buildChipFondo(fondos.length),
                                                   children: [
                                                     for (var fondo in fondos)
-                                                      Padding(
-                                                        padding: const EdgeInsets.symmetric(
-                                                            vertical: 10),
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          ScaffoldMessenger.of(context)
+                                                              .removeCurrentSnackBar();
+                                                          carteraProvider.fondoSelect = fondo;
+                                                          Navigator.of(context)
+                                                              .pushNamed(RouteGenerator.fondoPage);
+                                                        },
                                                         child: Text(
                                                           fondo.name,
                                                           overflow: TextOverflow.ellipsis,

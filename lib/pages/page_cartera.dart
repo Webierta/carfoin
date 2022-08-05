@@ -208,9 +208,13 @@ class _PageCarteraState extends State<PageCartera> {
                   builder: (context, data, child) {
                     if (data.fondos.isEmpty) {
                       return const Center(
-                        child: Text(
-                          'Añade fondos a esta cartera.',
-                          style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 22),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
+                            'Añade fondos a esta cartera',
+                            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 22),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       );
                     }
@@ -293,7 +297,7 @@ class _PageCarteraState extends State<PageCartera> {
                                       maxLines: 2,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 18,
+                                        fontSize: 16,
                                         color: Color(0xFF2196F3),
                                       ),
                                     ),
@@ -327,8 +331,9 @@ class _PageCarteraState extends State<PageCartera> {
                                               const Spacer(),
                                               Column(
                                                 crossAxisAlignment: CrossAxisAlignment.end,
+                                                mainAxisAlignment: MainAxisAlignment.center,
                                                 children: [
-                                                  const Spacer(),
+                                                  //const Spacer(),
                                                   Text(
                                                     'V.L. $lastPrecio $divisa',
                                                     style: const TextStyle(
@@ -346,63 +351,22 @@ class _PageCarteraState extends State<PageCartera> {
                                                             : const Color(0xFF4CAF50),
                                                       ),
                                                     ),
-                                                  const Spacer(),
+                                                  //const Spacer(),
                                                   (stats.resultado() != null &&
                                                           stats.resultado() != 0)
-                                                      ? Row(
-                                                          children: [
-                                                            const Icon(
-                                                              Icons.savings,
-                                                              color: Color(0xFF2196F3),
-                                                            ),
-                                                            const SizedBox(width: 6),
-                                                            Text(
-                                                              '${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} $divisa',
-                                                              style: const TextStyle(
-                                                                  color: Color(0xFF0D47A1),
-                                                                  fontSize: 14),
-                                                            ),
-                                                          ],
+                                                      ? Text(
+                                                          'Capital: ${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} $divisa',
+                                                          style: const TextStyle(
+                                                              color: Color(0xFF0D47A1),
+                                                              fontSize: 14),
                                                         )
                                                       : const Text('Sin inversiones'),
-                                                  const Spacer(),
+                                                  //const Spacer(),
                                                 ],
                                               ),
                                             ],
                                           ),
                                         ),
-                                        /*child: ListTile(
-                                          contentPadding: const EdgeInsets.all(0),
-                                          dense: true,
-                                          leading: DiaCalendario(epoch: valores.first.date),
-                                          title: Text(
-                                            'V.L. $lastPrecio $divisa',
-                                            style: const TextStyle(
-                                              color: Color(0xFF0D47A1),
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          subtitle: (stats.resultado() != null &&
-                                                  stats.resultado() != 0)
-                                              ? Text(
-                                                  'Capital: ${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} $divisa',
-                                                  style: const TextStyle(color: Color(0xFF0D47A1)),
-                                                )
-                                              : const Text('Sin inversiones'),
-                                          trailing: diferencia != null
-                                              ? Chip(
-                                                  backgroundColor: const Color(0xFFFFFFFF),
-                                                  label: Text(
-                                                    diferencia.toStringAsFixed(2),
-                                                    style: TextStyle(
-                                                        color: diferencia < 0
-                                                            ? const Color(0xFFF44336)
-                                                            : const Color(0xFF4CAF50)),
-                                                  ),
-                                                )
-                                              : const Text(''),
-                                        ),*/
                                       ),
                                     ),
                                 ],
