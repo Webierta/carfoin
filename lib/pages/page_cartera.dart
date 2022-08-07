@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
-import '../routes.dart';
+//import '../routes.dart';
+import '../router/router_utils.dart';
+import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
@@ -112,7 +115,7 @@ class _PageCarteraState extends State<PageCartera> {
   }
 
   SpeedDialChild _buildSpeedDialChild(BuildContext context,
-      {required IconData icono, required String label, required String page}) {
+      {required IconData icono, required String label, required AppPage page}) {
     return SpeedDialChild(
       child: Icon(icono),
       label: label,
@@ -120,7 +123,11 @@ class _PageCarteraState extends State<PageCartera> {
       foregroundColor: const Color(0xFF0D47A1),
       onTap: () async {
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
-        final newFondo = await Navigator.of(context).pushNamed(page);
+        //final newFondo = await Navigator.of(context).pushNamed(page);
+        final newFondo = await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => page.routeClass),
+        );
         newFondo != null
             ? _addFondo(newFondo as Fondo)
             : _showMsg(msg: 'Sin cambios en la cartera.');
@@ -144,7 +151,8 @@ class _PageCarteraState extends State<PageCartera> {
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () {
                     ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                    Navigator.of(context).pushNamed(RouteGenerator.homePage);
+                    //Navigator.of(context).pushNamed(RouteGenerator.homePage);
+                    context.go(homePage);
                   },
                 ),
                 title: Row(
@@ -192,14 +200,18 @@ class _PageCarteraState extends State<PageCartera> {
                 overlayColor: const Color(0xFF9E9E9E),
                 overlayOpacity: 0.4,
                 children: [
-                  _buildSpeedDialChild(context,
-                      icono: Icons.search,
-                      label: 'Buscar online por ISIN',
-                      page: RouteGenerator.inputFondo),
-                  _buildSpeedDialChild(context,
-                      icono: Icons.storage,
-                      label: 'Base de Datos local',
-                      page: RouteGenerator.searchFondo),
+                  _buildSpeedDialChild(
+                    context,
+                    icono: Icons.search,
+                    label: 'Buscar online por ISIN',
+                    page: AppPage.inputFondo,
+                  ),
+                  _buildSpeedDialChild(
+                    context,
+                    icono: Icons.storage,
+                    label: 'Base de Datos local',
+                    page: AppPage.searchFondo,
+                  ),
                 ],
               ),
               body: Padding(
@@ -281,8 +293,8 @@ class _PageCarteraState extends State<PageCartera> {
                                           onPressed: () {
                                             ScaffoldMessenger.of(context).removeCurrentSnackBar();
                                             carteraProvider.fondoSelect = fondo;
-                                            Navigator.of(context)
-                                                .pushNamed(RouteGenerator.fondoPage);
+                                            //Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
+                                            context.go(fondoPage);
                                           },
                                           icon: const Icon(
                                             Icons.poll,

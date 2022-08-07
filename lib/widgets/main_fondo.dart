@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
-import '../routes.dart';
+//import '../routes.dart';
+import '../router/routes_const.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../utils/fecha_util.dart';
@@ -424,7 +426,8 @@ class _MainFondoState extends State<MainFondo> {
                       child: IconButton(
                         icon: const Icon(Icons.shopping_cart, color: Color(0xFF0D47A1)),
                         onPressed: () =>
-                            Navigator.of(context).pushNamed(RouteGenerator.mercadoPage),
+                            //Navigator.of(context).pushNamed(RouteGenerator.mercadoPage),
+                            context.go(mercadoPage),
                       ),
                     ),
                   ),

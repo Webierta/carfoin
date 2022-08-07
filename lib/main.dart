@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'models/cartera_provider.dart';
-import 'routes.dart';
+import 'router/app_router.dart';
+//import 'routes.dart';
 
 Future main() async {
   Provider.debugCheckInvalidValueType = null;
@@ -23,7 +24,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    final router = AppRouter().router;
+    return MaterialApp.router(
+      routeInformationProvider: router.routeInformationProvider,
+      routeInformationParser: router.routeInformationParser,
+      routerDelegate: router.routerDelegate,
+
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -56,8 +62,8 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      initialRoute: '/',
-      onGenerateRoute: RouteGenerator.generateRoute,
+      //initialRoute: '/',
+      //onGenerateRoute: RouteGenerator.generateRoute,
     );
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:go_router/go_router.dart';
 
-import '../routes.dart';
+//import '../routes.dart';
+import '../router/routes_const.dart';
 import '../widgets/my_drawer.dart';
 
 class PageInfo extends StatelessWidget {
@@ -19,7 +21,8 @@ class PageInfo extends StatelessWidget {
             icon: const Icon(Icons.home),
             onPressed: () {
               ScaffoldMessenger.of(context).removeCurrentSnackBar();
-              Navigator.of(context).pushNamed(RouteGenerator.homePage);
+              //Navigator.of(context).pushNamed(RouteGenerator.homePage);
+              context.go(homePage);
             },
           ),
         ],

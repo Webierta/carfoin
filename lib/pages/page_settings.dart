@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import '../routes.dart';
+import '../router/routes_const.dart';
+//import '../routes.dart';
 import '../services/preferences_service.dart';
 import '../widgets/my_drawer.dart';
 
@@ -65,7 +67,8 @@ class _PageSettingsState extends State<PageSettings> {
               icon: const Icon(Icons.home),
               onPressed: () {
                 ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                Navigator.of(context).pushNamed(RouteGenerator.homePage);
+                //Navigator.of(context).pushNamed(RouteGenerator.homePage);
+                context.go(homePage);
               },
             ),
           ],

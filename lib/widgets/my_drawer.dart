@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
-import '../routes.dart';
+import '../router/routes_const.dart';
+
+//import '../routes.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({Key? key}) : super(key: key);
@@ -82,7 +85,8 @@ class MyDrawer extends StatelessWidget {
                   title: const Text('Inicio'),
                   onTap: () {
                     Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed(RouteGenerator.homePage);
+                    //Navigator.of(context).pushNamed(RouteGenerator.homePage);
+                    context.go(homePage);
                   },
                 ),
                 ListTile(
@@ -90,7 +94,8 @@ class MyDrawer extends StatelessWidget {
                   title: const Text('Ajustes'),
                   onTap: () {
                     Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed(RouteGenerator.settingsPage);
+                    //Navigator.of(context).pushNamed(RouteGenerator.settingsPage);
+                    context.go(settingsPage);
                   },
                 ),
                 const Divider(color: Colors.grey),
@@ -99,7 +104,8 @@ class MyDrawer extends StatelessWidget {
                   title: const Text('Info'),
                   onTap: () {
                     Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed(RouteGenerator.infoPage);
+                    //Navigator.of(context).pushNamed(RouteGenerator.infoPage);
+                    context.go(infoPage);
                   },
                 ),
                 ListTile(
@@ -107,7 +113,8 @@ class MyDrawer extends StatelessWidget {
                   title: const Text('About'),
                   onTap: () {
                     Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed(RouteGenerator.aboutPage);
+                    //Navigator.of(context).pushNamed(RouteGenerator.aboutPage);
+                    context.go(aboutPage);
                   },
                 ),
                 ListTile(
@@ -115,7 +122,8 @@ class MyDrawer extends StatelessWidget {
                   title: const Text('Donar'),
                   onTap: () {
                     Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed(RouteGenerator.supportPage);
+                    //Navigator.of(context).pushNamed(RouteGenerator.supportPage);
+                    context.go(supportPage);
                   },
                 ),
                 const Divider(color: Color(0xFF9E9E9E)),

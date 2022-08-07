@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 
 import 'pages/page_about.dart';
@@ -88,3 +89,5 @@ class AnimatedRoute extends PageRouteBuilder {
           },
         );
 }
+
+*/

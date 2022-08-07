@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
-import '../routes.dart';
+//import '../routes.dart';
+import '../router/routes_const.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../utils/konstantes.dart';
@@ -135,7 +137,8 @@ class _PageHomeState extends State<PageHome> {
                     IconButton(
                       icon: const Icon(Icons.settings),
                       onPressed: () {
-                        Navigator.of(context).pushNamed(RouteGenerator.settingsPage);
+                        //Navigator.of(context).pushNamed(RouteGenerator.settingsPage);
+                        context.go(settingsPage);
                       },
                     ),
                     PopupMenuButton(
@@ -223,8 +226,8 @@ class _PageHomeState extends State<PageHome> {
                                             onPressed: () {
                                               ScaffoldMessenger.of(context).removeCurrentSnackBar();
                                               carteraProvider.carteraSelect = cartera;
-                                              Navigator.of(context)
-                                                  .pushNamed(RouteGenerator.carteraPage);
+                                              //Navigator.of(context).pushNamed(RouteGenerator.carteraPage);
+                                              context.go(carteraPage);
                                             },
                                             icon: const Icon(
                                               Icons.business_center,
@@ -310,9 +313,10 @@ class _PageHomeState extends State<PageHome> {
                                                         onPressed: () {
                                                           ScaffoldMessenger.of(context)
                                                               .removeCurrentSnackBar();
+                                                          carteraProvider.carteraSelect = cartera;
                                                           carteraProvider.fondoSelect = fondo;
-                                                          Navigator.of(context)
-                                                              .pushNamed(RouteGenerator.fondoPage);
+                                                          //Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
+                                                          context.go(fondoPage);
                                                         },
                                                         child: Text(
                                                           fondo.name,

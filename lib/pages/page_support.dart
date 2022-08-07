@@ -1,9 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../routes.dart';
+//import '../routes.dart';
+import '../router/routes_const.dart';
 import '../widgets/my_drawer.dart';
 
 const String btcAddress = '15ZpNzqbYFx9P7wg4U438JMwZr2q3W6fkS';
@@ -42,7 +44,8 @@ class PageSupport extends StatelessWidget {
             icon: const Icon(Icons.home),
             onPressed: () {
               ScaffoldMessenger.of(context).removeCurrentSnackBar();
-              Navigator.of(context).pushNamed(RouteGenerator.homePage);
+              //Navigator.of(context).pushNamed(RouteGenerator.homePage);
+              context.go(homePage);
             },
           ),
         ],

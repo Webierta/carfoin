@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../routes.dart';
+//import '../routes.dart';
+import '../router/routes_const.dart';
 import '../widgets/my_drawer.dart';
 
 class PageAbout extends StatelessWidget {
@@ -31,7 +33,8 @@ class PageAbout extends StatelessWidget {
             icon: const Icon(Icons.home),
             onPressed: () {
               ScaffoldMessenger.of(context).removeCurrentSnackBar();
-              Navigator.of(context).pushNamed(RouteGenerator.homePage);
+              //Navigator.of(context).pushNamed(RouteGenerator.homePage);
+              context.go(homePage);
             },
           ),
         ],
@@ -45,7 +48,8 @@ class PageAbout extends StatelessWidget {
               _launchUrl(Uri.parse(url!));
             } else {
               //Navigator.of(context).pop();
-              Navigator.of(context).pushNamed(RouteGenerator.supportPage);
+              //Navigator.of(context).pushNamed(RouteGenerator.supportPage);
+              context.go(supportPage);
             }
           },
           data: mdstring,

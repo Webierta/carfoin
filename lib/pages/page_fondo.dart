@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
-import '../routes.dart';
+//import '../routes.dart';
+import '../router/router_utils.dart';
+import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../utils/fecha_util.dart';
@@ -116,7 +119,8 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
                     ScaffoldMessenger.of(context).removeCurrentSnackBar();
                     // TODO: set carteraOn antes de navigator??
                     //Navigator.of(context).pushNamed(RouteGenerator.carteraPage, arguments: true);
-                    Navigator.of(context).pushNamed(RouteGenerator.carteraPage);
+                    //Navigator.of(context).pushNamed(RouteGenerator.carteraPage);
+                    context.go(carteraPage);
                   },
                 ),
                 title: ListTile(
@@ -158,7 +162,8 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
                     onSelected: (Menu item) {
                       //TODO: ACCIONES PENDIENTES
                       if (item == Menu.mercado) {
-                        Navigator.of(context).pushNamed(RouteGenerator.mercadoPage);
+                        //Navigator.of(context).pushNamed(RouteGenerator.mercadoPage);
+                        context.go(mercadoPage);
                       } else if (item == Menu.eliminar) {
                         _deleteConfirm(context);
                       } else if (item == Menu.exportar) {
@@ -265,7 +270,11 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
   }
 
   void _getRangeApi(BuildContext context) async {
-    final newRange = await Navigator.of(context).pushNamed(RouteGenerator.inputRange);
+    //final newRange = await Navigator.of(context).pushNamed(RouteGenerator.inputRange);
+    final newRange = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AppPage.inputRange.routeClass),
+    );
     if (newRange != null) {
       if (!mounted) return;
       _dialogProgress(context);

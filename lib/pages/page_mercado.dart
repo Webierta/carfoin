@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
-import '../routes.dart';
+//import '../routes.dart';
+import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../utils/fecha_util.dart';
@@ -85,7 +87,8 @@ class _MercadoState extends State<PageMercado> {
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
                 ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                Navigator.of(context).pushNamed(RouteGenerator.fondoPage, arguments: true);
+                //Navigator.of(context).pushNamed(RouteGenerator.fondoPage, arguments: true);
+                context.go(fondoPage);
               },
             ),
             title: const Text('MERCADO')),
@@ -340,7 +343,8 @@ class _MercadoState extends State<PageMercado> {
 
         if (!mounted) return;
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
-        Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
+        //Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
+        context.go(fondoPage);
       }
     }
   }
