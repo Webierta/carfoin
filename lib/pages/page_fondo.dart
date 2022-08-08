@@ -15,9 +15,10 @@ import '../utils/konstantes.dart';
 import '../widgets/grafico_fondo.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/main_fondo.dart';
+import '../widgets/menus.dart';
 import '../widgets/tabla_fondo.dart';
 
-enum Menu { mercado, eliminar, exportar }
+//enum MenuFondo { mercado, eliminar, exportar }
 
 class PageFondo extends StatefulWidget {
   const PageFondo({Key? key}) : super(key: key);
@@ -69,25 +70,6 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
     super.dispose();
   }
 
-  PopupMenuItem<Menu> _buildMenuItem(Menu menu, IconData iconData, {bool divider = false}) {
-    return PopupMenuItem(
-      value: menu,
-      child: Column(
-        children: [
-          ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-            leading: Icon(iconData, color: const Color(0xFFFFFFFF)),
-            title: Text(
-              '${menu.name[0].toUpperCase()}${menu.name.substring(1)}',
-              style: const TextStyle(color: Color(0xFFFFFFFF)),
-            ),
-          ),
-          if (divider) const Divider(color: Color(0xFFFFFFFF)), // PopMenuDivider
-        ],
-      ),
-    );
-  }
-
   SpeedDialChild _buildSpeedDialChild(BuildContext context,
       {required IconData icono, required String label, required Function action}) {
     return SpeedDialChild(
@@ -108,120 +90,126 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
       future: database.getValores(carteraSelect, fondoSelect),
       builder: (BuildContext context, AsyncSnapshot<List<Valor>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return Container(
-            decoration: scaffoldGradient,
-            child: Scaffold(
-              backgroundColor: Colors.transparent,
-              appBar: AppBar(
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                    // TODO: set carteraOn antes de navigator??
-                    //Navigator.of(context).pushNamed(RouteGenerator.carteraPage, arguments: true);
-                    //Navigator.of(context).pushNamed(RouteGenerator.carteraPage);
-                    context.go(carteraPage);
-                  },
-                ),
-                title: ListTile(
-                  title: Text(
-                    fondoSelect.name,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: const TextStyle(color: Color(0xFF0D47A1)),
-                  ),
-                  subtitle: Row(
-                    children: [
-                      const Icon(Icons.business_center, color: Color(0xFF0D47A1)),
-                      const SizedBox(width: 10),
-                      Flexible(
-                        child: Text(
-                          carteraSelect.name,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: const TextStyle(color: Color(0xFF0D47A1)),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                actions: [
-                  PopupMenuButton(
-                    color: const Color(0xFF2196F3),
-                    offset: Offset(0.0, AppBar().preferredSize.height),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                    ),
-                    itemBuilder: (ctx) => [
-                      //_buildMenuItem(Menu.editar, Icons.edit, divider: true),
-                      //_buildMenuItem(Menu.suscribir, Icons.login),
-                      _buildMenuItem(Menu.mercado, Icons.shopping_cart, divider: true),
-                      _buildMenuItem(Menu.eliminar, Icons.delete_forever),
-                      _buildMenuItem(Menu.exportar, Icons.download),
-                    ],
-                    onSelected: (Menu item) {
-                      //TODO: ACCIONES PENDIENTES
-                      if (item == Menu.mercado) {
-                        //Navigator.of(context).pushNamed(RouteGenerator.mercadoPage);
-                        context.go(mercadoPage);
-                      } else if (item == Menu.eliminar) {
-                        _deleteConfirm(context);
-                      } else if (item == Menu.exportar) {
-                        print('EXPORTAR');
-                      }
+          return WillPopScope(
+            onWillPop: () async => false,
+            child: Container(
+              decoration: scaffoldGradient,
+              child: Scaffold(
+                backgroundColor: Colors.transparent,
+                appBar: AppBar(
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                      // TODO: set carteraOn antes de navigator??
+                      //Navigator.of(context).pushNamed(RouteGenerator.carteraPage, arguments: true);
+                      //Navigator.of(context).pushNamed(RouteGenerator.carteraPage);
+                      context.go(carteraPage);
                     },
                   ),
-                ],
-              ),
-              body: TabBarView(
-                controller: _tabController,
-                children: const [MainFondo(), TablaFondo(), GraficoFondo()],
-              ),
-              bottomNavigationBar: BottomAppBar(
-                color: const Color(0xFF0D47A1),
-                shape: const CircularNotchedRectangle(),
-                notchMargin: 5,
-                child: FractionallySizedBox(
-                  widthFactor: 0.7,
-                  alignment: FractionalOffset.bottomLeft,
-                  child: TabBar(
-                    controller: _tabController,
-                    labelColor: const Color(0xFFFFFFFF),
-                    unselectedLabelColor: const Color(0x62FFFFFF),
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    indicatorPadding: const EdgeInsets.all(5.0),
-                    indicatorColor: const Color(0xFF2196F3),
-                    tabs: const [
-                      Tab(icon: Icon(Icons.assessment, size: 32)),
-                      Tab(icon: Icon(Icons.table_rows_outlined, size: 32)),
-                      Tab(icon: Icon(Icons.timeline, size: 32)),
-                    ],
+                  title: ListTile(
+                    title: Text(
+                      fondoSelect.name,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: const TextStyle(color: Color(0xFF0D47A1)),
+                    ),
+                    subtitle: Row(
+                      children: [
+                        const Icon(Icons.business_center, color: Color(0xFF0D47A1)),
+                        const SizedBox(width: 10),
+                        Flexible(
+                          child: Text(
+                            carteraSelect.name,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: const TextStyle(color: Color(0xFF0D47A1)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    PopupMenuButton(
+                      color: const Color(0xFF2196F3),
+                      offset: Offset(0.0, AppBar().preferredSize.height),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                      ),
+                      itemBuilder: (ctx) => [
+                        //_buildMenuItem(Menu.editar, Icons.edit, divider: true),
+                        //_buildMenuItem(Menu.suscribir, Icons.login),
+                        //_buildMenuItem(MenuFondo.mercado, Icons.shopping_cart, divider: true),
+                        //_buildMenuItem(MenuFondo.eliminar, Icons.delete_forever),
+                        //_buildMenuItem(MenuFondo.exportar, Icons.download),
+                        buildMenuItem(MenuFondo.mercado, Icons.shopping_cart, divider: true),
+                        buildMenuItem(MenuFondo.eliminar, Icons.delete_forever),
+                        buildMenuItem(MenuFondo.exportar, Icons.download),
+                      ],
+                      onSelected: (item) {
+                        //TODO: ACCIONES PENDIENTES
+                        if (item == MenuFondo.mercado) {
+                          //Navigator.of(context).pushNamed(RouteGenerator.mercadoPage);
+                          context.go(mercadoPage);
+                        } else if (item == MenuFondo.eliminar) {
+                          _deleteConfirm(context);
+                        } else if (item == MenuFondo.exportar) {
+                          print('EXPORTAR');
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                body: TabBarView(
+                  controller: _tabController,
+                  children: const [MainFondo(), TablaFondo(), GraficoFondo()],
+                ),
+                bottomNavigationBar: BottomAppBar(
+                  color: const Color(0xFF0D47A1),
+                  shape: const CircularNotchedRectangle(),
+                  notchMargin: 5,
+                  child: FractionallySizedBox(
+                    widthFactor: 0.7,
+                    alignment: FractionalOffset.bottomLeft,
+                    child: TabBar(
+                      controller: _tabController,
+                      labelColor: const Color(0xFFFFFFFF),
+                      unselectedLabelColor: const Color(0x62FFFFFF),
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      indicatorPadding: const EdgeInsets.all(5.0),
+                      indicatorColor: const Color(0xFF2196F3),
+                      tabs: const [
+                        Tab(icon: Icon(Icons.assessment, size: 32)),
+                        Tab(icon: Icon(Icons.table_rows_outlined, size: 32)),
+                        Tab(icon: Icon(Icons.timeline, size: 32)),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-              floatingActionButton: SpeedDial(
-                icon: Icons.refresh,
-                foregroundColor: const Color(0xFF0D47A1),
-                backgroundColor: const Color(0xFFFFC107),
-                spacing: 8,
-                spaceBetweenChildren: 4,
-                overlayColor: const Color(0xFF9E9E9E),
-                overlayOpacity: 0.4,
-                children: [
-                  _buildSpeedDialChild(
-                    context,
-                    icono: Icons.date_range,
-                    label: 'Descargar valores históricos',
-                    action: _getRangeApi,
-                  ),
-                  _buildSpeedDialChild(
-                    context,
-                    icono: Icons.update,
-                    label: 'Actualizar último valor',
-                    action: _getDataApi,
-                  ),
-                ],
+                floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+                floatingActionButton: SpeedDial(
+                  icon: Icons.refresh,
+                  foregroundColor: const Color(0xFF0D47A1),
+                  backgroundColor: const Color(0xFFFFC107),
+                  spacing: 8,
+                  spaceBetweenChildren: 4,
+                  overlayColor: const Color(0xFF9E9E9E),
+                  overlayOpacity: 0.4,
+                  children: [
+                    _buildSpeedDialChild(
+                      context,
+                      icono: Icons.date_range,
+                      label: 'Descargar valores históricos',
+                      action: _getRangeApi,
+                    ),
+                    _buildSpeedDialChild(
+                      context,
+                      icono: Icons.update,
+                      label: 'Actualizar último valor',
+                      action: _getDataApi,
+                    ),
+                  ],
+                ),
               ),
             ),
           );

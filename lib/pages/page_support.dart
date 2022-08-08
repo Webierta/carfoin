@@ -36,158 +36,161 @@ class PageSupport extends StatelessWidget {
       _showSnackBar();
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Buy Me a Coffee'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              ScaffoldMessenger.of(context).removeCurrentSnackBar();
-              //Navigator.of(context).pushNamed(RouteGenerator.homePage);
-              context.go(homePage);
-            },
-          ),
-        ],
-      ),
-      drawer: const MyDrawer(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 40),
-        child: Column(
-          children: [
-            //const Head(),
-            //const Icon(Icons.coffee, size: 60, color: Color(0xFF1565C0)),
-            //const Divider(),
-            //const SizedBox(height: 10.0),
-            const Align(
-              alignment: Alignment.topLeft,
-              child: Text(
-                'CARFOIN es Software libre y de Código Abierto. Por favor considera colaborar '
-                'para mantener activo el desarrollo de esta App.',
-                style: TextStyle(fontSize: 18),
-              ),
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Buy Me a Coffee'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.home),
+              onPressed: () {
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                //Navigator.of(context).pushNamed(RouteGenerator.homePage);
+                context.go(homePage);
+              },
             ),
-            const SizedBox(height: 10.0),
-            Text.rich(
-              TextSpan(
-                style: const TextStyle(fontSize: 18),
-                text:
-                    '¿Crees que has encontrado un problema? Identificar y corregir errores hace que '
-                    'esta App sea mejor para todos. Informa de un error o sugiere una nueva funcionalidad aquí: ',
-                children: [
-                  TextSpan(
-                    style: const TextStyle(
-                      color: Colors.blueAccent,
-                      //fontSize: 18,
-                      decoration: TextDecoration.underline,
-                    ),
-                    text: 'GitHub issues.',
-                    recognizer: TapGestureRecognizer()..onTap = () => _launchUrl(urlGitHub),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10.0),
-            const Align(
-              alignment: Alignment.topLeft,
-              child: Text(
-                'Puedes colaborar con el desarrollo de ésta y otras aplicaciones con una pequeña '
-                'aportación a mi monedero de Bitcoins o vía PayPal.',
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
-            const Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.0),
+          ],
+        ),
+        drawer: const MyDrawer(),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 40),
+          child: Column(
+            children: [
+              //const Head(),
+              //const Icon(Icons.coffee, size: 60, color: Color(0xFF1565C0)),
+              //const Divider(),
+              //const SizedBox(height: 10.0),
+              const Align(
+                alignment: Alignment.topLeft,
                 child: Text(
-                  'Scan this QR code with your wallet application:',
+                  'CARFOIN es Software libre y de Código Abierto. Por favor considera colaborar '
+                  'para mantener activo el desarrollo de esta App.',
                   style: TextStyle(fontSize: 18),
                 ),
               ),
-            ),
-            FractionallySizedBox(
-              widthFactor: 0.5,
-              child: Image.asset('assets/Bitcoin_QR.png'),
-            ),
-            const Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.0),
-                child: Text(
-                  'Or copy the BTC Wallet Address:',
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-            ),
-            FittedBox(
-              fit: BoxFit.fitWidth,
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                    border: Border.all(
-                      color: Colors.black12,
-                      style: BorderStyle.solid,
-                    )),
-                child: Row(
+              const SizedBox(height: 10.0),
+              Text.rich(
+                TextSpan(
+                  style: const TextStyle(fontSize: 18),
+                  text:
+                      '¿Crees que has encontrado un problema? Identificar y corregir errores hace que '
+                      'esta App sea mejor para todos. Informa de un error o sugiere una nueva funcionalidad aquí: ',
                   children: [
-                    Container(
-                      height: 50,
-                      padding: const EdgeInsets.all(8.0),
-                      decoration: ShapeDecoration(
-                        color: Colors.grey[100],
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(8),
-                            topLeft: Radius.circular(8),
-                            bottomRight: Radius.zero,
-                            topRight: Radius.zero,
-                          ),
-                        ),
+                    TextSpan(
+                      style: const TextStyle(
+                        color: Colors.blueAccent,
+                        //fontSize: 18,
+                        decoration: TextDecoration.underline,
                       ),
-                      child: const Align(
-                        alignment: Alignment.center,
-                        child: Text(btcAddress),
-                      ),
-                    ),
-                    Container(
-                      height: 50,
-                      decoration: const BoxDecoration(
-                        border: Border(
-                            left: BorderSide(color: Colors.black12, style: BorderStyle.solid)),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.copy),
-                        onPressed: () => _clipboard(),
-                      ),
+                      text: 'GitHub issues.',
+                      recognizer: TapGestureRecognizer()..onTap = () => _launchUrl(urlGitHub),
                     ),
                   ],
                 ),
               ),
-            ),
-            const Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: EdgeInsets.only(top: 20.0, bottom: 10.0),
+              const SizedBox(height: 10.0),
+              const Align(
+                alignment: Alignment.topLeft,
                 child: Text(
-                  'Donar vía PayPal (abre el sitio web de pago de PayPal):',
+                  'Puedes colaborar con el desarrollo de ésta y otras aplicaciones con una pequeña '
+                  'aportación a mi monedero de Bitcoins o vía PayPal.',
                   style: TextStyle(fontSize: 18),
                 ),
               ),
-            ),
-            FractionallySizedBox(
-              widthFactor: 0.4,
-              child: ElevatedButton(
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  elevation: 10.0,
-                  padding: EdgeInsets.all(10),
+              const Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.0),
+                  child: Text(
+                    'Scan this QR code with your wallet application:',
+                    style: TextStyle(fontSize: 18),
+                  ),
                 ),
-                onPressed: () => _launchUrl(urlPayPal),
-                child: Image.asset('assets/paypal_logo.png'),
               ),
-            ),
-          ],
+              FractionallySizedBox(
+                widthFactor: 0.5,
+                child: Image.asset('assets/Bitcoin_QR.png'),
+              ),
+              const Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.0),
+                  child: Text(
+                    'Or copy the BTC Wallet Address:',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+              ),
+              FittedBox(
+                fit: BoxFit.fitWidth,
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                      border: Border.all(
+                        color: Colors.black12,
+                        style: BorderStyle.solid,
+                      )),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 50,
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: ShapeDecoration(
+                          color: Colors.grey[100],
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(8),
+                              topLeft: Radius.circular(8),
+                              bottomRight: Radius.zero,
+                              topRight: Radius.zero,
+                            ),
+                          ),
+                        ),
+                        child: const Align(
+                          alignment: Alignment.center,
+                          child: Text(btcAddress),
+                        ),
+                      ),
+                      Container(
+                        height: 50,
+                        decoration: const BoxDecoration(
+                          border: Border(
+                              left: BorderSide(color: Colors.black12, style: BorderStyle.solid)),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.copy),
+                          onPressed: () => _clipboard(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: EdgeInsets.only(top: 20.0, bottom: 10.0),
+                  child: Text(
+                    'Donar vía PayPal (abre el sitio web de pago de PayPal):',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+              ),
+              FractionallySizedBox(
+                widthFactor: 0.4,
+                child: ElevatedButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    elevation: 10.0,
+                    padding: EdgeInsets.all(10),
+                  ),
+                  onPressed: () => _launchUrl(urlPayPal),
+                  child: Image.asset('assets/paypal_logo.png'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -10,9 +10,10 @@ import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../utils/konstantes.dart';
 import '../widgets/loading_progress.dart';
+import '../widgets/menus.dart';
 import '../widgets/my_drawer.dart';
 
-enum Menu { ordenar, exportar, eliminar }
+//enum Menu { ordenar, exportar, eliminar }
 
 class PageHome extends StatefulWidget {
   const PageHome({Key? key}) : super(key: key);
@@ -78,31 +79,6 @@ class _PageHomeState extends State<PageHome> {
     super.dispose();
   }
 
-  PopupMenuItem<Menu> _buildMenuItem(Menu menu, IconData iconData, {bool divider = false}) {
-    return PopupMenuItem(
-      value: menu,
-      child: Column(
-        children: [
-          ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-            leading: Icon(iconData, color: const Color(0xFFFFFFFF)),
-            title: Text(
-              '${menu.name[0].toUpperCase()}${menu.name.substring(1)}',
-              style: const TextStyle(color: Color(0xFFFFFFFF)),
-            ),
-            trailing: menu == Menu.ordenar
-                ? Icon(
-                    _isCarterasByOrder ? Icons.check_box : Icons.check_box_outline_blank,
-                    color: const Color(0xFFFFFFFF),
-                  )
-                : null,
-          ),
-          if (divider == true) const Divider(color: Color(0xFFFFFFFF)), // PopMenuDivider
-        ],
-      ),
-    );
-  }
-
   final List<Icon> options = const [Icon(Icons.edit), Icon(Icons.delete_forever)];
 
   @override
@@ -126,223 +102,232 @@ class _PageHomeState extends State<PageHome> {
       future: database.getCarteras(byOrder: _isCarterasByOrder),
       builder: (BuildContext context, AsyncSnapshot<List<Cartera>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return Center(
-            child: Container(
-              decoration: scaffoldGradient,
-              child: Scaffold(
-                backgroundColor: Colors.transparent,
-                appBar: AppBar(
-                  title: const Text('Mis Carteras'),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.settings),
-                      onPressed: () {
-                        //Navigator.of(context).pushNamed(RouteGenerator.settingsPage);
-                        context.go(settingsPage);
-                      },
-                    ),
-                    PopupMenuButton(
-                      color: const Color(0xFF2196F3),
-                      offset: Offset(0.0, AppBar().preferredSize.height),
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+          return WillPopScope(
+            onWillPop: () async => false,
+            child: Center(
+              child: Container(
+                decoration: scaffoldGradient,
+                child: Scaffold(
+                  backgroundColor: Colors.transparent,
+                  appBar: AppBar(
+                    title: const Text('Mis Carteras'),
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.settings),
+                        onPressed: () {
+                          //Navigator.of(context).pushNamed(RouteGenerator.settingsPage);
+                          context.go(settingsPage);
+                        },
                       ),
-                      itemBuilder: (ctx) => [
-                        _buildMenuItem(Menu.ordenar, Icons.sort_by_alpha, divider: true),
-                        _buildMenuItem(Menu.exportar, Icons.save, divider: false),
-                        _buildMenuItem(Menu.eliminar, Icons.delete_forever, divider: false),
-                      ],
-                      onSelected: (item) async {
-                        //TODO: ACCIONES PENDIENTES
-                        if (item == Menu.ordenar) {
-                          _ordenarCarteras();
-                        } else if (item == Menu.exportar) {
-                          print('EXPORTAR');
-                        } else if (item == Menu.eliminar) {
-                          _deleteConfirm(context);
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                drawer: const MyDrawer(),
-                floatingActionButton: FloatingActionButton(
-                  backgroundColor: const Color(0xFFFFC107),
-                  child: const Icon(Icons.add, color: Color(0xFF0D47A1)),
-                  onPressed: () => _carteraInput(context),
-                ),
-                body: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Consumer<CarteraProvider>(
-                    builder: (context, data, child) {
-                      if (data.carteras.isEmpty) {
-                        return const Center(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
-                            child: Text(
-                              'Empieza creando una cartera',
-                              style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 22),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        );
-                      }
-                      return ListView.builder(
-                        itemCount: data.carteras.length,
-                        itemBuilder: (context, index) {
-                          Cartera cartera = data.carteras[index];
-                          List<Fondo> fondos = cartera.fondos ?? [];
-                          return Dismissible(
-                            key: UniqueKey(),
-                            direction: DismissDirection.endToStart,
-                            background: Container(
-                              color: const Color(0xFFF44336),
-                              margin: const EdgeInsets.symmetric(horizontal: 15),
-                              alignment: Alignment.centerRight,
-                              child: const Padding(
-                                padding: EdgeInsets.all(10.0),
-                                child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
-                              ),
-                            ),
-                            onDismissed: (_) => _deleteCartera(cartera),
+                      PopupMenuButton(
+                        color: const Color(0xFF2196F3),
+                        offset: Offset(0.0, AppBar().preferredSize.height),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                        ),
+                        itemBuilder: (ctx) => [
+                          //_buildMenuItem(Menu.ordenar, Icons.sort_by_alpha, divider: true),
+                          //_buildMenuItem(Menu.exportar, Icons.save, divider: false),
+                          //_buildMenuItem(Menu.eliminar, Icons.delete_forever, divider: false),
+                          buildMenuItem(Menu.ordenar, Icons.sort_by_alpha,
+                              divider: true, isOrder: _isCarterasByOrder),
+                          buildMenuItem(Menu.exportar, Icons.save),
+                          buildMenuItem(Menu.eliminar, Icons.delete_forever),
+                        ],
+                        onSelected: (item) async {
+                          //TODO: ACCIONES PENDIENTES
+                          if (item == Menu.ordenar) {
+                            _ordenarCarteras();
+                          } else if (item == Menu.exportar) {
+                            print('EXPORTAR');
+                          } else if (item == Menu.eliminar) {
+                            _deleteConfirm(context);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  drawer: const MyDrawer(),
+                  floatingActionButton: FloatingActionButton(
+                    backgroundColor: const Color(0xFFFFC107),
+                    child: const Icon(Icons.add, color: Color(0xFF0D47A1)),
+                    onPressed: () => _carteraInput(context),
+                  ),
+                  body: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Consumer<CarteraProvider>(
+                      builder: (context, data, child) {
+                        if (data.carteras.isEmpty) {
+                          return const Center(
                             child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: const Color.fromRGBO(255, 255, 255, 0.5),
-                                  border: Border.all(color: Colors.white, width: 2),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  children: [
-                                    ListTile(
-                                      leading: CircleAvatar(
-                                        radius: 22,
-                                        backgroundColor: const Color(0xFFFFFFFF),
-                                        child: CircleAvatar(
-                                          backgroundColor: const Color(0xFFFFC107),
-                                          child: IconButton(
-                                            onPressed: () {
-                                              ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                              carteraProvider.carteraSelect = cartera;
-                                              //Navigator.of(context).pushNamed(RouteGenerator.carteraPage);
-                                              context.go(carteraPage);
-                                            },
-                                            icon: const Icon(
-                                              Icons.business_center,
-                                              color: Color(0xFF0D47A1),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      title: Text(
-                                        cartera.name,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20,
-                                          color: Color(0xFF2196F3),
-                                        ),
-                                      ),
-                                      trailing: PopupMenuButton(
-                                        color: const Color(0xFF2196F3),
-                                        icon: const Icon(Icons.more_vert, color: Color(0xFF2196F3)),
-                                        itemBuilder: (context) => const [
-                                          PopupMenuItem(
-                                            value: 1,
-                                            child: ListTile(
-                                              leading: Icon(Icons.edit, color: Color(0xFFFFFFFF)),
-                                              title: Text(
-                                                'Renombrar',
-                                                style: TextStyle(color: Color(0xFFFFFFFF)),
-                                              ),
-                                            ),
-                                          ),
-                                          PopupMenuItem(
-                                            value: 2,
-                                            child: ListTile(
-                                              leading: Icon(Icons.delete_forever,
-                                                  color: Color(0xFFFFFFFF)),
-                                              title: Text(
-                                                'Eliminar',
-                                                style: TextStyle(color: Color(0xFFFFFFFF)),
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                        onSelected: (value) {
-                                          if (value == 1) {
-                                            _carteraInput(context, cartera: cartera);
-                                          } else if (value == 2) {
-                                            _deleteCartera(cartera);
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(12),
-                                      child: Container(
-                                        padding: const EdgeInsets.only(right: 12),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFBBDEFB),
-                                          border: Border.all(color: Colors.white, width: 2),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        //child: (cartera.fondos != null && cartera.fondos!.isNotEmpty)
-                                        child: fondos.isNotEmpty
-                                            ? Theme(
-                                                data: Theme.of(context)
-                                                    .copyWith(dividerColor: Colors.transparent),
-                                                child: ExpansionTile(
-                                                  childrenPadding:
-                                                      const EdgeInsets.only(bottom: 10, left: 20),
-                                                  expandedCrossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  expandedAlignment: Alignment.topLeft,
-                                                  maintainState: true,
-                                                  iconColor: Colors.blue,
-                                                  collapsedIconColor: Colors.blue,
-                                                  tilePadding: const EdgeInsets.all(0.0),
-                                                  backgroundColor: const Color(0xFFBBDEFB),
-                                                  title: _buildChipFondo(fondos.length),
-                                                  children: [
-                                                    for (var fondo in fondos)
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          ScaffoldMessenger.of(context)
-                                                              .removeCurrentSnackBar();
-                                                          carteraProvider.carteraSelect = cartera;
-                                                          carteraProvider.fondoSelect = fondo;
-                                                          //Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
-                                                          context.go(fondoPage);
-                                                        },
-                                                        child: Text(
-                                                          fondo.name,
-                                                          overflow: TextOverflow.ellipsis,
-                                                          maxLines: 1,
-                                                          style: const TextStyle(
-                                                              color: Color(0xFF0D47A1)),
-                                                        ),
-                                                      )
-                                                  ],
-                                                ),
-                                              )
-                                            : Padding(
-                                                padding: const EdgeInsets.symmetric(vertical: 6),
-                                                child: _buildChipFondo(null),
-                                              ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              padding: EdgeInsets.symmetric(horizontal: 12),
+                              child: Text(
+                                'Empieza creando una cartera',
+                                style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 22),
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           );
-                        },
-                      );
-                    },
+                        }
+                        return ListView.builder(
+                          itemCount: data.carteras.length,
+                          itemBuilder: (context, index) {
+                            Cartera cartera = data.carteras[index];
+                            List<Fondo> fondos = cartera.fondos ?? [];
+                            return Dismissible(
+                              key: UniqueKey(),
+                              direction: DismissDirection.endToStart,
+                              background: Container(
+                                color: const Color(0xFFF44336),
+                                margin: const EdgeInsets.symmetric(horizontal: 15),
+                                alignment: Alignment.centerRight,
+                                child: const Padding(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
+                                ),
+                              ),
+                              onDismissed: (_) => _deleteCartera(cartera),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: const Color.fromRGBO(255, 255, 255, 0.5),
+                                    border: Border.all(color: Colors.white, width: 2),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        leading: CircleAvatar(
+                                          radius: 22,
+                                          backgroundColor: const Color(0xFFFFFFFF),
+                                          child: CircleAvatar(
+                                            backgroundColor: const Color(0xFFFFC107),
+                                            child: IconButton(
+                                              onPressed: () {
+                                                ScaffoldMessenger.of(context)
+                                                    .removeCurrentSnackBar();
+                                                carteraProvider.carteraSelect = cartera;
+                                                //Navigator.of(context).pushNamed(RouteGenerator.carteraPage);
+                                                context.go(carteraPage);
+                                              },
+                                              icon: const Icon(
+                                                Icons.business_center,
+                                                color: Color(0xFF0D47A1),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        title: Text(
+                                          cartera.name,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20,
+                                            color: Color(0xFF2196F3),
+                                          ),
+                                        ),
+                                        trailing: PopupMenuButton(
+                                          color: const Color(0xFF2196F3),
+                                          icon:
+                                              const Icon(Icons.more_vert, color: Color(0xFF2196F3)),
+                                          itemBuilder: (context) => const [
+                                            PopupMenuItem(
+                                              value: 1,
+                                              child: ListTile(
+                                                leading: Icon(Icons.edit, color: Color(0xFFFFFFFF)),
+                                                title: Text(
+                                                  'Renombrar',
+                                                  style: TextStyle(color: Color(0xFFFFFFFF)),
+                                                ),
+                                              ),
+                                            ),
+                                            PopupMenuItem(
+                                              value: 2,
+                                              child: ListTile(
+                                                leading: Icon(Icons.delete_forever,
+                                                    color: Color(0xFFFFFFFF)),
+                                                title: Text(
+                                                  'Eliminar',
+                                                  style: TextStyle(color: Color(0xFFFFFFFF)),
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                          onSelected: (value) {
+                                            if (value == 1) {
+                                              _carteraInput(context, cartera: cartera);
+                                            } else if (value == 2) {
+                                              _deleteCartera(cartera);
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(12),
+                                        child: Container(
+                                          padding: const EdgeInsets.only(right: 12),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFBBDEFB),
+                                            border: Border.all(color: Colors.white, width: 2),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          //child: (cartera.fondos != null && cartera.fondos!.isNotEmpty)
+                                          child: fondos.isNotEmpty
+                                              ? Theme(
+                                                  data: Theme.of(context)
+                                                      .copyWith(dividerColor: Colors.transparent),
+                                                  child: ExpansionTile(
+                                                    childrenPadding:
+                                                        const EdgeInsets.only(bottom: 10, left: 20),
+                                                    expandedCrossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                    expandedAlignment: Alignment.topLeft,
+                                                    maintainState: true,
+                                                    iconColor: Colors.blue,
+                                                    collapsedIconColor: Colors.blue,
+                                                    tilePadding: const EdgeInsets.all(0.0),
+                                                    backgroundColor: const Color(0xFFBBDEFB),
+                                                    title: _buildChipFondo(fondos.length),
+                                                    children: [
+                                                      for (var fondo in fondos)
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            ScaffoldMessenger.of(context)
+                                                                .removeCurrentSnackBar();
+                                                            carteraProvider.carteraSelect = cartera;
+                                                            carteraProvider.fondoSelect = fondo;
+                                                            //Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
+                                                            context.go(fondoPage);
+                                                          },
+                                                          child: Text(
+                                                            fondo.name,
+                                                            overflow: TextOverflow.ellipsis,
+                                                            maxLines: 1,
+                                                            style: const TextStyle(
+                                                                color: Color(0xFF0D47A1)),
+                                                          ),
+                                                        )
+                                                    ],
+                                                  ),
+                                                )
+                                              : Padding(
+                                                  padding: const EdgeInsets.symmetric(vertical: 6),
+                                                  child: _buildChipFondo(null),
+                                                ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),

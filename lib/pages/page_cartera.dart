@@ -17,8 +17,9 @@ import '../utils/konstantes.dart';
 import '../utils/stats.dart';
 import '../widgets/hoja_calendario.dart';
 import '../widgets/loading_progress.dart';
+import '../widgets/menus.dart';
 
-enum MenuCartera { ordenar, eliminar }
+//enum MenuCartera { ordenar, eliminar }
 
 class PageCartera extends StatefulWidget {
   const PageCartera({Key? key}) : super(key: key);
@@ -88,32 +89,6 @@ class _PageCarteraState extends State<PageCartera> {
     PreferencesService.saveBool(keyByOrderFondosPref, _isFondosByOrder);
   }
 
-  PopupMenuItem<MenuCartera> _buildMenuItem(MenuCartera menu, IconData iconData,
-      {bool divider = false}) {
-    return PopupMenuItem(
-      value: menu,
-      child: Column(
-        children: [
-          ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-            leading: Icon(iconData, color: const Color(0xFFFFFFFF)),
-            title: Text(
-              '${menu.name[0].toUpperCase()}${menu.name.substring(1)}',
-              style: const TextStyle(color: Color(0xFFFFFFFF)),
-            ),
-            trailing: menu == MenuCartera.ordenar
-                ? Icon(
-                    _isFondosByOrder ? Icons.check_box : Icons.check_box_outline_blank,
-                    color: const Color(0xFFFFFFFF),
-                  )
-                : null,
-          ),
-          if (divider) const Divider(height: 10, color: Color(0xFFFFFFFF)), // PopMenuDivider
-        ],
-      ),
-    );
-  }
-
   SpeedDialChild _buildSpeedDialChild(BuildContext context,
       {required IconData icono, required String label, required AppPage page}) {
     return SpeedDialChild(
@@ -141,254 +116,261 @@ class _PageCarteraState extends State<PageCartera> {
       future: database.getFondos(carteraSelect, byOrder: _isFondosByOrder),
       builder: (BuildContext context, AsyncSnapshot<List<Fondo>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return Container(
-            decoration: scaffoldGradient,
-            child: Scaffold(
-              backgroundColor: Colors.transparent,
-              appBar: AppBar(
+          return WillPopScope(
+            onWillPop: () async => false,
+            child: Container(
+              decoration: scaffoldGradient,
+              child: Scaffold(
                 backgroundColor: Colors.transparent,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                    //Navigator.of(context).pushNamed(RouteGenerator.homePage);
-                    context.go(homePage);
-                  },
-                ),
-                title: Row(
-                  children: [
-                    const Icon(Icons.business_center),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: Text(carteraSelect.name, overflow: TextOverflow.ellipsis, maxLines: 1),
+                appBar: AppBar(
+                  backgroundColor: Colors.transparent,
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                      //Navigator.of(context).pushNamed(RouteGenerator.homePage);
+                      context.go(homePage);
+                    },
+                  ),
+                  title: Row(
+                    children: [
+                      const Icon(Icons.business_center),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child:
+                            Text(carteraSelect.name, overflow: TextOverflow.ellipsis, maxLines: 1),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      onPressed: () async {
+                        await _dialogUpdateAll(context);
+                      },
+                    ),
+                    PopupMenuButton(
+                      color: const Color(0xFF2196F3),
+                      offset: Offset(0.0, AppBar().preferredSize.height),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                      ),
+                      itemBuilder: (ctx) => [
+                        //_buildMenuItem(MenuCartera.ordenar, Icons.sort_by_alpha),
+                        //_buildMenuItem(MenuCartera.eliminar, Icons.delete_forever)
+                        buildMenuItem(MenuCartera.ordenar, Icons.sort_by_alpha,
+                            isOrder: _isFondosByOrder),
+                        buildMenuItem(MenuCartera.eliminar, Icons.delete_forever)
+                      ],
+                      onSelected: (item) async {
+                        if (item == MenuCartera.ordenar) {
+                          _ordenarFondos();
+                        } else if (item == MenuCartera.eliminar) {
+                          _deleteAllConfirm(context);
+                        }
+                      },
                     ),
                   ],
                 ),
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.refresh),
-                    onPressed: () async {
-                      await _dialogUpdateAll(context);
-                    },
-                  ),
-                  PopupMenuButton(
-                    color: const Color(0xFF2196F3),
-                    offset: Offset(0.0, AppBar().preferredSize.height),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                floatingActionButton: SpeedDial(
+                  icon: Icons.addchart,
+                  foregroundColor: const Color(0xFF0D47A1),
+                  backgroundColor: const Color(0xFFFFC107),
+                  spacing: 8,
+                  spaceBetweenChildren: 4,
+                  overlayColor: const Color(0xFF9E9E9E),
+                  overlayOpacity: 0.4,
+                  children: [
+                    _buildSpeedDialChild(
+                      context,
+                      icono: Icons.search,
+                      label: 'Buscar online por ISIN',
+                      page: AppPage.inputFondo,
                     ),
-                    itemBuilder: (ctx) => [
-                      _buildMenuItem(MenuCartera.ordenar, Icons.sort_by_alpha),
-                      _buildMenuItem(MenuCartera.eliminar, Icons.delete_forever)
-                    ],
-                    onSelected: (MenuCartera item) async {
-                      if (item == MenuCartera.ordenar) {
-                        _ordenarFondos();
-                      } else if (item == MenuCartera.eliminar) {
-                        _deleteAllConfirm(context);
-                      }
-                    },
-                  ),
-                ],
-              ),
-              floatingActionButton: SpeedDial(
-                icon: Icons.addchart,
-                foregroundColor: const Color(0xFF0D47A1),
-                backgroundColor: const Color(0xFFFFC107),
-                spacing: 8,
-                spaceBetweenChildren: 4,
-                overlayColor: const Color(0xFF9E9E9E),
-                overlayOpacity: 0.4,
-                children: [
-                  _buildSpeedDialChild(
-                    context,
-                    icono: Icons.search,
-                    label: 'Buscar online por ISIN',
-                    page: AppPage.inputFondo,
-                  ),
-                  _buildSpeedDialChild(
-                    context,
-                    icono: Icons.storage,
-                    label: 'Base de Datos local',
-                    page: AppPage.searchFondo,
-                  ),
-                ],
-              ),
-              body: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Consumer<CarteraProvider>(
-                  builder: (context, data, child) {
-                    if (data.fondos.isEmpty) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Text(
-                            'Añade fondos a esta cartera',
-                            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 22),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      );
-                    }
-                    return ListView.builder(
-                      itemCount: data.fondos.length,
-                      itemBuilder: (context, index) {
-                        Fondo fondo = data.fondos[index];
-                        //List<Valor> valores = await database.getValores(carteraSelect, fondo);
-                        //final valores = context.read<CarteraProvider>().valores;
-                        List<Valor>? valores = data.fondos[index].valores;
-                        String lastDate = '';
-                        int dia = 0;
-                        String mesYear = '';
-                        String lastPrecio = '';
-                        String divisa = fondo.divisa ?? '';
-                        double? diferencia;
-                        if (valores != null && valores.isNotEmpty) {
-                          int lastEpoch = valores.first.date;
-                          lastDate = FechaUtil.epochToString(lastEpoch);
-                          dia = FechaUtil.epochToDate(lastEpoch).day;
-                          //mes = FechaUtil.epochToDate(lastEpoch).month;
-                          //ano = FechaUtil.epochToDate(lastEpoch).year;
-                          mesYear = FechaUtil.epochToString(lastEpoch, formato: 'MMM yy');
-                          lastPrecio =
-                              NumberFormat.decimalPattern('es').format(valores.first.precio);
-                          if (valores.length > 1) {
-                            diferencia = valores.first.precio - valores[1].precio;
-                          }
-                          stats = Stats(valores);
-                        }
-                        return Dismissible(
-                          key: UniqueKey(),
-                          direction: DismissDirection.endToStart,
-                          background: Container(
-                            color: const Color(0xFFF44336),
-                            margin: const EdgeInsets.symmetric(horizontal: 15),
-                            alignment: Alignment.centerRight,
-                            child: const Padding(
-                              padding: EdgeInsets.all(10.0),
-                              child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
-                            ),
-                          ),
-                          onDismissed: (_) async {
-                            await _removeFondo(fondo);
-                          },
+                    _buildSpeedDialChild(
+                      context,
+                      icono: Icons.storage,
+                      label: 'Base de Datos local',
+                      page: AppPage.searchFondo,
+                    ),
+                  ],
+                ),
+                body: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Consumer<CarteraProvider>(
+                    builder: (context, data, child) {
+                      if (data.fondos.isEmpty) {
+                        return const Center(
                           child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: const Color.fromRGBO(255, 255, 255, 0.5),
-                                border: Border.all(color: Colors.white, width: 2),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                children: [
-                                  ListTile(
-                                    leading: CircleAvatar(
-                                      radius: 22,
-                                      backgroundColor: const Color(0xFFFFFFFF),
-                                      child: CircleAvatar(
-                                        backgroundColor: const Color(0xFFFFC107),
-                                        child: IconButton(
-                                          onPressed: () {
-                                            ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                            carteraProvider.fondoSelect = fondo;
-                                            //Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
-                                            context.go(fondoPage);
-                                          },
-                                          icon: const Icon(
-                                            Icons.poll,
-                                            color: Color(0xFF0D47A1),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    title: Text(
-                                      fondo.name,
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: Color(0xFF2196F3),
-                                      ),
-                                    ),
-                                    subtitle: Text(
-                                      fondo.isin,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: Color(0xFF0D47A1),
-                                      ),
-                                    ),
-                                    trailing: const Icon(Icons.more_vert),
-                                  ),
-                                  if (valores != null && valores.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFBBDEFB),
-                                          border: Border.all(color: Colors.white, width: 2),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        child: IntrinsicHeight(
-                                          child: Row(
-                                            //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            //crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              //mainAxisAlignment: MainAxisAlignment.start,
-                                              //crossAxisAlignment: CrossAxisAlignment.start,
-                                              DiaCalendario(epoch: valores.first.date),
-                                              const Spacer(),
-                                              Column(
-                                                crossAxisAlignment: CrossAxisAlignment.end,
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  //const Spacer(),
-                                                  Text(
-                                                    'V.L. $lastPrecio $divisa',
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Color(0xFF0D47A1),
-                                                    ),
-                                                  ),
-                                                  if (diferencia != null)
-                                                    Text(
-                                                      diferencia.toStringAsFixed(2),
-                                                      style: TextStyle(
-                                                        color: diferencia < 0
-                                                            ? const Color(0xFFF44336)
-                                                            : const Color(0xFF4CAF50),
-                                                      ),
-                                                    ),
-                                                  //const Spacer(),
-                                                  (stats.resultado() != null &&
-                                                          stats.resultado() != 0)
-                                                      ? Text(
-                                                          'Capital: ${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} $divisa',
-                                                          style: const TextStyle(
-                                                              color: Color(0xFF0D47A1),
-                                                              fontSize: 14),
-                                                        )
-                                                      : const Text('Sin inversiones'),
-                                                  //const Spacer(),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
+                            padding: EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              'Añade fondos a esta cartera',
+                              style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 22),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         );
-                      },
-                    );
-                  },
+                      }
+                      return ListView.builder(
+                        itemCount: data.fondos.length,
+                        itemBuilder: (context, index) {
+                          Fondo fondo = data.fondos[index];
+                          //List<Valor> valores = await database.getValores(carteraSelect, fondo);
+                          //final valores = context.read<CarteraProvider>().valores;
+                          List<Valor>? valores = data.fondos[index].valores;
+                          String lastDate = '';
+                          int dia = 0;
+                          String mesYear = '';
+                          String lastPrecio = '';
+                          String divisa = fondo.divisa ?? '';
+                          double? diferencia;
+                          if (valores != null && valores.isNotEmpty) {
+                            int lastEpoch = valores.first.date;
+                            lastDate = FechaUtil.epochToString(lastEpoch);
+                            dia = FechaUtil.epochToDate(lastEpoch).day;
+                            //mes = FechaUtil.epochToDate(lastEpoch).month;
+                            //ano = FechaUtil.epochToDate(lastEpoch).year;
+                            mesYear = FechaUtil.epochToString(lastEpoch, formato: 'MMM yy');
+                            lastPrecio =
+                                NumberFormat.decimalPattern('es').format(valores.first.precio);
+                            if (valores.length > 1) {
+                              diferencia = valores.first.precio - valores[1].precio;
+                            }
+                            stats = Stats(valores);
+                          }
+                          return Dismissible(
+                            key: UniqueKey(),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              color: const Color(0xFFF44336),
+                              margin: const EdgeInsets.symmetric(horizontal: 15),
+                              alignment: Alignment.centerRight,
+                              child: const Padding(
+                                padding: EdgeInsets.all(10.0),
+                                child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
+                              ),
+                            ),
+                            onDismissed: (_) async {
+                              await _removeFondo(fondo);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromRGBO(255, 255, 255, 0.5),
+                                  border: Border.all(color: Colors.white, width: 2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  children: [
+                                    ListTile(
+                                      leading: CircleAvatar(
+                                        radius: 22,
+                                        backgroundColor: const Color(0xFFFFFFFF),
+                                        child: CircleAvatar(
+                                          backgroundColor: const Color(0xFFFFC107),
+                                          child: IconButton(
+                                            onPressed: () {
+                                              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                              carteraProvider.fondoSelect = fondo;
+                                              //Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
+                                              context.go(fondoPage);
+                                            },
+                                            icon: const Icon(
+                                              Icons.poll,
+                                              color: Color(0xFF0D47A1),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      title: Text(
+                                        fondo.name,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Color(0xFF2196F3),
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        fondo.isin,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Color(0xFF0D47A1),
+                                        ),
+                                      ),
+                                      trailing: const Icon(Icons.more_vert),
+                                    ),
+                                    if (valores != null && valores.isNotEmpty)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFBBDEFB),
+                                            border: Border.all(color: Colors.white, width: 2),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: IntrinsicHeight(
+                                            child: Row(
+                                              //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              //crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                //mainAxisAlignment: MainAxisAlignment.start,
+                                                //crossAxisAlignment: CrossAxisAlignment.start,
+                                                DiaCalendario(epoch: valores.first.date),
+                                                const Spacer(),
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    //const Spacer(),
+                                                    Text(
+                                                      'V.L. $lastPrecio $divisa',
+                                                      style: const TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Color(0xFF0D47A1),
+                                                      ),
+                                                    ),
+                                                    if (diferencia != null)
+                                                      Text(
+                                                        diferencia.toStringAsFixed(2),
+                                                        style: TextStyle(
+                                                          color: diferencia < 0
+                                                              ? const Color(0xFFF44336)
+                                                              : const Color(0xFF4CAF50),
+                                                        ),
+                                                      ),
+                                                    //const Spacer(),
+                                                    (stats.resultado() != null &&
+                                                            stats.resultado() != 0)
+                                                        ? Text(
+                                                            'Capital: ${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} $divisa',
+                                                            style: const TextStyle(
+                                                                color: Color(0xFF0D47A1),
+                                                                fontSize: 14),
+                                                          )
+                                                        : const Text('Sin inversiones'),
+                                                    //const Spacer(),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
             ),

@@ -25,38 +25,41 @@ class PageAbout extends StatelessWidget {
       if (!await launchUrl(url)) throw 'Could not launch $url';
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('ABOUT'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              ScaffoldMessenger.of(context).removeCurrentSnackBar();
-              //Navigator.of(context).pushNamed(RouteGenerator.homePage);
-              context.go(homePage);
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('ABOUT'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.home),
+              onPressed: () {
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                //Navigator.of(context).pushNamed(RouteGenerator.homePage);
+                context.go(homePage);
+              },
+            ),
+          ],
+        ),
+        drawer: const MyDrawer(),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Markdown(
+            onTapLink: (String text, String? url, String title) {
+              if (text != 'donación') {
+                _launchUrl(Uri.parse(url!));
+              } else {
+                //Navigator.of(context).pop();
+                //Navigator.of(context).pushNamed(RouteGenerator.supportPage);
+                context.go(supportPage);
+              }
             },
-          ),
-        ],
-      ),
-      drawer: const MyDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Markdown(
-          onTapLink: (String text, String? url, String title) {
-            if (text != 'donación') {
-              _launchUrl(Uri.parse(url!));
-            } else {
-              //Navigator.of(context).pop();
-              //Navigator.of(context).pushNamed(RouteGenerator.supportPage);
-              context.go(supportPage);
-            }
-          },
-          data: mdstring,
-          styleSheet: MarkdownStyleSheet(
-            h1: const TextStyle(color: Colors.blue, fontSize: 40),
-            h2: const TextStyle(color: Colors.blue, fontSize: 22),
-            p: const TextStyle(fontSize: 18),
+            data: mdstring,
+            styleSheet: MarkdownStyleSheet(
+              h1: const TextStyle(color: Colors.blue, fontSize: 40),
+              h2: const TextStyle(color: Colors.blue, fontSize: 22),
+              p: const TextStyle(fontSize: 18),
+            ),
           ),
         ),
       ),
