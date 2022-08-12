@@ -1,6 +1,12 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:restart_app/restart_app.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
@@ -131,15 +137,33 @@ class _PageHomeState extends State<PageHome> {
                           //_buildMenuItem(Menu.eliminar, Icons.delete_forever, divider: false),
                           buildMenuItem(Menu.ordenar, Icons.sort_by_alpha,
                               divider: true, isOrder: _isCarterasByOrder),
+                          buildMenuItem(Menu.importar, Icons.file_download),
                           buildMenuItem(Menu.exportar, Icons.save),
                           buildMenuItem(Menu.eliminar, Icons.delete_forever),
                         ],
                         onSelected: (item) async {
                           //TODO: ACCIONES PENDIENTES
+                          /*switch (item) {
+                            case Menu.ordenar:
+                              _ordenarCarteras();
+                              break;
+                            case Menu.exportar:
+                              print('EXPORTAR');
+                              break;
+                            case Menu.importar:
+                              _import(context);
+                              break;
+                            case Menu.eliminar:
+                              _deleteConfirm(context);
+                              break;
+                          }*/
+
                           if (item == Menu.ordenar) {
                             _ordenarCarteras();
                           } else if (item == Menu.exportar) {
-                            print('EXPORTAR');
+                            _export(context);
+                          } else if (item == Menu.importar) {
+                            _import(context);
                           } else if (item == Menu.eliminar) {
                             _deleteConfirm(context);
                           }
@@ -151,7 +175,7 @@ class _PageHomeState extends State<PageHome> {
                   floatingActionButton: FloatingActionButton(
                     backgroundColor: const Color(0xFFFFC107),
                     child: const Icon(Icons.add, color: Color(0xFF0D47A1)),
-                    onPressed: () => _carteraInput(context),
+                    onPressed: () => _inputName(context),
                   ),
                   body: Padding(
                     padding: const EdgeInsets.all(12.0),
@@ -258,7 +282,7 @@ class _PageHomeState extends State<PageHome> {
                                           ],
                                           onSelected: (value) {
                                             if (value == 1) {
-                                              _carteraInput(context, cartera: cartera);
+                                              _inputName(context, cartera: cartera);
                                             } else if (value == 2) {
                                               _deleteCartera(cartera);
                                             }
@@ -340,8 +364,139 @@ class _PageHomeState extends State<PageHome> {
     );
   }
 
-  Future<void> _carteraInput(BuildContext context, {Cartera? cartera}) async {
-    String title = cartera?.name ?? 'Nueva Cartera';
+  _export(BuildContext context) async {
+    // TODO: DIALOGO NOMBRE FILE
+
+    await _inputName(context, isSave: true);
+
+    if (_errorText != null) return '';
+    String nombreDb = _controller.value.text.trim();
+    nombreDb = '$nombreDb.db';
+    _controller.clear();
+
+    bool okSave = false;
+    final String dbPath = await database.getDatabasePath();
+    var dbFile = File(dbPath);
+    final dbAsBytes = await dbFile.readAsBytes();
+    String filePath = '';
+
+    Future<String> _getFilePath() async {
+      Directory? directory = await getExternalStorageDirectory();
+      //if (directory == null || directory.path.isEmpty || !await directory.exists()) return '';
+      if (directory == null) return '';
+      if ((!await directory.exists())) directory.create();
+      String path = directory.path;
+      String filePath = '$path/$nombreDb';
+      return filePath;
+    }
+
+    try {
+      filePath = await _getFilePath();
+      if (filePath.isEmpty) throw Exception();
+      File file = File(filePath);
+      await file.writeAsBytes(dbAsBytes);
+      okSave = true;
+    } catch (e) {
+      //TODO: mensaje de error
+      //return;
+      okSave = false;
+    }
+
+    //_dialogResultSave(okSave, filePath);
+    await _resultProcess(isImport: false, isOk: okSave, filePath: filePath);
+  }
+
+  _resultProcess({required bool isImport, required bool isOk, String filePath = ''}) async {
+    String line1 = isOk ? 'El proceso ha concluido con éxito' : 'El proceso ha fallado';
+    String line2 = isImport
+        ? 'La app se reiniciará.'
+        : isOk
+            ? 'La copia se ha almacenado en $filePath'
+            : '';
+
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Resultado'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: [
+                  Text(line1),
+                  Text(line2),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: const Text('Cerrar'),
+                onPressed: () {
+                  isImport ? Restart.restartApp() : Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  _import(BuildContext context) async {
+    // DIALOGO CONFIRMACIÓN: ACEPTAR CANCELAR INICIAR PROCESO DE EXPORTACIÓN
+    // AVISO SE ELIMINARÁ TODO
+    // recomendar salvar copia de seguridad
+
+    // SELECCIONAR FILE
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result == null || result.files.isEmpty) return;
+
+    bool okImport = false;
+    final String dbPath = await database.getDatabasePath();
+    PlatformFile archivo = result.files.first;
+
+    // TODO: ESTUDIAR POSIBILIDAD DE RECUPERAR BD ORIGINAL: EXPORTAR AUTO??
+    //var dbFile = File(dbPath);
+    //var dbBackup = await dbFile.readAsBytes();
+
+    if (archivo.extension == 'db') {
+      try {
+        //throw Exception();
+        File file = File(archivo.path!);
+        final dbAsBytes = await file.readAsBytes();
+        //final dbDir = await getDatabasesPath();
+        //final String dbPath = join(dbDir, 'database.db');
+        await deleteDatabase(dbPath);
+        //await database.deleteDatabase(dbPath);
+        await File(dbPath).writeAsBytes(dbAsBytes);
+        okImport = true;
+      } catch (e) {
+        print('EXCEPCION');
+        print(e);
+        // TODO: DIALOGO ERROR: RECUPERAR BD ??
+        //await deleteDatabase(dbPath);
+        //await database.deleteDatabase(dbPath);
+        //await File(dbPath).writeAsBytes(dbBackup);
+        // TODO: RECUPERAR BD AUTOGUARDADA ??
+        //await deleteDatabase(dbPath);
+        okImport = false;
+      } finally {
+        //await _dialogResultImport(okImport);
+        await _resultProcess(isImport: true, isOk: okImport);
+        //Restart.restartApp();
+      }
+    } else {
+      //  msg: formato archivo incorrecto
+      return;
+    }
+  }
+
+  Future<void> _inputName(BuildContext context, {Cartera? cartera, bool isSave = false}) async {
+    //String title = cartera?.name ?? 'Nueva Cartera';
+    String title;
+    if (isSave == false) {
+      title = cartera?.name ?? 'Nueva Cartera';
+    } else {
+      title = 'Nombre base de datos';
+    }
     return showDialog(
         context: context,
         builder: (context) {
@@ -369,9 +524,17 @@ class _PageHomeState extends State<PageHome> {
                           },
                         ),
                         ElevatedButton(
-                          //onPressed: _controller.value.text.trim().isNotEmpty ? _submit : null,
                           onPressed: () {
-                            _controller.value.text.trim().isNotEmpty ? _submit(cartera) : null;
+                            //_controller.value.text.trim().isNotEmpty ? _submit(cartera) : null;
+                            if (_controller.value.text.trim().isNotEmpty) {
+                              //isSave ? Navigator.pop(context) : _submit(cartera);
+                              if (isSave == true) {
+                                Navigator.pop(context);
+                              } else {
+                                print('SUBMITTTTTTTTTTTTTT');
+                                _submit(cartera);
+                              }
+                            }
                           },
                           child: const Text('ACEPTAR'),
                         ),

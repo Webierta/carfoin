@@ -23,6 +23,9 @@ class DatabaseHelper {
   static const columnTipoOperacion = 'tipo';
   static const columnParticipaciones = 'participaciones';
 
+  // TODO: CAPTURA DE EXCEPCIONES EN TODAS LAS LLAMADAS A DB
+  // SI EXCEPCIÓN (archivo corrupto): ELIMINAR BD Y REINICIAR
+
   Future<Database>? _database;
 
   get database async {
@@ -36,6 +39,7 @@ class DatabaseHelper {
       await Directory(dbFolder).create(recursive: true);
     }
     final String dbPath = join(dbFolder, _databaseName);
+    //final String dbPath = await getDatabasePath();
     return await openDatabase(
       dbPath,
       version: _databaseVersion,
@@ -48,6 +52,25 @@ class DatabaseHelper {
       },
     );
   }
+
+  getDatabaseFolder() async {
+    final dbFolder = await getDatabasesPath();
+    if (!await Directory(dbFolder).exists()) {
+      await Directory(dbFolder).create(recursive: true);
+    }
+    return dbFolder;
+  }
+
+  Future<String> getDatabasePath() async {
+    final dbFolder = await getDatabasesPath();
+    final String dbPath = join(dbFolder, _databaseName);
+    return dbPath;
+  }
+
+  // TODO: comprobar si se ejecuta desde aquí sin error
+  /*deleteDatabase(String dbPath) async {
+    await deleteDatabase(dbPath);
+  }*/
 
   /* TABLA CARFOIN DE CARTERAS */
   Future<int> insertCartera(Cartera cartera) async {

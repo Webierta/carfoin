@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 //import 'menus.dart';
 
-enum Menu { ordenar, exportar, eliminar }
+enum Menu { ordenar, exportar, importar, eliminar }
 
 enum MenuCartera { ordenar, eliminar }
 
