@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 
 import 'models/cartera_provider.dart';
 import 'router/app_router.dart';
@@ -38,6 +38,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: const [Locale('es', 'ES')],
       debugShowCheckedModeBanner: false,
       title: 'Carfoin',
+      //scaffoldMessengerKey: snackbarKey,
       theme: ThemeData(
         //brightness: Brightness.dark,
         //primarySwatch: Colors.blue,

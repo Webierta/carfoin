@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 
+import '../pages/page_error.dart';
 import 'error_screen.dart';
 import 'router_utils.dart';
 
@@ -77,6 +78,10 @@ class AppRouter {
       GoRoute(
         path: AppPage.support.routePath,
         builder: (context, state) => const PageSupport(),
+      ),
+      GoRoute(
+        path: AppPage.error.routePath,
+        builder: (context, state) => const PageError(),
       ),
     ],
 

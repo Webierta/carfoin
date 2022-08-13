@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +27,8 @@ class PageFondo extends StatefulWidget {
   State<PageFondo> createState() => _PageFondoState();
 }
 
-class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMixin {
+class _PageFondoState extends State<PageFondo>
+    with SingleTickerProviderStateMixin {
   DatabaseHelper database = DatabaseHelper();
   late CarteraProvider carteraProvider;
   late Cartera carteraSelect;
@@ -37,12 +39,19 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
   late TabController _tabController;
 
   setValores(Cartera cartera, Fondo fondo) async {
-    carteraProvider.valores = await database.getValores(cartera, fondo);
-    fondo.valores = carteraProvider.valores;
-    valoresSelect = carteraProvider.valores;
+    try {
+      carteraProvider.valores = await database.getValores(cartera, fondo);
+      fondo.valores = carteraProvider.valores;
+      valoresSelect = carteraProvider.valores;
 
-    carteraProvider.operaciones = await database.getOperaciones(cartera, fondo);
-    operacionesSelect = carteraProvider.operaciones;
+      carteraProvider.operaciones =
+          await database.getOperaciones(cartera, fondo);
+      operacionesSelect = carteraProvider.operaciones;
+    } catch (e) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        context.go(errorPage);
+      });
+    }
   }
 
   @override
@@ -56,7 +65,9 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
     //operacionesSelect = [];
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      database.createTableFondo(carteraSelect, fondoSelect).whenComplete(() async {
+      database
+          .createTableFondo(carteraSelect, fondoSelect)
+          .whenComplete(() async {
         await setValores(carteraSelect, fondoSelect);
       });
     });
@@ -71,7 +82,9 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
   }
 
   SpeedDialChild _buildSpeedDialChild(BuildContext context,
-      {required IconData icono, required String label, required Function action}) {
+      {required IconData icono,
+      required String label,
+      required Function action}) {
     return SpeedDialChild(
       child: Icon(icono),
       label: label,
@@ -116,7 +129,8 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
                     ),
                     subtitle: Row(
                       children: [
-                        const Icon(Icons.business_center, color: Color(0xFF0D47A1)),
+                        const Icon(Icons.business_center,
+                            color: Color(0xFF0D47A1)),
                         const SizedBox(width: 10),
                         Flexible(
                           child: Text(
@@ -142,7 +156,8 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
                         //_buildMenuItem(MenuFondo.mercado, Icons.shopping_cart, divider: true),
                         //_buildMenuItem(MenuFondo.eliminar, Icons.delete_forever),
                         //_buildMenuItem(MenuFondo.exportar, Icons.download),
-                        buildMenuItem(MenuFondo.mercado, Icons.shopping_cart, divider: true),
+                        buildMenuItem(MenuFondo.mercado, Icons.shopping_cart,
+                            divider: true),
                         buildMenuItem(MenuFondo.eliminar, Icons.delete_forever),
                         buildMenuItem(MenuFondo.exportar, Icons.download),
                       ],
@@ -186,7 +201,8 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
                     ),
                   ),
                 ),
-                floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.endDocked,
                 floatingActionButton: SpeedDial(
                   icon: Icons.refresh,
                   foregroundColor: const Color(0xFF0D47A1),
@@ -234,7 +250,8 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
     _dialogProgress(context);
     final getDataApi = await apiService.getDataApi(fondoSelect.isin);
     if (getDataApi != null) {
-      var newValor = Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
+      var newValor =
+          Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
       fondoSelect.divisa = getDataApi.market;
       //TODO: POSIBLE ERROR SI CHOCA CON VALOR INTRODUCIDO DESDE MERCADO CON FECHA ANTERIOR
       //TODO check newvalor repetido por date ??
@@ -267,13 +284,17 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
       if (!mounted) return;
       _dialogProgress(context);
       var range = newRange as DateTimeRange;
-      String from = FechaUtil.dateToString(date: range.start, formato: 'yyyy-MM-dd');
-      String to = FechaUtil.dateToString(date: range.end, formato: 'yyyy-MM-dd');
-      final getDateApiRange = await apiService.getDataApiRange(fondoSelect.isin, to, from);
+      String from =
+          FechaUtil.dateToString(date: range.start, formato: 'yyyy-MM-dd');
+      String to =
+          FechaUtil.dateToString(date: range.end, formato: 'yyyy-MM-dd');
+      final getDateApiRange =
+          await apiService.getDataApiRange(fondoSelect.isin, to, from);
       var newListValores = <Valor>[];
       if (getDateApiRange != null) {
         for (var dataApi in getDateApiRange) {
-          newListValores.add(Valor(date: dataApi.epochSecs, precio: dataApi.price));
+          newListValores
+              .add(Valor(date: dataApi.epochSecs, precio: dataApi.price));
         }
         for (var valor in newListValores) {
           //await database.insertValor(carteraSelect, fondoSelect, valor);
@@ -303,7 +324,8 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
           builder: (BuildContext ctx) {
             return AlertDialog(
               title: const Text('Eliminar todo'),
-              content: const Text('Esto eliminará todos los valores almacenados del fondo.'),
+              content: const Text(
+                  'Esto eliminará todos los valores almacenados del fondo.'),
               actions: [
                 ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(),

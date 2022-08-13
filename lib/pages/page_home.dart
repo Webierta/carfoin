@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -52,12 +53,19 @@ class _PageHomeState extends State<PageHome> {
   }
 
   setCarteras() async {
-    carteraProvider.carteras = await database.getCarteras(byOrder: _isCarterasByOrder);
-    for (var cartera in carteraProvider.carteras) {
-      await database.createTableCartera(cartera).whenComplete(() async {
-        carteraProvider.fondos = await database.getFondos(cartera, byOrder: _isFondosByOrder);
-        //carteraProvider.addFondos(cartera, carteraProvider.fondos);
-        cartera.fondos = carteraProvider.fondos;
+    try {
+      //throw Exception();
+      carteraProvider.carteras = await database.getCarteras(byOrder: _isCarterasByOrder);
+      for (var cartera in carteraProvider.carteras) {
+        await database.createTableCartera(cartera).whenComplete(() async {
+          carteraProvider.fondos = await database.getFondos(cartera, byOrder: _isFondosByOrder);
+          //carteraProvider.addFondos(cartera, carteraProvider.fondos);
+          cartera.fondos = carteraProvider.fondos;
+        });
+      }
+    } catch (e) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        context.go(errorPage);
       });
     }
   }

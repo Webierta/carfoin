@@ -72,10 +72,83 @@ class DatabaseHelper {
     await deleteDatabase(dbPath);
   }*/
 
+  /* handleError() async {
+    print('HANDLE ERROR');
+    var pixelRatio = window.devicePixelRatio;
+    var logicalScreenSize = window.physicalSize / pixelRatio;
+    var logicalHeight = logicalScreenSize.height;
+    var paddingTop = window.padding.top / window.devicePixelRatio;
+    var paddingBottom = window.padding.bottom / window.devicePixelRatio;
+    var safeHeight = logicalHeight - paddingTop - paddingBottom;
+    var screenHeightPixels = window.physicalSize.longestSide;
+    SnackBar snackBar = SnackBar(
+      action: SnackBarAction(
+        label: 'Cerrar',
+        onPressed: () async {
+          //Database db = await database;
+          //await database.close();
+          await deleteDatabase(await getDatabasePath());
+          Restart.restartApp();
+        },
+      ),
+      content: const SizedBox(
+        height: 300,
+        child: Text(
+            'Archivo corrupto. La base de datos será eliminada y la aplicación se reiniciará.'),
+      ),
+      //duration: Duration(seconds: double.infinity),
+      duration: const Duration(days: 365),
+    );
+    //snackbarKey.currentState?.showSnackBar(snackBar);
+    snackbarKey.currentState?.showMaterialBanner(MaterialBanner(
+      padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+      forceActionsBelow: true,
+      //overflowAlignment: OverflowBarAlignment.center,
+      content: SingleChildScrollView(
+        child: ListBody(
+          children: const [
+            Text('Archivo corrupto.'),
+            Text('La base de datos será eliminada y la aplicación se reiniciará.'),
+          ],
+        ),
+      ),
+      //leading: const Icon(Icons.bug_report),
+      contentTextStyle: const TextStyle(
+        fontSize: 18,
+        color: Colors.red,
+        fontStyle: FontStyle.italic,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () async {
+            snackbarKey.currentState?.clearMaterialBanners();
+            //Database db = await database;
+            //await database.close();
+            await deleteDatabase(await getDatabasePath());
+            Restart.restartApp();
+          },
+          child: const Text('CERRAR'),
+        ),
+      ],
+    ));
+    /* Database db = await database;
+    await db.close();
+    await deleteDatabase(await getDatabasePath()); */
+  } */
+
   /* TABLA CARFOIN DE CARTERAS */
   Future<int> insertCartera(Cartera cartera) async {
     Database db = await database;
     return await db.insert(table, cartera.toDb());
+
+    /* try {
+      //throw Exception();
+      Database db = await database;
+      return await db.insert(table, cartera.toDb());
+    } catch (e) {
+      handleError();
+      return 0;
+    } */
   }
 
   Future<List<Cartera>> getCarteras({bool byOrder = false}) async {
@@ -83,6 +156,17 @@ class DatabaseHelper {
     final List<Map<String, dynamic>> query =
         byOrder ? await db.query(table, orderBy: '$columnNameCartera ASC') : await db.query(table);
     return query.map((e) => Cartera.fromMap(e)).toList();
+
+    /* try {
+      Database db = await database;
+      final List<Map<String, dynamic>> query = byOrder
+          ? await db.query(table, orderBy: '$columnNameCartera ASC')
+          : await db.query(table);
+      return query.map((e) => Cartera.fromMap(e)).toList();
+    } catch (e) {
+      handleError();
+      return [];
+    } */
   }
 
   Future<int> updateCartera(Cartera cartera) async {
@@ -212,7 +296,7 @@ class DatabaseHelper {
   }
 
   Future<void> updateOperacion(Cartera cartera, Fondo fondo, Valor valor) async {
-    Database db = await database;
+    //Database db = await database;
     //var nameTable = '_${cartera.id}${fondo.isin}';
     Valor? existeValor = await getValorByDate(cartera, fondo, valor);
     if (existeValor == null) {

@@ -15,6 +15,7 @@ enum AppPage {
   about,
   support,
   settings,
+  error,
 }
 
 extension AppPageExtension on AppPage {
@@ -42,6 +43,8 @@ extension AppPageExtension on AppPage {
         return '/support';
       case AppPage.settings:
         return '/settings';
+      case AppPage.error:
+        return '/error';
       default:
         return '/';
     }

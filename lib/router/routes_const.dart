@@ -9,3 +9,4 @@ const String infoPage = '/info';
 const String aboutPage = '/about';
 const String supportPage = '/support';
 const String settingsPage = '/settings';
+const String errorPage = '/error';
