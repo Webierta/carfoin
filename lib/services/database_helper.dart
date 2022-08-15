@@ -67,6 +67,23 @@ class DatabaseHelper {
     return dbPath;
   }
 
+  Future<bool> isDatabase(String path) async {
+    Database? db;
+    bool isDatabase = false;
+    try {
+      db = await openReadOnlyDatabase(path);
+      int version = await db.getVersion();
+      if (version == _databaseVersion) {
+        isDatabase = true;
+      }
+    } catch (_) {
+      isDatabase = false;
+    } finally {
+      await db?.close();
+    }
+    return isDatabase;
+  }
+
   // TODO: comprobar si se ejecuta desde aquí sin error
   /*deleteDatabase(String dbPath) async {
     await deleteDatabase(dbPath);

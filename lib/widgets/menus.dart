@@ -6,7 +6,7 @@ enum Menu { ordenar, exportar, importar, eliminar }
 
 enum MenuCartera { ordenar, eliminar }
 
-enum MenuFondo { mercado, eliminar, exportar }
+enum MenuFondo { mercado, eliminar }
 
 PopupMenuItem<Enum> buildMenuItem(Enum menu, IconData iconData,
     {bool divider = false, bool isOrder = false}) {

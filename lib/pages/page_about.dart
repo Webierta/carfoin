@@ -87,9 +87,14 @@ Esta App para Android está inspirada en otra aplicación del mismo autor, Carfo
 
 ## Fuente de los datos y Permisos
 
-Esta App utiliza información extraída de *Financial Times (FT) Markets Data* y otros cálculos de elaboración propia a partir de esos datos. Para la descarga de esos datos se utiliza la *API Funds (v1) by rpi4g* disponible en *rapidAPI*.
+Esta App utiliza la API *Funds by rpi4g* para obtener información de los mercados (*Financial Times Markets Data*) y elabora cálculos propios a partir de esos datos.
 
 Por tanto, esta aplicación requiere conexión a internet para recabar la información y depende de la disponibilidad de ese servidor y de la funcionalidad de esa API. Esta aplicación no tiene ninguna vinculación oficial con Financial Times.
+
+Los únicos permisos que requiere esta App son:
+
+* Acceso a internet (básicamente para buscar fondos y actualizar sus valores).
+* Acceso al almacenamiento del dispositivo (para almacenar o rescatar copias de seguridad).
 
 ---
 
@@ -99,12 +104,13 @@ Por tanto, esta aplicación requiere conexión a internet para recabar la inform
 
 No puede garantizarse que el contenido ofrecido esté libre de errores, ya sean errores en el servidor origen de los datos, en el proceso de acceso a los datos o en su tratamiento, por lo que la información presentada no cuenta con ninguna garantía, ni explícita ni implícita. El usuario acepta expresamente conocer esta circunstancia. La utilización de la información obtenida por esta App se realiza por parte del usuario bajo su propia cuenta y riesgo, correspondiéndole en exclusiva a él responder frente a terceros por daños que pudieran derivarse de ella.
 
-El acceso, navegación y uso de los servicios webs (FT) derivados del uso de la API está sujeta a sus Términos y condiciones y puede implicar la aceptación de su Política de Privacidad y uso Cookies. En concreto, FT advierte que *All content on FT.com is for your general information and use only and is not intended to address your particular requirements. In particular, the content does not constitute any form of advice, recommendation, representation, endorsement or arrangement by FT and is not intended to be relied upon by users in making (or refraining from making) any specific investment or other decisions. Any information that you receive via FT.com is at best delayed intraday data and not "real time". Share price information may be rounded up/down and therefore not entirely accurate. FT is not responsible for any use of content by you outside its scope as stated in the FT Terms & Conditions*.
+El acceso, navegación y uso de los servicios webs de *Financial Times* (FT) derivados del uso de la API está sujeta a sus Términos y condiciones y puede implicar la aceptación de su Política de Privacidad y uso Cookies. En concreto, FT advierte que *All content on FT.com is for your general information and use only and is not intended to address your particular requirements. In particular, the content does not constitute any form of advice, recommendation, representation, endorsement or arrangement by FT and is not intended to be relied upon by users in making (or refraining from making) any specific investment or other decisions. Any information that you receive via FT.com is at best delayed intraday data and not "real time". Share price information may be rounded up/down and therefore not entirely accurate. FT is not responsible for any use of content by you outside its scope as stated in the FT Terms & Conditions*.
 
 ---
 
 ## Reconocimientos
 
+* API Funds (v1) by rpi4g in RapidAPI.
 * Icono de la aplicación: Created by Freepik from [Flaticon](https://www.flaticon.com) (Flaticon License: Free for personal and commercial purpose with attribution).
 
 """;

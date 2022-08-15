@@ -465,7 +465,9 @@ class _PageHomeState extends State<PageHome> {
     //var dbFile = File(dbPath);
     //var dbBackup = await dbFile.readAsBytes();
 
-    if (archivo.extension == 'db') {
+    if (archivo.extension == 'db' &&
+        archivo.path != null &&
+        await database.isDatabase(archivo.path!)) {
       try {
         //throw Exception();
         File file = File(archivo.path!);
@@ -493,6 +495,7 @@ class _PageHomeState extends State<PageHome> {
       }
     } else {
       //  msg: formato archivo incorrecto
+      print('archivo no reconocido');
       return;
     }
   }

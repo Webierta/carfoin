@@ -96,7 +96,7 @@ const String mdstring = """
 
 **CARFOIN** es una utilidad para la gestión de múltiples Carteras de Fondos de Inversión. Permite crear fácilmente Carteras personalizadas y seguir su evolución. Opera rápidamente con los Fondos para consultar, actualizar y archivar sus valores liquidativos.
 
-Después de crear una Cartera, incorpora los Fondos de Inversión que te interesa seguir. Puedes añadir un nuevo Fondo desde la base de datos que incorpora el programa o bien online a partir de su código ISIN —el programa utiliza el dígito de control para verificarlo—. Se incluyen algunos Fondos a modo de demostración, puedes eliminarlos.
+Después de crear una Cartera, incorpora los Fondos de Inversión que te interesa seguir. Puedes añadir un nuevo Fondo desde la base de datos que incorpora el programa o bien online a partir de su código ISIN —el programa utiliza el dígito de control para verificarlo—.
 
 Después puedes seguir la evolución de los Fondos añadidos actualizando periódicamente su cotización y archivando el histórico de valores. El programa calcula algunos índices de rentabilidad y muestra los valores en una tabla y en un gráfico.
 
@@ -109,7 +109,7 @@ Después puedes seguir la evolución de los Fondos añadidos actualizando perió
 * Actualiza vía internet la última cotización o un intervalo de tiempo y archiva los valores liquidativos obtenidos.
 * Consulta la evolución de los valores guardados y muestra algunos índices de rentabilidad.
 * Permite simular operaciones de suscripción y reembolso para seguir la evolución del capital invertido.
-* Hace copias de seguridad de las Carteras y exporta el histórico de valores a un archivo csv para abrir con hoja de cálculo.
+* Hace copias de seguridad e importa el archivo de las Carteras.
 * Próximamente más funciones...
 
 """;
