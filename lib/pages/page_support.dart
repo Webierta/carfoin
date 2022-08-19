@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-//import '../routes.dart';
 import '../router/routes_const.dart';
 import '../widgets/my_drawer.dart';
 
@@ -75,7 +74,7 @@ class PageSupport extends StatelessWidget {
                   style: const TextStyle(fontSize: 18),
                   text:
                       '¿Crees que has encontrado un problema? Identificar y corregir errores hace que '
-                      'esta App sea mejor para todos. Informa de un error o sugiere una nueva funcionalidad aquí: ',
+                      'esta App sea mejor para todos. Informa de un error o sugiere una nueva funcionalidad en ',
                   children: [
                     TextSpan(
                       style: const TextStyle(

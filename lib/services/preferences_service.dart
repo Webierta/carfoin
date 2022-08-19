@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String keyByOrderCarterasPref = 'isByOrderCarteras';
+const String keyViewCarterasPref = 'isViewDetalleCarteras';
 const String keyConfirmDeleteCarteraPref = 'isConfirmDeleteCartera';
 const String keyByOrderFondosPref = 'isByOrderFondos';
 const String keyConfirmDeleteFondoPref = 'isConfirmDeleteFondo';

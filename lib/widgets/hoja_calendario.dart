@@ -43,7 +43,7 @@ class DiaCalendario extends StatelessWidget {
   }
 }
 
-class HojaCalendario extends StatelessWidget {
+/*class HojaCalendario extends StatelessWidget {
   final int epoch;
   const HojaCalendario({Key? key, required this.epoch}) : super(key: key);
 
@@ -89,4 +89,4 @@ class HojaCalendario extends StatelessWidget {
       ),
     );
   }
-}
+}*/

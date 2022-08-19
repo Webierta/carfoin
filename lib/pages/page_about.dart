@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 //import '../routes.dart';
 import '../router/routes_const.dart';
+import '../utils/konstantes.dart';
 import '../widgets/my_drawer.dart';
 
 class PageAbout extends StatelessWidget {
@@ -70,7 +71,7 @@ class PageAbout extends StatelessWidget {
 const String mdstring = """
 ## Autor y Licencia
 
-> Versión 1.0.0
+> Versión $kVersion
 > Copyleft 2022
 > Jesús Cuerda (Webierta)
 > All Wrongs Reserved. Licencia GPLv3

@@ -38,7 +38,8 @@ class _PageInputRangeState extends State<PageInputRange> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ListTile(
-                        leading: const Icon(Icons.assessment, size: 32, color: Color(0xFF2196F3)),
+                        leading: const Icon(Icons.assessment,
+                            size: 32, color: Color(0xFF2196F3)),
                         title: Text(fondoSelect.name),
                       ),
                       const SizedBox(height: 10),
@@ -52,8 +53,8 @@ class _PageInputRangeState extends State<PageInputRange> {
                           contentPadding: const EdgeInsets.all(12.0),
                           title: InkWell(
                             onTap: () async {
-                              var newRange =
-                                  await _datePicker(context, DatePickerEntryMode.inputOnly);
+                              var newRange = await _datePicker(
+                                  context, DatePickerEntryMode.inputOnly);
                               if (newRange != null) {
                                 setState(() => _dateRange = newRange);
                               }
@@ -65,13 +66,15 @@ class _PageInputRangeState extends State<PageInputRange> {
                               ),
                               child: FittedBox(
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       '${DateFormat('dd/MM/yyyy').format(_dateRange?.start ?? _initDateRange.start)} - '
                                       '${DateFormat('dd/MM/yyyy').format(_dateRange?.end ?? _initDateRange.end)}',
                                     ),
-                                    const Icon(Icons.arrow_drop_down, color: Color(0xFF2196F3)),
+                                    const Icon(Icons.arrow_drop_down,
+                                        color: Color(0xFF2196F3)),
                                   ],
                                 ),
                               ),
@@ -80,10 +83,11 @@ class _PageInputRangeState extends State<PageInputRange> {
                           trailing: CircleAvatar(
                             backgroundColor: const Color(0xFFFFC107),
                             child: IconButton(
-                              icon: const Icon(Icons.date_range, color: Color(0xFF0D47A1)),
+                              icon: const Icon(Icons.date_range,
+                                  color: Color(0xFF0D47A1)),
                               onPressed: () async {
-                                var newRange =
-                                    await _datePicker(context, DatePickerEntryMode.calendarOnly);
+                                var newRange = await _datePicker(
+                                    context, DatePickerEntryMode.calendarOnly);
                                 if (newRange != null) {
                                   setState(() => _dateRange = newRange);
                                 }
@@ -103,8 +107,9 @@ class _PageInputRangeState extends State<PageInputRange> {
                             child: const Text('ACEPTAR'),
                             onPressed: () {
                               if (_dateRange != null) {
-                                var range =
-                                    DateTimeRange(start: _dateRange!.start, end: _dateRange!.end);
+                                var range = DateTimeRange(
+                                    start: _dateRange!.start,
+                                    end: _dateRange!.end);
                                 Navigator.pop(context, range);
                               } else {
                                 var range = _initDateRange;
@@ -148,7 +153,7 @@ class _PageInputRangeState extends State<PageInputRange> {
         start: _initDateRange.start,
         end: _initDateRange.end,
       ),
-      firstDate: DateTime(2018, 1, 1),
+      firstDate: DateTime(1997, 1, 1),
       lastDate: DateTime.now(),
       //currentDate: DateTime.now(),
       //initialEntryMode: DatePickerEntryMode.inputOnly,

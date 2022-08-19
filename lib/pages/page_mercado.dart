@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+//import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
-//import '../routes.dart';
 import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../utils/fecha_util.dart';
 import '../utils/konstantes.dart';
+import '../utils/number_util.dart';
 import '../utils/stats.dart';
 import '../widgets/loading_progress.dart';
 
@@ -61,7 +61,8 @@ class _MercadoState extends State<PageMercado> {
   }
 
   _resetControllers() {
-    _dateController.text = FechaUtil.epochToString(DateTime.now().millisecondsSinceEpoch ~/ 1000);
+    _dateController.text =
+        FechaUtil.epochToString(DateTime.now().millisecondsSinceEpoch ~/ 1000);
     _partController.text = '0.0';
     _precioController.text = '0.0';
   }
@@ -89,7 +90,6 @@ class _MercadoState extends State<PageMercado> {
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () {
                   ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                  //Navigator.of(context).pushNamed(RouteGenerator.fondoPage, arguments: true);
                   context.go(fondoPage);
                 },
               ),
@@ -99,7 +99,8 @@ class _MercadoState extends State<PageMercado> {
             padding: const EdgeInsets.all(10),
             children: [
               ListTile(
-                title: Align(alignment: Alignment.center, child: Text(fondoSelect.name)),
+                title: Align(
+                    alignment: Alignment.center, child: Text(fondoSelect.name)),
                 subtitle: Align(
                   alignment: Alignment.center,
                   child: Chip(
@@ -142,15 +143,18 @@ class _MercadoState extends State<PageMercado> {
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             'SUSCRIBIR',
-                            style: TextStyle(fontWeight: _tipo ? FontWeight.bold : FontWeight.w300),
+                            style: TextStyle(
+                                fontWeight:
+                                    _tipo ? FontWeight.bold : FontWeight.w300),
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             'REEMBOLSAR',
-                            style:
-                                TextStyle(fontWeight: !_tipo ? FontWeight.bold : FontWeight.w300),
+                            style: TextStyle(
+                                fontWeight:
+                                    !_tipo ? FontWeight.bold : FontWeight.w300),
                           ),
                         ),
                       ],
@@ -161,7 +165,8 @@ class _MercadoState extends State<PageMercado> {
               const SizedBox(height: 30),
               Form(
                 key: _formKey,
-                onChanged: () => setState(() => _isValido = _formKey.currentState?.validate()),
+                onChanged: () => setState(
+                    () => _isValido = _formKey.currentState?.validate()),
                 child: Column(
                   children: [
                     FractionallySizedBox(
@@ -176,7 +181,9 @@ class _MercadoState extends State<PageMercado> {
                         ),
                         controller: _dateController,
                         validator: (value) {
-                          return (value == null || value.isEmpty) ? 'Campo requerido' : null;
+                          return (value == null || value.isEmpty)
+                              ? 'Campo requerido'
+                              : null;
                         },
                         readOnly: true,
                         onTap: () async {
@@ -185,9 +192,11 @@ class _MercadoState extends State<PageMercado> {
                             setState(() {
                               // TODO: CONTROL OTRAS TIME ZONE PARA NO REPETIR DATE ??
                               // o epoch +/- 1 day ??
-                              DateTime timeZone = fecha.add(const Duration(hours: 2));
+                              DateTime timeZone =
+                                  fecha.add(const Duration(hours: 2));
                               _date = timeZone.millisecondsSinceEpoch ~/ 1000;
-                              _dateController.text = FechaUtil.dateToString(date: fecha);
+                              _dateController.text =
+                                  FechaUtil.dateToString(date: fecha);
                             });
                           }
                         },
@@ -201,13 +210,15 @@ class _MercadoState extends State<PageMercado> {
                         decoration: InputDecoration(
                           errorStyle: const TextStyle(fontSize: 0, height: 0),
                           labelText: 'Participaciones',
-                          suffixIcon:
-                              Icon(_tipo ? Icons.add_shopping_cart : Icons.currency_exchange),
+                          suffixIcon: Icon(_tipo
+                              ? Icons.add_shopping_cart
+                              : Icons.currency_exchange),
                           border: const OutlineInputBorder(),
                         ),
                         controller: _partController,
                         inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'(^\-?\d*\.?\d*)'))
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'(^\-?\d*\.?\d*)'))
                         ],
                         keyboardType: TextInputType.number,
                         validator: (inputPart) {
@@ -221,7 +232,8 @@ class _MercadoState extends State<PageMercado> {
                         },
                         onTap: () => _partController.clear(),
                         onChanged: (value) {
-                          setState(() => _participaciones = double.tryParse(value) ?? 0);
+                          setState(() =>
+                              _participaciones = double.tryParse(value) ?? 0);
                         },
                       ),
                     ),
@@ -234,12 +246,14 @@ class _MercadoState extends State<PageMercado> {
                           errorStyle: const TextStyle(fontSize: 0, height: 0),
                           labelText: 'Precio',
                           suffixIcon: IconButton(
-                            icon: const Icon(Icons.download, color: Color(0xFF2196F3)),
+                            icon: const Icon(Icons.download,
+                                color: Color(0xFF2196F3)),
                             onPressed: () async {
                               //Loading(context).openDialog(title: 'Obteniendo valor liquidativo...');
                               //const LoadingProgress(titulo: 'Obteniendo valor liquidativo...');
                               ///var precioApi = await _getPrecioApi(context, fondoOn);
-                              var precioApi = await _dialogProgress(context, fondoSelect);
+                              var precioApi =
+                                  await _dialogProgress(context, fondoSelect);
                               if (!mounted) return;
                               //Loading(context).closeDialog();
                               if (precioApi != null) {
@@ -263,7 +277,8 @@ class _MercadoState extends State<PageMercado> {
                         ),
                         controller: _precioController,
                         inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'(^\-?\d*\.?\d*)'))
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'(^\-?\d*\.?\d*)'))
                         ],
                         keyboardType: TextInputType.number,
                         validator: (inputPrecio) {
@@ -280,7 +295,8 @@ class _MercadoState extends State<PageMercado> {
                             _precioController.clear();
                           }
                         },
-                        onChanged: (value) => setState(() => _precio = double.tryParse(value) ?? 0),
+                        onChanged: (value) => setState(
+                            () => _precio = double.tryParse(value) ?? 0),
                       ),
                     ),
                     const SizedBox(height: 30),
@@ -293,13 +309,23 @@ class _MercadoState extends State<PageMercado> {
                           fillColor: Color(0xFFD5D5D5),
                           filled: true,
                         ),
-                        child: Text(
-                          _isValido == true
-                              ? NumberFormat.currency(locale: 'es', symbol: '')
-                                  .format(_participaciones * _precio)
-                              : '0.0',
-                          textAlign: TextAlign.end,
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              _isValido == true
+                                  /*? NumberFormat.currency(
+                                          locale: 'es', symbol: '')
+                                      .format(_participaciones * _precio)*/
+                                  ? NumberUtil.currency(
+                                      _participaciones * _precio)
+                                  : '0.0',
+                              maxLines: 1,
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -307,7 +333,8 @@ class _MercadoState extends State<PageMercado> {
                     FractionallySizedBox(
                       widthFactor: 0.6,
                       child: ElevatedButton(
-                        onPressed: _isValido == true ? () => _submit(context) : null,
+                        onPressed:
+                            _isValido == true ? () => _submit(context) : null,
                         child: const Text('ORDENAR'),
                       ),
                     ),
@@ -338,8 +365,11 @@ class _MercadoState extends State<PageMercado> {
         );
       } else {
         print('OK');
-        Valor newOp =
-            Valor(tipo: tipoOp, date: _date, participaciones: _participaciones, precio: _precio);
+        Valor newOp = Valor(
+            tipo: tipoOp,
+            date: _date,
+            participaciones: _participaciones,
+            precio: _precio);
 
         //TODO: insert or update ??
         // TODO: setValores para update UI ??
@@ -381,7 +411,8 @@ class _MercadoState extends State<PageMercado> {
 
   Future<double?>? _getPrecioApi(BuildContext context, Fondo fondo) async {
     String fromAndTo = FechaUtil.epochToString(_date, formato: 'yyyy-MM-dd');
-    final getDateApiRange = await apiService.getDataApiRange(fondo.isin, fromAndTo, fromAndTo);
+    final getDateApiRange =
+        await apiService.getDataApiRange(fondo.isin, fromAndTo, fromAndTo);
     if (getDateApiRange != null && getDateApiRange.isNotEmpty) {
       return getDateApiRange.first.price;
     }

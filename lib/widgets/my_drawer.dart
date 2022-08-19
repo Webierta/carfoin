@@ -3,8 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../router/routes_const.dart';
-
-//import '../routes.dart';
+import '../utils/konstantes.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({Key? key}) : super(key: key);
@@ -20,7 +19,6 @@ class MyDrawer extends StatelessWidget {
               children: [
                 DrawerHeader(
                   decoration: const BoxDecoration(
-                    //color: Colors.blue,
                     image: DecorationImage(
                       fit: BoxFit.fill,
                       image: AssetImage('assets/drawer_header.png'),
@@ -35,7 +33,10 @@ class MyDrawer extends StatelessWidget {
                           fit: BoxFit.fitWidth,
                           child: Text(
                             'CARFOIN',
-                            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .displaySmall
+                                ?.copyWith(
                                   color: const Color(0xFFFFFFFF),
                                   fontWeight: FontWeight.w100,
                                 ),
@@ -85,7 +86,6 @@ class MyDrawer extends StatelessWidget {
                   title: const Text('Inicio'),
                   onTap: () {
                     Navigator.of(context).pop();
-                    //Navigator.of(context).pushNamed(RouteGenerator.homePage);
                     context.go(homePage);
                   },
                 ),
@@ -94,17 +94,16 @@ class MyDrawer extends StatelessWidget {
                   title: const Text('Ajustes'),
                   onTap: () {
                     Navigator.of(context).pop();
-                    //Navigator.of(context).pushNamed(RouteGenerator.settingsPage);
                     context.go(settingsPage);
                   },
                 ),
                 const Divider(color: Colors.grey),
                 ListTile(
-                  leading: const Icon(Icons.info_outline, color: Color(0xFF0D47A1)),
+                  leading:
+                      const Icon(Icons.info_outline, color: Color(0xFF0D47A1)),
                   title: const Text('Info'),
                   onTap: () {
                     Navigator.of(context).pop();
-                    //Navigator.of(context).pushNamed(RouteGenerator.infoPage);
                     context.go(infoPage);
                   },
                 ),
@@ -113,22 +112,22 @@ class MyDrawer extends StatelessWidget {
                   title: const Text('About'),
                   onTap: () {
                     Navigator.of(context).pop();
-                    //Navigator.of(context).pushNamed(RouteGenerator.aboutPage);
                     context.go(aboutPage);
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.local_cafe_outlined, color: Color(0xFF0D47A1)),
+                  leading: const Icon(Icons.local_cafe_outlined,
+                      color: Color(0xFF0D47A1)),
                   title: const Text('Donar'),
                   onTap: () {
                     Navigator.of(context).pop();
-                    //Navigator.of(context).pushNamed(RouteGenerator.supportPage);
                     context.go(supportPage);
                   },
                 ),
                 const Divider(color: Color(0xFF9E9E9E)),
                 ListTile(
-                  leading: const Icon(Icons.exit_to_app, color: Color(0xFF0D47A1)),
+                  leading:
+                      const Icon(Icons.exit_to_app, color: Color(0xFF0D47A1)),
                   title: const Text('Salir'),
                   onTap: () => SystemNavigator.pop(),
                 ),
@@ -138,7 +137,10 @@ class MyDrawer extends StatelessWidget {
           const Divider(color: Color(0xFF9E9E9E)),
           Container(
             padding: const EdgeInsets.all(10),
-            child: Text('Versión 1.0.0', style: Theme.of(context).textTheme.labelSmall),
+            child: Text(
+              'Versión $kVersion',
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
           ),
         ],
       ),

@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+//import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
-//import '../routes.dart';
 import '../router/router_utils.dart';
 import '../router/routes_const.dart';
 import '../services/api_service.dart';
@@ -15,12 +14,11 @@ import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../utils/fecha_util.dart';
 import '../utils/konstantes.dart';
+import '../utils/number_util.dart';
 import '../utils/stats.dart';
 import '../widgets/hoja_calendario.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
-
-//enum MenuCartera { ordenar, eliminar }
 
 class PageCartera extends StatefulWidget {
   const PageCartera({Key? key}) : super(key: key);
@@ -45,8 +43,10 @@ class _PageCarteraState extends State<PageCartera> {
     bool? isFondosByOrder;
     bool? isAutoUpdate;
     bool? isConfirmDeleteFondo;
-    await PreferencesService.getBool(keyByOrderFondosPref).then((value) => isFondosByOrder = value);
-    await PreferencesService.getBool(keyAutoUpdatePref).then((value) => isAutoUpdate = value);
+    await PreferencesService.getBool(keyByOrderFondosPref)
+        .then((value) => isFondosByOrder = value);
+    await PreferencesService.getBool(keyAutoUpdatePref)
+        .then((value) => isAutoUpdate = value);
     await PreferencesService.getBool(keyConfirmDeleteFondoPref)
         .then((value) => isConfirmDeleteFondo = value);
     setState(() {
@@ -58,7 +58,8 @@ class _PageCarteraState extends State<PageCartera> {
 
   setFondos(Cartera cartera) async {
     try {
-      carteraProvider.fondos = await database.getFondos(cartera, byOrder: _isFondosByOrder);
+      carteraProvider.fondos =
+          await database.getFondos(cartera, byOrder: _isFondosByOrder);
       //carteraProvider.addFondos(cartera, carteraProvider.fondos);
       /// ????
       carteraSelect.fondos = carteraProvider.fondos;
@@ -66,7 +67,8 @@ class _PageCarteraState extends State<PageCartera> {
         await database.createTableFondo(cartera, fondo).whenComplete(() async {
           carteraProvider.valores = await database.getValores(cartera, fondo);
           fondo.valores = carteraProvider.valores;
-          carteraProvider.operaciones = await database.getOperaciones(cartera, fondo);
+          carteraProvider.operaciones =
+              await database.getOperaciones(cartera, fondo);
         });
       }
     } catch (e) {
@@ -144,8 +146,8 @@ class _PageCarteraState extends State<PageCartera> {
                       const Icon(Icons.business_center),
                       const SizedBox(width: 10),
                       Flexible(
-                        child:
-                            Text(carteraSelect.name, overflow: TextOverflow.ellipsis, maxLines: 1),
+                        child: Text(carteraSelect.name,
+                            overflow: TextOverflow.ellipsis, maxLines: 1),
                       ),
                     ],
                   ),
@@ -167,7 +169,8 @@ class _PageCarteraState extends State<PageCartera> {
                         //_buildMenuItem(MenuCartera.eliminar, Icons.delete_forever)
                         buildMenuItem(MenuCartera.ordenar, Icons.sort_by_alpha,
                             isOrder: _isFondosByOrder),
-                        buildMenuItem(MenuCartera.eliminar, Icons.delete_forever)
+                        buildMenuItem(
+                            MenuCartera.eliminar, Icons.delete_forever)
                       ],
                       onSelected: (item) async {
                         if (item == MenuCartera.ordenar) {
@@ -212,7 +215,8 @@ class _PageCarteraState extends State<PageCartera> {
                             padding: EdgeInsets.symmetric(horizontal: 12),
                             child: Text(
                               'Añade fondos a esta cartera',
-                              style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 22),
+                              style: TextStyle(
+                                  color: Color(0xFFFFFFFF), fontSize: 22),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -237,11 +241,14 @@ class _PageCarteraState extends State<PageCartera> {
                             dia = FechaUtil.epochToDate(lastEpoch).day;
                             //mes = FechaUtil.epochToDate(lastEpoch).month;
                             //ano = FechaUtil.epochToDate(lastEpoch).year;
-                            mesYear = FechaUtil.epochToString(lastEpoch, formato: 'MMM yy');
+                            mesYear = FechaUtil.epochToString(lastEpoch,
+                                formato: 'MMM yy');
+                            //lastPrecio = NumberFormat.decimalPattern('es').format(valores.first.precio);
                             lastPrecio =
-                                NumberFormat.decimalPattern('es').format(valores.first.precio);
+                                NumberUtil.decimal(valores.first.precio);
                             if (valores.length > 1) {
-                              diferencia = valores.first.precio - valores[1].precio;
+                              diferencia =
+                                  valores.first.precio - valores[1].precio;
                             }
                             stats = Stats(valores);
                           }
@@ -250,11 +257,13 @@ class _PageCarteraState extends State<PageCartera> {
                             direction: DismissDirection.endToStart,
                             background: Container(
                               color: const Color(0xFFF44336),
-                              margin: const EdgeInsets.symmetric(horizontal: 15),
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 15),
                               alignment: Alignment.centerRight,
                               child: const Padding(
                                 padding: EdgeInsets.all(10.0),
-                                child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
+                                child: Icon(Icons.delete,
+                                    color: Color(0xFFFFFFFF)),
                               ),
                             ),
                             onDismissed: (_) async {
@@ -265,8 +274,10 @@ class _PageCarteraState extends State<PageCartera> {
                               child: Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: const Color.fromRGBO(255, 255, 255, 0.5),
-                                  border: Border.all(color: Colors.white, width: 2),
+                                  color:
+                                      const Color.fromRGBO(255, 255, 255, 0.5),
+                                  border:
+                                      Border.all(color: Colors.white, width: 2),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Column(
@@ -274,14 +285,17 @@ class _PageCarteraState extends State<PageCartera> {
                                     ListTile(
                                       leading: CircleAvatar(
                                         radius: 22,
-                                        backgroundColor: const Color(0xFFFFFFFF),
+                                        backgroundColor:
+                                            const Color(0xFFFFFFFF),
                                         child: CircleAvatar(
-                                          backgroundColor: const Color(0xFFFFC107),
+                                          backgroundColor:
+                                              const Color(0xFFFFC107),
                                           child: IconButton(
                                             onPressed: () {
-                                              ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                              carteraProvider.fondoSelect = fondo;
-                                              //Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
+                                              ScaffoldMessenger.of(context)
+                                                  .removeCurrentSnackBar();
+                                              carteraProvider.fondoSelect =
+                                                  fondo;
                                               context.go(fondoPage);
                                             },
                                             icon: const Icon(
@@ -312,57 +326,91 @@ class _PageCarteraState extends State<PageCartera> {
                                     ),
                                     if (valores != null && valores.isNotEmpty)
                                       Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12),
                                         child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 12),
                                           decoration: BoxDecoration(
                                             color: const Color(0xFFBBDEFB),
-                                            border: Border.all(color: Colors.white, width: 2),
-                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(
+                                                color: Colors.white, width: 2),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                           ),
                                           child: IntrinsicHeight(
                                             child: Row(
-                                              //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              //crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
                                                 //mainAxisAlignment: MainAxisAlignment.start,
                                                 //crossAxisAlignment: CrossAxisAlignment.start,
-                                                DiaCalendario(epoch: valores.first.date),
-                                                const Spacer(),
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  children: [
-                                                    //const Spacer(),
-                                                    Text(
-                                                      'V.L. $lastPrecio $divisa',
-                                                      style: const TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.bold,
-                                                        color: Color(0xFF0D47A1),
-                                                      ),
-                                                    ),
-                                                    if (diferencia != null)
+                                                DiaCalendario(
+                                                    epoch: valores.first.date),
+                                                //const Spacer(),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      //const Spacer(),
                                                       Text(
-                                                        diferencia.toStringAsFixed(2),
-                                                        style: TextStyle(
-                                                          color: diferencia < 0
-                                                              ? const Color(0xFFF44336)
-                                                              : const Color(0xFF4CAF50),
+                                                        'V.L. $lastPrecio $divisa',
+                                                        style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              Color(0xFF0D47A1),
                                                         ),
                                                       ),
-                                                    //const Spacer(),
-                                                    (stats.resultado() != null &&
-                                                            stats.resultado() != 0)
-                                                        ? Text(
-                                                            'Capital: ${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} $divisa',
-                                                            style: const TextStyle(
-                                                                color: Color(0xFF0D47A1),
-                                                                fontSize: 14),
-                                                          )
-                                                        : const Text('Sin inversiones'),
-                                                    //const Spacer(),
-                                                  ],
+                                                      if (diferencia != null)
+                                                        Text(
+                                                          diferencia
+                                                              .toStringAsFixed(
+                                                                  2),
+                                                          style: TextStyle(
+                                                            color: diferencia <
+                                                                    0
+                                                                ? const Color(
+                                                                    0xFFF44336)
+                                                                : const Color(
+                                                                    0xFF4CAF50),
+                                                          ),
+                                                        ),
+                                                      //const Spacer(),
+                                                      (stats.resultado() !=
+                                                                  null &&
+                                                              stats.resultado() !=
+                                                                  0)
+                                                          ? FittedBox(
+                                                              fit: BoxFit
+                                                                  .scaleDown,
+                                                              child: Text(
+                                                                //'Capital: ${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} $divisa',
+                                                                'Capital: ${NumberUtil.decimalFixed(stats.resultado()!)} $divisa',
+                                                                /*overflow:
+                                                                    TextOverflow
+                                                                        .fade,
+                                                                maxLines: 1,
+                                                                softWrap: false,*/
+                                                                style:
+                                                                    const TextStyle(
+                                                                  color: Color(
+                                                                      0xFF0D47A1),
+                                                                  //fontSize: 14
+                                                                ),
+                                                              ),
+                                                            )
+                                                          : const Text(
+                                                              'Sin inversiones'),
+                                                      //const Spacer(),
+                                                    ],
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -398,7 +446,8 @@ class _PageCarteraState extends State<PageCartera> {
           key: _dialogKey,
           builder: (context, setState) {
             // return Dialog(child: Loading(...); ???
-            return Loading(titulo: 'ACTUALIZANDO FONDOS...', subtitulo: _loadingText);
+            return Loading(
+                titulo: 'ACTUALIZANDO FONDOS...', subtitulo: _loadingText);
           },
         );
       },
@@ -436,7 +485,8 @@ class _PageCarteraState extends State<PageCartera> {
         await database.createTableFondo(carteraSelect, fondo);
         final getDataApi = await apiService.getDataApi(fondo.isin);
         if (getDataApi != null) {
-          var newValor = Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
+          var newValor =
+              Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
           //TODO valor divisa??
           fondo.divisa = getDataApi.market;
           // cambiar insertar por update para no duplicar el fondo en la cartera
@@ -450,9 +500,11 @@ class _PageCarteraState extends State<PageCartera> {
           await database.updateOperacion(carteraSelect, fondo, newValor);
           // END PRUEBA
 
-          mapResultados[fondo.name] = const Icon(Icons.check_box, color: Colors.green);
+          mapResultados[fondo.name] =
+              const Icon(Icons.check_box, color: Colors.green);
         } else {
-          mapResultados[fondo.name] = const Icon(Icons.disabled_by_default, color: Colors.red);
+          mapResultados[fondo.name] =
+              const Icon(Icons.disabled_by_default, color: Colors.red);
         }
       }
       //TODO: check si es necesario update (si no ha habido cambios porque todos los fondos han dado error)
@@ -487,7 +539,10 @@ class _PageCarteraState extends State<PageCartera> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     for (var res in mapResultados.entries)
-                      ListTile(dense: true, title: Text(res.key), trailing: res.value),
+                      ListTile(
+                          dense: true,
+                          title: Text(res.key),
+                          trailing: res.value),
                   ],
                 ),
               ),
@@ -503,7 +558,8 @@ class _PageCarteraState extends State<PageCartera> {
     await database.createTableFondo(carteraSelect, fondo);
     final getDataApi = await apiService.getDataApi(fondo.isin);
     if (getDataApi != null) {
-      var newValor = Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
+      var newValor =
+          Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
       fondo.divisa = getDataApi.market;
 
       ///await carfoin.insertFondoCartera(fondo);
@@ -524,7 +580,8 @@ class _PageCarteraState extends State<PageCartera> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return const Loading(titulo: 'FONDO AÑADIDO', subtitulo: 'Cargando último valor...');
+        return const Loading(
+            titulo: 'FONDO AÑADIDO', subtitulo: 'Cargando último valor...');
       },
     );
     var update = await _getDataApi(newFondo);
@@ -535,7 +592,8 @@ class _PageCarteraState extends State<PageCartera> {
   }
 
   _addFondo(Fondo newFondo) async {
-    var existe = [for (var fondo in carteraProvider.fondos) fondo.isin].contains(newFondo.isin);
+    var existe = [for (var fondo in carteraProvider.fondos) fondo.isin]
+        .contains(newFondo.isin);
     if (existe) {
       _showMsg(
         msg: 'El fondo con ISIN ${newFondo.isin} ya existe en esta cartera.',
@@ -557,7 +615,9 @@ class _PageCarteraState extends State<PageCartera> {
     return showDialog(
         context: context,
         builder: (BuildContext ctx) {
-          String title = fondoName == null ? 'Eliminar todos los fondos' : 'Eliminar $fondoName';
+          String title = fondoName == null
+              ? 'Eliminar todos los fondos'
+              : 'Eliminar $fondoName';
           String content = fondoName == null
               ? '¿Eliminar todos los fondos en la cartera ${carteraSelect.name}?'
               : '¿Eliminar el fondo $fondoName y todos sus valores?';
@@ -672,7 +732,6 @@ import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
 import '../routes.dart';
 import '../services/api_service.dart';
-import '../services/control_center.dart';
 import '../services/preferences_service.dart';
 import '../utils/fecha_util.dart';
 import '../utils/konstantes.dart';

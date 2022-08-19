@@ -10,7 +10,6 @@ class DataApi {
   double price;
   DateTime humanDate;
   int epochSecs;
-
   DataApi(
       {required this.name,
       required this.market,
@@ -26,18 +25,22 @@ class DataApi {
         epochSecs: json["epochSecs"],
       );
 
-  Map<String, dynamic> toJson() => {
-        "name": name,
-        "market": market,
-        "price": price,
-        "humanDate":
-            "${humanDate.year.toString().padLeft(4, '0')}-${humanDate.month.toString().padLeft(2, '0')}-${humanDate.day.toString().padLeft(2, '0')}",
-        "epochSecs": epochSecs,
-      };
+  Map<String, dynamic> toJson() {
+    String year = humanDate.year.toString().padLeft(4, '0');
+    String month = humanDate.month.toString().padLeft(2, '0');
+    String day = humanDate.day.toString().padLeft(2, '0');
+    return {
+      "name": name,
+      "market": market,
+      "price": price,
+      "humanDate": "$year-$month-$day",
+      "epochSecs": epochSecs,
+    };
+  }
 }
 
-List<DataApiRange> dataApiRangeFromJson(String str) =>
-    List<DataApiRange>.from(json.decode(str).map((x) => DataApiRange.fromJson(x)));
+List<DataApiRange> dataApiRangeFromJson(String str) => List<DataApiRange>.from(
+    json.decode(str).map((x) => DataApiRange.fromJson(x)));
 
 String dataApiRangeToJson(List<DataApiRange> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
@@ -46,7 +49,6 @@ class DataApiRange {
   DateTime humanDate;
   int epochSecs;
   double price;
-
   DataApiRange({
     required this.humanDate,
     required this.epochSecs,
@@ -59,10 +61,14 @@ class DataApiRange {
         price: json["price"].toDouble(),
       );
 
-  Map<String, dynamic> toJson() => {
-        "humanDate":
-            "${humanDate.year.toString().padLeft(4, '0')}-${humanDate.month.toString().padLeft(2, '0')}-${humanDate.day.toString().padLeft(2, '0')}",
-        "epochSecs": epochSecs,
-        "price": price,
-      };
+  Map<String, dynamic> toJson() {
+    String year = humanDate.year.toString().padLeft(4, '0');
+    String month = humanDate.month.toString().padLeft(2, '0');
+    String day = humanDate.day.toString().padLeft(2, '0');
+    return {
+      "humanDate": "$year-$month-$day",
+      "epochSecs": epochSecs,
+      "price": price,
+    };
+  }
 }

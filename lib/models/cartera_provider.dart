@@ -1,7 +1,5 @@
-import 'dart:math' show sqrt, pow;
 import 'package:flutter/material.dart';
 
-import '../utils/fecha_util.dart';
 import 'cartera.dart';
 
 class CarteraProvider with ChangeNotifier {
@@ -202,7 +200,7 @@ class CarteraProvider with ChangeNotifier {
             if (indexDate == -1) {
               _carteras[index].fondos![indexIsin].valores!.add(valor);
               sortValores(fondo);
-              calculaIndices(fondo);
+              //calculaIndices(fondo);
               notifyListeners();
             }
           }
@@ -232,7 +230,7 @@ class CarteraProvider with ChangeNotifier {
             if (indexDate != -1) {
               _carteras[index].fondos![indexIsin].valores![indexDate] = valor;
               sortValores(fondo);
-              calculaIndices(fondo);
+              //calculaIndices(fondo);
               notifyListeners();
             }
           }
@@ -270,36 +268,38 @@ class CarteraProvider with ChangeNotifier {
     //fondo.valores!.remove(valor);
     //calculaIndices(fondo);
     _valores.remove(valor);
-    calculaIndices(fondo);
+    //calculaIndices(fondo);
     notifyListeners();
   }
 
   void removeValorByDate(Fondo fondo, Valor valor) {
     fondo.valores!.removeWhere((v) => v.date == valor.date);
-    calculaIndices(fondo);
+    //calculaIndices(fondo);
     notifyListeners();
   }
 
   void removeOperacion(Fondo fondo, Valor valor) {
     _operaciones.remove(valor);
-    calculaIndices(fondo);
+    //calculaIndices(fondo);
     notifyListeners();
   }
 
   void removeAllValores(Fondo fondo) {
     //fondo.valores!.clear();
     _valores.clear();
-    calculaIndices(fondo);
+    //calculaIndices(fondo);
     notifyListeners();
   }
 
   void removeAllOperaciones(Fondo fondo) {
     _operaciones.clear();
-    calculaIndices(fondo);
+    //calculaIndices(fondo);
     notifyListeners();
   }
 
   // TODO: cambiar fondo.valores por _valores ??
+  /// INNECESARIO: SUSTITUIDO POR STATS
+  /*
   void calculaStats(Fondo fondo) {
     int? dateMinimo;
     int? dateMaximo;
@@ -309,9 +309,18 @@ class CarteraProvider with ChangeNotifier {
     double? volatilidad;
     if (fondo.valores != null && fondo.valores!.isNotEmpty) {
       sortValores(fondo);
+      Stats stats = Stats(fondo.valores!);
+      //dateMinimo = stats.datePrecioMinimo();
+      //dateMaximo = stats.datePrecioMaximo();
       dateMinimo = fondo.valores!.last.date;
       dateMaximo = fondo.valores!.first.date;
-      final List<double> precios = fondo.valores!.map((v) => v.precio).toList();
+      precioMinimo = stats.precioMinimo();
+      precioMaximo = stats.precioMaximo();
+      precioMedio = stats.precioMedio();
+      volatilidad = stats.volatilidad();
+
+      /// TEST TEST TEST
+      /*final List<double> precios = fondo.valores!.map((v) => v.precio).toList();
       precioMinimo = precios.reduce((curr, next) => curr < next ? curr : next);
       precioMaximo = precios.reduce((curr, next) => curr > next ? curr : next);
       precioMedio = precios.reduce((a, b) => a + b) / precios.length;
@@ -321,7 +330,7 @@ class CarteraProvider with ChangeNotifier {
             (valor.precio - precioMedio) * (valor.precio - precioMedio);
       }
       var varianza = diferencialesCuadrados / fondo.valores!.length;
-      volatilidad = sqrt(varianza);
+      volatilidad = sqrt(varianza);*/
     }
     fondo.dateMinimo = dateMinimo;
     fondo.dateMaximo = dateMaximo;
@@ -335,7 +344,11 @@ class CarteraProvider with ChangeNotifier {
   void calculaTotalParticipaciones(Fondo fondo) {
     double? participaciones;
     if (fondo.valores != null && fondo.valores!.isNotEmpty) {
-      double part = 0.0;
+      Stats stats = Stats(fondo.valores!);
+      participaciones = stats.totalParticipaciones();
+
+      /// TEST TEST TEST
+      /*double part = 0.0;
       for (var valor in fondo.valores!) {
         if (valor.tipo == 1) {
           part += valor.participaciones ?? 0.0;
@@ -343,7 +356,7 @@ class CarteraProvider with ChangeNotifier {
           part -= valor.participaciones ?? 0.0;
         }
       }
-      participaciones = part;
+      participaciones = part;*/
     }
     fondo.totalParticipaciones = participaciones;
     notifyListeners();
@@ -354,7 +367,11 @@ class CarteraProvider with ChangeNotifier {
     if (fondo.valores != null &&
         fondo.valores!.isNotEmpty &&
         fondo.totalParticipaciones != null) {
-      double inv = 0.0;
+      Stats stats = Stats(fondo.valores!);
+      inversion = stats.inversion();
+
+      /// TEST TEST TEST
+      /*double inv = 0.0;
       for (var valor in fondo.valores!) {
         if (valor.tipo == 1) {
           inv += (valor.participaciones ?? 0.0) * valor.precio;
@@ -362,7 +379,7 @@ class CarteraProvider with ChangeNotifier {
           inv -= (valor.participaciones ?? 0.0) * valor.precio;
         }
       }
-      inversion = inv;
+      inversion = inv;*/
     }
     fondo.inversion = inversion;
     notifyListeners();
@@ -374,9 +391,11 @@ class CarteraProvider with ChangeNotifier {
         fondo.valores!.isNotEmpty &&
         fondo.totalParticipaciones != null) {
       sortValores(fondo);
-      print('RESULTADO');
-      print('${fondo.valores!.first.precio}');
-      resultado = fondo.totalParticipaciones! * fondo.valores!.first.precio;
+      Stats stats = Stats(fondo.valores!);
+      resultado = stats.resultado();
+
+      /// TEST TEST TEST
+      //resultado = fondo.totalParticipaciones! * fondo.valores!.first.precio;
     }
     fondo.resultado = resultado;
     notifyListeners();
@@ -385,7 +404,11 @@ class CarteraProvider with ChangeNotifier {
   void calculaBalance(Fondo fondo) {
     double? balance;
     if (fondo.resultado != null && fondo.inversion != null) {
-      balance = fondo.resultado! - fondo.inversion!;
+      Stats stats = Stats(fondo.valores!);
+      balance = stats.balance();
+
+      /// TEST TEST TEST
+      //balance = fondo.resultado! - fondo.inversion!;
     }
     fondo.balance = balance;
     notifyListeners();
@@ -396,7 +419,11 @@ class CarteraProvider with ChangeNotifier {
     if (fondo.balance != null &&
         fondo.inversion != null &&
         fondo.inversion! > 0) {
-      rentabilidad = fondo.balance! / fondo.inversion!;
+      Stats stats = Stats(fondo.valores!);
+      rentabilidad = stats.rentabilidad();
+
+      /// TEST TEST TEST
+      //rentabilidad = fondo.balance! / fondo.inversion!;
     }
     fondo.rentabilidad = rentabilidad;
     notifyListeners();
@@ -408,7 +435,11 @@ class CarteraProvider with ChangeNotifier {
         fondo.inversion != null &&
         fondo.inversion! > 0) {
       sortValores(fondo);
-      int? dateFirstOp;
+      Stats stats = Stats(fondo.valores!);
+      tae = stats.tae();
+
+      /// TEST TEST TEST
+      /*int? dateFirstOp;
       for (var valor in fondo.valores!.reversed) {
         if (valor.tipo != null) {
           dateFirstOp = valor.date;
@@ -423,19 +454,20 @@ class CarteraProvider with ChangeNotifier {
                         .difference(FechaUtil.epochToDate(dateFirstOp))
                         .inDays))) -
             1;
-      }
+      }*/
     }
     fondo.tae = tae;
     notifyListeners();
   }
+  */
 
-  void calculaIndices(Fondo fondo) {
-    calculaStats(fondo);
+  //void calculaIndices(Fondo fondo) {
+  /*calculaStats(fondo);
     calculaTotalParticipaciones(fondo);
     calculaInversion(fondo);
     calculaResultado(fondo);
     calculaBalance(fondo);
     calculaRentabilidad(fondo);
-    calculaTae(fondo);
-  }
+    calculaTae(fondo);*/
+  //}
 }

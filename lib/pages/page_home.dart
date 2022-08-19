@@ -4,23 +4,23 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
-import 'package:path_provider/path_provider.dart';
+//import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
-//import '../routes.dart';
 import '../router/routes_const.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../utils/konstantes.dart';
+import '../utils/number_util.dart';
+import '../utils/stats.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
 import '../widgets/my_drawer.dart';
-
-//enum Menu { ordenar, exportar, eliminar }
 
 class PageHome extends StatefulWidget {
   const PageHome({Key? key}) : super(key: key);
@@ -30,6 +30,7 @@ class PageHome extends StatefulWidget {
 
 class _PageHomeState extends State<PageHome> {
   bool _isCarterasByOrder = true;
+  bool _isViewDetalleCarteras = true;
   bool _isFondosByOrder = true;
   bool _isConfirmDeleteCartera = true;
   late TextEditingController _controller;
@@ -40,13 +41,18 @@ class _PageHomeState extends State<PageHome> {
     bool? isCarterasByOrder;
     bool? isFondosByOrder;
     bool? isConfirmDeleteCartera;
+    bool? isViewDetalleCarteras;
     await PreferencesService.getBool(keyByOrderCarterasPref)
         .then((value) => isCarterasByOrder = value);
-    await PreferencesService.getBool(keyByOrderFondosPref).then((value) => isFondosByOrder = value);
+    await PreferencesService.getBool(keyViewCarterasPref)
+        .then((value) => isViewDetalleCarteras = value);
+    await PreferencesService.getBool(keyByOrderFondosPref)
+        .then((value) => isFondosByOrder = value);
     await PreferencesService.getBool(keyConfirmDeleteCarteraPref)
         .then((value) => isConfirmDeleteCartera = value);
     setState(() {
       _isCarterasByOrder = isCarterasByOrder ?? true;
+      _isViewDetalleCarteras = isViewDetalleCarteras ?? true;
       _isFondosByOrder = isFondosByOrder ?? true;
       _isConfirmDeleteCartera = isConfirmDeleteCartera ?? true;
     });
@@ -55,13 +61,28 @@ class _PageHomeState extends State<PageHome> {
   setCarteras() async {
     try {
       //throw Exception();
-      carteraProvider.carteras = await database.getCarteras(byOrder: _isCarterasByOrder);
+      carteraProvider.carteras =
+          await database.getCarteras(byOrder: _isCarterasByOrder);
       for (var cartera in carteraProvider.carteras) {
         await database.createTableCartera(cartera).whenComplete(() async {
-          carteraProvider.fondos = await database.getFondos(cartera, byOrder: _isFondosByOrder);
+          carteraProvider.fondos =
+              await database.getFondos(cartera, byOrder: _isFondosByOrder);
           //carteraProvider.addFondos(cartera, carteraProvider.fondos);
           cartera.fondos = carteraProvider.fondos;
         });
+        if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
+          for (var fondo in cartera.fondos!) {
+            await database
+                .createTableFondo(cartera, fondo)
+                .whenComplete(() async {
+              carteraProvider.valores =
+                  await database.getValores(cartera, fondo);
+              fondo.valores = carteraProvider.valores;
+              carteraProvider.operaciones =
+                  await database.getOperaciones(cartera, fondo);
+            });
+          }
+        }
       }
     } catch (e) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -87,31 +108,24 @@ class _PageHomeState extends State<PageHome> {
     PreferencesService.saveBool(keyByOrderCarterasPref, _isCarterasByOrder);
   }
 
+  _viewCarteras() async {
+    setState(() => _isViewDetalleCarteras = !_isViewDetalleCarteras);
+    PreferencesService.saveBool(keyViewCarterasPref, _isViewDetalleCarteras);
+  }
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
-  final List<Icon> options = const [Icon(Icons.edit), Icon(Icons.delete_forever)];
+  final List<Icon> options = const [
+    Icon(Icons.edit),
+    Icon(Icons.delete_forever)
+  ];
 
   @override
   Widget build(BuildContext context) {
-    _buildChipFondo(int? lengthFondos) {
-      return Align(
-        alignment: Alignment.topLeft,
-        child: Chip(
-          padding: const EdgeInsets.only(left: 10, right: 20),
-          backgroundColor: const Color(0xFFBBDEFB),
-          avatar: const Icon(Icons.poll, color: Color(0xFF0D47A1), size: 32),
-          label: Text(
-            '${lengthFondos ?? 'Sin'} Fondos',
-            style: const TextStyle(color: Color(0xFF0D47A1), fontSize: 18),
-          ),
-        ),
-      );
-    }
-
     return FutureBuilder(
       future: database.getCarteras(byOrder: _isCarterasByOrder),
       builder: (BuildContext context, AsyncSnapshot<List<Cartera>> snapshot) {
@@ -124,14 +138,17 @@ class _PageHomeState extends State<PageHome> {
                 child: Scaffold(
                   backgroundColor: Colors.transparent,
                   appBar: AppBar(
-                    title: const Text('Mis Carteras'),
+                    title: const Text('Carteras'),
                     actions: [
                       IconButton(
                         icon: const Icon(Icons.settings),
-                        onPressed: () {
-                          //Navigator.of(context).pushNamed(RouteGenerator.settingsPage);
-                          context.go(settingsPage);
-                        },
+                        onPressed: () => context.go(settingsPage),
+                      ),
+                      IconButton(
+                        icon: _isViewDetalleCarteras
+                            ? const Icon(Icons.format_list_bulleted)
+                            : const Icon(Icons.view_stream),
+                        onPressed: () => _viewCarteras(),
                       ),
                       PopupMenuButton(
                         color: const Color(0xFF2196F3),
@@ -140,32 +157,14 @@ class _PageHomeState extends State<PageHome> {
                           borderRadius: BorderRadius.all(Radius.circular(8.0)),
                         ),
                         itemBuilder: (ctx) => [
-                          //_buildMenuItem(Menu.ordenar, Icons.sort_by_alpha, divider: true),
-                          //_buildMenuItem(Menu.exportar, Icons.save, divider: false),
-                          //_buildMenuItem(Menu.eliminar, Icons.delete_forever, divider: false),
                           buildMenuItem(Menu.ordenar, Icons.sort_by_alpha,
                               divider: true, isOrder: _isCarterasByOrder),
-                          buildMenuItem(Menu.importar, Icons.file_download),
                           buildMenuItem(Menu.exportar, Icons.save),
+                          buildMenuItem(Menu.importar, Icons.file_download,
+                              divider: true),
                           buildMenuItem(Menu.eliminar, Icons.delete_forever),
                         ],
                         onSelected: (item) async {
-                          //TODO: ACCIONES PENDIENTES
-                          /*switch (item) {
-                            case Menu.ordenar:
-                              _ordenarCarteras();
-                              break;
-                            case Menu.exportar:
-                              print('EXPORTAR');
-                              break;
-                            case Menu.importar:
-                              _import(context);
-                              break;
-                            case Menu.eliminar:
-                              _deleteConfirm(context);
-                              break;
-                          }*/
-
                           if (item == Menu.ordenar) {
                             _ordenarCarteras();
                           } else if (item == Menu.exportar) {
@@ -186,7 +185,7 @@ class _PageHomeState extends State<PageHome> {
                     onPressed: () => _inputName(context),
                   ),
                   body: Padding(
-                    padding: const EdgeInsets.all(12.0),
+                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 42),
                     child: Consumer<CarteraProvider>(
                       builder: (context, data, child) {
                         if (data.carteras.isEmpty) {
@@ -195,27 +194,126 @@ class _PageHomeState extends State<PageHome> {
                               padding: EdgeInsets.symmetric(horizontal: 12),
                               child: Text(
                                 'Empieza creando una cartera',
-                                style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 22),
+                                style: TextStyle(
+                                    color: Color(0xFFFFFFFF), fontSize: 22),
                                 textAlign: TextAlign.center,
                               ),
                             ),
+                          );
+                        }
+                        if (!_isViewDetalleCarteras) {
+                          return ListView.builder(
+                            itemCount: data.carteras.length,
+                            itemBuilder: (context, index) {
+                              Cartera cartera = data.carteras[index];
+                              return VistaCompacta(
+                                  delete: _deleteCartera,
+                                  cartera: cartera,
+                                  goCartera: _goCartera);
+                            },
                           );
                         }
                         return ListView.builder(
                           itemCount: data.carteras.length,
                           itemBuilder: (context, index) {
                             Cartera cartera = data.carteras[index];
-                            List<Fondo> fondos = cartera.fondos ?? [];
-                            return Dismissible(
+                            /*List<Fondo> fondos = cartera.fondos ?? [];
+                            double capitalCarteraEur = 0.0;
+                            double capitalCarteraUsd = 0.0;
+                            double capitalCarteraOtra = 0.0;
+                            double rendimientoCarteraEur = 0.0;
+                            double rendimientoCarteraUsd = 0.0;
+                            double rendimientoCarteraOtra = 0.0;
+                            double participacionesCartera = 0.0;
+                            bool isTrueCapitalCarteraEur = false;
+                            bool isTrueCapitalCarteraUsd = false;
+                            bool isTrueCapitalCarteraOtra = false;
+                            bool isTrueRendCarteraEur = false;
+                            bool isTrueRendCarteraUsd = false;
+                            bool isTrueRendCarteraOtra = false;*/
+                            /*if (fondos.isNotEmpty) {
+                              for (var fondo in fondos) {
+                                if (fondo.valores != null &&
+                                    fondo.valores!.isNotEmpty) {
+                                  Stats stats = Stats(fondo.valores!);
+                                  participacionesCartera +=
+                                      stats.totalParticipaciones() ?? 0.0;
+                                  if (participacionesCartera > 0) {
+                                    if (fondo.divisa == 'EUR') {
+                                      if (stats.resultado() != null) {
+                                        isTrueCapitalCarteraEur = true;
+                                      }
+                                      if (stats.balance() != null) {
+                                        isTrueRendCarteraEur = true;
+                                      }
+                                      capitalCarteraEur +=
+                                          stats.resultado() ?? 0.0;
+                                      rendimientoCarteraEur +=
+                                          stats.balance() ?? 0.0;
+                                    } else if (fondo.divisa == 'USD') {
+                                      if (stats.resultado() != null) {
+                                        isTrueCapitalCarteraUsd = true;
+                                      }
+                                      if (stats.balance() != null) {
+                                        isTrueRendCarteraUsd = true;
+                                      }
+                                      capitalCarteraUsd +=
+                                          stats.resultado() ?? 0.0;
+                                      rendimientoCarteraUsd +=
+                                          stats.balance() ?? 0.0;
+                                    } else {
+                                      if (stats.resultado() != null) {
+                                        isTrueCapitalCarteraOtra = true;
+                                      }
+                                      if (stats.balance() != null) {
+                                        isTrueRendCarteraOtra = true;
+                                      }
+                                      capitalCarteraOtra +=
+                                          stats.resultado() ?? 0.0;
+                                      rendimientoCarteraOtra +=
+                                          stats.balance() ?? 0.0;
+                                    }
+                                  }
+                                }
+                              }
+                            }*/
+
+                            /*Widget _builTextCartera(double valorStats,
+                                {String divisa = '', bool color = false}) {
+                              return Text(
+                                '${NumberFormat.decimalPattern('es').format(double.parse(valorStats.toStringAsFixed(2)))} $divisa',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  color: color == true
+                                      ? valorStats < 0
+                                          ? Colors.red
+                                          : Colors.green
+                                      : Colors.black,
+                                  fontSize: 16,
+                                ),
+                              );
+                            }*/
+
+                            return VistaDetalle(
+                              cartera: cartera,
+                              delete: _deleteCartera,
+                              goCartera: _goCartera,
+                              inputName: _inputName,
+                              goFondo: _goFondo,
+                            );
+
+                            /*return Dismissible(
                               key: UniqueKey(),
                               direction: DismissDirection.endToStart,
                               background: Container(
                                 color: const Color(0xFFF44336),
-                                margin: const EdgeInsets.symmetric(horizontal: 15),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 15),
                                 alignment: Alignment.centerRight,
                                 child: const Padding(
                                   padding: EdgeInsets.all(10.0),
-                                  child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
+                                  child: Icon(Icons.delete,
+                                      color: Color(0xFFFFFFFF)),
                                 ),
                               ),
                               onDismissed: (_) => _deleteCartera(cartera),
@@ -224,8 +322,10 @@ class _PageHomeState extends State<PageHome> {
                                 child: Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    color: const Color.fromRGBO(255, 255, 255, 0.5),
-                                    border: Border.all(color: Colors.white, width: 2),
+                                    color: const Color.fromRGBO(
+                                        255, 255, 255, 0.5),
+                                    border: Border.all(
+                                        color: Colors.white, width: 2),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Column(
@@ -233,15 +333,17 @@ class _PageHomeState extends State<PageHome> {
                                       ListTile(
                                         leading: CircleAvatar(
                                           radius: 22,
-                                          backgroundColor: const Color(0xFFFFFFFF),
+                                          backgroundColor:
+                                              const Color(0xFFFFFFFF),
                                           child: CircleAvatar(
-                                            backgroundColor: const Color(0xFFFFC107),
+                                            backgroundColor:
+                                                const Color(0xFFFFC107),
                                             child: IconButton(
                                               onPressed: () {
                                                 ScaffoldMessenger.of(context)
                                                     .removeCurrentSnackBar();
-                                                carteraProvider.carteraSelect = cartera;
-                                                //Navigator.of(context).pushNamed(RouteGenerator.carteraPage);
+                                                carteraProvider.carteraSelect =
+                                                    cartera;
                                                 context.go(carteraPage);
                                               },
                                               icon: const Icon(
@@ -263,34 +365,39 @@ class _PageHomeState extends State<PageHome> {
                                         ),
                                         trailing: PopupMenuButton(
                                           color: const Color(0xFF2196F3),
-                                          icon:
-                                              const Icon(Icons.more_vert, color: Color(0xFF2196F3)),
+                                          icon: const Icon(Icons.more_vert,
+                                              color: Color(0xFF2196F3)),
                                           itemBuilder: (context) => const [
                                             PopupMenuItem(
                                               value: 1,
                                               child: ListTile(
-                                                leading: Icon(Icons.edit, color: Color(0xFFFFFFFF)),
+                                                leading: Icon(Icons.edit,
+                                                    color: Color(0xFFFFFFFF)),
                                                 title: Text(
                                                   'Renombrar',
-                                                  style: TextStyle(color: Color(0xFFFFFFFF)),
+                                                  style: TextStyle(
+                                                      color: Color(0xFFFFFFFF)),
                                                 ),
                                               ),
                                             ),
                                             PopupMenuItem(
                                               value: 2,
                                               child: ListTile(
-                                                leading: Icon(Icons.delete_forever,
+                                                leading: Icon(
+                                                    Icons.delete_forever,
                                                     color: Color(0xFFFFFFFF)),
                                                 title: Text(
                                                   'Eliminar',
-                                                  style: TextStyle(color: Color(0xFFFFFFFF)),
+                                                  style: TextStyle(
+                                                      color: Color(0xFFFFFFFF)),
                                                 ),
                                               ),
                                             )
                                           ],
                                           onSelected: (value) {
                                             if (value == 1) {
-                                              _inputName(context, cartera: cartera);
+                                              _inputName(context,
+                                                  cartera: cartera);
                                             } else if (value == 2) {
                                               _deleteCartera(cartera);
                                             }
@@ -300,62 +407,159 @@ class _PageHomeState extends State<PageHome> {
                                       Padding(
                                         padding: const EdgeInsets.all(12),
                                         child: Container(
-                                          padding: const EdgeInsets.only(right: 12),
+                                          padding:
+                                              const EdgeInsets.only(right: 12),
                                           decoration: BoxDecoration(
                                             color: const Color(0xFFBBDEFB),
-                                            border: Border.all(color: Colors.white, width: 2),
-                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(
+                                                color: Colors.white, width: 2),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                           ),
                                           //child: (cartera.fondos != null && cartera.fondos!.isNotEmpty)
                                           child: fondos.isNotEmpty
                                               ? Theme(
                                                   data: Theme.of(context)
-                                                      .copyWith(dividerColor: Colors.transparent),
+                                                      .copyWith(
+                                                          dividerColor: Colors
+                                                              .transparent),
                                                   child: ExpansionTile(
                                                     childrenPadding:
-                                                        const EdgeInsets.only(bottom: 10, left: 20),
+                                                        const EdgeInsets.only(
+                                                            bottom: 10,
+                                                            left: 20),
                                                     expandedCrossAxisAlignment:
-                                                        CrossAxisAlignment.start,
-                                                    expandedAlignment: Alignment.topLeft,
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    expandedAlignment:
+                                                        Alignment.topLeft,
                                                     maintainState: true,
                                                     iconColor: Colors.blue,
-                                                    collapsedIconColor: Colors.blue,
-                                                    tilePadding: const EdgeInsets.all(0.0),
-                                                    backgroundColor: const Color(0xFFBBDEFB),
-                                                    title: _buildChipFondo(fondos.length),
+                                                    collapsedIconColor:
+                                                        Colors.blue,
+                                                    tilePadding:
+                                                        const EdgeInsets.all(
+                                                            0.0),
+                                                    backgroundColor:
+                                                        const Color(0xFFBBDEFB),
+                                                    title: ChipFondo(
+                                                        lengthFondos:
+                                                            fondos.length),
                                                     children: [
                                                       for (var fondo in fondos)
                                                         TextButton(
                                                           onPressed: () {
-                                                            ScaffoldMessenger.of(context)
+                                                            ScaffoldMessenger
+                                                                    .of(context)
                                                                 .removeCurrentSnackBar();
-                                                            carteraProvider.carteraSelect = cartera;
-                                                            carteraProvider.fondoSelect = fondo;
-                                                            //Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
-                                                            context.go(fondoPage);
+                                                            carteraProvider
+                                                                    .carteraSelect =
+                                                                cartera;
+                                                            carteraProvider
+                                                                    .fondoSelect =
+                                                                fondo;
+                                                            context
+                                                                .go(fondoPage);
                                                           },
                                                           child: Text(
                                                             fondo.name,
-                                                            overflow: TextOverflow.ellipsis,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
                                                             maxLines: 1,
                                                             style: const TextStyle(
-                                                                color: Color(0xFF0D47A1)),
+                                                                color: Color(
+                                                                    0xFF0D47A1)),
                                                           ),
                                                         )
                                                     ],
                                                   ),
                                                 )
-                                              : Padding(
-                                                  padding: const EdgeInsets.symmetric(vertical: 6),
-                                                  child: _buildChipFondo(null),
+                                              : const Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      vertical: 6),
+                                                  child: ChipFondo(
+                                                      lengthFondos: null),
                                                 ),
                                         ),
                                       ),
+                                      if (fondos.isNotEmpty &&
+                                          participacionesCartera > 0 &&
+                                          (isTrueCapitalCarteraEur ||
+                                              isTrueCapitalCarteraUsd ||
+                                              isTrueCapitalCarteraOtra) &&
+                                          (isTrueRendCarteraEur ||
+                                              isTrueRendCarteraUsd ||
+                                              isTrueRendCarteraOtra))
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 32),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  const Text('Valor',
+                                                      style: TextStyle(
+                                                          fontSize: 16)),
+                                                  const Spacer(),
+                                                  Column(
+                                                    children: [
+                                                      if (isTrueCapitalCarteraEur)
+                                                        _builTextCartera(
+                                                            capitalCarteraEur,
+                                                            divisa: 'EUR'),
+                                                      if (isTrueCapitalCarteraUsd)
+                                                        _builTextCartera(
+                                                            capitalCarteraUsd,
+                                                            divisa: 'USD'),
+                                                      if (isTrueCapitalCarteraOtra)
+                                                        _builTextCartera(
+                                                            capitalCarteraOtra),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 10),
+                                              Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  const Text('Rendimiento',
+                                                      style: TextStyle(
+                                                          fontSize: 16)),
+                                                  const Spacer(),
+                                                  Column(
+                                                    children: [
+                                                      if (isTrueRendCarteraEur)
+                                                        _builTextCartera(
+                                                            rendimientoCarteraEur,
+                                                            divisa: 'EUR',
+                                                            color: true),
+                                                      if (isTrueRendCarteraUsd)
+                                                        _builTextCartera(
+                                                            rendimientoCarteraUsd,
+                                                            divisa: 'USD',
+                                                            color: true),
+                                                      if (isTrueRendCarteraOtra)
+                                                        _builTextCartera(
+                                                            rendimientoCarteraOtra,
+                                                            color: true),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                     ],
                                   ),
                                 ),
                               ),
-                            );
+                            );*/
                           },
                         );
                       },
@@ -388,7 +592,7 @@ class _PageHomeState extends State<PageHome> {
     final dbAsBytes = await dbFile.readAsBytes();
     String filePath = '';
 
-    Future<String> _getFilePath() async {
+    /* Future<String> _getFilePath() async {
       Directory? directory = await getExternalStorageDirectory();
       //if (directory == null || directory.path.isEmpty || !await directory.exists()) return '';
       if (directory == null) return '';
@@ -396,16 +600,31 @@ class _PageHomeState extends State<PageHome> {
       String path = directory.path;
       String filePath = '$path/$nombreDb';
       return filePath;
-    }
+    } */
 
     try {
-      filePath = await _getFilePath();
-      if (filePath.isEmpty) throw Exception();
+      String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+      if (selectedDirectory == null) return;
+      filePath = '$selectedDirectory/$nombreDb';
+
+      //filePath = await _getFilePath();
+
+      if (filePath.isEmpty) throw Exception(); // o return ??
       File file = File(filePath);
-      await file.writeAsBytes(dbAsBytes);
-      okSave = true;
+
+      var status = await Permission.storage.status;
+      if (!status.isGranted) {
+        status = await Permission.storage.request();
+      }
+      if (status.isGranted) {
+        await file.writeAsBytes(dbAsBytes);
+        okSave = true;
+      } else {
+        throw Exception();
+      }
     } catch (e) {
       //TODO: mensaje de error
+      print(e.toString());
       //return;
       okSave = false;
     }
@@ -414,13 +633,25 @@ class _PageHomeState extends State<PageHome> {
     await _resultProcess(isImport: false, isOk: okSave, filePath: filePath);
   }
 
-  _resultProcess({required bool isImport, required bool isOk, String filePath = ''}) async {
-    String line1 = isOk ? 'El proceso ha concluido con éxito' : 'El proceso ha fallado';
+  _resultProcess(
+      {required bool isImport,
+      required bool isOk,
+      String filePath = ''}) async {
+    String path = filePath;
+    if (!isImport) {
+      if (filePath.contains('0/')) {
+        var index = filePath.indexOf('0/');
+        path = filePath.substring(index + 2);
+      }
+    }
+    String line1 =
+        isOk ? 'El proceso ha concluido con éxito.' : 'El proceso ha fallado.';
     String line2 = isImport
         ? 'La app se reiniciará.'
         : isOk
-            ? 'La copia se ha almacenado en $filePath'
-            : '';
+            ? 'La copia se ha almacenado en $path'
+            : 'Intenta guardar la copia de seguridad en el almacenamiento interno (dependiendo de la '
+                'versión de Android de tu dispositivo puede que la app no tenga permiso para escribir en la tarjeta SD).';
 
     return showDialog(
         context: context,
@@ -449,11 +680,39 @@ class _PageHomeState extends State<PageHome> {
   }
 
   _import(BuildContext context) async {
-    // DIALOGO CONFIRMACIÓN: ACEPTAR CANCELAR INICIAR PROCESO DE EXPORTACIÓN
-    // AVISO SE ELIMINARÁ TODO
-    // recomendar salvar copia de seguridad
+    var isConfirm = await showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: const Text('Importar Base de Datos'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: const [
+                  Text(
+                      'La nueva base de datos sobreescribirá los datos actuales, '
+                      'que se perderán y no podrán ser recuperados.'),
+                  SizedBox(height: 10),
+                  Text('Se recomienda exportar una copia de seguridad antes de '
+                      'importar una nueva base de datos.'),
+                  SizedBox(height: 10),
+                  Text('¿Quieres continuar con el proceso de importación?'),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancelar')),
+              TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Aceptar'))
+            ],
+          );
+        });
 
-    // SELECCIONAR FILE
+    if (await isConfirm == null || !await isConfirm) return;
+
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result == null || result.files.isEmpty) return;
 
@@ -500,14 +759,16 @@ class _PageHomeState extends State<PageHome> {
     }
   }
 
-  Future<void> _inputName(BuildContext context, {Cartera? cartera, bool isSave = false}) async {
+  Future<void> _inputName(BuildContext context,
+      {Cartera? cartera, bool isSave = false}) async {
     //String title = cartera?.name ?? 'Nueva Cartera';
     String title;
     if (isSave == false) {
       title = cartera?.name ?? 'Nueva Cartera';
     } else {
-      title = 'Nombre base de datos';
+      title = 'Exportar Base de Datos';
     }
+    String label = isSave ? 'Nombre del archivo sin extensión' : '';
     return showDialog(
         context: context,
         builder: (context) {
@@ -518,13 +779,29 @@ class _PageHomeState extends State<PageHome> {
                   return SingleChildScrollView(
                     child: AlertDialog(
                       title: Text(title),
-                      content: TextField(
-                        controller: _controller,
-                        decoration: InputDecoration(
-                          hintText: 'Nombre',
-                          errorMaxLines: 4,
-                          errorText: _errorText,
-                        ),
+                      content: Column(
+                        children: [
+                          TextField(
+                            controller: _controller,
+                            decoration: InputDecoration(
+                              hintText: 'Nombre',
+                              errorMaxLines: 4,
+                              errorText: _errorText,
+                              labelText: label,
+                            ),
+                          ),
+                          if (isSave)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 12),
+                              child: Text(
+                                  'Después selecciona el destino donde almacenar '
+                                  'la copia de seguridad (se recomienda utilizar '
+                                  'el almacenamiento interno del dispositivo '
+                                  'porque dependiendo de tu versión de Android '
+                                  'puede que la app no tenga permiso para escribir '
+                                  'en la tarjeta SD).'),
+                            ),
+                        ],
                       ),
                       actions: <Widget>[
                         OutlinedButton(
@@ -535,18 +812,13 @@ class _PageHomeState extends State<PageHome> {
                           },
                         ),
                         ElevatedButton(
-                          onPressed: () {
-                            //_controller.value.text.trim().isNotEmpty ? _submit(cartera) : null;
-                            if (_controller.value.text.trim().isNotEmpty) {
-                              //isSave ? Navigator.pop(context) : _submit(cartera);
-                              if (isSave == true) {
-                                Navigator.pop(context);
-                              } else {
-                                print('SUBMITTTTTTTTTTTTTT');
-                                _submit(cartera);
-                              }
-                            }
-                          },
+                          onPressed: _controller.value.text.trim().isNotEmpty
+                              ? () {
+                                  isSave
+                                      ? Navigator.pop(context)
+                                      : _submit(cartera);
+                                }
+                              : null,
                           child: const Text('ACEPTAR'),
                         ),
                       ],
@@ -571,11 +843,13 @@ class _PageHomeState extends State<PageHome> {
   void _submit(Cartera? cartera) async {
     if (_errorText == null) {
       var input = _controller.value.text.trim();
-      var existe = [for (var cartera in carteraProvider.carteras) cartera.name].contains(input);
+      var existe = [for (var cartera in carteraProvider.carteras) cartera.name]
+          .contains(input);
       if (existe) {
         _controller.clear();
         _pop();
-        _showMsg(msg: 'Ya existe una cartera con ese nombre.', color: Colors.red);
+        _showMsg(
+            msg: 'Ya existe una cartera con ese nombre.', color: Colors.red);
       } else if (cartera != null) {
         print('RENAME RENAME');
         print('${cartera.id}');
@@ -598,8 +872,9 @@ class _PageHomeState extends State<PageHome> {
     return showDialog(
         context: context,
         builder: (BuildContext ctx) {
-          String title =
-              carteraName == null ? 'Eliminar todas las carteras' : 'Eliminar $carteraName';
+          String title = carteraName == null
+              ? 'Eliminar todas las carteras'
+              : 'Eliminar $carteraName';
           String content = carteraName == null
               ? '¿Eliminar todas las carteras y sus fondos?'
               : '¿Eliminar la cartera $carteraName y todos sus fondos?';
@@ -622,6 +897,19 @@ class _PageHomeState extends State<PageHome> {
             ],
           );
         });
+  }
+
+  _goCartera(BuildContext context, Cartera cartera) {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    carteraProvider.carteraSelect = cartera;
+    context.go(carteraPage);
+  }
+
+  _goFondo(BuildContext context, Cartera cartera, Fondo fondo) {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    carteraProvider.carteraSelect = cartera;
+    carteraProvider.fondoSelect = fondo;
+    context.go(fondoPage);
   }
 
   _deleteCartera(Cartera cartera) async {
@@ -663,5 +951,384 @@ class _PageHomeState extends State<PageHome> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
     Navigator.of(context).pop();
+  }
+}
+
+class ChipFondo extends StatelessWidget {
+  final int? lengthFondos;
+  const ChipFondo({Key? key, this.lengthFondos}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    String title;
+    if (lengthFondos == null || lengthFondos == 0) {
+      title = 'Sin fondos';
+    } else if (lengthFondos == 1) {
+      title = '$lengthFondos Fondo';
+    } else {
+      title = '$lengthFondos Fondos';
+    }
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Chip(
+        padding: const EdgeInsets.only(left: 10, right: 20),
+        backgroundColor: const Color(0xFFBBDEFB),
+        avatar: const Icon(Icons.poll, color: Color(0xFF0D47A1), size: 32),
+        label: Text(
+          title,
+          style: const TextStyle(color: Color(0xFF0D47A1), fontSize: 18),
+        ),
+      ),
+    );
+  }
+}
+
+class VistaCompacta extends StatelessWidget {
+  final Cartera cartera;
+  final Function delete;
+  final Function goCartera;
+  const VistaCompacta(
+      {Key? key,
+      required this.cartera,
+      required this.delete,
+      required this.goCartera})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dismissible(
+      key: UniqueKey(),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        color: const Color(0xFFF44336),
+        margin: const EdgeInsets.symmetric(horizontal: 15),
+        alignment: Alignment.centerRight,
+        child: const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
+        ),
+      ),
+      onDismissed: (_) => delete(cartera),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: InputChip(
+            labelPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            avatar: CircleAvatar(
+              backgroundColor: const Color(0xFFFFC107),
+              child: Text(
+                cartera.name[0],
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Color(0xFF0D47A1),
+                ),
+              ),
+            ),
+            backgroundColor: const Color(0xFFBBDEFB),
+            label: Text(cartera.name),
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              color: Color(0xFF2196F3),
+            ),
+            onPressed: () => goCartera(context, cartera)),
+      ),
+    );
+  }
+}
+
+class VistaDetalle extends StatelessWidget {
+  final Cartera cartera;
+  final Function delete;
+  final Function goCartera;
+  final Function inputName;
+  final Function goFondo;
+  const VistaDetalle({
+    Key? key,
+    required this.cartera,
+    required this.delete,
+    required this.goCartera,
+    required this.inputName,
+    required this.goFondo,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    List<Fondo> fondos = cartera.fondos ?? [];
+    double capitalCarteraEur = 0.0;
+    double capitalCarteraUsd = 0.0;
+    double capitalCarteraOtra = 0.0;
+    double rendimientoCarteraEur = 0.0;
+    double rendimientoCarteraUsd = 0.0;
+    double rendimientoCarteraOtra = 0.0;
+    double participacionesCartera = 0.0;
+    bool isTrueCapitalCarteraEur = false;
+    bool isTrueCapitalCarteraUsd = false;
+    bool isTrueCapitalCarteraOtra = false;
+    bool isTrueRendCarteraEur = false;
+    bool isTrueRendCarteraUsd = false;
+    bool isTrueRendCarteraOtra = false;
+    if (fondos.isNotEmpty) {
+      for (var fondo in fondos) {
+        if (fondo.valores != null && fondo.valores!.isNotEmpty) {
+          Stats stats = Stats(fondo.valores!);
+          participacionesCartera += stats.totalParticipaciones() ?? 0.0;
+          if (participacionesCartera > 0) {
+            if (fondo.divisa == 'EUR') {
+              if (stats.resultado() != null) {
+                isTrueCapitalCarteraEur = true;
+              }
+              if (stats.balance() != null) {
+                isTrueRendCarteraEur = true;
+              }
+              capitalCarteraEur += stats.resultado() ?? 0.0;
+              rendimientoCarteraEur += stats.balance() ?? 0.0;
+            } else if (fondo.divisa == 'USD') {
+              if (stats.resultado() != null) {
+                isTrueCapitalCarteraUsd = true;
+              }
+              if (stats.balance() != null) {
+                isTrueRendCarteraUsd = true;
+              }
+              capitalCarteraUsd += stats.resultado() ?? 0.0;
+              rendimientoCarteraUsd += stats.balance() ?? 0.0;
+            } else {
+              if (stats.resultado() != null) {
+                isTrueCapitalCarteraOtra = true;
+              }
+              if (stats.balance() != null) {
+                isTrueRendCarteraOtra = true;
+              }
+              capitalCarteraOtra += stats.resultado() ?? 0.0;
+              rendimientoCarteraOtra += stats.balance() ?? 0.0;
+            }
+          }
+        }
+      }
+    }
+
+    Widget _builTextCartera(double valorStats,
+        {String divisa = '', bool color = false}) {
+      return FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          '${NumberUtil.decimalFixed(valorStats)} $divisa',
+          //'${NumberFormat.decimalPattern('es').format(double.parse(valorStats.toStringAsFixed(2)))} $divisa',
+          //'${NumberFormat.compactLong(locale: 'es').format(double.parse(valorStats.toStringAsFixed(2)))} $divisa',
+
+          /*? NumberFormat.compactLong(
+            locale: 'es')
+            .format(double.parse(stats
+            .resultado()!
+            .toStringAsFixed(2)))*/
+          maxLines: 1,
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            color: color == true
+                ? valorStats < 0
+                    ? Colors.red
+                    : Colors.green
+                : Colors.black,
+            fontSize: 16,
+          ),
+        ),
+      );
+    }
+
+    return Dismissible(
+      key: UniqueKey(),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        color: const Color(0xFFF44336),
+        margin: const EdgeInsets.symmetric(horizontal: 15),
+        alignment: Alignment.centerRight,
+        child: const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
+        ),
+      ),
+      onDismissed: (_) => delete(cartera),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color.fromRGBO(255, 255, 255, 0.5),
+            border: Border.all(color: Colors.white, width: 2),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: [
+              ListTile(
+                leading: CircleAvatar(
+                  radius: 22,
+                  backgroundColor: const Color(0xFFFFFFFF),
+                  child: CircleAvatar(
+                    backgroundColor: const Color(0xFFFFC107),
+                    child: IconButton(
+                      onPressed: () => goCartera(context, cartera),
+                      icon: const Icon(
+                        Icons.business_center,
+                        color: Color(0xFF0D47A1),
+                      ),
+                    ),
+                  ),
+                ),
+                title: Text(
+                  cartera.name,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Color(0xFF2196F3),
+                  ),
+                ),
+                trailing: PopupMenuButton(
+                  color: const Color(0xFF2196F3),
+                  icon: const Icon(Icons.more_vert, color: Color(0xFF2196F3)),
+                  itemBuilder: (context) => const [
+                    PopupMenuItem(
+                      value: 1,
+                      child: ListTile(
+                        leading: Icon(Icons.edit, color: Color(0xFFFFFFFF)),
+                        title: Text(
+                          'Renombrar',
+                          style: TextStyle(color: Color(0xFFFFFFFF)),
+                        ),
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 2,
+                      child: ListTile(
+                        leading: Icon(Icons.delete_forever,
+                            color: Color(0xFFFFFFFF)),
+                        title: Text(
+                          'Eliminar',
+                          style: TextStyle(color: Color(0xFFFFFFFF)),
+                        ),
+                      ),
+                    )
+                  ],
+                  onSelected: (value) {
+                    if (value == 1) {
+                      inputName(context, cartera: cartera);
+                    } else if (value == 2) {
+                      delete(cartera);
+                    }
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Container(
+                  padding: const EdgeInsets.only(right: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFBBDEFB),
+                    border: Border.all(color: Colors.white, width: 2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: fondos.isNotEmpty
+                      ? Theme(
+                          data: Theme.of(context)
+                              .copyWith(dividerColor: Colors.transparent),
+                          child: ExpansionTile(
+                            childrenPadding:
+                                const EdgeInsets.only(bottom: 10, left: 20),
+                            expandedCrossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            expandedAlignment: Alignment.topLeft,
+                            maintainState: true,
+                            iconColor: Colors.blue,
+                            collapsedIconColor: Colors.blue,
+                            tilePadding: const EdgeInsets.all(0.0),
+                            backgroundColor: const Color(0xFFBBDEFB),
+                            title: ChipFondo(lengthFondos: fondos.length),
+                            children: [
+                              for (var fondo in fondos)
+                                TextButton(
+                                  onPressed: () {
+                                    goFondo(context, cartera, fondo);
+                                  },
+                                  child: Text(
+                                    fondo.name,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                        color: Color(0xFF0D47A1)),
+                                  ),
+                                )
+                            ],
+                          ),
+                        )
+                      : const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 6),
+                          child: ChipFondo(lengthFondos: null),
+                        ),
+                ),
+              ),
+              if (fondos.isNotEmpty &&
+                  participacionesCartera > 0 &&
+                  (isTrueCapitalCarteraEur ||
+                      isTrueCapitalCarteraUsd ||
+                      isTrueCapitalCarteraOtra) &&
+                  (isTrueRendCarteraEur ||
+                      isTrueRendCarteraUsd ||
+                      isTrueRendCarteraOtra))
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('VALOR', style: TextStyle(fontSize: 12)),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              if (isTrueCapitalCarteraEur)
+                                _builTextCartera(capitalCarteraEur,
+                                    divisa: 'EUR'),
+                              if (isTrueCapitalCarteraUsd)
+                                _builTextCartera(capitalCarteraUsd,
+                                    divisa: 'USD'),
+                              if (isTrueCapitalCarteraOtra)
+                                _builTextCartera(capitalCarteraOtra),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('BALANCE', style: TextStyle(fontSize: 12)),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              if (isTrueRendCarteraEur)
+                                _builTextCartera(rendimientoCarteraEur,
+                                    divisa: 'EUR', color: true),
+                              if (isTrueRendCarteraUsd)
+                                _builTextCartera(rendimientoCarteraUsd,
+                                    divisa: 'USD', color: true),
+                              if (isTrueRendCarteraOtra)
+                                _builTextCartera(rendimientoCarteraOtra,
+                                    color: true),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

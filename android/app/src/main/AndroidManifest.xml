@@ -2,8 +2,10 @@
     package="com.github.webierta.carfoin">
     
    <uses-permission android:name="android.permission.INTERNET"/>
+   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     
-   <application
+   <application        
         android:label="Carfoin"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">

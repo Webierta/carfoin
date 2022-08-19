@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 import 'models/cartera_provider.dart';
 import 'router/app_router.dart';
-//import 'routes.dart';
 
 Future main() async {
   Provider.debugCheckInvalidValueType = null;
@@ -29,7 +28,6 @@ class MyApp extends StatelessWidget {
       routeInformationProvider: router.routeInformationProvider,
       routeInformationParser: router.routeInformationParser,
       routerDelegate: router.routerDelegate,
-
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -38,24 +36,17 @@ class MyApp extends StatelessWidget {
       supportedLocales: const [Locale('es', 'ES')],
       debugShowCheckedModeBanner: false,
       title: 'Carfoin',
-      //scaffoldMessengerKey: snackbarKey,
       theme: ThemeData(
-        //brightness: Brightness.dark,
-        //primarySwatch: Colors.blue,
         primaryColor: const Color(0xFF0D47A1),
         colorScheme: ColorScheme.fromSwatch().copyWith(secondary: const Color(0xFFFFC107)),
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        //scaffoldBackgroundColor: const Color(0xFF64B5F6),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.transparent,
           elevation: 0,
           foregroundColor: Color(0xFF0D47A1),
-          //foregroundColor: Color(0xFFFFFFFF),
         ),
         cardTheme: CardTheme(
           color: const Color.fromRGBO(255, 255, 255, 0.5),
-          // 33 150 243
-          //color: const Color.fromRGBO(33, 150, 243, 0.1),
           elevation: 0.0,
           shape: RoundedRectangleBorder(
             side: BorderSide(color: Theme.of(context).colorScheme.outline),
@@ -63,8 +54,6 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      //initialRoute: '/',
-      //onGenerateRoute: RouteGenerator.generateRoute,
     );
   }
 }

@@ -2,11 +2,9 @@ class Cartera {
   final int? id;
   String name;
   List<Fondo>? fondos;
-
   Cartera({this.id, required this.name, this.fondos}) {
     fondos ??= [];
   }
-
   //List<Fondo> fondos;
   //Cartera({this.id, required this.name, this.fondos = []});
 
@@ -25,7 +23,6 @@ class Fondo {
   final String name;
   String? divisa;
   List<Valor>? valores;
-
   Fondo({required this.isin, required this.name, this.divisa, this.valores}) {
     divisa ??= '';
     valores ??= [];
@@ -41,7 +38,7 @@ class Fondo {
     return {'isin': isin, 'name': name, 'divisa': divisa};
   }
 
-  double? precioMinimo;
+  /*double? precioMinimo;
   double? precioMaximo;
   double? precioMedio;
   int? dateMinimo;
@@ -53,7 +50,7 @@ class Fondo {
   double? resultado;
   double? balance;
   double? rentabilidad;
-  double? tae;
+  double? tae;*/
 }
 
 class Valor {
@@ -62,7 +59,12 @@ class Valor {
   int? tipo;
   double? participaciones;
 
-  Valor({required this.date, required this.precio, this.tipo, this.participaciones}) {
+  Valor({
+    required this.date,
+    required this.precio,
+    this.tipo,
+    this.participaciones,
+  }) {
     tipo ??= -1;
     participaciones ??= 0;
   }
@@ -74,6 +76,11 @@ class Valor {
         participaciones = map['participaciones'];
 
   Map<String, Object?> toDb() {
-    return {'date': date, 'precio': precio, 'tipo': tipo, 'participaciones': participaciones};
+    return {
+      'date': date,
+      'precio': precio,
+      'tipo': tipo,
+      'participaciones': participaciones
+    };
   }
 }

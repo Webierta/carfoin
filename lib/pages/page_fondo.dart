@@ -6,20 +6,17 @@ import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
-//import '../routes.dart';
 import '../router/router_utils.dart';
 import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../utils/fecha_util.dart';
 import '../utils/konstantes.dart';
-import '../widgets/grafico_fondo.dart';
 import '../widgets/loading_progress.dart';
-import '../widgets/main_fondo.dart';
 import '../widgets/menus.dart';
-import '../widgets/tabla_fondo.dart';
-
-//enum MenuFondo { mercado, eliminar, exportar }
+import '../widgets/tabs/grafico_fondo.dart';
+import '../widgets/tabs/main_fondo.dart';
+import '../widgets/tabs/tabla_fondo.dart';
 
 class PageFondo extends StatefulWidget {
   const PageFondo({Key? key}) : super(key: key);
@@ -27,7 +24,8 @@ class PageFondo extends StatefulWidget {
   State<PageFondo> createState() => _PageFondoState();
 }
 
-class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMixin {
+class _PageFondoState extends State<PageFondo>
+    with SingleTickerProviderStateMixin {
   DatabaseHelper database = DatabaseHelper();
   late CarteraProvider carteraProvider;
   late Cartera carteraSelect;
@@ -43,7 +41,8 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
       fondo.valores = carteraProvider.valores;
       valoresSelect = carteraProvider.valores;
 
-      carteraProvider.operaciones = await database.getOperaciones(cartera, fondo);
+      carteraProvider.operaciones =
+          await database.getOperaciones(cartera, fondo);
       operacionesSelect = carteraProvider.operaciones;
     } catch (e) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -63,7 +62,9 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
     //operacionesSelect = [];
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      database.createTableFondo(carteraSelect, fondoSelect).whenComplete(() async {
+      database
+          .createTableFondo(carteraSelect, fondoSelect)
+          .whenComplete(() async {
         await setValores(carteraSelect, fondoSelect);
       });
     });
@@ -78,7 +79,9 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
   }
 
   SpeedDialChild _buildSpeedDialChild(BuildContext context,
-      {required IconData icono, required String label, required Function action}) {
+      {required IconData icono,
+      required String label,
+      required Function action}) {
     return SpeedDialChild(
       child: Icon(icono),
       label: label,
@@ -123,7 +126,8 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
                     ),
                     subtitle: Row(
                       children: [
-                        const Icon(Icons.business_center, color: Color(0xFF0D47A1)),
+                        const Icon(Icons.business_center,
+                            color: Color(0xFF0D47A1)),
                         const SizedBox(width: 10),
                         Flexible(
                           child: Text(
@@ -191,7 +195,8 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
                     ),
                   ),
                 ),
-                floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.endDocked,
                 floatingActionButton: SpeedDial(
                   icon: Icons.refresh,
                   foregroundColor: const Color(0xFF0D47A1),
@@ -239,7 +244,8 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
     _dialogProgress(context);
     final getDataApi = await apiService.getDataApi(fondoSelect.isin);
     if (getDataApi != null) {
-      var newValor = Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
+      var newValor =
+          Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
       fondoSelect.divisa = getDataApi.market;
       //TODO: POSIBLE ERROR SI CHOCA CON VALOR INTRODUCIDO DESDE MERCADO CON FECHA ANTERIOR
       //TODO check newvalor repetido por date ??
@@ -276,13 +282,17 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
       if (!mounted) return;
       _dialogProgress(context);
       var range = newRange as DateTimeRange;
-      String from = FechaUtil.dateToString(date: range.start, formato: 'yyyy-MM-dd');
-      String to = FechaUtil.dateToString(date: range.end, formato: 'yyyy-MM-dd');
-      final getDateApiRange = await apiService.getDataApiRange(fondoSelect.isin, to, from);
+      String from =
+          FechaUtil.dateToString(date: range.start, formato: 'yyyy-MM-dd');
+      String to =
+          FechaUtil.dateToString(date: range.end, formato: 'yyyy-MM-dd');
+      final getDateApiRange =
+          await apiService.getDataApiRange(fondoSelect.isin, to, from);
       var newListValores = <Valor>[];
       if (getDateApiRange != null) {
         for (var dataApi in getDateApiRange) {
-          newListValores.add(Valor(date: dataApi.epochSecs, precio: dataApi.price));
+          newListValores
+              .add(Valor(date: dataApi.epochSecs, precio: dataApi.price));
         }
         for (var valor in newListValores) {
           //await database.insertValor(carteraSelect, fondoSelect, valor);
@@ -312,7 +322,8 @@ class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMix
           builder: (BuildContext ctx) {
             return AlertDialog(
               title: const Text('Eliminar todo'),
-              content: const Text('Esto eliminará todos los valores almacenados del fondo.'),
+              content: const Text(
+                  'Esto eliminará todos los valores almacenados del fondo.'),
               actions: [
                 ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(),

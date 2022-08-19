@@ -2,6 +2,7 @@ import '../pages/page_input_fondo.dart';
 import '../pages/page_input_range.dart';
 import '../pages/page_search_fondo.dart';
 import 'error_screen.dart';
+import 'routes_const.dart';
 
 enum AppPage {
   home,
@@ -22,29 +23,36 @@ extension AppPageExtension on AppPage {
   String get routePath {
     switch (this) {
       case AppPage.home:
-        return '/';
+        return homePage;
       case AppPage.cartera:
-        return '/cartera';
+        return carteraPage;
       case AppPage.fondo:
-        return '/fondo';
-      case AppPage.searchFondo:
-        return 'searchFondo';
-      case AppPage.inputFondo:
-        return 'inputFondo';
-      case AppPage.inputRange:
-        return 'inputRange';
+        return fondoPage;
       case AppPage.mercado:
-        return '/mercado';
+        return mercadoPage;
       case AppPage.info:
-        return '/info';
+        return infoPage;
       case AppPage.about:
-        return '/about';
+        return aboutPage;
       case AppPage.support:
-        return '/support';
+        return supportPage;
       case AppPage.settings:
-        return '/settings';
+        return settingsPage;
       case AppPage.error:
-        return '/error';
+        return errorPage;
+      default:
+        return homePage;
+    }
+  }
+
+  String get subRoutePath {
+    switch (this) {
+      case AppPage.searchFondo:
+        return searchFondoSub;
+      case AppPage.inputFondo:
+        return inputFondoSub;
+      case AppPage.inputRange:
+        return inputRangeSub;
       default:
         return '/';
     }
@@ -59,7 +67,6 @@ extension AppPageExtension on AppPage {
       case AppPage.inputRange:
         return const PageInputRange();
       default:
-        //return const PageHome();
         return const ErrorScreen();
     }
   }

@@ -9,6 +9,8 @@ const BoxDecoration scaffoldGradient = BoxDecoration(
   ),
 );
 
+const String kVersion = '1.0.0';
+
 /*const String keyByOrderCarterasPref = 'isByOrderCarteras';
 
 const String keyConfirmDeleteCarteraPref = 'isConfirmDeleteCartera';

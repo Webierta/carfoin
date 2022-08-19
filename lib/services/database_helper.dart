@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../models/cartera.dart';
 
@@ -87,113 +87,34 @@ class DatabaseHelper {
   // TODO: comprobar si se ejecuta desde aquí sin error
   /*deleteDatabase(String dbPath) async {
     await deleteDatabase(dbPath);
+    //await db.close();
+    //await deleteDatabase(await getDatabasePath());
   }*/
-
-  /* handleError() async {
-    print('HANDLE ERROR');
-    var pixelRatio = window.devicePixelRatio;
-    var logicalScreenSize = window.physicalSize / pixelRatio;
-    var logicalHeight = logicalScreenSize.height;
-    var paddingTop = window.padding.top / window.devicePixelRatio;
-    var paddingBottom = window.padding.bottom / window.devicePixelRatio;
-    var safeHeight = logicalHeight - paddingTop - paddingBottom;
-    var screenHeightPixels = window.physicalSize.longestSide;
-    SnackBar snackBar = SnackBar(
-      action: SnackBarAction(
-        label: 'Cerrar',
-        onPressed: () async {
-          //Database db = await database;
-          //await database.close();
-          await deleteDatabase(await getDatabasePath());
-          Restart.restartApp();
-        },
-      ),
-      content: const SizedBox(
-        height: 300,
-        child: Text(
-            'Archivo corrupto. La base de datos será eliminada y la aplicación se reiniciará.'),
-      ),
-      //duration: Duration(seconds: double.infinity),
-      duration: const Duration(days: 365),
-    );
-    //snackbarKey.currentState?.showSnackBar(snackBar);
-    snackbarKey.currentState?.showMaterialBanner(MaterialBanner(
-      padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-      forceActionsBelow: true,
-      //overflowAlignment: OverflowBarAlignment.center,
-      content: SingleChildScrollView(
-        child: ListBody(
-          children: const [
-            Text('Archivo corrupto.'),
-            Text('La base de datos será eliminada y la aplicación se reiniciará.'),
-          ],
-        ),
-      ),
-      //leading: const Icon(Icons.bug_report),
-      contentTextStyle: const TextStyle(
-        fontSize: 18,
-        color: Colors.red,
-        fontStyle: FontStyle.italic,
-      ),
-      actions: [
-        TextButton(
-          onPressed: () async {
-            snackbarKey.currentState?.clearMaterialBanners();
-            //Database db = await database;
-            //await database.close();
-            await deleteDatabase(await getDatabasePath());
-            Restart.restartApp();
-          },
-          child: const Text('CERRAR'),
-        ),
-      ],
-    ));
-    /* Database db = await database;
-    await db.close();
-    await deleteDatabase(await getDatabasePath()); */
-  } */
 
   /* TABLA CARFOIN DE CARTERAS */
   Future<int> insertCartera(Cartera cartera) async {
     Database db = await database;
     return await db.insert(table, cartera.toDb());
-
-    /* try {
-      //throw Exception();
-      Database db = await database;
-      return await db.insert(table, cartera.toDb());
-    } catch (e) {
-      handleError();
-      return 0;
-    } */
   }
 
   Future<List<Cartera>> getCarteras({bool byOrder = false}) async {
     Database db = await database;
-    final List<Map<String, dynamic>> query =
-        byOrder ? await db.query(table, orderBy: '$columnNameCartera ASC') : await db.query(table);
+    final List<Map<String, dynamic>> query = byOrder
+        ? await db.query(table, orderBy: '$columnNameCartera ASC')
+        : await db.query(table);
     return query.map((e) => Cartera.fromMap(e)).toList();
-
-    /* try {
-      Database db = await database;
-      final List<Map<String, dynamic>> query = byOrder
-          ? await db.query(table, orderBy: '$columnNameCartera ASC')
-          : await db.query(table);
-      return query.map((e) => Cartera.fromMap(e)).toList();
-    } catch (e) {
-      handleError();
-      return [];
-    } */
   }
 
   Future<int> updateCartera(Cartera cartera) async {
     Database db = await database;
-    return await db.update(table, cartera.toDb(), where: '$columnId = ?', whereArgs: [cartera.id]);
+    return await db.update(table, cartera.toDb(),
+        where: '$columnId = ?', whereArgs: [cartera.id]);
   }
 
   Future<int> deleteCartera(Cartera cartera) async {
     Database db = await database;
-    return await db.delete(table, where: '$columnId = ?', whereArgs: [cartera.id]);
+    return await db
+        .delete(table, where: '$columnId = ?', whereArgs: [cartera.id]);
   }
 
   Future<int> deleteAllCarteras() async {
@@ -236,13 +157,15 @@ class DatabaseHelper {
   Future<void> updateFondo(Cartera cartera, Fondo fondo) async {
     Database db = await database;
     var nameTable = '_${cartera.id}';
-    await db.update(nameTable, fondo.toDb(), where: '$columnIsin = ?', whereArgs: [fondo.isin]);
+    await db.update(nameTable, fondo.toDb(),
+        where: '$columnIsin = ?', whereArgs: [fondo.isin]);
   }
 
   Future<void> deleteFondo(Cartera cartera, Fondo fondo) async {
     Database db = await database;
     var nameTable = '_${cartera.id}';
-    await db.delete(nameTable, where: '$columnIsin = ?', whereArgs: [fondo.isin]);
+    await db
+        .delete(nameTable, where: '$columnIsin = ?', whereArgs: [fondo.isin]);
   }
 
   Future<void> deleteAllFondos(Cartera cartera) async {
@@ -268,13 +191,15 @@ class DatabaseHelper {
   Future<void> insertValor(Cartera cartera, Fondo fondo, Valor valor) async {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
-    await db.insert(nameTable, valor.toDb(), conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert(nameTable, valor.toDb(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<Valor>> getValores(Cartera cartera, Fondo fondo) async {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
-    final List<Map<String, dynamic>> query = await db.query(nameTable, orderBy: '$columnDate DESC');
+    final List<Map<String, dynamic>> query =
+        await db.query(nameTable, orderBy: '$columnDate DESC');
     return query.map((e) => Valor.fromMap(e)).toList();
   }
 
@@ -282,7 +207,9 @@ class DatabaseHelper {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
     final List<Map<String, dynamic>> query = await db.query(nameTable,
-        orderBy: '$columnDate ASC', where: '$columnTipoOperacion IN (?, ?)', whereArgs: [1, 0]);
+        orderBy: '$columnDate ASC',
+        where: '$columnTipoOperacion IN (?, ?)',
+        whereArgs: [1, 0]);
     return query.map((e) => Valor.fromMap(e)).toList();
   }
 
@@ -297,13 +224,16 @@ class DatabaseHelper {
   Future<void> updateValor(Cartera cartera, Fondo fondo, Valor valor) async {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
-    await db.update(nameTable, valor.toDb(), where: '$columnDate = ?', whereArgs: [valor.date]);
+    await db.update(nameTable, valor.toDb(),
+        where: '$columnDate = ?', whereArgs: [valor.date]);
   }
 
-  Future<Valor?> getValorByDate(Cartera cartera, Fondo fondo, Valor valor) async {
+  Future<Valor?> getValorByDate(
+      Cartera cartera, Fondo fondo, Valor valor) async {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
-    var query = await db.query(nameTable, where: '$columnDate = ?', whereArgs: [valor.date]);
+    var query = await db
+        .query(nameTable, where: '$columnDate = ?', whereArgs: [valor.date]);
     var value = query.map((e) => Valor.fromMap(e)).toList();
     if (value.isNotEmpty) {
       return value.first;
@@ -312,7 +242,8 @@ class DatabaseHelper {
     }
   }
 
-  Future<void> updateOperacion(Cartera cartera, Fondo fondo, Valor valor) async {
+  Future<void> updateOperacion(
+      Cartera cartera, Fondo fondo, Valor valor) async {
     //Database db = await database;
     //var nameTable = '_${cartera.id}${fondo.isin}';
     Valor? existeValor = await getValorByDate(cartera, fondo, valor);
@@ -335,7 +266,8 @@ class DatabaseHelper {
   Future<void> deleteValor(Cartera cartera, Fondo fondo, Valor valor) async {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
-    await db.delete(nameTable, where: '$columnDate = ?', whereArgs: [valor.date]);
+    await db
+        .delete(nameTable, where: '$columnDate = ?', whereArgs: [valor.date]);
   }
 
   Future<void> deleteValorByDate(Cartera cartera, Fondo fondo, int date) async {
@@ -354,23 +286,29 @@ class DatabaseHelper {
     if (op.tipo == 1) {
       await deleteAllOperacionesPosteriores(cartera, fondo, op);
     }
-    Valor newValor = Valor(date: op.date, precio: op.precio, tipo: null, participaciones: null);
+    Valor newValor = Valor(
+        date: op.date, precio: op.precio, tipo: null, participaciones: null);
     await updateValor(cartera, fondo, newValor);
   }
 
   Future<void> deleteAllOperaciones(Cartera cartera, Fondo fondo) async {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
-    await db.delete(nameTable, where: '$columnTipoOperacion IN (?, ?)', whereArgs: [1, 0]);
+    await db.delete(nameTable,
+        where: '$columnTipoOperacion IN (?, ?)', whereArgs: [1, 0]);
   }
 
-  Future<void> deleteAllOperacionesPosteriores(Cartera cartera, Fondo fondo, Valor op) async {
+  Future<void> deleteAllOperacionesPosteriores(
+      Cartera cartera, Fondo fondo, Valor op) async {
     List<Valor> operaciones = await getOperaciones(cartera, fondo);
     if (operaciones.isNotEmpty) {
       for (var ope in operaciones) {
         if (ope.date > op.date) {
-          Valor newValor =
-              Valor(date: ope.date, precio: ope.precio, tipo: null, participaciones: null);
+          Valor newValor = Valor(
+              date: ope.date,
+              precio: ope.precio,
+              tipo: null,
+              participaciones: null);
           await updateValor(cartera, fondo, newValor);
         }
       }

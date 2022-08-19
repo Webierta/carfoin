@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+//import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../models/cartera.dart';
-import '../models/cartera_provider.dart';
-//import '../routes.dart';
-import '../router/routes_const.dart';
-import '../services/database_helper.dart';
-import '../services/preferences_service.dart';
-import '../utils/fecha_util.dart';
-import '../utils/stats.dart';
-import 'hoja_calendario.dart';
-//import 'hoja_calendario.dart';
+import '../../models/cartera.dart';
+import '../../models/cartera_provider.dart';
+import '../../router/routes_const.dart';
+import '../../services/database_helper.dart';
+import '../../services/preferences_service.dart';
+import '../../utils/fecha_util.dart';
+import '../../utils/number_util.dart';
+import '../../utils/stats.dart';
+import '../hoja_calendario.dart';
 
 class MainFondo extends StatefulWidget {
   const MainFondo({Key? key}) : super(key: key);
@@ -28,7 +27,6 @@ class _MainFondoState extends State<MainFondo> {
   late List<Valor> valoresSelect;
   late List<Valor> operacionesSelect;
   bool _isConfirmDelete = true;
-
   late Stats stats;
 
   getSharedPrefs() async {
@@ -74,7 +72,8 @@ class _MainFondoState extends State<MainFondo> {
     //final carteraSelect = carteraProvider.carteraSelect;
     //final fondoSelect = carteraProvider.fondoSelect;
     final List<Valor> valores = context.watch<CarteraProvider>().valores;
-    final List<Valor> operaciones = context.watch<CarteraProvider>().operaciones;
+    final List<Valor> operaciones =
+        context.watch<CarteraProvider>().operaciones;
 
     /*int dia = 0;
     String mesYear = '';
@@ -145,26 +144,38 @@ class _MainFondoState extends State<MainFondo> {
           DataRow(cells: [
             DataCell(Align(
               alignment: Alignment.centerRight,
-              child: Text(FechaUtil.epochToString(op.date, formato: 'dd/MM/yy')),
+              child:
+                  Text(FechaUtil.epochToString(op.date, formato: 'dd/MM/yy')),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
-                NumberFormat.decimalPattern('es')
-                    .format(op.tipo == 1 ? op.participaciones : (op.participaciones ?? 0) * -1),
+                /*NumberFormat.decimalPattern('es').format(op.tipo == 1
+                    ? op.participaciones
+                    : (op.participaciones ?? 0) * -1),*/
+                op.tipo == 1
+                    ? NumberUtil.decimal(op.participaciones ?? 0, long: false)
+                    : NumberUtil.decimal((op.participaciones ?? 0) * -1,
+                        long: false),
                 style: TextStyle(
-                  color: op.tipo == 1 ? const Color(0xFF4CAF50) : const Color(0xFFF44336),
+                  color: op.tipo == 1
+                      ? const Color(0xFF4CAF50)
+                      : const Color(0xFFF44336),
                 ),
               ),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
-              child: Text(NumberFormat.decimalPattern('es').format(op.precio)),
+              //child: Text(NumberFormat.decimalPattern('es').format(op.precio)),
+              child: Text(NumberUtil.decimal(op.precio)),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
-              child: Text(NumberFormat.decimalPattern('es').format(
-                  double.parse(((op.participaciones ?? 0) * op.precio).toStringAsFixed(2)))),
+              /*child: Text(NumberFormat.decimalPattern('es').format(double.parse(
+                  ((op.participaciones ?? 0) * op.precio).toStringAsFixed(2)))),*/
+              child: Text(NumberUtil.decimalFixed(
+                  (op.participaciones ?? 0) * op.precio,
+                  long: false)),
             )),
             DataCell(IconButton(
               onPressed: () async {
@@ -193,35 +204,44 @@ class _MainFondoState extends State<MainFondo> {
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
-                FechaUtil.epochToString(valores.first.date, formato: 'dd/MM/yy'),
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                FechaUtil.epochToString(valores.first.date,
+                    formato: 'dd/MM/yy'),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
               ),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
                 stats.totalParticipaciones() != null
-                    ? NumberFormat.decimalPattern('es')
-                        .format(double.parse(stats.totalParticipaciones()!.toStringAsFixed(2)))
+                    /*? NumberFormat.decimalPattern('es').format(double.parse(
+                        stats.totalParticipaciones()!.toStringAsFixed(2)))*/
+                    ? NumberUtil.decimalFixed(stats.totalParticipaciones()!,
+                        long: false)
                     : '',
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
               ),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
-                NumberFormat.decimalPattern('es').format(valores.first.precio),
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                //NumberFormat.decimalPattern('es').format(valores.first.precio),
+                NumberUtil.decimal(valores.first.precio),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
               ),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
                 stats.resultado() != null
-                    ? NumberFormat.decimalPattern('es')
-                        .format(double.parse(stats.resultado()!.toStringAsFixed(2)))
+                    /*? NumberFormat.decimalPattern('es').format(
+                        double.parse(stats.resultado()!.toStringAsFixed(2)))*/
+                    ? NumberUtil.decimalFixed(stats.resultado()!, long: false)
                     : '',
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
               ),
             )),
             const DataCell(Text('')),
@@ -230,9 +250,10 @@ class _MainFondoState extends State<MainFondo> {
       ];
     }
 
-    String fechaPrecioMin() {
+    /*String fechaPrecioMin() {
       if (stats.datePrecioMinimo() != null) {
-        return FechaUtil.epochToString(stats.datePrecioMinimo()!, formato: 'dd/MM/yy');
+        return FechaUtil.epochToString(stats.datePrecioMinimo()!,
+            formato: 'dd/MM/yy');
       }
       return '';
     }
@@ -240,10 +261,11 @@ class _MainFondoState extends State<MainFondo> {
     String fechaPrecioMax() {
       int? x = stats.datePrecioMaximo();
       if (stats.datePrecioMaximo() != null) {
-        return FechaUtil.epochToString(stats.datePrecioMaximo()!, formato: 'dd/MM/yy');
+        return FechaUtil.epochToString(stats.datePrecioMaximo()!,
+            formato: 'dd/MM/yy');
       }
       return '';
-    }
+    }*/
 
     String fechaPrecio(int? precio) {
       if (precio != null) {
@@ -262,7 +284,8 @@ class _MainFondoState extends State<MainFondo> {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.assessment, size: 32, color: Color(0xFF2196F3)),
+                  leading: const Icon(Icons.assessment,
+                      size: 32, color: Color(0xFF2196F3)),
                   title: Text(
                     fondoSelect.name,
                     overflow: TextOverflow.ellipsis,
@@ -285,7 +308,8 @@ class _MainFondoState extends State<MainFondo> {
                     ? const Text(
                         'Sin datos. Descarga el último valor o un intervalo de valores históricos.')
                     : Padding(
-                        padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+                        padding: const EdgeInsets.only(
+                            left: 12, right: 12, bottom: 12),
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
@@ -301,7 +325,8 @@ class _MainFondoState extends State<MainFondo> {
                                     DiaCalendario(epoch: valores.first.date),
                                     const Spacer(),
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
                                       children: [
                                         Text(
                                           'V.L. ${valores.first.precio} ${fondoSelect.divisa}',
@@ -312,53 +337,28 @@ class _MainFondoState extends State<MainFondo> {
                                           ),
                                         ),
                                         if (_getDiferencia() != null)
-                                          Text(_getDiferencia()!.toStringAsFixed(2),
+                                          Text(
+                                              _getDiferencia()!
+                                                  .toStringAsFixed(2),
                                               style: TextStyle(
                                                 //fontSize: 16,
                                                 color: _getDiferencia()! < 0
                                                     ? const Color(0xFFF44336)
                                                     : const Color(0xFF4CAF50),
                                               )),
-                                        //const Spacer(),
-                                        /*(stats.resultado() != null && stats.resultado() != 0)
-                                            ? Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 10),
-                                                decoration: BoxDecoration(
-                                                  color: const Color(0xFF2196F3),
-                                                  shape: BoxShape.rectangle,
-                                                  borderRadius: BorderRadius.circular(12),
-                                                ),
-                                                child: Row(
-                                                  children: [
-                                                    const Icon(
-                                                      Icons.savings,
-                                                      color: Color(0xFFFFFFFF),
-                                                    ),
-                                                    const SizedBox(width: 10),
-                                                    Text(
-                                                      '${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} ${fondoSelect.divisa}',
-                                                      style: const TextStyle(
-                                                        //color: Color(0xFF0D47A1),
-                                                        color: Color(0xFFFFFFFF),
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              )
-                                            : const Text('Sin inversiones'),*/
                                       ],
                                     ),
                                   ],
                                 ),
                               ),
-                              if (valores.isNotEmpty) const SizedBox(height: 10),
+                              if (valores.isNotEmpty)
+                                const SizedBox(height: 10),
                               if (valores.length > 1)
                                 Row(
                                   children: [
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                             'Mínimo  \t\t (${fechaPrecio(stats.datePrecioMinimo())})'),
@@ -370,19 +370,32 @@ class _MainFondoState extends State<MainFondo> {
                                     ),
                                     const Spacer(),
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
                                       children: [
-                                        Text(NumberFormat.decimalPattern('es')
-                                            .format(stats.precioMinimo())),
-                                        Text(NumberFormat.decimalPattern('es')
-                                            .format(stats.precioMaximo())),
+                                        /*Text(NumberFormat.decimalPattern('es')
+                                            .format(stats.precioMinimo())),*/
+                                        Text(NumberUtil.decimal(
+                                            stats.precioMinimo() ?? 0)),
+                                        /*Text(NumberFormat.decimalPattern('es')
+                                            .format(stats.precioMaximo())),*/
+                                        Text(NumberUtil.decimal(
+                                            stats.precioMaximo() ?? 0)),
                                         Text(stats.precioMedio() != null
-                                            ? NumberFormat.decimalPattern('es').format(double.parse(
-                                                stats.precioMedio()!.toStringAsFixed(2)))
+                                            /*? NumberFormat.decimalPattern('es')
+                                                .format(double.parse(stats
+                                                    .precioMedio()!
+                                                    .toStringAsFixed(2)))*/
+                                            ? NumberUtil.decimalFixed(
+                                                stats.precioMedio()!)
                                             : ''),
                                         Text(stats.volatilidad() != null
-                                            ? NumberFormat.decimalPattern('es').format(double.parse(
-                                                stats.volatilidad()!.toStringAsFixed(2)))
+                                            /*? NumberFormat.decimalPattern('es')
+                                                .format(double.parse(stats
+                                                    .volatilidad()!
+                                                    .toStringAsFixed(2)))*/
+                                            ? NumberUtil.decimalFixed(
+                                                stats.volatilidad()!)
                                             : ''),
                                       ],
                                     ),
@@ -404,7 +417,8 @@ class _MainFondoState extends State<MainFondo> {
               children: [
                 ListTile(
                   contentPadding: const EdgeInsets.all(12),
-                  leading: const Icon(Icons.compare_arrows, size: 32, color: Color(0xFF2196F3)),
+                  leading: const Icon(Icons.compare_arrows,
+                      size: 32, color: Color(0xFF2196F3)),
                   /*title: FittedBox(
                     child: Text('OPERACIONES', style: Theme.of(context).textTheme.titleLarge),
                   ),*/
@@ -424,7 +438,8 @@ class _MainFondoState extends State<MainFondo> {
                     child: CircleAvatar(
                       backgroundColor: const Color(0xFFFFC107),
                       child: IconButton(
-                        icon: const Icon(Icons.shopping_cart, color: Color(0xFF0D47A1)),
+                        icon: const Icon(Icons.shopping_cart,
+                            color: Color(0xFF0D47A1)),
                         onPressed: () =>
                             //Navigator.of(context).pushNamed(RouteGenerator.mercadoPage),
                             context.go(mercadoPage),
@@ -442,21 +457,23 @@ class _MainFondoState extends State<MainFondo> {
                             fit: BoxFit.fill,
                             child: DataTable(
                               decoration: BoxDecoration(
-                                border: Border.all(color: Colors.blue, width: 2),
+                                border:
+                                    Border.all(color: Colors.blue, width: 2),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               //headingRowHeight: 0,
                               columnSpacing: 20,
                               dataRowHeight: 70,
                               //horizontalMargin: 10,
-                              headingRowColor:
-                                  MaterialStateColor.resolveWith((states) => Colors.blue),
+                              headingRowColor: MaterialStateColor.resolveWith(
+                                  (states) => Colors.blue),
                               headingTextStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
-                              dataTextStyle: const TextStyle(fontSize: 18, color: Colors.black),
+                              dataTextStyle: const TextStyle(
+                                  fontSize: 18, color: Colors.black),
                               columns: _createColumns(),
                               rows: _createRows(),
                             ),
@@ -514,66 +531,116 @@ class _MainFondoState extends State<MainFondo> {
                         children: [
                           Row(
                             children: [
-                              const Text('Inversión', style: TextStyle(fontSize: 16)),
-                              const Spacer(),
-                              Text(
-                                stats.inversion() != null
-                                    ? NumberFormat.decimalPattern('es')
-                                        .format(double.parse(stats.inversion()!.toStringAsFixed(2)))
-                                    : '',
-                                style: const TextStyle(fontSize: 16),
+                              const Text('Inversión',
+                                  style: TextStyle(fontSize: 16)),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      stats.inversion() != null
+                                          /*? NumberFormat.decimalPattern('es')
+                                              .format(double.parse(stats
+                                                  .inversion()!
+                                                  .toStringAsFixed(2)))*/
+                                          ? NumberUtil.decimalFixed(
+                                              stats.inversion()!)
+                                          : '',
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 10),
                           Row(
                             children: [
-                              const Text('Resultado', style: TextStyle(fontSize: 16)),
-                              const Spacer(),
-                              Text(
-                                stats.resultado() != null
-                                    ? NumberFormat.decimalPattern('es')
-                                        .format(double.parse(stats.resultado()!.toStringAsFixed(2)))
-                                    : '',
-                                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                              const Text('Resultado',
+                                  style: TextStyle(fontSize: 16)),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      stats.resultado() != null
+                                          /*? NumberFormat.decimalPattern('es')
+                                              .format(double.parse(stats
+                                                  .resultado()!
+                                                  .toStringAsFixed(2)))*/
+                                          /*? NumberFormat.compactLong(
+                                                  locale: 'es')
+                                              .format(double.parse(stats
+                                                  .resultado()!
+                                                  .toStringAsFixed(2)))*/
+                                          ? NumberUtil.decimalFixed(
+                                              stats.resultado()!)
+                                          : '',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 16),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 10),
                           Row(
                             children: [
-                              const Text('Rendimiento', style: TextStyle(fontSize: 16)),
-                              const Spacer(),
-                              Text(
-                                stats.balance() != null
-                                    ? NumberFormat.decimalPattern('es')
-                                        .format(double.parse(stats.balance()!.toStringAsFixed(2)))
-                                    : '',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w900,
-                                  color: fondoSelect.balance != null && fondoSelect.balance! < 0
-                                      ? Colors.red
-                                      : Colors.green,
-                                  fontSize: 16,
+                              const Text('Rendimiento',
+                                  style: TextStyle(fontSize: 16)),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      stats.balance() != null
+                                          /*? NumberFormat.decimalPattern('es')
+                                              .format(double.parse(stats
+                                                  .balance()!
+                                                  .toStringAsFixed(2)))*/
+                                          ? NumberUtil.decimalFixed(
+                                              stats.balance()!)
+                                          : '',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        color: stats.balance() != null &&
+                                                stats.balance()! < 0
+                                            ? Colors.red
+                                            : Colors.green,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               )
                             ],
                           ),
                           const SizedBox(height: 10),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('Rentabilidad', style: TextStyle(fontSize: 16)),
-                              const Spacer(),
+                              const Text('Rentabilidad',
+                                  style: TextStyle(fontSize: 16)),
+                              //const Spacer(),
                               Text(
                                 stats.rentabilidad() != null
-                                    ? NumberFormat.decimalPercentPattern(
+                                    /*? NumberFormat.decimalPercentPattern(
                                         locale: 'es',
                                         decimalDigits: 2,
-                                      ).format(stats.rentabilidad())
+                                      ).format(stats.rentabilidad())*/
+                                    ? NumberUtil.percent(stats.rentabilidad()!)
                                     : '',
                                 style: TextStyle(
-                                  color: fondoSelect.rentabilidad != null &&
-                                          fondoSelect.rentabilidad! < 0
+                                  color: stats.rentabilidad() != null &&
+                                          stats.rentabilidad()! < 0
                                       ? Colors.red
                                       : Colors.green,
                                   fontSize: 16,
@@ -583,18 +650,20 @@ class _MainFondoState extends State<MainFondo> {
                           ),
                           const SizedBox(height: 10),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('TAE', style: TextStyle(fontSize: 16)),
-                              const Spacer(),
+                              //const Spacer(),
                               Text(
                                 stats.tae() != null
-                                    ? NumberFormat.decimalPercentPattern(
+                                    /*? NumberFormat.decimalPercentPattern(
                                         locale: 'es',
                                         decimalDigits: 2,
-                                      ).format(stats.tae())
+                                      ).format(stats.tae())*/
+                                    ? NumberUtil.percent(stats.tae()!)
                                     : '',
                                 style: TextStyle(
-                                  color: fondoSelect.tae != null && fondoSelect.tae! < 0
+                                  color: stats.tae() != null && stats.tae()! < 0
                                       ? Colors.red
                                       : Colors.green,
                                   fontSize: 16,

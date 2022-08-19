@@ -2,8 +2,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/cartera_provider.dart';
-import '../utils/fecha_util.dart';
+import '../../models/cartera_provider.dart';
+import '../../utils/fecha_util.dart';
 
 class GraficoFondo extends StatelessWidget {
   const GraficoFondo({Key? key}) : super(key: key);
@@ -35,7 +35,8 @@ class GraficoFondo extends StatelessWidget {
 
     var mapData = {for (var valor in valores) valor.date: valor.precio};
     final spots = <FlSpot>[
-      for (final entry in mapData.entries) FlSpot(entry.key.toDouble(), entry.value)
+      for (final entry in mapData.entries)
+        FlSpot(entry.key.toDouble(), entry.value)
     ];
 
     final lineChartData = LineChartData(
@@ -61,15 +62,18 @@ class GraficoFondo extends StatelessWidget {
           getTooltipItems: (touchedSpots) {
             return touchedSpots.map((LineBarSpot touchedSpot) {
               var epoch = touchedSpot.x.toInt();
-              DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
+              DateTime dateTime =
+                  DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
               //var fecha = DateFormat('d/MM/yy').format(dateTime);
               var fecha = FechaUtil.dateToString(date: dateTime);
               final textStyle = TextStyle(
-                color: touchedSpot.bar.gradient?.colors[0] ?? touchedSpot.bar.color,
+                color: touchedSpot.bar.gradient?.colors[0] ??
+                    touchedSpot.bar.color,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               );
-              return LineTooltipItem('${touchedSpot.y.toStringAsFixed(2)}\n$fecha', textStyle);
+              return LineTooltipItem(
+                  '${touchedSpot.y.toStringAsFixed(2)}\n$fecha', textStyle);
             }).toList();
           },
         ),
@@ -114,7 +118,8 @@ class GraficoFondo extends StatelessWidget {
             //interval: ((epochMax - epochMin) / spots.length) * 10,
             //interval: 1650057221 / spots.length,
             //TODO: REVISAR INTERVALO OPTIMO
-            interval: (epochMax - epochMin) > 2592000 ? 22592000 : 2592000, // 1 mes
+            interval:
+                (epochMax - epochMin) > 2592000 ? 22592000 : 2592000, // 1 mes
             //interval: (spots.last.x - spots.first.x),
             //interval: fechas.length / 2,
             getTitlesWidget: (double value, TitleMeta meta) {
@@ -129,7 +134,8 @@ class GraficoFondo extends StatelessWidget {
               }*/
               //return Text(DateFormat.MMMd().format(dateTime));
               //return Text(DateFormat.yMMM('es').format(dateTime));
-              return Text(FechaUtil.dateToString(date: dateTime, formato: 'yMMM'));
+              return Text(
+                  FechaUtil.dateToString(date: dateTime, formato: 'yMMM'));
             },
           ),
         ),
@@ -151,7 +157,8 @@ class GraficoFondo extends StatelessWidget {
                   ..style = PaintingStyle.stroke,
               ),
               alignment: Alignment.topRight,
-              labelResolver: (line) => 'Media: ${precioMedio.toStringAsFixed(2)}',
+              labelResolver: (line) =>
+                  'Media: ${precioMedio.toStringAsFixed(2)}',
             ),
           ),
           HorizontalLine(
@@ -168,7 +175,8 @@ class GraficoFondo extends StatelessWidget {
                   ..style = PaintingStyle.stroke,
               ),
               alignment: Alignment.topRight,
-              labelResolver: (line) => 'Máx: ${precioMax.toStringAsFixed(2)} - ${fechaMax ?? ''}',
+              labelResolver: (line) =>
+                  'Máx: ${precioMax.toStringAsFixed(2)} - ${fechaMax ?? ''}',
             ),
           ),
           HorizontalLine(
@@ -185,7 +193,8 @@ class GraficoFondo extends StatelessWidget {
                   ..style = PaintingStyle.stroke,
               ),
               alignment: Alignment.topRight,
-              labelResolver: (line) => 'Mín: ${precioMin.toStringAsFixed(2)} - ${fechaMin ?? ''}',
+              labelResolver: (line) =>
+                  'Mín: ${precioMin.toStringAsFixed(2)} - ${fechaMin ?? ''}',
             ),
           ),
         ],

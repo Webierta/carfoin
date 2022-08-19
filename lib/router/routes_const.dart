@@ -10,3 +10,7 @@ const String aboutPage = '/about';
 const String supportPage = '/support';
 const String settingsPage = '/settings';
 const String errorPage = '/error';
+
+const String searchFondoSub = 'searchFondo';
+const String inputFondoSub = 'inputFondo';
+const String inputRangeSub = 'inputRange';
