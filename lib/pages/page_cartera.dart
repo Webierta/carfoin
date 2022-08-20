@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
-//import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
@@ -37,7 +36,7 @@ class _PageCarteraState extends State<PageCartera> {
   final GlobalKey _dialogKey = GlobalKey();
   String _loadingText = '';
 
-  late Stats stats;
+  //late Stats stats;
 
   getSharedPrefs() async {
     bool? isFondosByOrder;
@@ -124,317 +123,311 @@ class _PageCarteraState extends State<PageCartera> {
     return FutureBuilder(
       future: database.getFondos(carteraSelect, byOrder: _isFondosByOrder),
       builder: (BuildContext context, AsyncSnapshot<List<Fondo>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return WillPopScope(
-            onWillPop: () async => false,
-            child: Container(
-              decoration: scaffoldGradient,
-              child: Scaffold(
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const LoadingProgress(titulo: 'Actualizando fondos...');
+        }
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: Container(
+            decoration: scaffoldGradient,
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: AppBar(
                 backgroundColor: Colors.transparent,
-                appBar: AppBar(
-                  backgroundColor: Colors.transparent,
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                      //Navigator.of(context).pushNamed(RouteGenerator.homePage);
-                      context.go(homePage);
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                    context.go(homePage);
+                  },
+                ),
+                title: Row(
+                  children: [
+                    const Icon(Icons.business_center),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Text(
+                        carteraSelect.name,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
+                ),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: () async => await _dialogUpdateAll(context),
+                  ),
+                  PopupMenuButton(
+                    color: const Color(0xFF2196F3),
+                    offset: Offset(0.0, AppBar().preferredSize.height),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                    ),
+                    itemBuilder: (ctx) => [
+                      buildMenuItem(MenuCartera.ordenar, Icons.sort_by_alpha,
+                          isOrder: _isFondosByOrder),
+                      buildMenuItem(MenuCartera.eliminar, Icons.delete_forever)
+                    ],
+                    onSelected: (item) async {
+                      if (item == MenuCartera.ordenar) {
+                        _ordenarFondos();
+                      } else if (item == MenuCartera.eliminar) {
+                        _deleteAllConfirm(context);
+                      }
                     },
                   ),
-                  title: Row(
-                    children: [
-                      const Icon(Icons.business_center),
-                      const SizedBox(width: 10),
-                      Flexible(
-                        child: Text(carteraSelect.name,
-                            overflow: TextOverflow.ellipsis, maxLines: 1),
-                      ),
-                    ],
+                ],
+              ),
+              floatingActionButton: SpeedDial(
+                icon: Icons.addchart,
+                foregroundColor: const Color(0xFF0D47A1),
+                backgroundColor: const Color(0xFFFFC107),
+                spacing: 8,
+                spaceBetweenChildren: 4,
+                overlayColor: const Color(0xFF9E9E9E),
+                overlayOpacity: 0.4,
+                children: [
+                  _buildSpeedDialChild(
+                    context,
+                    icono: Icons.search,
+                    label: 'Buscar online por ISIN',
+                    page: AppPage.inputFondo,
                   ),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.refresh),
-                      onPressed: () async {
-                        await _dialogUpdateAll(context);
-                      },
-                    ),
-                    PopupMenuButton(
-                      color: const Color(0xFF2196F3),
-                      offset: Offset(0.0, AppBar().preferredSize.height),
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                      ),
-                      itemBuilder: (ctx) => [
-                        //_buildMenuItem(MenuCartera.ordenar, Icons.sort_by_alpha),
-                        //_buildMenuItem(MenuCartera.eliminar, Icons.delete_forever)
-                        buildMenuItem(MenuCartera.ordenar, Icons.sort_by_alpha,
-                            isOrder: _isFondosByOrder),
-                        buildMenuItem(
-                            MenuCartera.eliminar, Icons.delete_forever)
-                      ],
-                      onSelected: (item) async {
-                        if (item == MenuCartera.ordenar) {
-                          _ordenarFondos();
-                        } else if (item == MenuCartera.eliminar) {
-                          _deleteAllConfirm(context);
+                  _buildSpeedDialChild(
+                    context,
+                    icono: Icons.storage,
+                    label: 'Base de Datos local',
+                    page: AppPage.searchFondo,
+                  ),
+                ],
+              ),
+              body: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Consumer<CarteraProvider>(
+                  builder: (context, data, child) {
+                    if (data.fondos.isEmpty) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
+                            'Añade fondos a esta cartera',
+                            style: TextStyle(
+                                color: Color(0xFFFFFFFF), fontSize: 22),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      );
+                    }
+                    return ListView.builder(
+                      itemCount: data.fondos.length,
+                      itemBuilder: (context, index) {
+                        Fondo fondo = data.fondos[index];
+                        return DataCartera(
+                          fondo: fondo,
+                          removeFondo: _removeFondo,
+                          goFondo: _goFondo,
+                        );
+
+                        /*
+                        /// START WIDGET
+
+                        //List<Valor> valores = await database.getValores(carteraSelect, fondo);
+                        //final valores = context.read<CarteraProvider>().valores;
+                        List<Valor>? valores = data.fondos[index].valores;
+                        String lastDate = '';
+                        int dia = 0;
+                        String mesYear = '';
+                        String lastPrecio = '';
+                        String divisa = fondo.divisa ?? '';
+                        double? diferencia;
+                        if (valores != null && valores.isNotEmpty) {
+                          int lastEpoch = valores.first.date;
+                          lastDate = FechaUtil.epochToString(lastEpoch);
+                          dia = FechaUtil.epochToDate(lastEpoch).day;
+                          //mes = FechaUtil.epochToDate(lastEpoch).month;
+                          //ano = FechaUtil.epochToDate(lastEpoch).year;
+                          mesYear = FechaUtil.epochToString(lastEpoch,
+                              formato: 'MMM yy');
+                          //lastPrecio = NumberFormat.decimalPattern('es').format(valores.first.precio);
+                          lastPrecio = NumberUtil.decimal(valores.first.precio);
+                          if (valores.length > 1) {
+                            diferencia =
+                                valores.first.precio - valores[1].precio;
+                          }
+                          stats = Stats(valores);
                         }
-                      },
-                    ),
-                  ],
-                ),
-                floatingActionButton: SpeedDial(
-                  icon: Icons.addchart,
-                  foregroundColor: const Color(0xFF0D47A1),
-                  backgroundColor: const Color(0xFFFFC107),
-                  spacing: 8,
-                  spaceBetweenChildren: 4,
-                  overlayColor: const Color(0xFF9E9E9E),
-                  overlayOpacity: 0.4,
-                  children: [
-                    _buildSpeedDialChild(
-                      context,
-                      icono: Icons.search,
-                      label: 'Buscar online por ISIN',
-                      page: AppPage.inputFondo,
-                    ),
-                    _buildSpeedDialChild(
-                      context,
-                      icono: Icons.storage,
-                      label: 'Base de Datos local',
-                      page: AppPage.searchFondo,
-                    ),
-                  ],
-                ),
-                body: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Consumer<CarteraProvider>(
-                    builder: (context, data, child) {
-                      if (data.fondos.isEmpty) {
-                        return const Center(
+                        // TODO: refactor widget DISMISSIBLE
+                        return Dismissible(
+                          key: UniqueKey(),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            color: const Color(0xFFF44336),
+                            margin: const EdgeInsets.symmetric(horizontal: 15),
+                            alignment: Alignment.centerRight,
+                            child: const Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child:
+                                  Icon(Icons.delete, color: Color(0xFFFFFFFF)),
+                            ),
+                          ),
+                          onDismissed: (_) async => await _removeFondo(fondo),
                           child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
-                            child: Text(
-                              'Añade fondos a esta cartera',
-                              style: TextStyle(
-                                  color: Color(0xFFFFFFFF), fontSize: 22),
-                              textAlign: TextAlign.center,
+                            padding: const EdgeInsets.all(12.0),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: const Color.fromRGBO(255, 255, 255, 0.5),
+                                border:
+                                    Border.all(color: Colors.white, width: 2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    leading: CircleAvatar(
+                                      radius: 22,
+                                      backgroundColor: const Color(0xFFFFFFFF),
+                                      child: CircleAvatar(
+                                        backgroundColor:
+                                            const Color(0xFFFFC107),
+                                        child: IconButton(
+                                          onPressed: () =>
+                                              _goFondo(context, fondo),
+                                          icon: const Icon(
+                                            Icons.poll,
+                                            color: Color(0xFF0D47A1),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    title: Text(
+                                      fondo.name,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Color(0xFF2196F3),
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      fondo.isin,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Color(0xFF0D47A1),
+                                      ),
+                                    ),
+                                    //trailing: const Icon(Icons.more_vert),
+                                  ),
+                                  if (valores != null && valores.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFBBDEFB),
+                                          border: Border.all(
+                                              color: Colors.white, width: 2),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: IntrinsicHeight(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              //mainAxisAlignment: MainAxisAlignment.start,
+                                              //crossAxisAlignment: CrossAxisAlignment.start,
+                                              DiaCalendario(
+                                                  epoch: valores.first.date),
+                                              //const Spacer(),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    //const Spacer(),
+                                                    Text(
+                                                      'V.L. $lastPrecio $divisa',
+                                                      style: const TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            Color(0xFF0D47A1),
+                                                      ),
+                                                    ),
+                                                    if (diferencia != null)
+                                                      Text(
+                                                        diferencia
+                                                            .toStringAsFixed(2),
+                                                        style: TextStyle(
+                                                          color: diferencia < 0
+                                                              ? const Color(
+                                                                  0xFFF44336)
+                                                              : const Color(
+                                                                  0xFF4CAF50),
+                                                        ),
+                                                      ),
+                                                    //const Spacer(),
+                                                    (stats.resultado() !=
+                                                                null &&
+                                                            stats.resultado() !=
+                                                                0)
+                                                        ? FittedBox(
+                                                            fit: BoxFit
+                                                                .scaleDown,
+                                                            child: Text(
+                                                              'Capital: ${NumberUtil.decimalFixed(stats.resultado()!)} $divisa',
+                                                              style:
+                                                                  const TextStyle(
+                                                                color: Color(
+                                                                    0xFF0D47A1),
+                                                                //fontSize: 14
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : const Text(
+                                                            'Sin inversiones'),
+                                                    //const Spacer(),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
                           ),
                         );
-                      }
-                      return ListView.builder(
-                        itemCount: data.fondos.length,
-                        itemBuilder: (context, index) {
-                          Fondo fondo = data.fondos[index];
-                          //List<Valor> valores = await database.getValores(carteraSelect, fondo);
-                          //final valores = context.read<CarteraProvider>().valores;
-                          List<Valor>? valores = data.fondos[index].valores;
-                          String lastDate = '';
-                          int dia = 0;
-                          String mesYear = '';
-                          String lastPrecio = '';
-                          String divisa = fondo.divisa ?? '';
-                          double? diferencia;
-                          if (valores != null && valores.isNotEmpty) {
-                            int lastEpoch = valores.first.date;
-                            lastDate = FechaUtil.epochToString(lastEpoch);
-                            dia = FechaUtil.epochToDate(lastEpoch).day;
-                            //mes = FechaUtil.epochToDate(lastEpoch).month;
-                            //ano = FechaUtil.epochToDate(lastEpoch).year;
-                            mesYear = FechaUtil.epochToString(lastEpoch,
-                                formato: 'MMM yy');
-                            //lastPrecio = NumberFormat.decimalPattern('es').format(valores.first.precio);
-                            lastPrecio =
-                                NumberUtil.decimal(valores.first.precio);
-                            if (valores.length > 1) {
-                              diferencia =
-                                  valores.first.precio - valores[1].precio;
-                            }
-                            stats = Stats(valores);
-                          }
-                          return Dismissible(
-                            key: UniqueKey(),
-                            direction: DismissDirection.endToStart,
-                            background: Container(
-                              color: const Color(0xFFF44336),
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 15),
-                              alignment: Alignment.centerRight,
-                              child: const Padding(
-                                padding: EdgeInsets.all(10.0),
-                                child: Icon(Icons.delete,
-                                    color: Color(0xFFFFFFFF)),
-                              ),
-                            ),
-                            onDismissed: (_) async {
-                              await _removeFondo(fondo);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color:
-                                      const Color.fromRGBO(255, 255, 255, 0.5),
-                                  border:
-                                      Border.all(color: Colors.white, width: 2),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  children: [
-                                    ListTile(
-                                      leading: CircleAvatar(
-                                        radius: 22,
-                                        backgroundColor:
-                                            const Color(0xFFFFFFFF),
-                                        child: CircleAvatar(
-                                          backgroundColor:
-                                              const Color(0xFFFFC107),
-                                          child: IconButton(
-                                            onPressed: () {
-                                              ScaffoldMessenger.of(context)
-                                                  .removeCurrentSnackBar();
-                                              carteraProvider.fondoSelect =
-                                                  fondo;
-                                              context.go(fondoPage);
-                                            },
-                                            icon: const Icon(
-                                              Icons.poll,
-                                              color: Color(0xFF0D47A1),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      title: Text(
-                                        fondo.name,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 2,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                          color: Color(0xFF2196F3),
-                                        ),
-                                      ),
-                                      subtitle: Text(
-                                        fondo.isin,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          color: Color(0xFF0D47A1),
-                                        ),
-                                      ),
-                                      //trailing: const Icon(Icons.more_vert),
-                                    ),
-                                    if (valores != null && valores.isNotEmpty)
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 12),
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 12),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFBBDEFB),
-                                            border: Border.all(
-                                                color: Colors.white, width: 2),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          child: IntrinsicHeight(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                //mainAxisAlignment: MainAxisAlignment.start,
-                                                //crossAxisAlignment: CrossAxisAlignment.start,
-                                                DiaCalendario(
-                                                    epoch: valores.first.date),
-                                                //const Spacer(),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.end,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      //const Spacer(),
-                                                      Text(
-                                                        'V.L. $lastPrecio $divisa',
-                                                        style: const TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color:
-                                                              Color(0xFF0D47A1),
-                                                        ),
-                                                      ),
-                                                      if (diferencia != null)
-                                                        Text(
-                                                          diferencia
-                                                              .toStringAsFixed(
-                                                                  2),
-                                                          style: TextStyle(
-                                                            color: diferencia <
-                                                                    0
-                                                                ? const Color(
-                                                                    0xFFF44336)
-                                                                : const Color(
-                                                                    0xFF4CAF50),
-                                                          ),
-                                                        ),
-                                                      //const Spacer(),
-                                                      (stats.resultado() !=
-                                                                  null &&
-                                                              stats.resultado() !=
-                                                                  0)
-                                                          ? FittedBox(
-                                                              fit: BoxFit
-                                                                  .scaleDown,
-                                                              child: Text(
-                                                                //'Capital: ${NumberFormat.decimalPattern('es').format(double.parse(stats.resultado()!.toStringAsFixed(2)))} $divisa',
-                                                                'Capital: ${NumberUtil.decimalFixed(stats.resultado()!)} $divisa',
-                                                                /*overflow:
-                                                                    TextOverflow
-                                                                        .fade,
-                                                                maxLines: 1,
-                                                                softWrap: false,*/
-                                                                style:
-                                                                    const TextStyle(
-                                                                  color: Color(
-                                                                      0xFF0D47A1),
-                                                                  //fontSize: 14
-                                                                ),
-                                                              ),
-                                                            )
-                                                          : const Text(
-                                                              'Sin inversiones'),
-                                                      //const Spacer(),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
+
+                        /// END WIDGET
+                        */
+                      },
+                    );
+                  },
                 ),
               ),
             ),
-          );
-        } else {
-          return const LoadingProgress(titulo: 'Actualizando fondos...');
-        }
+          ),
+        );
       },
     );
+  }
+
+  _goFondo(BuildContext context, Fondo fondo) {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    carteraProvider.fondoSelect = fondo;
+    context.go(fondoPage);
   }
 
   _dialogUpdateAll(BuildContext context) async {
@@ -613,6 +606,7 @@ class _PageCarteraState extends State<PageCartera> {
 
   _dialogDeleteConfirm(BuildContext context, [String? fondoName]) async {
     return showDialog(
+        barrierDismissible: false,
         context: context,
         builder: (BuildContext ctx) {
           String title = fondoName == null
@@ -645,7 +639,6 @@ class _PageCarteraState extends State<PageCartera> {
   _removeFondo(Fondo fondo) async {
     _eliminarFondo() async {
       await database.deleteAllValores(carteraSelect, fondo);
-
       await database.deleteFondo(carteraSelect, fondo);
       carteraProvider.removeFondo(carteraSelect, fondo);
       await setFondos(carteraSelect);
@@ -653,7 +646,11 @@ class _PageCarteraState extends State<PageCartera> {
 
     if (_isConfirmDeleteFondo) {
       var resp = await _dialogDeleteConfirm(context, fondo.name);
-      resp ? _eliminarFondo() : setState(() {});
+      if (resp == null || resp == false) {
+        setState(() {});
+      } else {
+        _eliminarFondo();
+      }
     } else {
       _eliminarFondo();
     }
@@ -676,37 +673,14 @@ class _PageCarteraState extends State<PageCartera> {
       _showMsg(msg: 'Nada que eliminar');
     } else {
       var resp = await _dialogDeleteConfirm(context);
-      resp ? _removeAllFondos() : setState(() {});
-      /*showDialog(
-          context: context,
-          builder: (BuildContext ctx) {
-            return AlertDialog(
-              title: const Text('Eliminar todo'),
-              content: Text(
-                  'Esto eliminará todos los fondos almacenados en la cartera ${carteraSelect.name}'),
-              actions: [
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('CANCELAR'),
-                ),
-                ElevatedButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFFF44336),
-                    primary: const Color(0xFFFFFFFF),
-                  ),
-                  onPressed: () async {
-                    await database.deleteAllFondos(carteraSelect);
-                    carteraProvider.removeAllFondos(carteraSelect);
 
-                    /// ???
-                    await setFondos(carteraSelect);
-                    _pop();
-                  },
-                  child: const Text('ACEPTAR'),
-                ),
-              ],
-            );
-          });*/
+      if (resp == null || resp == false) {
+        setState(() {});
+      } else {
+        _removeAllFondos();
+      }
+
+      //resp ? _removeAllFondos() : setState(() {});
     }
   }
 
@@ -722,544 +696,159 @@ class _PageCarteraState extends State<PageCartera> {
   }
 }
 
-/*****
-
-import 'package:flutter/material.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:provider/provider.dart';
-
-import '../models/cartera.dart';
-import '../models/cartera_provider.dart';
-import '../routes.dart';
-import '../services/api_service.dart';
-import '../services/preferences_service.dart';
-import '../utils/fecha_util.dart';
-import '../utils/konstantes.dart';
-import '../widgets/loading_progress.dart';
-
-enum MenuCartera { ordenar, eliminar }
-
-class PageCartera extends StatefulWidget {
-  const PageCartera({Key? key}) : super(key: key);
-  @override
-  State<PageCartera> createState() => _PageCarteraState();
-}
-
-class _PageCarteraState extends State<PageCartera> {
-  late ControlCenter controlCenter;
-  bool _isFondosByOrder = false;
-  bool _isCarterasByOrder = false;
-  bool _isAutoUpdate = true;
-  late ApiService apiService;
-  final GlobalKey _dialogKey = GlobalKey();
-  String _loadingText = '';
-
-  getSharedPrefs() async {
-    bool? isCarterasByOrder;
-    bool? isFondosByOrder;
-    bool? isAutoUpdate;
-    await PreferencesService.getBool(keyByOrderCarterasPref).then((value) {
-      isCarterasByOrder = value;
-      //setState(() => _isCarterasByOrder = value);
-    });
-    await PreferencesService.getBool(keyByOrderFondosPref).then((value) {
-      isFondosByOrder = value;
-      //setState(() => _isFondosByOrder = value);
-    });
-    await PreferencesService.getBool(keyAutoUpdatePref).then((value) {
-      isAutoUpdate = value;
-      //setState(() => _isAutoUpdate = value);
-    });
-    setState(() {
-      _isCarterasByOrder = isCarterasByOrder!;
-      _isFondosByOrder = isFondosByOrder!;
-      _isAutoUpdate = isAutoUpdate!;
-    });
-  }
-
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      getSharedPrefs();
-    });
-    controlCenter = ControlCenter(context);
-    controlCenter.openDb().whenComplete(() async {
-      await controlCenter.updateCarteras(_isCarterasByOrder, _isFondosByOrder);
-    });
-    apiService = ApiService();
-    super.initState();
-  }
-
-  PopupMenuItem<MenuCartera> _buildMenuItem(MenuCartera menu, IconData iconData,
-      {bool divider = false}) {
-    return PopupMenuItem(
-      value: menu,
-      child: Column(
-        children: [
-          ListTile(
-            leading: Icon(iconData, color: const Color(0xFFFFFFFF)),
-            title: Text(
-              '${menu.name[0].toUpperCase()}${menu.name.substring(1)}',
-              style: const TextStyle(color: Color(0xFFFFFFFF)),
-            ),
-            trailing: menu == MenuCartera.ordenar
-                ? Icon(
-                    _isFondosByOrder ? Icons.check_box : Icons.check_box_outline_blank,
-                    color: const Color(0xFFFFFFFF),
-                  )
-                : null,
-          ),
-          if (divider) const Divider(height: 10, color: Color(0xFFFFFFFF)), // PopMenuDivider
-        ],
-      ),
-    );
-  }
-
-  SpeedDialChild _buildSpeedDialChild(BuildContext context,
-      {required IconData icono, required String label, required String page}) {
-    return SpeedDialChild(
-      child: Icon(icono),
-      label: label,
-      backgroundColor: const Color(0xFFFFC107),
-      foregroundColor: const Color(0xFF0D47A1),
-      onTap: () async {
-        ScaffoldMessenger.of(context).removeCurrentSnackBar();
-        final newFondo = await Navigator.of(context).pushNamed(page);
-        newFondo != null
-            ? _addFondo(newFondo as Fondo)
-            : _showMsg(msg: 'Sin cambios en la cartera.');
-      },
-    );
-  }
+class DataCartera extends StatelessWidget {
+  final Fondo fondo;
+  final Function removeFondo;
+  final Function goFondo;
+  const DataCartera({
+    Key? key,
+    required this.fondo,
+    required this.removeFondo,
+    required this.goFondo,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var carteraOn = context.read<CarteraProvider>().carteraOn!;
-    var fondos = context.watch<CarteraProvider>().fondos;
-    return FutureBuilder<bool>(
-      future: controlCenter.openDb(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          // TODO : pendiente manejar error
-          if (snapshot.hasError) {
-            return Center(
-              child: Text('${snapshot.error}', style: const TextStyle(fontSize: 18)),
-            );
-          } else if (snapshot.hasData) {
-            return Scaffold(
-              appBar: AppBar(
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                    Navigator.of(context).pushNamed(RouteGenerator.homePage);
-                  },
-                ),
-                title: Text(carteraOn.name),
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.refresh),
-                    onPressed: () async {
-                      await _dialogUpdateAll(context);
-                    },
-                  ),
-                  PopupMenuButton(
-                    color: Colors.blue,
-                    offset: Offset(0.0, AppBar().preferredSize.height),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+    List<Valor>? valores = fondo.valores;
+
+    Stats? stats;
+    String lastDate = '';
+    int dia = 0;
+    String mesYear = '';
+    String lastPrecio = '';
+    String divisa = fondo.divisa ?? '';
+    double? diferencia;
+    if (valores != null && valores.isNotEmpty) {
+      int lastEpoch = valores.first.date;
+      lastDate = FechaUtil.epochToString(lastEpoch);
+      dia = FechaUtil.epochToDate(lastEpoch).day;
+      //mes = FechaUtil.epochToDate(lastEpoch).month;
+      //ano = FechaUtil.epochToDate(lastEpoch).year;
+      mesYear = FechaUtil.epochToString(lastEpoch, formato: 'MMM yy');
+      //lastPrecio = NumberFormat.decimalPattern('es').format(valores.first.precio);
+      lastPrecio = NumberUtil.decimal(valores.first.precio);
+      if (valores.length > 1) {
+        diferencia = valores.first.precio - valores[1].precio;
+      }
+      stats = Stats(valores);
+    }
+    return Dismissible(
+      key: UniqueKey(),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        color: const Color(0xFFF44336),
+        margin: const EdgeInsets.symmetric(horizontal: 15),
+        alignment: Alignment.centerRight,
+        child: const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
+        ),
+      ),
+      onDismissed: (_) async => await removeFondo(fondo),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color.fromRGBO(255, 255, 255, 0.5),
+            border: Border.all(color: Colors.white, width: 2),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: [
+              ListTile(
+                leading: CircleAvatar(
+                  radius: 22,
+                  backgroundColor: const Color(0xFFFFFFFF),
+                  child: CircleAvatar(
+                    backgroundColor: const Color(0xFFFFC107),
+                    child: IconButton(
+                      onPressed: () => goFondo(context, fondo),
+                      icon: const Icon(Icons.poll, color: Color(0xFF0D47A1)),
                     ),
-                    itemBuilder: (ctx) => [
-                      _buildMenuItem(MenuCartera.ordenar, Icons.sort_by_alpha),
-                      _buildMenuItem(MenuCartera.eliminar, Icons.delete_forever)
-                    ],
-                    onSelected: (MenuCartera item) async {
-                      if (item == MenuCartera.ordenar) {
-                        _ordenarFondos();
-                      } else if (item == MenuCartera.eliminar) {
-                        _deleteAllConfirm(context);
-                      }
-                    },
                   ),
-                ],
+                ),
+                title: Text(
+                  fondo.name,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Color(0xFF2196F3),
+                  ),
+                ),
+                subtitle: Text(
+                  fondo.isin,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF0D47A1),
+                  ),
+                ),
               ),
-              floatingActionButton: SpeedDial(
-                icon: Icons.addchart,
-                foregroundColor: const Color(0xFF0D47A1),
-                backgroundColor: const Color(0xFFFFC107),
-                spacing: 8,
-                spaceBetweenChildren: 4,
-                overlayColor: Colors.grey,
-                overlayOpacity: 0.4,
-                children: [
-                  _buildSpeedDialChild(context,
-                      icono: Icons.search,
-                      label: 'Buscar online por ISIN',
-                      page: RouteGenerator.inputFondo),
-                  _buildSpeedDialChild(context,
-                      icono: Icons.storage,
-                      label: 'Base de Datos local',
-                      page: RouteGenerator.searchFondo),
-                ],
-              ),
-              /*body: carteraOn.fondos.isEmpty
-                  ? const Center(child: Text('No hay fondos guardados.')) : Consumer..*/
-              body: Consumer<CarteraProvider>(builder: (context, data, child) {
-                if (data.carteras.isEmpty) {
-                  return const Center(child: Text('No hay fondos guardados.'));
-                }
-                return ListView.builder(
-                  //itemCount: carteraOn.fondos.length,
-                  itemCount: data.carteraOn!.fondos.length,
-                  itemBuilder: (context, index) {
-                    Fondo cartFondo = data.fondos[index];
-                    // cartFondo ============  carteraOn.fondos[index]
-                    int? lastEpoch = _getLastDate(cartFondo);
-                    String lastDate = lastEpoch != null ? FechaUtil.epochToString(lastEpoch) : '';
-                    String lastPrecio = '${_getLastPrecio(cartFondo) ?? ''}';
-                    double? diferencia = _getDiferencia(cartFondo);
-                    return Dismissible(
-                      key: UniqueKey(),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        color: Colors.red,
-                        margin: const EdgeInsets.symmetric(horizontal: 15),
-                        alignment: Alignment.centerRight,
-                        child: const Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: Icon(Icons.delete, color: Colors.white),
-                        ),
-                      ),
-                      onDismissed: (_) async {
-                        await _removeFondo(cartFondo);
-                      },
-                      child: Card(
-                        child: ListTile(
-                          leading: const Icon(Icons.assessment, size: 32),
-                          title: Text(cartFondo.name),
-                          subtitle: Text(cartFondo.isin),
-                          trailing: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(lastDate),
-                              Text(
-                                lastPrecio,
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              if (diferencia != null)
+              if (valores != null && valores.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFBBDEFB),
+                      border: Border.all(color: Colors.white, width: 2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: IntrinsicHeight(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          DiaCalendario(epoch: valores.first.date),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
                                 Text(
-                                  diferencia.toStringAsFixed(2),
-                                  style: TextStyle(
-                                    color: diferencia < 0
-                                        ? const Color(0xFFF44336)
-                                        : const Color(0xFF4CAF50),
+                                  'V.L. $lastPrecio $divisa',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF0D47A1),
                                   ),
                                 ),
-                            ],
+                                if (diferencia != null)
+                                  Text(
+                                    diferencia.toStringAsFixed(2),
+                                    style: TextStyle(
+                                      color: diferencia < 0
+                                          ? const Color(0xFFF44336)
+                                          : const Color(0xFF4CAF50),
+                                    ),
+                                  ),
+                                (stats != null &&
+                                        stats.resultado() != null &&
+                                        stats.resultado() != 0)
+                                    ? FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          'Capital: ${NumberUtil.decimalFixed(stats.resultado()!)} $divisa',
+                                          style: const TextStyle(
+                                            color: Color(0xFF0D47A1),
+                                            //fontSize: 14
+                                          ),
+                                        ),
+                                      )
+                                    : const Text('Sin inversiones'),
+                              ],
+                            ),
                           ),
-                          onTap: () {
-                            ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                            controlCenter.providerOnFondo(cartFondo);
-
-                            ///Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
-                          },
-                        ),
+                        ],
                       ),
-                    );
-                  },
-                );
-              }),
-            );
-          }
-        }
-        return const LoadingProgress(titulo: 'Recuperando fondos...', subtitulo: 'Cargando...');
-      },
-    );
-  }
-
-  _dialogUpdateAll(BuildContext context) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          key: _dialogKey,
-          builder: (context, setState) {
-            return Loading(titulo: 'ACTUALIZANDO FONDOS...', subtitulo: _loadingText);
-          },
-        );
-      },
-    );
-    var mapResultados = await _updateAll(context);
-    _pop();
-    mapResultados.isNotEmpty
-        ? await _showResultados(mapResultados)
-        : _showMsg(msg: 'Nada que actualizar');
-  }
-
-  _setStateDialog(String newText) {
-    if (_dialogKey.currentState != null && _dialogKey.currentState!.mounted) {
-      _dialogKey.currentState!.setState(() {
-        _loadingText = newText;
-      });
-    }
-  }
-
-  Future<Map<String, Icon>> _updateAll(BuildContext context) async {
-    var carteraOn = context.read<CarteraProvider>().carteraOn!;
-    var fondosOn = carteraOn.fondos;
-    _setStateDialog('Conectando...');
-    var mapResultados = <String, Icon>{};
-    if (fondosOn.isNotEmpty) {
-      for (var fondo in fondosOn) {
-        _setStateDialog(fondo.name);
-        //TODO: NECESARIO  createTable ?
-        await controlCenter.createTableFondo(carteraOn, fondo);
-        final getDataApi = await apiService.getDataApi(fondo.isin);
-        if (getDataApi != null) {
-          var newValor = Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
-          //TODO valor divisa??
-          fondo.divisa = getDataApi.market;
-          // cambiar insertar por update para no duplicar el fondo en la cartera
-          //await carfoin.insertFondoCartera(fondo);
-          //await carfoin.updateFondoCartera(fondo);
-          await controlCenter.updateFondoCartera(carteraOn, fondo);
-          //await carfoin.insertValorFondo(fondo, newValor);
-          await controlCenter.insertValor(carteraOn, fondo, newValor);
-
-          ///await controlCenter
-          mapResultados[fondo.name] = const Icon(Icons.check_box, color: Colors.green);
-        } else {
-          mapResultados[fondo.name] = const Icon(Icons.disabled_by_default, color: Colors.red);
-        }
-      }
-      //TODO: check si es necesario update (si no ha habido cambios porque todos los fondos han dado error)
-      ///await carfoin.updateFondos(_isFondosByOrder);
-
-      //await carfoin.updateDbCarteras(_isCarterasByOrder);
-      await controlCenter.updateCarteras(_isCarterasByOrder, _isFondosByOrder);
-    }
-    return mapResultados;
-  }
-
-  _showResultados(Map<String, Icon> mapResultados) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return WillPopScope(
-          onWillPop: () async => false,
-          child: AlertDialog(
-            insetPadding: const EdgeInsets.all(10),
-            title: const Text('Resultado'),
-            actions: [
-              TextButton(
-                child: const Text('Cerrar'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-            content: SingleChildScrollView(
-              child: SizedBox(
-                width: double.maxFinite,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    for (var res in mapResultados.entries)
-                      ListTile(dense: true, title: Text(res.key), trailing: res.value),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  double? _getLastPrecio(Fondo fondo) {
-    /*if (fondo.historico.isNotEmpty) {
-      return fondo.historico.first.precio;
-    }*/
-    if (fondo.valores.isNotEmpty) {
-      return fondo.valores.first.precio;
-    }
-    return null;
-  }
-
-  int? _getLastDate(Fondo fondo) {
-    /*if (fondo.historico.isNotEmpty) {
-      return fondo.historico.first.date;
-    }*/
-    if (fondo.valores.isNotEmpty) {
-      return fondo.valores.first.date;
-    }
-    return null;
-  }
-
-  double? _getDiferencia(Fondo fondo) {
-    /*if (fondo.historico.length > 1) {
-      var last = fondo.historico.first.precio;
-      var prev = fondo.historico[1].precio;
-      return last - prev;
-    }*/
-    if (fondo.valores.length > 1) {
-      return fondo.valores.first.precio - fondo.valores[1].precio;
-    }
-    return null;
-  }
-
-  _getDataApi(Fondo fondo) async {
-    var carteraOn = context.read<CarteraProvider>().carteraOn!;
-    //await carfoin.createTableFondo(fondo);
-    await controlCenter.createTableFondo(carteraOn, fondo);
-    final getDataApi = await apiService.getDataApi(fondo.isin);
-    if (getDataApi != null) {
-      var newValor = Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
-      fondo.divisa = getDataApi.market;
-
-      ///await carfoin.insertFondoCartera(fondo);
-      //await carfoin.updateFondoCartera(fondo);
-      //await carfoin.insertValorFondo(fondo, newValor);
-      await controlCenter.updateFondoCartera(carteraOn, fondo);
-      await controlCenter.insertValor(carteraOn, fondo, newValor);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  _dialogAutoUpdate(BuildContext context, Fondo newFondo) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return const Loading(titulo: 'FONDO AÑADIDO', subtitulo: 'Cargando último valor...');
-      },
-    );
-    var update = await _getDataApi(newFondo);
-    _pop();
-    update
-        ? _showMsg(msg: 'Fondo actualizado')
-        : _showMsg(msg: 'Error al actualizar el fondo', color: Colors.red);
-  }
-
-  _addFondo(Fondo newFondo) async {
-    //var carteraOn = context.read<CarfoinProvider>().getCartera!;
-    var carteraOn = context.read<CarteraProvider>().carteraOn!;
-    var fondosOn = carteraOn.fondos;
-    //var existe = [for (var fondo in carfoin.getFondos) fondo.isin].contains(newFondo.isin);
-    var existe = [for (var fondo in fondosOn) fondo.isin].contains(newFondo.isin);
-    if (existe) {
-      _showMsg(
-        msg: 'El fondo con ISIN ${newFondo.isin} ya existe en esta cartera.',
-        color: Colors.red,
-      );
-    } else {
-      //await carfoin.insertFondoCartera(newFondo);
-      await controlCenter.insertFondo(carteraOn, newFondo);
-      //var carteraOn = context.read<CarfoinProvider>().getCartera!;
-
-      if (_isAutoUpdate) {
-        if (!mounted) return;
-        await _dialogAutoUpdate(context, newFondo);
-      } else {
-        _showMsg(msg: 'Fondo añadido');
-      }
-
-      ///await carfoin.updateFondos(_isFondosByOrder);
-    }
-    // TODO: por qué no es necesario aquí ??
-    //await carfoin.updateDbCarteras(_isCarterasByOrder);
-    await controlCenter.updateCarteras(_isCarterasByOrder, _isFondosByOrder);
-  }
-
-  _removeFondo(Fondo fondo) async {
-    var carteraOn = context.read<CarteraProvider>().carteraOn!;
-    //await carfoin.deleteFondoCartera(fondo);
-    //await carfoin.updateFondos(_isFondosByOrder);
-    //await carfoin.updateDbCarteras(_isCarterasByOrder);
-    await controlCenter.deleteFondo(carteraOn, fondo);
-    await controlCenter.updateFondos(carteraOn, _isFondosByOrder);
-    await controlCenter.updateCarteras(_isCarterasByOrder, _isFondosByOrder);
-  }
-
-  _removeAllFondos(List<Fondo> fondos) async {
-    var carteraOn = context.read<CarteraProvider>().carteraOn!;
-    for (var fondo in fondos) {
-      //await carfoin.deleteFondoCartera(fondo);
-      await controlCenter.deleteFondo(carteraOn, fondo);
-    }
-    //await carfoin.updateFondos(_isFondosByOrder);
-    //await carfoin.updateDbCarteras(_isCarterasByOrder);
-    await controlCenter.updateFondos(carteraOn, _isFondosByOrder);
-    await controlCenter.updateFondos(carteraOn, _isFondosByOrder);
-  }
-
-  _ordenarFondos() async {
-    setState(() => _isFondosByOrder = !_isFondosByOrder);
-    PreferencesService.saveBool(keyByOrderFondosPref, _isFondosByOrder);
-
-    ///await carfoin.updateFondos(_isFondosByOrder);
-    //await carfoin.updateDbCarteras(_isCarterasByOrder);
-    await controlCenter.updateCarteras(_isCarterasByOrder, _isFondosByOrder);
-  }
-
-  void _deleteAllConfirm(BuildContext context) {
-    var carteraOn = context.read<CarteraProvider>().carteraOn!;
-    //var carteraOn = context.read<CarfoinProvider>().getCartera!;
-    var fondosOn = carteraOn.fondos;
-    //if (carfoin.getFondos.isEmpty) {
-    if (fondosOn.isEmpty) {
-      _showMsg(msg: 'Nada que eliminar');
-    } else {
-      showDialog(
-          context: context,
-          builder: (BuildContext ctx) {
-            //var carteraOn = context.read<CarfoinProvider>().getCartera!;
-            return AlertDialog(
-              title: const Text('Eliminar todo'),
-              content: Text(
-                  'Esto eliminará todos los fondos almacenados en la cartera ${carteraOn.name}'),
-              actions: [
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('CANCELAR'),
-                ),
-                ElevatedButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFFF44336),
-                    primary: const Color(0xFFFFFFFF),
+                    ),
                   ),
-                  onPressed: () async {
-                    _removeAllFondos(fondosOn);
-                    /*for (var fondo in carfoin.getFondos) {
-                      //await carfoin.deleteFondo(fondo);
-                      await carfoin.deleteFondoCartera(fondo);
-                    }
-                    await carfoin.updateFondos(_isFondosByOrder);
-                    await carfoin.updateDbCarteras(_isCarterasByOrder);
-                    carfoin.deleteAllFondosCarteras();*/
-                    _pop();
-                  },
-                  child: const Text('ACEPTAR'),
                 ),
-              ],
-            );
-          });
-    }
-  }
-
-  void _showMsg({required String msg, MaterialColor color = Colors.grey}) =>
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), backgroundColor: color),
-      );
-
-  void _pop() {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    Navigator.of(context).pop();
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
-
-    ***/

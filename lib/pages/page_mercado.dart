@@ -390,7 +390,7 @@ class _MercadoState extends State<PageMercado> {
       initialDate: DateTime.now(),
       locale: const Locale('es'),
       //initialDatePickerMode: DatePickerMode.day,
-      firstDate: DateTime(2015, 1, 1),
+      firstDate: DateTime(1997, 1, 1),
       lastDate: DateTime.now(),
     );
     return picked;

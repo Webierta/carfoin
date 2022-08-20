@@ -16,11 +16,11 @@ import '../router/routes_const.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../utils/konstantes.dart';
-import '../utils/number_util.dart';
-import '../utils/stats.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
 import '../widgets/my_drawer.dart';
+import '../widgets/views/vista_compacta.dart';
+import '../widgets/views/vista_detalle.dart';
 
 class PageHome extends StatefulWidget {
   const PageHome({Key? key}) : super(key: key);
@@ -195,7 +195,9 @@ class _PageHomeState extends State<PageHome> {
                               child: Text(
                                 'Empieza creando una cartera',
                                 style: TextStyle(
-                                    color: Color(0xFFFFFFFF), fontSize: 22),
+                                  color: Color(0xFFFFFFFF),
+                                  fontSize: 22,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -207,9 +209,10 @@ class _PageHomeState extends State<PageHome> {
                             itemBuilder: (context, index) {
                               Cartera cartera = data.carteras[index];
                               return VistaCompacta(
-                                  delete: _deleteCartera,
-                                  cartera: cartera,
-                                  goCartera: _goCartera);
+                                delete: _deleteCartera,
+                                cartera: cartera,
+                                goCartera: _goCartera,
+                              );
                             },
                           );
                         }
@@ -217,83 +220,6 @@ class _PageHomeState extends State<PageHome> {
                           itemCount: data.carteras.length,
                           itemBuilder: (context, index) {
                             Cartera cartera = data.carteras[index];
-                            /*List<Fondo> fondos = cartera.fondos ?? [];
-                            double capitalCarteraEur = 0.0;
-                            double capitalCarteraUsd = 0.0;
-                            double capitalCarteraOtra = 0.0;
-                            double rendimientoCarteraEur = 0.0;
-                            double rendimientoCarteraUsd = 0.0;
-                            double rendimientoCarteraOtra = 0.0;
-                            double participacionesCartera = 0.0;
-                            bool isTrueCapitalCarteraEur = false;
-                            bool isTrueCapitalCarteraUsd = false;
-                            bool isTrueCapitalCarteraOtra = false;
-                            bool isTrueRendCarteraEur = false;
-                            bool isTrueRendCarteraUsd = false;
-                            bool isTrueRendCarteraOtra = false;*/
-                            /*if (fondos.isNotEmpty) {
-                              for (var fondo in fondos) {
-                                if (fondo.valores != null &&
-                                    fondo.valores!.isNotEmpty) {
-                                  Stats stats = Stats(fondo.valores!);
-                                  participacionesCartera +=
-                                      stats.totalParticipaciones() ?? 0.0;
-                                  if (participacionesCartera > 0) {
-                                    if (fondo.divisa == 'EUR') {
-                                      if (stats.resultado() != null) {
-                                        isTrueCapitalCarteraEur = true;
-                                      }
-                                      if (stats.balance() != null) {
-                                        isTrueRendCarteraEur = true;
-                                      }
-                                      capitalCarteraEur +=
-                                          stats.resultado() ?? 0.0;
-                                      rendimientoCarteraEur +=
-                                          stats.balance() ?? 0.0;
-                                    } else if (fondo.divisa == 'USD') {
-                                      if (stats.resultado() != null) {
-                                        isTrueCapitalCarteraUsd = true;
-                                      }
-                                      if (stats.balance() != null) {
-                                        isTrueRendCarteraUsd = true;
-                                      }
-                                      capitalCarteraUsd +=
-                                          stats.resultado() ?? 0.0;
-                                      rendimientoCarteraUsd +=
-                                          stats.balance() ?? 0.0;
-                                    } else {
-                                      if (stats.resultado() != null) {
-                                        isTrueCapitalCarteraOtra = true;
-                                      }
-                                      if (stats.balance() != null) {
-                                        isTrueRendCarteraOtra = true;
-                                      }
-                                      capitalCarteraOtra +=
-                                          stats.resultado() ?? 0.0;
-                                      rendimientoCarteraOtra +=
-                                          stats.balance() ?? 0.0;
-                                    }
-                                  }
-                                }
-                              }
-                            }*/
-
-                            /*Widget _builTextCartera(double valorStats,
-                                {String divisa = '', bool color = false}) {
-                              return Text(
-                                '${NumberFormat.decimalPattern('es').format(double.parse(valorStats.toStringAsFixed(2)))} $divisa',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w900,
-                                  color: color == true
-                                      ? valorStats < 0
-                                          ? Colors.red
-                                          : Colors.green
-                                      : Colors.black,
-                                  fontSize: 16,
-                                ),
-                              );
-                            }*/
-
                             return VistaDetalle(
                               cartera: cartera,
                               delete: _deleteCartera,
@@ -301,265 +227,6 @@ class _PageHomeState extends State<PageHome> {
                               inputName: _inputName,
                               goFondo: _goFondo,
                             );
-
-                            /*return Dismissible(
-                              key: UniqueKey(),
-                              direction: DismissDirection.endToStart,
-                              background: Container(
-                                color: const Color(0xFFF44336),
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 15),
-                                alignment: Alignment.centerRight,
-                                child: const Padding(
-                                  padding: EdgeInsets.all(10.0),
-                                  child: Icon(Icons.delete,
-                                      color: Color(0xFFFFFFFF)),
-                                ),
-                              ),
-                              onDismissed: (_) => _deleteCartera(cartera),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: const Color.fromRGBO(
-                                        255, 255, 255, 0.5),
-                                    border: Border.all(
-                                        color: Colors.white, width: 2),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      ListTile(
-                                        leading: CircleAvatar(
-                                          radius: 22,
-                                          backgroundColor:
-                                              const Color(0xFFFFFFFF),
-                                          child: CircleAvatar(
-                                            backgroundColor:
-                                                const Color(0xFFFFC107),
-                                            child: IconButton(
-                                              onPressed: () {
-                                                ScaffoldMessenger.of(context)
-                                                    .removeCurrentSnackBar();
-                                                carteraProvider.carteraSelect =
-                                                    cartera;
-                                                context.go(carteraPage);
-                                              },
-                                              icon: const Icon(
-                                                Icons.business_center,
-                                                color: Color(0xFF0D47A1),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        title: Text(
-                                          cartera.name,
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20,
-                                            color: Color(0xFF2196F3),
-                                          ),
-                                        ),
-                                        trailing: PopupMenuButton(
-                                          color: const Color(0xFF2196F3),
-                                          icon: const Icon(Icons.more_vert,
-                                              color: Color(0xFF2196F3)),
-                                          itemBuilder: (context) => const [
-                                            PopupMenuItem(
-                                              value: 1,
-                                              child: ListTile(
-                                                leading: Icon(Icons.edit,
-                                                    color: Color(0xFFFFFFFF)),
-                                                title: Text(
-                                                  'Renombrar',
-                                                  style: TextStyle(
-                                                      color: Color(0xFFFFFFFF)),
-                                                ),
-                                              ),
-                                            ),
-                                            PopupMenuItem(
-                                              value: 2,
-                                              child: ListTile(
-                                                leading: Icon(
-                                                    Icons.delete_forever,
-                                                    color: Color(0xFFFFFFFF)),
-                                                title: Text(
-                                                  'Eliminar',
-                                                  style: TextStyle(
-                                                      color: Color(0xFFFFFFFF)),
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                          onSelected: (value) {
-                                            if (value == 1) {
-                                              _inputName(context,
-                                                  cartera: cartera);
-                                            } else if (value == 2) {
-                                              _deleteCartera(cartera);
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(12),
-                                        child: Container(
-                                          padding:
-                                              const EdgeInsets.only(right: 12),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFBBDEFB),
-                                            border: Border.all(
-                                                color: Colors.white, width: 2),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          //child: (cartera.fondos != null && cartera.fondos!.isNotEmpty)
-                                          child: fondos.isNotEmpty
-                                              ? Theme(
-                                                  data: Theme.of(context)
-                                                      .copyWith(
-                                                          dividerColor: Colors
-                                                              .transparent),
-                                                  child: ExpansionTile(
-                                                    childrenPadding:
-                                                        const EdgeInsets.only(
-                                                            bottom: 10,
-                                                            left: 20),
-                                                    expandedCrossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    expandedAlignment:
-                                                        Alignment.topLeft,
-                                                    maintainState: true,
-                                                    iconColor: Colors.blue,
-                                                    collapsedIconColor:
-                                                        Colors.blue,
-                                                    tilePadding:
-                                                        const EdgeInsets.all(
-                                                            0.0),
-                                                    backgroundColor:
-                                                        const Color(0xFFBBDEFB),
-                                                    title: ChipFondo(
-                                                        lengthFondos:
-                                                            fondos.length),
-                                                    children: [
-                                                      for (var fondo in fondos)
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            ScaffoldMessenger
-                                                                    .of(context)
-                                                                .removeCurrentSnackBar();
-                                                            carteraProvider
-                                                                    .carteraSelect =
-                                                                cartera;
-                                                            carteraProvider
-                                                                    .fondoSelect =
-                                                                fondo;
-                                                            context
-                                                                .go(fondoPage);
-                                                          },
-                                                          child: Text(
-                                                            fondo.name,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            maxLines: 1,
-                                                            style: const TextStyle(
-                                                                color: Color(
-                                                                    0xFF0D47A1)),
-                                                          ),
-                                                        )
-                                                    ],
-                                                  ),
-                                                )
-                                              : const Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 6),
-                                                  child: ChipFondo(
-                                                      lengthFondos: null),
-                                                ),
-                                        ),
-                                      ),
-                                      if (fondos.isNotEmpty &&
-                                          participacionesCartera > 0 &&
-                                          (isTrueCapitalCarteraEur ||
-                                              isTrueCapitalCarteraUsd ||
-                                              isTrueCapitalCarteraOtra) &&
-                                          (isTrueRendCarteraEur ||
-                                              isTrueRendCarteraUsd ||
-                                              isTrueRendCarteraOtra))
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 32),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  const Text('Valor',
-                                                      style: TextStyle(
-                                                          fontSize: 16)),
-                                                  const Spacer(),
-                                                  Column(
-                                                    children: [
-                                                      if (isTrueCapitalCarteraEur)
-                                                        _builTextCartera(
-                                                            capitalCarteraEur,
-                                                            divisa: 'EUR'),
-                                                      if (isTrueCapitalCarteraUsd)
-                                                        _builTextCartera(
-                                                            capitalCarteraUsd,
-                                                            divisa: 'USD'),
-                                                      if (isTrueCapitalCarteraOtra)
-                                                        _builTextCartera(
-                                                            capitalCarteraOtra),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 10),
-                                              Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  const Text('Rendimiento',
-                                                      style: TextStyle(
-                                                          fontSize: 16)),
-                                                  const Spacer(),
-                                                  Column(
-                                                    children: [
-                                                      if (isTrueRendCarteraEur)
-                                                        _builTextCartera(
-                                                            rendimientoCarteraEur,
-                                                            divisa: 'EUR',
-                                                            color: true),
-                                                      if (isTrueRendCarteraUsd)
-                                                        _builTextCartera(
-                                                            rendimientoCarteraUsd,
-                                                            divisa: 'USD',
-                                                            color: true),
-                                                      if (isTrueRendCarteraOtra)
-                                                        _builTextCartera(
-                                                            rendimientoCarteraOtra,
-                                                            color: true),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );*/
                           },
                         );
                       },
@@ -577,15 +244,11 @@ class _PageHomeState extends State<PageHome> {
   }
 
   _export(BuildContext context) async {
-    // TODO: DIALOGO NOMBRE FILE
-
     await _inputName(context, isSave: true);
-
     if (_errorText != null) return '';
     String nombreDb = _controller.value.text.trim();
     nombreDb = '$nombreDb.db';
     _controller.clear();
-
     bool okSave = false;
     final String dbPath = await database.getDatabasePath();
     var dbFile = File(dbPath);
@@ -606,9 +269,7 @@ class _PageHomeState extends State<PageHome> {
       String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
       if (selectedDirectory == null) return;
       filePath = '$selectedDirectory/$nombreDb';
-
       //filePath = await _getFilePath();
-
       if (filePath.isEmpty) throw Exception(); // o return ??
       File file = File(filePath);
 
@@ -650,8 +311,9 @@ class _PageHomeState extends State<PageHome> {
         ? 'La app se reiniciará.'
         : isOk
             ? 'La copia se ha almacenado en $path'
-            : 'Intenta guardar la copia de seguridad en el almacenamiento interno (dependiendo de la '
-                'versión de Android de tu dispositivo puede que la app no tenga permiso para escribir en la tarjeta SD).';
+            : 'Intenta guardar la copia de seguridad en el almacenamiento interno '
+                '(dependiendo de la versión de Android de tu dispositivo puede '
+                'que la app no tenga permiso para escribir en la tarjeta SD).';
 
     return showDialog(
         context: context,
@@ -870,6 +532,7 @@ class _PageHomeState extends State<PageHome> {
 
   _dialogDeleteConfirm(BuildContext context, [String? carteraName]) async {
     return showDialog(
+        barrierDismissible: false,
         context: context,
         builder: (BuildContext ctx) {
           String title = carteraName == null
@@ -923,7 +586,11 @@ class _PageHomeState extends State<PageHome> {
 
     if (_isConfirmDeleteCartera) {
       var resp = await _dialogDeleteConfirm(context, cartera.name);
-      resp ? _eliminar() : setState(() {});
+      if (resp == null || resp == false) {
+        setState(() {});
+      } else {
+        _eliminar();
+      }
     } else {
       _eliminar();
     }
@@ -931,7 +598,7 @@ class _PageHomeState extends State<PageHome> {
 
   void _deleteConfirm(BuildContext context) async {
     var resp = await _dialogDeleteConfirm(context);
-    if (resp) {
+    if (resp == true) {
       for (var cartera in carteraProvider.carteras) {
         await database.deleteAllFondos(cartera);
         carteraProvider.removeAllFondos(cartera);
@@ -951,384 +618,5 @@ class _PageHomeState extends State<PageHome> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
     Navigator.of(context).pop();
-  }
-}
-
-class ChipFondo extends StatelessWidget {
-  final int? lengthFondos;
-  const ChipFondo({Key? key, this.lengthFondos}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    String title;
-    if (lengthFondos == null || lengthFondos == 0) {
-      title = 'Sin fondos';
-    } else if (lengthFondos == 1) {
-      title = '$lengthFondos Fondo';
-    } else {
-      title = '$lengthFondos Fondos';
-    }
-    return Align(
-      alignment: Alignment.topLeft,
-      child: Chip(
-        padding: const EdgeInsets.only(left: 10, right: 20),
-        backgroundColor: const Color(0xFFBBDEFB),
-        avatar: const Icon(Icons.poll, color: Color(0xFF0D47A1), size: 32),
-        label: Text(
-          title,
-          style: const TextStyle(color: Color(0xFF0D47A1), fontSize: 18),
-        ),
-      ),
-    );
-  }
-}
-
-class VistaCompacta extends StatelessWidget {
-  final Cartera cartera;
-  final Function delete;
-  final Function goCartera;
-  const VistaCompacta(
-      {Key? key,
-      required this.cartera,
-      required this.delete,
-      required this.goCartera})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Dismissible(
-      key: UniqueKey(),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        color: const Color(0xFFF44336),
-        margin: const EdgeInsets.symmetric(horizontal: 15),
-        alignment: Alignment.centerRight,
-        child: const Padding(
-          padding: EdgeInsets.all(10.0),
-          child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
-        ),
-      ),
-      onDismissed: (_) => delete(cartera),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: InputChip(
-            labelPadding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            avatar: CircleAvatar(
-              backgroundColor: const Color(0xFFFFC107),
-              child: Text(
-                cartera.name[0],
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Color(0xFF0D47A1),
-                ),
-              ),
-            ),
-            backgroundColor: const Color(0xFFBBDEFB),
-            label: Text(cartera.name),
-            labelStyle: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-              color: Color(0xFF2196F3),
-            ),
-            onPressed: () => goCartera(context, cartera)),
-      ),
-    );
-  }
-}
-
-class VistaDetalle extends StatelessWidget {
-  final Cartera cartera;
-  final Function delete;
-  final Function goCartera;
-  final Function inputName;
-  final Function goFondo;
-  const VistaDetalle({
-    Key? key,
-    required this.cartera,
-    required this.delete,
-    required this.goCartera,
-    required this.inputName,
-    required this.goFondo,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    List<Fondo> fondos = cartera.fondos ?? [];
-    double capitalCarteraEur = 0.0;
-    double capitalCarteraUsd = 0.0;
-    double capitalCarteraOtra = 0.0;
-    double rendimientoCarteraEur = 0.0;
-    double rendimientoCarteraUsd = 0.0;
-    double rendimientoCarteraOtra = 0.0;
-    double participacionesCartera = 0.0;
-    bool isTrueCapitalCarteraEur = false;
-    bool isTrueCapitalCarteraUsd = false;
-    bool isTrueCapitalCarteraOtra = false;
-    bool isTrueRendCarteraEur = false;
-    bool isTrueRendCarteraUsd = false;
-    bool isTrueRendCarteraOtra = false;
-    if (fondos.isNotEmpty) {
-      for (var fondo in fondos) {
-        if (fondo.valores != null && fondo.valores!.isNotEmpty) {
-          Stats stats = Stats(fondo.valores!);
-          participacionesCartera += stats.totalParticipaciones() ?? 0.0;
-          if (participacionesCartera > 0) {
-            if (fondo.divisa == 'EUR') {
-              if (stats.resultado() != null) {
-                isTrueCapitalCarteraEur = true;
-              }
-              if (stats.balance() != null) {
-                isTrueRendCarteraEur = true;
-              }
-              capitalCarteraEur += stats.resultado() ?? 0.0;
-              rendimientoCarteraEur += stats.balance() ?? 0.0;
-            } else if (fondo.divisa == 'USD') {
-              if (stats.resultado() != null) {
-                isTrueCapitalCarteraUsd = true;
-              }
-              if (stats.balance() != null) {
-                isTrueRendCarteraUsd = true;
-              }
-              capitalCarteraUsd += stats.resultado() ?? 0.0;
-              rendimientoCarteraUsd += stats.balance() ?? 0.0;
-            } else {
-              if (stats.resultado() != null) {
-                isTrueCapitalCarteraOtra = true;
-              }
-              if (stats.balance() != null) {
-                isTrueRendCarteraOtra = true;
-              }
-              capitalCarteraOtra += stats.resultado() ?? 0.0;
-              rendimientoCarteraOtra += stats.balance() ?? 0.0;
-            }
-          }
-        }
-      }
-    }
-
-    Widget _builTextCartera(double valorStats,
-        {String divisa = '', bool color = false}) {
-      return FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          '${NumberUtil.decimalFixed(valorStats)} $divisa',
-          //'${NumberFormat.decimalPattern('es').format(double.parse(valorStats.toStringAsFixed(2)))} $divisa',
-          //'${NumberFormat.compactLong(locale: 'es').format(double.parse(valorStats.toStringAsFixed(2)))} $divisa',
-
-          /*? NumberFormat.compactLong(
-            locale: 'es')
-            .format(double.parse(stats
-            .resultado()!
-            .toStringAsFixed(2)))*/
-          maxLines: 1,
-          style: TextStyle(
-            fontWeight: FontWeight.w900,
-            color: color == true
-                ? valorStats < 0
-                    ? Colors.red
-                    : Colors.green
-                : Colors.black,
-            fontSize: 16,
-          ),
-        ),
-      );
-    }
-
-    return Dismissible(
-      key: UniqueKey(),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        color: const Color(0xFFF44336),
-        margin: const EdgeInsets.symmetric(horizontal: 15),
-        alignment: Alignment.centerRight,
-        child: const Padding(
-          padding: EdgeInsets.all(10.0),
-          child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
-        ),
-      ),
-      onDismissed: (_) => delete(cartera),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color.fromRGBO(255, 255, 255, 0.5),
-            border: Border.all(color: Colors.white, width: 2),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            children: [
-              ListTile(
-                leading: CircleAvatar(
-                  radius: 22,
-                  backgroundColor: const Color(0xFFFFFFFF),
-                  child: CircleAvatar(
-                    backgroundColor: const Color(0xFFFFC107),
-                    child: IconButton(
-                      onPressed: () => goCartera(context, cartera),
-                      icon: const Icon(
-                        Icons.business_center,
-                        color: Color(0xFF0D47A1),
-                      ),
-                    ),
-                  ),
-                ),
-                title: Text(
-                  cartera.name,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Color(0xFF2196F3),
-                  ),
-                ),
-                trailing: PopupMenuButton(
-                  color: const Color(0xFF2196F3),
-                  icon: const Icon(Icons.more_vert, color: Color(0xFF2196F3)),
-                  itemBuilder: (context) => const [
-                    PopupMenuItem(
-                      value: 1,
-                      child: ListTile(
-                        leading: Icon(Icons.edit, color: Color(0xFFFFFFFF)),
-                        title: Text(
-                          'Renombrar',
-                          style: TextStyle(color: Color(0xFFFFFFFF)),
-                        ),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 2,
-                      child: ListTile(
-                        leading: Icon(Icons.delete_forever,
-                            color: Color(0xFFFFFFFF)),
-                        title: Text(
-                          'Eliminar',
-                          style: TextStyle(color: Color(0xFFFFFFFF)),
-                        ),
-                      ),
-                    )
-                  ],
-                  onSelected: (value) {
-                    if (value == 1) {
-                      inputName(context, cartera: cartera);
-                    } else if (value == 2) {
-                      delete(cartera);
-                    }
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Container(
-                  padding: const EdgeInsets.only(right: 12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFBBDEFB),
-                    border: Border.all(color: Colors.white, width: 2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: fondos.isNotEmpty
-                      ? Theme(
-                          data: Theme.of(context)
-                              .copyWith(dividerColor: Colors.transparent),
-                          child: ExpansionTile(
-                            childrenPadding:
-                                const EdgeInsets.only(bottom: 10, left: 20),
-                            expandedCrossAxisAlignment:
-                                CrossAxisAlignment.start,
-                            expandedAlignment: Alignment.topLeft,
-                            maintainState: true,
-                            iconColor: Colors.blue,
-                            collapsedIconColor: Colors.blue,
-                            tilePadding: const EdgeInsets.all(0.0),
-                            backgroundColor: const Color(0xFFBBDEFB),
-                            title: ChipFondo(lengthFondos: fondos.length),
-                            children: [
-                              for (var fondo in fondos)
-                                TextButton(
-                                  onPressed: () {
-                                    goFondo(context, cartera, fondo);
-                                  },
-                                  child: Text(
-                                    fondo.name,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: const TextStyle(
-                                        color: Color(0xFF0D47A1)),
-                                  ),
-                                )
-                            ],
-                          ),
-                        )
-                      : const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 6),
-                          child: ChipFondo(lengthFondos: null),
-                        ),
-                ),
-              ),
-              if (fondos.isNotEmpty &&
-                  participacionesCartera > 0 &&
-                  (isTrueCapitalCarteraEur ||
-                      isTrueCapitalCarteraUsd ||
-                      isTrueCapitalCarteraOtra) &&
-                  (isTrueRendCarteraEur ||
-                      isTrueRendCarteraUsd ||
-                      isTrueRendCarteraOtra))
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('VALOR', style: TextStyle(fontSize: 12)),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              if (isTrueCapitalCarteraEur)
-                                _builTextCartera(capitalCarteraEur,
-                                    divisa: 'EUR'),
-                              if (isTrueCapitalCarteraUsd)
-                                _builTextCartera(capitalCarteraUsd,
-                                    divisa: 'USD'),
-                              if (isTrueCapitalCarteraOtra)
-                                _builTextCartera(capitalCarteraOtra),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('BALANCE', style: TextStyle(fontSize: 12)),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              if (isTrueRendCarteraEur)
-                                _builTextCartera(rendimientoCarteraEur,
-                                    divisa: 'EUR', color: true),
-                              if (isTrueRendCarteraUsd)
-                                _builTextCartera(rendimientoCarteraUsd,
-                                    divisa: 'USD', color: true),
-                              if (isTrueRendCarteraOtra)
-                                _builTextCartera(rendimientoCarteraOtra,
-                                    color: true),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

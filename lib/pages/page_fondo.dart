@@ -35,6 +35,8 @@ class _PageFondoState extends State<PageFondo>
   late ApiService apiService;
   late TabController _tabController;
 
+  bool _deleteOp = false;
+
   setValores(Cartera cartera, Fondo fondo) async {
     try {
       carteraProvider.valores = await database.getValores(cartera, fondo);
@@ -78,10 +80,12 @@ class _PageFondoState extends State<PageFondo>
     super.dispose();
   }
 
-  SpeedDialChild _buildSpeedDialChild(BuildContext context,
-      {required IconData icono,
-      required String label,
-      required Function action}) {
+  SpeedDialChild _buildSpeedDialChild(
+    BuildContext context, {
+    required IconData icono,
+    required String label,
+    required Function action,
+  }) {
     return SpeedDialChild(
       child: Icon(icono),
       label: label,
@@ -99,133 +103,140 @@ class _PageFondoState extends State<PageFondo>
     return FutureBuilder(
       future: database.getValores(carteraSelect, fondoSelect),
       builder: (BuildContext context, AsyncSnapshot<List<Valor>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return WillPopScope(
-            onWillPop: () async => false,
-            child: Container(
-              decoration: scaffoldGradient,
-              child: Scaffold(
-                backgroundColor: Colors.transparent,
-                appBar: AppBar(
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                      // TODO: set carteraOn antes de navigator??
-                      //Navigator.of(context).pushNamed(RouteGenerator.carteraPage, arguments: true);
-                      //Navigator.of(context).pushNamed(RouteGenerator.carteraPage);
-                      context.go(carteraPage);
-                    },
-                  ),
-                  title: ListTile(
-                    title: Text(
-                      fondoSelect.name,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: const TextStyle(color: Color(0xFF0D47A1)),
-                    ),
-                    subtitle: Row(
-                      children: [
-                        const Icon(Icons.business_center,
-                            color: Color(0xFF0D47A1)),
-                        const SizedBox(width: 10),
-                        Flexible(
-                          child: Text(
-                            carteraSelect.name,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: const TextStyle(color: Color(0xFF0D47A1)),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  actions: [
-                    PopupMenuButton(
-                      color: const Color(0xFF2196F3),
-                      offset: Offset(0.0, AppBar().preferredSize.height),
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                      ),
-                      itemBuilder: (ctx) => [
-                        //_buildMenuItem(Menu.editar, Icons.edit, divider: true),
-                        //_buildMenuItem(Menu.suscribir, Icons.login),
-                        //_buildMenuItem(MenuFondo.mercado, Icons.shopping_cart, divider: true),
-                        //_buildMenuItem(MenuFondo.eliminar, Icons.delete_forever),
-                        //_buildMenuItem(MenuFondo.exportar, Icons.download),
-                        buildMenuItem(MenuFondo.mercado, Icons.shopping_cart),
-                        buildMenuItem(MenuFondo.eliminar, Icons.delete_forever),
-                        //buildMenuItem(MenuFondo.exportar, Icons.download),
-                      ],
-                      onSelected: (item) {
-                        //TODO: ACCIONES PENDIENTES
-                        if (item == MenuFondo.mercado) {
-                          //Navigator.of(context).pushNamed(RouteGenerator.mercadoPage);
-                          context.go(mercadoPage);
-                        } else if (item == MenuFondo.eliminar) {
-                          _deleteConfirm(context);
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                body: TabBarView(
-                  controller: _tabController,
-                  children: const [MainFondo(), TablaFondo(), GraficoFondo()],
-                ),
-                bottomNavigationBar: BottomAppBar(
-                  color: const Color(0xFF0D47A1),
-                  shape: const CircularNotchedRectangle(),
-                  notchMargin: 5,
-                  child: FractionallySizedBox(
-                    widthFactor: 0.7,
-                    alignment: FractionalOffset.bottomLeft,
-                    child: TabBar(
-                      controller: _tabController,
-                      labelColor: const Color(0xFFFFFFFF),
-                      unselectedLabelColor: const Color(0x62FFFFFF),
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      indicatorPadding: const EdgeInsets.all(5.0),
-                      indicatorColor: const Color(0xFF2196F3),
-                      tabs: const [
-                        Tab(icon: Icon(Icons.assessment, size: 32)),
-                        Tab(icon: Icon(Icons.table_rows_outlined, size: 32)),
-                        Tab(icon: Icon(Icons.timeline, size: 32)),
-                      ],
-                    ),
-                  ),
-                ),
-                floatingActionButtonLocation:
-                    FloatingActionButtonLocation.endDocked,
-                floatingActionButton: SpeedDial(
-                  icon: Icons.refresh,
-                  foregroundColor: const Color(0xFF0D47A1),
-                  backgroundColor: const Color(0xFFFFC107),
-                  spacing: 8,
-                  spaceBetweenChildren: 4,
-                  overlayColor: const Color(0xFF9E9E9E),
-                  overlayOpacity: 0.4,
-                  children: [
-                    _buildSpeedDialChild(
-                      context,
-                      icono: Icons.date_range,
-                      label: 'Descargar valores históricos',
-                      action: _getRangeApi,
-                    ),
-                    _buildSpeedDialChild(
-                      context,
-                      icono: Icons.update,
-                      label: 'Actualizar último valor',
-                      action: _getDataApi,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        } else {
+        if (snapshot.connectionState != ConnectionState.done) {
           return const LoadingProgress(titulo: 'Actualizando valores...');
         }
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: Container(
+            decoration: scaffoldGradient,
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: AppBar(
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                    // TODO: set carteraOn antes de navigator??
+                    context.go(carteraPage);
+                  },
+                ),
+                title: ListTile(
+                  title: Text(
+                    fondoSelect.name,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: const TextStyle(color: Color(0xFF0D47A1)),
+                  ),
+                  subtitle: Row(
+                    children: [
+                      const Icon(
+                        Icons.business_center,
+                        color: Color(0xFF0D47A1),
+                      ),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: Text(
+                          carteraSelect.name,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: const TextStyle(color: Color(0xFF0D47A1)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  PopupMenuButton(
+                    color: const Color(0xFF2196F3),
+                    offset: Offset(0.0, AppBar().preferredSize.height),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                    ),
+                    itemBuilder: (ctx) => [
+                      buildMenuItem(MenuFondo.mercado, Icons.shopping_cart),
+                      buildMenuItem(MenuFondo.eliminar, Icons.delete_forever),
+                    ],
+                    onSelected: (item) async {
+                      if (item == MenuFondo.mercado) {
+                        context.go(mercadoPage);
+                      } else if (item == MenuFondo.eliminar) {
+                        if (carteraProvider.valores.isEmpty) {
+                          _showMsg(msg: 'Nada que eliminar');
+                        } else {
+                          var resp = await _deleteConfirm(context);
+                          if (resp == null || resp == false) {
+                            setState(() {});
+                          } else {
+                            if (_deleteOp) {
+                              await database.deleteAllValores(
+                                  carteraSelect, fondoSelect);
+                            } else {
+                              await database.deleteOnlyValores(
+                                  carteraSelect, fondoSelect);
+                            }
+                            await setValores(carteraSelect, fondoSelect);
+                          }
+                        }
+                      }
+                    },
+                  ),
+                ],
+              ),
+              body: TabBarView(
+                controller: _tabController,
+                children: const [MainFondo(), TablaFondo(), GraficoFondo()],
+              ),
+              bottomNavigationBar: BottomAppBar(
+                color: const Color(0xFF0D47A1),
+                shape: const CircularNotchedRectangle(),
+                notchMargin: 5,
+                child: FractionallySizedBox(
+                  widthFactor: 0.7,
+                  alignment: FractionalOffset.bottomLeft,
+                  child: TabBar(
+                    controller: _tabController,
+                    labelColor: const Color(0xFFFFFFFF),
+                    unselectedLabelColor: const Color(0x62FFFFFF),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicatorPadding: const EdgeInsets.all(5.0),
+                    indicatorColor: const Color(0xFF2196F3),
+                    tabs: const [
+                      Tab(icon: Icon(Icons.assessment, size: 32)),
+                      Tab(icon: Icon(Icons.table_rows_outlined, size: 32)),
+                      Tab(icon: Icon(Icons.timeline, size: 32)),
+                    ],
+                  ),
+                ),
+              ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.endDocked,
+              floatingActionButton: SpeedDial(
+                icon: Icons.refresh,
+                foregroundColor: const Color(0xFF0D47A1),
+                backgroundColor: const Color(0xFFFFC107),
+                spacing: 8,
+                spaceBetweenChildren: 4,
+                overlayColor: const Color(0xFF9E9E9E),
+                overlayOpacity: 0.4,
+                children: [
+                  _buildSpeedDialChild(
+                    context,
+                    icono: Icons.date_range,
+                    label: 'Descargar valores históricos',
+                    action: _getRangeApi,
+                  ),
+                  _buildSpeedDialChild(
+                    context,
+                    icono: Icons.update,
+                    label: 'Actualizar último valor',
+                    action: _getDataApi,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
       },
     );
   }
@@ -282,17 +293,23 @@ class _PageFondoState extends State<PageFondo>
       if (!mounted) return;
       _dialogProgress(context);
       var range = newRange as DateTimeRange;
-      String from =
-          FechaUtil.dateToString(date: range.start, formato: 'yyyy-MM-dd');
-      String to =
-          FechaUtil.dateToString(date: range.end, formato: 'yyyy-MM-dd');
+      String from = FechaUtil.dateToString(
+        date: range.start,
+        formato: 'yyyy-MM-dd',
+      );
+      String to = FechaUtil.dateToString(
+        date: range.end,
+        formato: 'yyyy-MM-dd',
+      );
       final getDateApiRange =
           await apiService.getDataApiRange(fondoSelect.isin, to, from);
       var newListValores = <Valor>[];
       if (getDateApiRange != null) {
         for (var dataApi in getDateApiRange) {
-          newListValores
-              .add(Valor(date: dataApi.epochSecs, precio: dataApi.price));
+          newListValores.add(Valor(
+            date: dataApi.epochSecs,
+            precio: dataApi.price,
+          ));
         }
         for (var valor in newListValores) {
           //await database.insertValor(carteraSelect, fondoSelect, valor);
@@ -310,42 +327,60 @@ class _PageFondoState extends State<PageFondo>
     }
   }
 
-  void _deleteConfirm(BuildContext context) async {
+  _deleteConfirm(BuildContext context) async {
     //var fondoOn = context.read<CarfoinProvider>().getFondo!;
     // TODO: necesario getValores si se usa provider watch ??
     //await carfoin.getValoresFondo(fondoOn);
-    if (carteraProvider.valores.isEmpty) {
-      _showMsg(msg: 'Nada que eliminar');
-    } else {
-      showDialog(
-          context: context,
-          builder: (BuildContext ctx) {
-            return AlertDialog(
-              title: const Text('Eliminar todo'),
-              content: const Text(
-                  'Esto eliminará todos los valores almacenados del fondo.'),
-              actions: [
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('CANCELAR'),
+    return showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: const Text('Eliminar Valores'),
+            content: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                        'Esto eliminará todos los valores almacenados del fondo.'),
+                    const SizedBox(height: 10),
+                    if (carteraProvider.operaciones.isNotEmpty)
+                      CheckboxListTile(
+                        title: const Text('Eliminar operaciones'),
+                        value: _deleteOp,
+                        onChanged: (bool? newValue) {
+                          setState(() => _deleteOp = newValue!);
+                        },
+                        controlAffinity: ListTileControlAffinity.leading,
+                      ),
+                  ],
+                );
+              },
+            ),
+            actions: [
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, false),
+                //onPressed: () => Navigator.of(context).pop(),
+                child: const Text('CANCELAR'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(
+                  backgroundColor: const Color(0xFFF44336),
+                  primary: const Color(0xFFFFFFFF),
                 ),
-                ElevatedButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFFF44336),
-                    primary: const Color(0xFFFFFFFF),
-                  ),
-                  onPressed: () async {
+                /*onPressed: () async {
                     await database.deleteAllValores(carteraSelect, fondoSelect);
                     await setValores(carteraSelect, fondoSelect);
                     _pop();
                     //_tabController.animateTo(_tabController.index);
-                  },
-                  child: const Text('ACEPTAR'),
-                ),
-              ],
-            );
-          });
-    }
+                  },*/
+                child: const Text('ACEPTAR'),
+              ),
+            ],
+          );
+        });
   }
 
   void _showMsg({required String msg, MaterialColor color = Colors.grey}) {

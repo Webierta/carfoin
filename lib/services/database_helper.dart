@@ -249,10 +249,8 @@ class DatabaseHelper {
     Valor? existeValor = await getValorByDate(cartera, fondo, valor);
     if (existeValor == null) {
       //await db.update(nameTable, valor.toDb(), where: '$columnDate = ?', whereArgs: [valor.date]);
-      print('NO EXISTE');
       await insertValor(cartera, fondo, valor);
     } else {
-      print('EXISTE');
       var upValor = Valor(
           date: valor.date,
           precio: valor.precio,
@@ -280,6 +278,14 @@ class DatabaseHelper {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
     await db.delete(nameTable);
+  }
+
+  Future<void> deleteOnlyValores(Cartera cartera, Fondo fondo) async {
+    Database db = await database;
+    var nameTable = '_${cartera.id}${fondo.isin}';
+    //await db.delete(nameTable, where: '$columnTipoOperacion = ?', whereArgs: [-1]);
+    await db.delete(nameTable,
+        where: '$columnTipoOperacion IN (?)', whereArgs: [-1]);
   }
 
   Future<void> deleteOperacion(Cartera cartera, Fondo fondo, Valor op) async {
