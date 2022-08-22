@@ -185,6 +185,7 @@ class _PageFondoState extends State<PageFondo>
               ),
               body: TabBarView(
                 controller: _tabController,
+                physics: const NeverScrollableScrollPhysics(),
                 children: const [MainFondo(), TablaFondo(), GraficoFondo()],
               ),
               bottomNavigationBar: BottomAppBar(

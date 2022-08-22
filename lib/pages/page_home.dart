@@ -4,7 +4,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
-//import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
@@ -185,7 +184,7 @@ class _PageHomeState extends State<PageHome> {
                     onPressed: () => _inputName(context),
                   ),
                   body: Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 42),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Consumer<CarteraProvider>(
                       builder: (context, data, child) {
                         if (data.carteras.isEmpty) {
@@ -266,9 +265,13 @@ class _PageHomeState extends State<PageHome> {
     } */
 
     try {
+      ///var storages = await ExternalPath.getExternalStorageDirectories();
+
       String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
       if (selectedDirectory == null) return;
+
       filePath = '$selectedDirectory/$nombreDb';
+
       //filePath = await _getFilePath();
       if (filePath.isEmpty) throw Exception(); // o return ??
       File file = File(filePath);
@@ -290,7 +293,6 @@ class _PageHomeState extends State<PageHome> {
       okSave = false;
     }
 
-    //_dialogResultSave(okSave, filePath);
     await _resultProcess(isImport: false, isOk: okSave, filePath: filePath);
   }
 
@@ -530,6 +532,19 @@ class _PageHomeState extends State<PageHome> {
     }
   }
 
+  _goCartera(BuildContext context, Cartera cartera) {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    carteraProvider.carteraSelect = cartera;
+    context.go(carteraPage);
+  }
+
+  _goFondo(BuildContext context, Cartera cartera, Fondo fondo) {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    carteraProvider.carteraSelect = cartera;
+    carteraProvider.fondoSelect = fondo;
+    context.go(fondoPage);
+  }
+
   _dialogDeleteConfirm(BuildContext context, [String? carteraName]) async {
     return showDialog(
         barrierDismissible: false,
@@ -562,21 +577,10 @@ class _PageHomeState extends State<PageHome> {
         });
   }
 
-  _goCartera(BuildContext context, Cartera cartera) {
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    carteraProvider.carteraSelect = cartera;
-    context.go(carteraPage);
-  }
-
-  _goFondo(BuildContext context, Cartera cartera, Fondo fondo) {
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    carteraProvider.carteraSelect = cartera;
-    carteraProvider.fondoSelect = fondo;
-    context.go(fondoPage);
-  }
-
   _deleteCartera(Cartera cartera) async {
     _eliminar() async {
+      //await database.deleteAllValores(cartera)
+
       await database.deleteAllFondos(cartera);
       await database.deleteCartera(cartera);
       carteraProvider.removeAllFondos(cartera);

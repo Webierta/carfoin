@@ -10,6 +10,7 @@ class VistaDetalle extends StatelessWidget {
   final Function goCartera;
   final Function inputName;
   final Function goFondo;
+
   const VistaDetalle({
     Key? key,
     required this.cartera,
@@ -39,8 +40,9 @@ class VistaDetalle extends StatelessWidget {
       for (var fondo in fondos) {
         if (fondo.valores != null && fondo.valores!.isNotEmpty) {
           Stats stats = Stats(fondo.valores!);
-          participacionesCartera += stats.totalParticipaciones() ?? 0.0;
-          if (participacionesCartera > 0) {
+          double participacionesFondo = stats.totalParticipaciones() ?? 0.0;
+          participacionesCartera += participacionesFondo;
+          if (participacionesFondo > 0) {
             if (fondo.divisa == 'EUR') {
               if (stats.resultado() != null) {
                 isTrueCapitalCarteraEur = true;
@@ -72,26 +74,6 @@ class VistaDetalle extends StatelessWidget {
           }
         }
       }
-    }
-
-    Widget _builTextCartera(double valorStats,
-        {String divisa = '', bool color = false}) {
-      return FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          '${NumberUtil.decimalFixed(valorStats)} $divisa',
-          maxLines: 1,
-          style: TextStyle(
-            fontWeight: FontWeight.w900,
-            color: color == true
-                ? valorStats < 0
-                    ? Colors.red
-                    : Colors.green
-                : Colors.black,
-            fontSize: 16,
-          ),
-        ),
-      );
     }
 
     return Dismissible(
@@ -206,9 +188,8 @@ class VistaDetalle extends StatelessWidget {
                             children: [
                               for (var fondo in fondos)
                                 TextButton(
-                                  onPressed: () {
-                                    goFondo(context, cartera, fondo);
-                                  },
+                                  onPressed: () =>
+                                      goFondo(context, cartera, fondo),
                                   child: Text(
                                     fondo.name,
                                     overflow: TextOverflow.ellipsis,
@@ -234,52 +215,29 @@ class VistaDetalle extends StatelessWidget {
                   (isTrueRendCarteraEur ||
                       isTrueRendCarteraUsd ||
                       isTrueRendCarteraOtra))
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Wrap(
+                    alignment: WrapAlignment.end,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('VALOR', style: TextStyle(fontSize: 12)),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              if (isTrueCapitalCarteraEur)
-                                _builTextCartera(capitalCarteraEur,
-                                    divisa: 'EUR'),
-                              if (isTrueCapitalCarteraUsd)
-                                _builTextCartera(capitalCarteraUsd,
-                                    divisa: 'USD'),
-                              if (isTrueCapitalCarteraOtra)
-                                _builTextCartera(capitalCarteraOtra),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('BALANCE', style: TextStyle(fontSize: 12)),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              if (isTrueRendCarteraEur)
-                                _builTextCartera(rendimientoCarteraEur,
-                                    divisa: 'EUR', color: true),
-                              if (isTrueRendCarteraUsd)
-                                _builTextCartera(rendimientoCarteraUsd,
-                                    divisa: 'USD', color: true),
-                              if (isTrueRendCarteraOtra)
-                                _builTextCartera(rendimientoCarteraOtra,
-                                    color: true),
-                            ],
-                          ),
-                        ],
-                      ),
+                      if (isTrueCapitalCarteraEur && isTrueRendCarteraEur)
+                        ListTileCart(
+                          capital: capitalCarteraEur,
+                          balance: rendimientoCarteraEur,
+                          divisa: '€',
+                        ),
+                      if (isTrueCapitalCarteraUsd && isTrueRendCarteraUsd)
+                        ListTileCart(
+                          capital: capitalCarteraUsd,
+                          balance: rendimientoCarteraUsd,
+                          divisa: '\$',
+                        ),
+                      if (isTrueCapitalCarteraOtra && isTrueRendCarteraOtra)
+                        ListTileCart(
+                          capital: capitalCarteraOtra,
+                          balance: rendimientoCarteraOtra,
+                          divisa: '?',
+                        ),
                     ],
                   ),
                 ),
@@ -315,6 +273,63 @@ class ChipFondo extends StatelessWidget {
           title,
           style: const TextStyle(color: Color(0xFF0D47A1), fontSize: 18),
         ),
+      ),
+    );
+  }
+}
+
+class ListTileCart extends StatelessWidget {
+  final double capital;
+  final double balance;
+  final String divisa;
+  const ListTileCart(
+      {Key? key,
+      required this.capital,
+      required this.balance,
+      required this.divisa})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Row _buildRow(double stats, {bool isTitle = true}) {
+      Color fontColor = const Color(0xFF000000);
+      double fontSsize = 16;
+      IconData icon = Icons.savings;
+      if (!isTitle) {
+        fontColor =
+            stats < 0 ? const Color(0xFFF44336) : const Color(0xFF4CAF50);
+        fontSsize = 14;
+        icon = Icons.iso;
+      }
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FittedBox(
+            child: Text(
+              '${NumberUtil.decimalFixed(stats, long: false)} $divisa',
+              textAlign: TextAlign.end,
+              maxLines: 1,
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: fontSsize,
+                color: fontColor,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Icon(icon, color: const Color(0xFF0D47A1)),
+        ],
+      );
+    }
+
+    return SizedBox(
+      width: 200,
+      child: ListTile(
+        visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
+        dense: true,
+        title: _buildRow(capital),
+        subtitle: _buildRow(balance, isTitle: false),
       ),
     );
   }

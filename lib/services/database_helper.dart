@@ -164,11 +164,19 @@ class DatabaseHelper {
   Future<void> deleteFondo(Cartera cartera, Fondo fondo) async {
     Database db = await database;
     var nameTable = '_${cartera.id}';
+    // ELIMINA TODOS SUS VALORES
+    await deleteAllValores(cartera, fondo);
     await db
         .delete(nameTable, where: '$columnIsin = ?', whereArgs: [fondo.isin]);
   }
 
   Future<void> deleteAllFondos(Cartera cartera) async {
+    if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
+      for (var fondo in cartera.fondos!) {
+        await deleteFondo(cartera, fondo);
+      }
+    }
+
     Database db = await database;
     var nameTable = '_${cartera.id}';
     await db.delete(nameTable);

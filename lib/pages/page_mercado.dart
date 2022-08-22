@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-//import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
@@ -144,8 +143,9 @@ class _MercadoState extends State<PageMercado> {
                           child: Text(
                             'SUSCRIBIR',
                             style: TextStyle(
-                                fontWeight:
-                                    _tipo ? FontWeight.bold : FontWeight.w300),
+                              fontWeight:
+                                  _tipo ? FontWeight.bold : FontWeight.w300,
+                            ),
                           ),
                         ),
                         Padding(
@@ -153,8 +153,9 @@ class _MercadoState extends State<PageMercado> {
                           child: Text(
                             'REEMBOLSAR',
                             style: TextStyle(
-                                fontWeight:
-                                    !_tipo ? FontWeight.bold : FontWeight.w300),
+                              fontWeight:
+                                  !_tipo ? FontWeight.bold : FontWeight.w300,
+                            ),
                           ),
                         ),
                       ],
@@ -246,8 +247,10 @@ class _MercadoState extends State<PageMercado> {
                           errorStyle: const TextStyle(fontSize: 0, height: 0),
                           labelText: 'Precio',
                           suffixIcon: IconButton(
-                            icon: const Icon(Icons.download,
-                                color: Color(0xFF2196F3)),
+                            icon: const Icon(
+                              Icons.download,
+                              color: Color(0xFF2196F3),
+                            ),
                             onPressed: () async {
                               //Loading(context).openDialog(title: 'Obteniendo valor liquidativo...');
                               //const LoadingProgress(titulo: 'Obteniendo valor liquidativo...');
@@ -315,15 +318,14 @@ class _MercadoState extends State<PageMercado> {
                             fit: BoxFit.scaleDown,
                             child: Text(
                               _isValido == true
-                                  /*? NumberFormat.currency(
-                                          locale: 'es', symbol: '')
-                                      .format(_participaciones * _precio)*/
                                   ? NumberUtil.currency(
                                       _participaciones * _precio)
                                   : '0.0',
                               maxLines: 1,
                               style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
@@ -357,14 +359,12 @@ class _MercadoState extends State<PageMercado> {
       Stats stats = Stats(valoresSelect);
       var participaciones = stats.totalParticipaciones() ?? 0;
       if (tipoOp == 0 && _participaciones > participaciones) {
-        print('operacion no permitida');
         _showMsg(
           //msg: 'Operación no permitida: no puedes reembolsar las participaciones que no tienes.',
           msg: 'Máximo de participaciones: $participaciones',
           color: Colors.red,
         );
       } else {
-        print('OK');
         Valor newOp = Valor(
             tipo: tipoOp,
             date: _date,
@@ -378,7 +378,6 @@ class _MercadoState extends State<PageMercado> {
 
         if (!mounted) return;
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
-        //Navigator.of(context).pushNamed(RouteGenerator.fondoPage);
         context.go(fondoPage);
       }
     }

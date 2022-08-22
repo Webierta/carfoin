@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-//import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/cartera.dart';
@@ -38,19 +37,14 @@ class _MainFondoState extends State<MainFondo> {
   setValores(Cartera cartera, Fondo fondo) async {
     carteraProvider.valores = await database.getValores(cartera, fondo);
     fondo.valores = carteraProvider.valores;
-
     //fondoSelect.valores = carteraProvider.valores;
-
     valoresSelect = carteraProvider.valores;
-
     carteraProvider.operaciones = await database.getOperaciones(cartera, fondo);
     operacionesSelect = carteraProvider.operaciones;
-
     //carteraProvider.addValores(carteraSelect, fondoSelect, valoresSelect);
     //carteraProvider.calculaStats(fondo);
     //carteraProvider.calculaInversion(fondo);
     //carteraProvider.calculaResultado(fondo);
-
     //stats = Stats(valoresSelect);
   }
 
@@ -83,7 +77,6 @@ class _MainFondoState extends State<MainFondo> {
     }*/
 
     stats = Stats(valores);
-
     //carteraProvider.addValores(carteraSelect, fondoSelect, valores);
 
     double? _getDiferencia() {
@@ -373,27 +366,15 @@ class _MainFondoState extends State<MainFondo> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.end,
                                       children: [
-                                        /*Text(NumberFormat.decimalPattern('es')
-                                            .format(stats.precioMinimo())),*/
                                         Text(NumberUtil.decimal(
                                             stats.precioMinimo() ?? 0)),
-                                        /*Text(NumberFormat.decimalPattern('es')
-                                            .format(stats.precioMaximo())),*/
                                         Text(NumberUtil.decimal(
                                             stats.precioMaximo() ?? 0)),
                                         Text(stats.precioMedio() != null
-                                            /*? NumberFormat.decimalPattern('es')
-                                                .format(double.parse(stats
-                                                    .precioMedio()!
-                                                    .toStringAsFixed(2)))*/
                                             ? NumberUtil.decimalFixed(
                                                 stats.precioMedio()!)
                                             : ''),
                                         Text(stats.volatilidad() != null
-                                            /*? NumberFormat.decimalPattern('es')
-                                                .format(double.parse(stats
-                                                    .volatilidad()!
-                                                    .toStringAsFixed(2)))*/
                                             ? NumberUtil.decimalFixed(
                                                 stats.volatilidad()!)
                                             : ''),
@@ -419,9 +400,6 @@ class _MainFondoState extends State<MainFondo> {
                   contentPadding: const EdgeInsets.all(12),
                   leading: const Icon(Icons.compare_arrows,
                       size: 32, color: Color(0xFF2196F3)),
-                  /*title: FittedBox(
-                    child: Text('OPERACIONES', style: Theme.of(context).textTheme.titleLarge),
-                  ),*/
                   title: const FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
@@ -438,11 +416,11 @@ class _MainFondoState extends State<MainFondo> {
                     child: CircleAvatar(
                       backgroundColor: const Color(0xFFFFC107),
                       child: IconButton(
-                        icon: const Icon(Icons.shopping_cart,
-                            color: Color(0xFF0D47A1)),
-                        onPressed: () =>
-                            //Navigator.of(context).pushNamed(RouteGenerator.mercadoPage),
-                            context.go(mercadoPage),
+                        icon: const Icon(
+                          Icons.shopping_cart,
+                          color: Color(0xFF0D47A1),
+                        ),
+                        onPressed: () => context.go(mercadoPage),
                       ),
                     ),
                   ),
@@ -457,8 +435,10 @@ class _MainFondoState extends State<MainFondo> {
                             fit: BoxFit.fill,
                             child: DataTable(
                               decoration: BoxDecoration(
-                                border:
-                                    Border.all(color: Colors.blue, width: 2),
+                                border: Border.all(
+                                  color: Colors.blue,
+                                  width: 2,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               //headingRowHeight: 0,
@@ -531,8 +511,10 @@ class _MainFondoState extends State<MainFondo> {
                         children: [
                           Row(
                             children: [
-                              const Text('Inversión',
-                                  style: TextStyle(fontSize: 16)),
+                              const Text(
+                                'Inversión',
+                                style: TextStyle(fontSize: 16),
+                              ),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Align(
@@ -541,10 +523,6 @@ class _MainFondoState extends State<MainFondo> {
                                     fit: BoxFit.scaleDown,
                                     child: Text(
                                       stats.inversion() != null
-                                          /*? NumberFormat.decimalPattern('es')
-                                              .format(double.parse(stats
-                                                  .inversion()!
-                                                  .toStringAsFixed(2)))*/
                                           ? NumberUtil.decimalFixed(
                                               stats.inversion()!)
                                           : '',
@@ -558,8 +536,10 @@ class _MainFondoState extends State<MainFondo> {
                           const SizedBox(height: 10),
                           Row(
                             children: [
-                              const Text('Resultado',
-                                  style: TextStyle(fontSize: 16)),
+                              const Text(
+                                'Resultado',
+                                style: TextStyle(fontSize: 16),
+                              ),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Align(
@@ -568,21 +548,13 @@ class _MainFondoState extends State<MainFondo> {
                                     fit: BoxFit.scaleDown,
                                     child: Text(
                                       stats.resultado() != null
-                                          /*? NumberFormat.decimalPattern('es')
-                                              .format(double.parse(stats
-                                                  .resultado()!
-                                                  .toStringAsFixed(2)))*/
-                                          /*? NumberFormat.compactLong(
-                                                  locale: 'es')
-                                              .format(double.parse(stats
-                                                  .resultado()!
-                                                  .toStringAsFixed(2)))*/
                                           ? NumberUtil.decimalFixed(
                                               stats.resultado()!)
                                           : '',
                                       style: const TextStyle(
-                                          fontWeight: FontWeight.w900,
-                                          fontSize: 16),
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 16,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -602,10 +574,6 @@ class _MainFondoState extends State<MainFondo> {
                                     fit: BoxFit.scaleDown,
                                     child: Text(
                                       stats.balance() != null
-                                          /*? NumberFormat.decimalPattern('es')
-                                              .format(double.parse(stats
-                                                  .balance()!
-                                                  .toStringAsFixed(2)))*/
                                           ? NumberUtil.decimalFixed(
                                               stats.balance()!)
                                           : '',
@@ -632,10 +600,6 @@ class _MainFondoState extends State<MainFondo> {
                               //const Spacer(),
                               Text(
                                 stats.rentabilidad() != null
-                                    /*? NumberFormat.decimalPercentPattern(
-                                        locale: 'es',
-                                        decimalDigits: 2,
-                                      ).format(stats.rentabilidad())*/
                                     ? NumberUtil.percent(stats.rentabilidad()!)
                                     : '',
                                 style: TextStyle(
@@ -656,10 +620,6 @@ class _MainFondoState extends State<MainFondo> {
                               //const Spacer(),
                               Text(
                                 stats.tae() != null
-                                    /*? NumberFormat.decimalPercentPattern(
-                                        locale: 'es',
-                                        decimalDigits: 2,
-                                      ).format(stats.tae())*/
                                     ? NumberUtil.percent(stats.tae()!)
                                     : '',
                                 style: TextStyle(

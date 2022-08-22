@@ -37,7 +37,6 @@ class _PageCarteraState extends State<PageCartera> {
   String _loadingText = '';
 
   //late Stats stats;
-
   getSharedPrefs() async {
     bool? isFondosByOrder;
     bool? isAutoUpdate;
@@ -204,7 +203,7 @@ class _PageCarteraState extends State<PageCartera> {
                 ],
               ),
               body: Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Consumer<CarteraProvider>(
                   builder: (context, data, child) {
                     if (data.fondos.isEmpty) {
@@ -229,189 +228,6 @@ class _PageCarteraState extends State<PageCartera> {
                           removeFondo: _removeFondo,
                           goFondo: _goFondo,
                         );
-
-                        /*
-                        /// START WIDGET
-
-                        //List<Valor> valores = await database.getValores(carteraSelect, fondo);
-                        //final valores = context.read<CarteraProvider>().valores;
-                        List<Valor>? valores = data.fondos[index].valores;
-                        String lastDate = '';
-                        int dia = 0;
-                        String mesYear = '';
-                        String lastPrecio = '';
-                        String divisa = fondo.divisa ?? '';
-                        double? diferencia;
-                        if (valores != null && valores.isNotEmpty) {
-                          int lastEpoch = valores.first.date;
-                          lastDate = FechaUtil.epochToString(lastEpoch);
-                          dia = FechaUtil.epochToDate(lastEpoch).day;
-                          //mes = FechaUtil.epochToDate(lastEpoch).month;
-                          //ano = FechaUtil.epochToDate(lastEpoch).year;
-                          mesYear = FechaUtil.epochToString(lastEpoch,
-                              formato: 'MMM yy');
-                          //lastPrecio = NumberFormat.decimalPattern('es').format(valores.first.precio);
-                          lastPrecio = NumberUtil.decimal(valores.first.precio);
-                          if (valores.length > 1) {
-                            diferencia =
-                                valores.first.precio - valores[1].precio;
-                          }
-                          stats = Stats(valores);
-                        }
-                        // TODO: refactor widget DISMISSIBLE
-                        return Dismissible(
-                          key: UniqueKey(),
-                          direction: DismissDirection.endToStart,
-                          background: Container(
-                            color: const Color(0xFFF44336),
-                            margin: const EdgeInsets.symmetric(horizontal: 15),
-                            alignment: Alignment.centerRight,
-                            child: const Padding(
-                              padding: EdgeInsets.all(10.0),
-                              child:
-                                  Icon(Icons.delete, color: Color(0xFFFFFFFF)),
-                            ),
-                          ),
-                          onDismissed: (_) async => await _removeFondo(fondo),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: const Color.fromRGBO(255, 255, 255, 0.5),
-                                border:
-                                    Border.all(color: Colors.white, width: 2),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                children: [
-                                  ListTile(
-                                    leading: CircleAvatar(
-                                      radius: 22,
-                                      backgroundColor: const Color(0xFFFFFFFF),
-                                      child: CircleAvatar(
-                                        backgroundColor:
-                                            const Color(0xFFFFC107),
-                                        child: IconButton(
-                                          onPressed: () =>
-                                              _goFondo(context, fondo),
-                                          icon: const Icon(
-                                            Icons.poll,
-                                            color: Color(0xFF0D47A1),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    title: Text(
-                                      fondo.name,
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: Color(0xFF2196F3),
-                                      ),
-                                    ),
-                                    subtitle: Text(
-                                      fondo.isin,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: Color(0xFF0D47A1),
-                                      ),
-                                    ),
-                                    //trailing: const Icon(Icons.more_vert),
-                                  ),
-                                  if (valores != null && valores.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 12),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFBBDEFB),
-                                          border: Border.all(
-                                              color: Colors.white, width: 2),
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        child: IntrinsicHeight(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              //mainAxisAlignment: MainAxisAlignment.start,
-                                              //crossAxisAlignment: CrossAxisAlignment.start,
-                                              DiaCalendario(
-                                                  epoch: valores.first.date),
-                                              //const Spacer(),
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.end,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    //const Spacer(),
-                                                    Text(
-                                                      'V.L. $lastPrecio $divisa',
-                                                      style: const TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color:
-                                                            Color(0xFF0D47A1),
-                                                      ),
-                                                    ),
-                                                    if (diferencia != null)
-                                                      Text(
-                                                        diferencia
-                                                            .toStringAsFixed(2),
-                                                        style: TextStyle(
-                                                          color: diferencia < 0
-                                                              ? const Color(
-                                                                  0xFFF44336)
-                                                              : const Color(
-                                                                  0xFF4CAF50),
-                                                        ),
-                                                      ),
-                                                    //const Spacer(),
-                                                    (stats.resultado() !=
-                                                                null &&
-                                                            stats.resultado() !=
-                                                                0)
-                                                        ? FittedBox(
-                                                            fit: BoxFit
-                                                                .scaleDown,
-                                                            child: Text(
-                                                              'Capital: ${NumberUtil.decimalFixed(stats.resultado()!)} $divisa',
-                                                              style:
-                                                                  const TextStyle(
-                                                                color: Color(
-                                                                    0xFF0D47A1),
-                                                                //fontSize: 14
-                                                              ),
-                                                            ),
-                                                          )
-                                                        : const Text(
-                                                            'Sin inversiones'),
-                                                    //const Spacer(),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-
-                        /// END WIDGET
-                        */
                       },
                     );
                   },
@@ -502,7 +318,6 @@ class _PageCarteraState extends State<PageCartera> {
       }
       //TODO: check si es necesario update (si no ha habido cambios porque todos los fondos han dado error)
       ///await carfoin.updateFondos(_isFondosByOrder);
-
       //await carfoin.updateDbCarteras(_isCarterasByOrder);
       await setFondos(carteraSelect);
     }
@@ -673,14 +488,11 @@ class _PageCarteraState extends State<PageCartera> {
       _showMsg(msg: 'Nada que eliminar');
     } else {
       var resp = await _dialogDeleteConfirm(context);
-
       if (resp == null || resp == false) {
         setState(() {});
       } else {
         _removeAllFondos();
       }
-
-      //resp ? _removeAllFondos() : setState(() {});
     }
   }
 

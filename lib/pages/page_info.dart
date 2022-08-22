@@ -98,7 +98,9 @@ const String mdstring = """
 
 Después de crear una Cartera, incorpora los Fondos de Inversión que te interesa seguir. Puedes añadir un nuevo Fondo desde la base de datos que incorpora el programa o bien online a partir de su código ISIN —el programa utiliza el dígito de control para verificarlo—.
 
-Después puedes seguir la evolución de los Fondos añadidos actualizando periódicamente su cotización y archivando el histórico de valores. El programa calcula algunos índices de rentabilidad y muestra los valores en una tabla y en un gráfico.
+Después puedes seguir la evolución de los Fondos añadidos actualizando periódicamente su cotización y archivando el histórico de valores.
+
+El programa muestra los valores en una tabla y en un gráfico, y además calcula algunos estadísticos de los fondos (valor liquidativo medio, volatilidad...) e índices de rentabilidad (rendimiento, rentabilidad acumulada...). Ten en cuenta que estos cálculos dependen de los valores descargados y por tanto no son valores absolutos del fondo.
 
 ---
 
