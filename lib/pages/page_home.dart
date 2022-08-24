@@ -1,19 +1,15 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
-import 'package:sqflite/sqflite.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
 import '../router/routes_const.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
+import '../utils/file_util.dart';
 import '../utils/konstantes.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
@@ -242,80 +238,48 @@ class _PageHomeState extends State<PageHome> {
     );
   }
 
-  _export(BuildContext context) async {
-    await _inputName(context, isSave: true);
-    if (_errorText != null) return '';
-    String nombreDb = _controller.value.text.trim();
-    nombreDb = '$nombreDb.db';
-    _controller.clear();
-    bool okSave = false;
-    final String dbPath = await database.getDatabasePath();
-    var dbFile = File(dbPath);
-    final dbAsBytes = await dbFile.readAsBytes();
-    String filePath = '';
-
-    /* Future<String> _getFilePath() async {
-      Directory? directory = await getExternalStorageDirectory();
-      //if (directory == null || directory.path.isEmpty || !await directory.exists()) return '';
-      if (directory == null) return '';
-      if ((!await directory.exists())) directory.create();
-      String path = directory.path;
-      String filePath = '$path/$nombreDb';
-      return filePath;
-    } */
-
-    try {
-      ///var storages = await ExternalPath.getExternalStorageDirectories();
-
-      String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-      if (selectedDirectory == null) return;
-
-      filePath = '$selectedDirectory/$nombreDb';
-
-      //filePath = await _getFilePath();
-      if (filePath.isEmpty) throw Exception(); // o return ??
-      File file = File(filePath);
-
-      var status = await Permission.storage.status;
-      if (!status.isGranted) {
-        status = await Permission.storage.request();
+  _showResult({
+    required bool isImport,
+    required Status status,
+    String? msg,
+    bool? requiredRestart,
+  }) async {
+    String line1 = '';
+    String line2 = '';
+    if (isImport) {
+      if (status == Status.ok) {
+        line1 = 'Proceso de importación terminado con éxito.';
+      } else if (status == Status.error) {
+        line1 = 'Error en el proceso de importación.';
+      } else if (status == Status.abortado) {
+        line1 = 'Proceso abortado';
       }
-      if (status.isGranted) {
-        await file.writeAsBytes(dbAsBytes);
-        okSave = true;
-      } else {
-        throw Exception();
+      if (requiredRestart == true) {
+        line2 = 'La app se reiniciará.';
+      } else if (msg != null) {
+        line2 = msg;
       }
-    } catch (e) {
-      //TODO: mensaje de error
-      print(e.toString());
-      //return;
-      okSave = false;
-    }
-
-    await _resultProcess(isImport: false, isOk: okSave, filePath: filePath);
-  }
-
-  _resultProcess(
-      {required bool isImport,
-      required bool isOk,
-      String filePath = ''}) async {
-    String path = filePath;
-    if (!isImport) {
-      if (filePath.contains('0/')) {
-        var index = filePath.indexOf('0/');
-        path = filePath.substring(index + 2);
+    } else {
+      if (status == Status.ok) {
+        line1 = 'Proceso de exportación terminado con éxito.';
+        if (msg != null) {
+          String path = msg;
+          if (msg.contains('0/')) {
+            var index = msg.indexOf('0/');
+            path = msg.substring(index + 2);
+          }
+          line2 = 'Copia guardada en $path';
+        }
+      } else if (status == Status.error) {
+        line1 = 'Error en el proceso de exportación.';
+        line2 =
+            'Intenta guardar la copia de seguridad en el almacenamiento interno '
+            '(dependiendo de la versión de Android de tu dispositivo puede '
+            'que la App no tenga permiso para escribir en la tarjeta SD).';
+      } else if (status == Status.abortado) {
+        line1 = 'Proceso abortado';
       }
     }
-    String line1 =
-        isOk ? 'El proceso ha concluido con éxito.' : 'El proceso ha fallado.';
-    String line2 = isImport
-        ? 'La app se reiniciará.'
-        : isOk
-            ? 'La copia se ha almacenado en $path'
-            : 'Intenta guardar la copia de seguridad en el almacenamiento interno '
-                '(dependiendo de la versión de Android de tu dispositivo puede '
-                'que la app no tenga permiso para escribir en la tarjeta SD).';
 
     return showDialog(
         context: context,
@@ -325,22 +289,36 @@ class _PageHomeState extends State<PageHome> {
             title: const Text('Resultado'),
             content: SingleChildScrollView(
               child: ListBody(
-                children: [
-                  Text(line1),
-                  Text(line2),
-                ],
+                children: [Text(line1), Text(line2)],
               ),
             ),
             actions: [
               TextButton(
                 child: const Text('Cerrar'),
                 onPressed: () {
-                  isImport ? Restart.restartApp() : Navigator.of(context).pop();
+                  (isImport && requiredRestart == true)
+                      ? Restart.restartApp()
+                      : Navigator.of(context).pop();
                 },
               ),
             ],
           );
         });
+  }
+
+  _export(BuildContext context) async {
+    await _inputName(context, isSave: true);
+    if (_errorText != null) return '';
+    String nombreDb = _controller.value.text.trim();
+    nombreDb = '$nombreDb.db';
+    _controller.clear();
+
+    var resultExport = await FileUtil.exportar(nombreDb);
+    await _showResult(
+      isImport: false,
+      status: resultExport.status,
+      msg: resultExport.msg,
+    );
   }
 
   _import(BuildContext context) async {
@@ -377,50 +355,13 @@ class _PageHomeState extends State<PageHome> {
 
     if (await isConfirm == null || !await isConfirm) return;
 
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-    if (result == null || result.files.isEmpty) return;
-
-    bool okImport = false;
-    final String dbPath = await database.getDatabasePath();
-    PlatformFile archivo = result.files.first;
-
-    // TODO: ESTUDIAR POSIBILIDAD DE RECUPERAR BD ORIGINAL: EXPORTAR AUTO??
-    //var dbFile = File(dbPath);
-    //var dbBackup = await dbFile.readAsBytes();
-
-    if (archivo.extension == 'db' &&
-        archivo.path != null &&
-        await database.isDatabase(archivo.path!)) {
-      try {
-        //throw Exception();
-        File file = File(archivo.path!);
-        final dbAsBytes = await file.readAsBytes();
-        //final dbDir = await getDatabasesPath();
-        //final String dbPath = join(dbDir, 'database.db');
-        await deleteDatabase(dbPath);
-        //await database.deleteDatabase(dbPath);
-        await File(dbPath).writeAsBytes(dbAsBytes);
-        okImport = true;
-      } catch (e) {
-        print('EXCEPCION');
-        print(e);
-        // TODO: DIALOGO ERROR: RECUPERAR BD ??
-        //await deleteDatabase(dbPath);
-        //await database.deleteDatabase(dbPath);
-        //await File(dbPath).writeAsBytes(dbBackup);
-        // TODO: RECUPERAR BD AUTOGUARDADA ??
-        //await deleteDatabase(dbPath);
-        okImport = false;
-      } finally {
-        //await _dialogResultImport(okImport);
-        await _resultProcess(isImport: true, isOk: okImport);
-        //Restart.restartApp();
-      }
-    } else {
-      //  msg: formato archivo incorrecto
-      print('archivo no reconocido');
-      return;
-    }
+    var resultImport = await FileUtil.importar();
+    await _showResult(
+      isImport: true,
+      status: resultImport.status,
+      requiredRestart: resultImport.requiredRestart,
+      msg: resultImport.msg,
+    );
   }
 
   Future<void> _inputName(BuildContext context,
@@ -454,17 +395,6 @@ class _PageHomeState extends State<PageHome> {
                               labelText: label,
                             ),
                           ),
-                          if (isSave)
-                            const Padding(
-                              padding: EdgeInsets.only(top: 12),
-                              child: Text(
-                                  'Después selecciona el destino donde almacenar '
-                                  'la copia de seguridad (se recomienda utilizar '
-                                  'el almacenamiento interno del dispositivo '
-                                  'porque dependiendo de tu versión de Android '
-                                  'puede que la app no tenga permiso para escribir '
-                                  'en la tarjeta SD).'),
-                            ),
                         ],
                       ),
                       actions: <Widget>[
