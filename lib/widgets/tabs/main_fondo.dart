@@ -132,6 +132,7 @@ class _MainFondoState extends State<MainFondo> {
     }
 
     List<DataRow> _createRows() {
+      if (operaciones.isEmpty || valores.isEmpty) return <DataRow>[];
       return [
         for (var op in operaciones)
           DataRow(cells: [
@@ -469,16 +470,31 @@ class _MainFondoState extends State<MainFondo> {
         if (operaciones.isNotEmpty)
           Card(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: Column(
                 children: [
-                  const ListTile(
-                    leading: Icon(
+                  ListTile(
+                    leading: const Icon(
                       Icons.balance,
                       size: 32,
                       color: Color(0xFF2196F3),
                     ), // Icons.balance
-                    title: Text('BALANCE', style: TextStyle(fontSize: 18)),
+                    title:
+                        const Text('BALANCE', style: TextStyle(fontSize: 18)),
+                    trailing: CircleAvatar(
+                      radius: 22,
+                      backgroundColor: const Color(0xFFFFFFFF),
+                      child: CircleAvatar(
+                        backgroundColor: const Color(0xFFFFC107),
+                        child: IconButton(
+                          onPressed: () => context.go(infoBalancePage),
+                          icon: const Icon(
+                            Icons.info_outline,
+                            color: Color(0xFF0D47A1),
+                          ),
+                        ),
+                      ),
+                    ),
                     /*subtitle: Align(
                       alignment: Alignment.topLeft,
                       child: Chip(
@@ -595,9 +611,10 @@ class _MainFondoState extends State<MainFondo> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('Rentabilidad',
-                                  style: TextStyle(fontSize: 16)),
-                              //const Spacer(),
+                              const Text(
+                                'Rentabilidad',
+                                style: TextStyle(fontSize: 16),
+                              ),
                               Text(
                                 stats.rentabilidad() != null
                                     ? NumberUtil.percent(stats.rentabilidad()!)
@@ -613,17 +630,43 @@ class _MainFondoState extends State<MainFondo> {
                             ],
                           ),
                           const SizedBox(height: 10),
+                          if (stats.rentabilidad() != null &&
+                              stats.anualizar(stats.rentabilidad()!) != null)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'TAE',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                Text(
+                                  NumberUtil.percent(
+                                      stats.anualizar(stats.rentabilidad()!)!),
+                                  style: TextStyle(
+                                    color: stats.anualizar(
+                                                stats.rentabilidad()!)! <
+                                            0
+                                        ? Colors.red
+                                        : Colors.green,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          const SizedBox(height: 10),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('TAE', style: TextStyle(fontSize: 16)),
-                              //const Spacer(),
+                              const Text(
+                                'TWR',
+                                style: TextStyle(fontSize: 16),
+                              ),
                               Text(
-                                stats.tae() != null
-                                    ? NumberUtil.percent(stats.tae()!)
+                                stats.twr() != null
+                                    ? NumberUtil.percent(stats.twr()!)
                                     : '',
                                 style: TextStyle(
-                                  color: stats.tae() != null && stats.tae()! < 0
+                                  color: stats.twr() != null && stats.twr()! < 0
                                       ? Colors.red
                                       : Colors.green,
                                   fontSize: 16,
@@ -631,6 +674,28 @@ class _MainFondoState extends State<MainFondo> {
                               ),
                             ],
                           ),
+                          const SizedBox(height: 10),
+                          if (stats.twr() != null &&
+                              stats.anualizar(stats.twr()!) != null)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'TWR Anual',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                Text(
+                                  NumberUtil.percent(
+                                      stats.anualizar(stats.twr()!)!),
+                                  style: TextStyle(
+                                    color: stats.anualizar(stats.twr()!)! < 0
+                                        ? Colors.red
+                                        : Colors.green,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
                         ],
                       ),
                     ),

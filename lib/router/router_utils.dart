@@ -11,6 +11,7 @@ enum AppPage {
   searchFondo,
   inputFondo,
   inputRange,
+  infoBalance,
   mercado,
   info,
   about,
@@ -30,6 +31,8 @@ extension AppPageExtension on AppPage {
         return fondoPage;
       case AppPage.mercado:
         return mercadoPage;
+      case AppPage.infoBalance:
+        return infoBalancePage;
       case AppPage.info:
         return infoPage;
       case AppPage.about:

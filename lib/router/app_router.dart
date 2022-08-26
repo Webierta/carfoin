@@ -6,6 +6,7 @@ import '../pages/page_error.dart';
 import '../pages/page_fondo.dart';
 import '../pages/page_home.dart';
 import '../pages/page_info.dart';
+import '../pages/page_info_balance.dart';
 import '../pages/page_input_fondo.dart';
 import '../pages/page_input_range.dart';
 import '../pages/page_mercado.dart';
@@ -48,6 +49,10 @@ class AppRouter {
             builder: (context, state) => const PageInputRange(),
           ),
         ],
+      ),
+      GoRoute(
+        path: AppPage.infoBalance.routePath,
+        builder: (context, state) => const PageInfoBalance(),
       ),
       GoRoute(
         path: AppPage.mercado.routePath,

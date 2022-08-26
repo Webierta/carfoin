@@ -3,7 +3,6 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-//import '../routes.dart';
 import '../router/routes_const.dart';
 import '../utils/konstantes.dart';
 import '../widgets/my_drawer.dart';
@@ -28,38 +27,42 @@ class PageAbout extends StatelessWidget {
 
     return WillPopScope(
       onWillPop: () async => false,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('ABOUT'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.home),
-              onPressed: () {
-                ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                //Navigator.of(context).pushNamed(RouteGenerator.homePage);
-                context.go(homePage);
+      child: Container(
+        decoration: scaffoldGradient,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            title: const Text('ABOUT'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  //Navigator.of(context).pushNamed(RouteGenerator.homePage);
+                  context.go(homePage);
+                },
+              ),
+            ],
+          ),
+          drawer: const MyDrawer(),
+          body: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Markdown(
+              onTapLink: (String text, String? url, String title) {
+                if (text != 'donación') {
+                  _launchUrl(Uri.parse(url!));
+                } else {
+                  //Navigator.of(context).pop();
+                  //Navigator.of(context).pushNamed(RouteGenerator.supportPage);
+                  context.go(supportPage);
+                }
               },
-            ),
-          ],
-        ),
-        drawer: const MyDrawer(),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Markdown(
-            onTapLink: (String text, String? url, String title) {
-              if (text != 'donación') {
-                _launchUrl(Uri.parse(url!));
-              } else {
-                //Navigator.of(context).pop();
-                //Navigator.of(context).pushNamed(RouteGenerator.supportPage);
-                context.go(supportPage);
-              }
-            },
-            data: mdstring,
-            styleSheet: MarkdownStyleSheet(
-              h1: const TextStyle(color: Colors.blue, fontSize: 40),
-              h2: const TextStyle(color: Colors.blue, fontSize: 22),
-              p: const TextStyle(fontSize: 18),
+              data: mdstring,
+              styleSheet: MarkdownStyleSheet(
+                h1: const TextStyle(color: Colors.blue, fontSize: 40),
+                h2: const TextStyle(color: Colors.blue, fontSize: 22),
+                p: const TextStyle(fontSize: 18),
+              ),
             ),
           ),
         ),

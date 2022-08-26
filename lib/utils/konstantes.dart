@@ -14,7 +14,7 @@ const BoxDecoration scaffoldGradient = BoxDecoration(
   ),
 );
 
-const String kVersion = '1.1.1';
+const String kVersion = '1.1.2';
 
 /*const String keyByOrderCarterasPref = 'isByOrderCarteras';
 
