@@ -5,6 +5,7 @@ import '../../models/cartera.dart';
 import '../../models/cartera_provider.dart';
 import '../../services/database_helper.dart';
 import '../../utils/fecha_util.dart';
+import '../../utils/styles.dart';
 
 class TablaFondo extends StatefulWidget {
   const TablaFondo({Key? key}) : super(key: key);
@@ -66,12 +67,29 @@ class _TablaFondoState extends State<TablaFondo> {
         return Text(
           dif.toStringAsFixed(2),
           textAlign: TextAlign.center,
-          style: TextStyle(
-              color:
-                  dif < 0 ? const Color(0xFFF44336) : const Color(0xFF4CAF50)),
+          style: TextStyle(color: textRedGreen(dif)),
         );
       }
       return const Text('');
+    }
+
+    Widget _getId(int? tipo, int index) {
+      _getTxt() {
+        return Text(
+          _isSortDesc ? '${valores.length - index}' : '${index + 1}',
+          textAlign: TextAlign.center,
+        );
+      }
+
+      if (tipo == 1 || tipo == 0) {
+        return CircleAvatar(
+          backgroundColor:
+              tipo == 1 ? const Color(0xFF4CAF50) : const Color(0xFFF44336),
+          //const Color(0xFFF44336) : const Color(0xFF4CAF50))
+          child: _getTxt(),
+        );
+      }
+      return _getTxt();
     }
 
     return valores.isEmpty
@@ -133,7 +151,8 @@ class _TablaFondoState extends State<TablaFondo> {
                       return Dismissible(
                           key: UniqueKey(),
                           direction: DismissDirection.endToStart,
-                          background: Container(
+                          background: bgDismissible,
+                          /*background: Container(
                             color: Colors.red,
                             margin: const EdgeInsets.symmetric(horizontal: 15),
                             //alignment: Alignment.centerRight,
@@ -142,7 +161,7 @@ class _TablaFondoState extends State<TablaFondo> {
                               padding: EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
                               child: Icon(Icons.delete, color: Colors.white),
                             ),
-                          ),
+                          ),*/
                           onDismissed: (_) async {
                             //var carfoin = context.read<CarfoinProvider>();
                             //await carfoin.eliminarValor(valoresOn[index].date);
@@ -159,13 +178,9 @@ class _TablaFondoState extends State<TablaFondo> {
                             child: Row(
                               children: [
                                 Expanded(
-                                    flex: 1,
-                                    child: Text(
-                                      _isSortDesc
-                                          ? '${valores.length - index}'
-                                          : '${index + 1}',
-                                      textAlign: TextAlign.center,
-                                    )),
+                                  flex: 1,
+                                  child: _getId(valores[index].tipo, index),
+                                ),
                                 Expanded(
                                     flex: 3,
                                     child: Text(

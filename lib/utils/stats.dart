@@ -2,6 +2,7 @@ import 'dart:math';
 
 import '../models/cartera.dart';
 import 'fecha_util.dart';
+import 'xirr_calculator.dart';
 
 class Stats {
   final List<Valor> valores;
@@ -250,27 +251,23 @@ class Stats {
   double? twr() {
     double? twr;
     List<double> rpnList = [];
-    List<Valor> operaciones = [];
-    for (var valor in valores.reversed) {
-      if (valor.tipo == 1 || valor.tipo == 0) {
-        operaciones.add(valor);
-      }
+    List<Valor> allValoresSort = List.from(valores.reversed);
+    List<Valor> allOpSort =
+        allValoresSort.where((v) => v.tipo == 1 || v.tipo == 0).toList();
+    if (allValoresSort.last.tipo != 1 && allValoresSort.last.tipo != 0) {
+      allOpSort.add(allValoresSort.last);
     }
-    if (valores.reversed.last.tipo != 1 || valores.reversed.last.tipo != 0) {
-      operaciones.add(valores.reversed.last);
-    }
-    if (operaciones.isNotEmpty) {
-      for (int i = 0; i < operaciones.length; i++) {
-        var op = operaciones[i];
+    if (allOpSort.isNotEmpty) {
+      for (int i = 0; i < allOpSort.length; i++) {
+        var op = allOpSort[i];
         if (i == 0) {
           var rpn = 0.0;
           rpnList.add(rpn + 1);
         } else {
-          double valorFinal =
-              (operaciones[i - 1].participaciones! * op.precio) +
-                  (op.participaciones! * op.precio);
+          double valorFinal = (allOpSort[i - 1].participaciones! * op.precio) +
+              (op.participaciones! * op.precio);
           double valorInicial =
-              (operaciones[i - 1].participaciones! * operaciones[i - 1].precio);
+              (allOpSort[i - 1].participaciones! * allOpSort[i - 1].precio);
           double valorOp = op.participaciones! * op.precio;
           var rpn = (valorFinal - valorInicial - valorOp) / valorInicial;
           rpnList.add(rpn + 1);
@@ -283,5 +280,97 @@ class Stats {
       twr = rpnProducto - 1;
     }
     return twr;
+  }
+
+  List<CashFlow> _getCashFlows() {
+    List<Valor> copyValores = List.generate(
+        valores.length,
+        (i) => Valor(
+              date: valores[i].date,
+              precio: valores[i].precio,
+              tipo: valores[i].tipo,
+              participaciones: valores[i].participaciones,
+            ));
+    var statsAllValores = Stats(copyValores);
+    List<Valor> allOpSort =
+        copyValores.reversed.where((v) => v.tipo == 1 || v.tipo == 0).toList();
+    var lastValor = copyValores.reversed.last;
+    if (lastValor.tipo == 1 || lastValor.tipo == 0) {
+      allOpSort.clear();
+    } else {
+      allOpSort.add(Valor(
+        date: lastValor.date,
+        precio: lastValor.precio,
+        participaciones: statsAllValores.totalParticipaciones(),
+        tipo: 0,
+      ));
+    }
+
+    /*if (allValores.isNotEmpty) {
+      var part = 0.0;
+      for (int i = allValores.length - 1; i > -1; i--) {
+        var valor = allValores[i];
+        if (valor.tipo == 1 || valor.tipo == 0) {
+          part += valor.participaciones!;
+          opCashFlows.add(valor);
+        }
+        if (i == 0) {
+          if (valor.tipo != 1 && valor.tipo != 0) {
+            Valor lastValor = Valor(
+              date: valor.date,
+              precio: valor.precio,
+              //participaciones: allValores[1].participaciones,
+              participaciones: part,
+              //tipo: 0,
+            );
+            opCashFlows.add(lastValor);
+          }
+        }
+      }
+    }*/
+    //opCashFlows.last.tipo = 0;
+    List<CashFlow> cashFlows = [];
+    if (allOpSort.isNotEmpty && allOpSort.length > 2) {
+      for (var op in allOpSort) {
+        var fecha = FechaUtil.epochToDate(op.date);
+        var date = DateTime(fecha.year, fecha.month, fecha.day);
+        int signo = op.tipo == 1 ? -1 : 1;
+        var importe = op.precio * op.participaciones! * signo;
+        cashFlows.add(CashFlow(importe: importe, date: date));
+      }
+    }
+    return cashFlows;
+  }
+
+  double? mwr() {
+    double? mwr;
+    List<CashFlow> cashFlows = _getCashFlows();
+    if (cashFlows.isNotEmpty && cashFlows.length > 1) {
+      print('CASHFLOWS');
+      for (var cf in cashFlows) {
+        print('${cf.importe} ${cf.date}');
+      }
+      try {
+        mwr = CalculationWrapper.xirr(cashFlows);
+        print(mwr?.toStringAsPrecision(6));
+        print('XIRR: $mwr');
+      } catch (e) {
+        print('ERROR XIRR: $e');
+        mwr = null;
+      }
+    }
+    return mwr;
+  }
+
+  // MWRA = ((1 + MWR) ^ (días / 365)) - 1
+  double? mwrAcum(double mwr) {
+    double? mwrAcum;
+    List<CashFlow> cashFlows = _getCashFlows();
+    double dias;
+    if (cashFlows.isNotEmpty && cashFlows.length > 1) {
+      dias = cashFlows.last.date.difference(cashFlows.first.date).inDays / 365;
+      mwrAcum = pow((1 + mwr), dias) - 1;
+    }
+    return mwrAcum;
   }
 }

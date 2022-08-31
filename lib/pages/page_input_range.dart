@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cartera_provider.dart';
-import '../utils/konstantes.dart';
+import '../utils/styles.dart';
 
 class PageInputRange extends StatefulWidget {
   const PageInputRange({Key? key}) : super(key: key);

@@ -9,9 +9,9 @@ import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../utils/fecha_util.dart';
-import '../utils/konstantes.dart';
 import '../utils/number_util.dart';
 import '../utils/stats.dart';
+import '../utils/styles.dart';
 import '../widgets/loading_progress.dart';
 
 class PageMercado extends StatefulWidget {
@@ -358,6 +358,7 @@ class _MercadoState extends State<PageMercado> {
       //TODO: check tipo Op 0 permitida
       Stats stats = Stats(valoresSelect);
       var participaciones = stats.totalParticipaciones() ?? 0;
+      print('PARTICIPACIONES: $participaciones');
       if (tipoOp == 0 && _participaciones > participaciones) {
         _showMsg(
           //msg: 'Operación no permitida: no puedes reembolsar las participaciones que no tienes.',

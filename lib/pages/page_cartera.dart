@@ -12,9 +12,9 @@ import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../utils/fecha_util.dart';
-import '../utils/konstantes.dart';
 import '../utils/number_util.dart';
 import '../utils/stats.dart';
+import '../utils/styles.dart';
 import '../widgets/hoja_calendario.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
@@ -310,10 +310,10 @@ class _PageCarteraState extends State<PageCartera> {
           // END PRUEBA
 
           mapResultados[fondo.name] =
-              const Icon(Icons.check_box, color: Colors.green);
+              const Icon(Icons.check_box, color: Color(0xFF4CAF50));
         } else {
           mapResultados[fondo.name] =
-              const Icon(Icons.disabled_by_default, color: Colors.red);
+              const Icon(Icons.disabled_by_default, color: Color(0xFFF44336));
         }
       }
       //TODO: check si es necesario update (si no ha habido cambios porque todos los fondos han dado error)
@@ -522,14 +522,16 @@ class DataCartera extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Valor>? valores = fondo.valores;
-
     Stats? stats;
+    double? _resultado;
+    double? _tae;
     String lastDate = '';
     int dia = 0;
     String mesYear = '';
     String lastPrecio = '';
     String divisa = fondo.divisa ?? '';
     double? diferencia;
+
     if (valores != null && valores.isNotEmpty) {
       int lastEpoch = valores.first.date;
       lastDate = FechaUtil.epochToString(lastEpoch);
@@ -543,121 +545,132 @@ class DataCartera extends StatelessWidget {
         diferencia = valores.first.precio - valores[1].precio;
       }
       stats = Stats(valores);
+      _resultado = stats.resultado();
+      double? twr = stats.twr();
+      if (twr != null) {
+        _tae = stats.anualizar(twr);
+      }
     }
     return Dismissible(
       key: UniqueKey(),
       direction: DismissDirection.endToStart,
-      background: Container(
-        color: const Color(0xFFF44336),
-        margin: const EdgeInsets.symmetric(horizontal: 15),
-        alignment: Alignment.centerRight,
-        child: const Padding(
-          padding: EdgeInsets.all(10.0),
-          child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
-        ),
-      ),
+      background: bgDismissible,
       onDismissed: (_) async => await removeFondo(fondo),
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color.fromRGBO(255, 255, 255, 0.5),
-            border: Border.all(color: Colors.white, width: 2),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            children: [
-              ListTile(
-                leading: CircleAvatar(
-                  radius: 22,
-                  backgroundColor: const Color(0xFFFFFFFF),
-                  child: CircleAvatar(
-                    backgroundColor: const Color(0xFFFFC107),
-                    child: IconButton(
-                      onPressed: () => goFondo(context, fondo),
-                      icon: const Icon(Icons.poll, color: Color(0xFF0D47A1)),
-                    ),
-                  ),
-                ),
-                title: Text(
-                  fondo.name,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Color(0xFF2196F3),
-                  ),
-                ),
-                subtitle: Text(
-                  fondo.isin,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF0D47A1),
-                  ),
-                ),
-              ),
-              if (valores != null && valores.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFBBDEFB),
-                      border: Border.all(color: Colors.white, width: 2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: IntrinsicHeight(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          DiaCalendario(epoch: valores.first.date),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'V.L. $lastPrecio $divisa',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0D47A1),
-                                  ),
-                                ),
-                                if (diferencia != null)
-                                  Text(
-                                    diferencia.toStringAsFixed(2),
-                                    style: TextStyle(
-                                      color: diferencia < 0
-                                          ? const Color(0xFFF44336)
-                                          : const Color(0xFF4CAF50),
-                                    ),
-                                  ),
-                                (stats != null &&
-                                        stats.resultado() != null &&
-                                        stats.resultado() != 0)
-                                    ? FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          'Capital: ${NumberUtil.decimalFixed(stats.resultado()!)} $divisa',
-                                          style: const TextStyle(
-                                            color: Color(0xFF0D47A1),
-                                            //fontSize: 14
-                                          ),
-                                        ),
-                                      )
-                                    : const Text('Sin inversiones'),
-                              ],
-                            ),
-                          ),
-                        ],
+        padding: const EdgeInsets.all(8),
+        child: Card(
+          //padding: const EdgeInsets.all(12),
+          //decoration: boxDeco,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: CircleAvatar(
+                    radius: 22,
+                    backgroundColor: const Color(0xFFFFFFFF),
+                    child: CircleAvatar(
+                      backgroundColor: const Color(0xFFFFC107),
+                      child: IconButton(
+                        onPressed: () => goFondo(context, fondo),
+                        icon: const Icon(Icons.poll, color: Color(0xFF0D47A1)),
                       ),
                     ),
                   ),
+                  title: Text(
+                    fondo.name,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    style: styleTitle,
+                    /*style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Color(0xFF2196F3),
+                    ),*/
+                  ),
+                  subtitle: Text(
+                    fondo.isin,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF0D47A1),
+                    ),
+                  ),
                 ),
-            ],
+                if (valores != null && valores.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: boxDecoBlue,
+                      child: IntrinsicHeight(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            DiaCalendario(epoch: valores.first.date),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        'V.L. $lastPrecio $divisa',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF0D47A1),
+                                        ),
+                                      ),
+                                      if (diferencia != null)
+                                        const SizedBox(width: 10),
+                                      if (diferencia != null)
+                                        Text(
+                                          diferencia.toStringAsFixed(2),
+                                          style: TextStyle(
+                                            color: textRedGreen(diferencia),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  _resultado != null
+                                      ? FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text(
+                                            'Capital: ${NumberUtil.decimalFixed(_resultado)} $divisa',
+                                            style: const TextStyle(
+                                              color: Color(0xFF0D47A1),
+                                              //fontSize: 14
+                                            ),
+                                          ),
+                                        )
+                                      : const Text('Sin inversiones'),
+                                  if (_tae != null)
+                                    Text.rich(TextSpan(
+                                      style: const TextStyle(fontSize: 16),
+                                      text: 'TAE: ',
+                                      children: [
+                                        TextSpan(
+                                          text: NumberUtil.percent(_tae),
+                                          style: TextStyle(
+                                            //fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: textRedGreen(_tae),
+                                          ),
+                                        )
+                                      ],
+                                    )),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

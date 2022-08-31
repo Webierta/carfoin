@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/cartera.dart';
+import '../../utils/styles.dart';
 
 class VistaCompacta extends StatelessWidget {
   final Cartera cartera;
@@ -18,15 +19,7 @@ class VistaCompacta extends StatelessWidget {
     return Dismissible(
       key: UniqueKey(),
       direction: DismissDirection.endToStart,
-      background: Container(
-        color: const Color(0xFFF44336),
-        margin: const EdgeInsets.symmetric(horizontal: 15),
-        alignment: Alignment.centerRight,
-        child: const Padding(
-          padding: EdgeInsets.all(10.0),
-          child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
-        ),
-      ),
+      background: bgDismissible,
       onDismissed: (_) => delete(cartera),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

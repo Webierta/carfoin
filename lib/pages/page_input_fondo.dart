@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
 import '../services/api_service.dart';
-import '../utils/konstantes.dart';
+import '../utils/styles.dart';
 
 class PageInputFondo extends StatefulWidget {
   const PageInputFondo({Key? key}) : super(key: key);
@@ -56,13 +56,15 @@ class _PageInputFondoState extends State<PageInputFondo> {
                       //leading: const Icon(Icons.business_center),
                       //title: Text(carteraOn.name),
                       //subtitle: const Text('Introduce el ISIN del nuevo Fondo'),
-                      leading: const Icon(Icons.add_chart, size: 32, color: Color(0xFF2196F3)),
+                      leading: const Icon(Icons.add_chart,
+                          size: 32, color: Color(0xFF2196F3)),
                       title: const Text('Introduce el ISIN del nuevo Fondo'),
                       subtitle: Align(
                         alignment: Alignment.centerLeft,
                         child: Chip(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
-                          avatar: const Icon(Icons.business_center, color: Color(0xFF0D47A1)),
+                          avatar: const Icon(Icons.business_center,
+                              color: Color(0xFF0D47A1)),
                           backgroundColor: const Color(0xFFBBDEFB),
                           label: Text(
                             carteraSelect.name,
@@ -81,7 +83,10 @@ class _PageInputFondoState extends State<PageInputFondo> {
                           });
                         },
                         textCapitalization: TextCapitalization.characters,
-                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9]'))],
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp('[a-zA-Z0-9]'))
+                        ],
                         decoration: const InputDecoration(
                           hintText: 'ISIN',
                           border: OutlineInputBorder(),
@@ -97,8 +102,8 @@ class _PageInputFondoState extends State<PageInputFondo> {
                               icon: const Icon(Icons.security),
                               label: const Text('Validar'),
                               onPressed: _controller.text.isNotEmpty
-                                  ? () => setState(
-                                      () => _validIsin = _checkIsin(_controller.value.text))
+                                  ? () => setState(() => _validIsin =
+                                      _checkIsin(_controller.value.text))
                                   : null,
                             ),
                             ElevatedButton.icon(
@@ -107,19 +112,23 @@ class _PageInputFondoState extends State<PageInputFondo> {
                               onPressed: _controller.text.isEmpty
                                   ? null
                                   : () async {
-                                      FocusManager.instance.primaryFocus?.unfocus();
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
                                       if (_checkIsin(_controller.value.text)) {
                                         setState(() {
                                           _validIsin = true;
                                           _buscando = true;
                                         });
-                                        locatedFond = await _searchIsin(_controller.value.text);
+                                        locatedFond = await _searchIsin(
+                                            _controller.value.text);
                                         setState(() => _buscando = false);
                                       } else {
                                         setState(() => _validIsin = false);
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           const SnackBar(
-                                            content: Text('Código ISIN no válido.'),
+                                            content:
+                                                Text('Código ISIN no válido.'),
                                             backgroundColor: Colors.red,
                                           ),
                                         );
@@ -181,7 +190,8 @@ class _PageInputFondoState extends State<PageInputFondo> {
                     TextButton(
                         child: const Text('Aceptar'),
                         onPressed: () {
-                          var fondo = Fondo(name: locatedFond!.name, isin: locatedFond!.isin);
+                          var fondo = Fondo(
+                              name: locatedFond!.name, isin: locatedFond!.isin);
                           ScaffoldMessenger.of(context).removeCurrentSnackBar();
                           Navigator.pop(context, fondo);
                         }),

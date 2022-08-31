@@ -38,7 +38,8 @@ class MyApp extends StatelessWidget {
       title: 'Carfoin',
       theme: ThemeData(
         primaryColor: const Color(0xFF0D47A1),
-        colorScheme: ColorScheme.fromSwatch().copyWith(secondary: const Color(0xFFFFC107)),
+        colorScheme: ColorScheme.fromSwatch()
+            .copyWith(secondary: const Color(0xFFFFC107)),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.transparent,

@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../router/routes_const.dart';
 import '../utils/konstantes.dart';
+import '../utils/styles.dart';
 import '../widgets/my_drawer.dart';
 
 class PageAbout extends StatelessWidget {

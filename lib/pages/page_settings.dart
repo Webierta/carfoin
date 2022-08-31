@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../router/routes_const.dart';
 import '../services/preferences_service.dart';
-import '../utils/konstantes.dart';
+import '../utils/styles.dart';
 import '../widgets/my_drawer.dart';
 
 class PageSettings extends StatefulWidget {

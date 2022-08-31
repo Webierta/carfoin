@@ -10,6 +10,7 @@ import '../../services/preferences_service.dart';
 import '../../utils/fecha_util.dart';
 import '../../utils/number_util.dart';
 import '../../utils/stats.dart';
+import '../../utils/styles.dart';
 import '../hoja_calendario.dart';
 
 class MainFondo extends StatefulWidget {
@@ -135,6 +136,7 @@ class _MainFondoState extends State<MainFondo> {
       if (operaciones.isEmpty || valores.isEmpty) return <DataRow>[];
       return [
         for (var op in operaciones)
+          // TODO: HACER AQUI CÁLCULOS
           DataRow(cells: [
             DataCell(Align(
               alignment: Alignment.centerRight,
@@ -268,27 +270,78 @@ class _MainFondoState extends State<MainFondo> {
       return '';
     }
 
+    double? _inversion;
+    double? _resultado;
+    double? _rendimiento;
+    double? _rentabilidad;
+    double? _rentAnual;
+    double? _twr;
+    double? _tae;
+    double? _mwr;
+    double? _mwrAcum;
+    if (operaciones.isNotEmpty) {
+      _inversion = stats.inversion();
+      _resultado = stats.resultado();
+      _rendimiento = stats.balance();
+      _rentabilidad = stats.rentabilidad();
+      if (_rentabilidad != null) {
+        _rentAnual = stats.anualizar(_rentabilidad);
+      }
+      _twr = stats.twr();
+      if (_twr != null) {
+        _tae = stats.anualizar(_twr);
+      }
+      _mwr = stats.mwr();
+      if (_mwr != null) {
+        _mwrAcum = stats.mwrAcum(_mwr);
+      }
+    }
+
+    bool _allStatsIsNull() {
+      List<double?> listStats = [
+        _inversion,
+        _resultado,
+        _rendimiento,
+        _rentabilidad,
+        _rentAnual,
+        _twr,
+        _tae,
+        _mwr,
+        _mwrAcum
+      ];
+      for (var st in listStats) {
+        if (st != null) return false;
+      }
+      return true;
+    }
+
     return ListView(
       shrinkWrap: true,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(8),
       children: [
         Card(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            //padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            //padding: const EdgeInsets.only(top: 10, left: 20, right: 20),
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.assessment,
-                      size: 32, color: Color(0xFF2196F3)),
+                  leading: const Icon(
+                    Icons.assessment,
+                    size: 32,
+                    color: Color(0xFF2196F3),
+                  ),
                   title: Text(
                     fondoSelect.name,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
-                    style: const TextStyle(
+                    style: styleTitle,
+                    /*style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                       color: Color(0xFF2196F3),
-                    ),
+                    ),*/
                   ),
                   subtitle: Text(
                     fondoSelect.isin,
@@ -306,11 +359,7 @@ class _MainFondoState extends State<MainFondo> {
                             left: 12, right: 12, bottom: 12),
                         child: Container(
                           padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFBBDEFB),
-                            border: Border.all(color: Colors.white, width: 2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                          decoration: boxDecoBlue,
                           child: Column(
                             children: [
                               IntrinsicHeight(
@@ -332,14 +381,13 @@ class _MainFondoState extends State<MainFondo> {
                                         ),
                                         if (_getDiferencia() != null)
                                           Text(
-                                              _getDiferencia()!
-                                                  .toStringAsFixed(2),
-                                              style: TextStyle(
+                                            _getDiferencia()!
+                                                .toStringAsFixed(2),
+                                            style: TextStyle(
                                                 //fontSize: 16,
-                                                color: _getDiferencia()! < 0
-                                                    ? const Color(0xFFF44336)
-                                                    : const Color(0xFF4CAF50),
-                                              )),
+                                                color: textRedGreen(
+                                                    _getDiferencia()!)),
+                                          ),
                                       ],
                                     ),
                                   ],
@@ -398,7 +446,7 @@ class _MainFondoState extends State<MainFondo> {
             child: Column(
               children: [
                 ListTile(
-                  contentPadding: const EdgeInsets.all(12),
+                  //contentPadding: const EdgeInsets.all(12),
                   leading: const Icon(Icons.compare_arrows,
                       size: 32, color: Color(0xFF2196F3)),
                   title: const FittedBox(
@@ -437,7 +485,7 @@ class _MainFondoState extends State<MainFondo> {
                             child: DataTable(
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: Colors.blue,
+                                  color: const Color(0xFF2196F3),
                                   width: 2,
                                 ),
                                 borderRadius: BorderRadius.circular(10),
@@ -479,8 +527,10 @@ class _MainFondoState extends State<MainFondo> {
                       size: 32,
                       color: Color(0xFF2196F3),
                     ), // Icons.balance
-                    title:
-                        const Text('BALANCE', style: TextStyle(fontSize: 18)),
+                    title: const Text(
+                      'BALANCE',
+                      style: TextStyle(fontSize: 18),
+                    ),
                     trailing: CircleAvatar(
                       radius: 22,
                       backgroundColor: const Color(0xFFFFFFFF),
@@ -495,206 +545,75 @@ class _MainFondoState extends State<MainFondo> {
                         ),
                       ),
                     ),
-                    /*subtitle: Align(
-                      alignment: Alignment.topLeft,
-                      child: Chip(
-                        //padding: const EdgeInsets.symmetric(horizontal: 10),
-                        backgroundColor: const Color(0xFFBBDEFB),
-                        avatar:
-                            const Icon(Icons.calendar_today, size: 20, color: Color(0xFF0D47A1)),
-                        label: Text(
-                          FechaUtil.epochToString(
-                            valores.first.date,
-                            formato: 'dd/MM/yy',
-                          ),
-                          style: const TextStyle(color: Color(0xFF0D47A1)),
-                        ),
-                      ),
-                    ),*/
-                    //trailing: HojaCalendario(epoch: valores.first.date),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Container(
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFBBDEFB),
-                        border: Border.all(color: Colors.white, width: 2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      decoration: boxDecoBlue,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Row(
-                            children: [
-                              const Text(
-                                'Inversión',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      stats.inversion() != null
-                                          ? NumberUtil.decimalFixed(
-                                              stats.inversion()!)
-                                          : '',
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              const Text(
-                                'Resultado',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      stats.resultado() != null
-                                          ? NumberUtil.decimalFixed(
-                                              stats.resultado()!)
-                                          : '',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              const Text('Rendimiento',
-                                  style: TextStyle(fontSize: 16)),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      stats.balance() != null
-                                          ? NumberUtil.decimalFixed(
-                                              stats.balance()!)
-                                          : '',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w900,
-                                        color: stats.balance() != null &&
-                                                stats.balance()! < 0
-                                            ? Colors.red
-                                            : Colors.green,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Rentabilidad',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              Text(
-                                stats.rentabilidad() != null
-                                    ? NumberUtil.percent(stats.rentabilidad()!)
-                                    : '',
-                                style: TextStyle(
-                                  color: stats.rentabilidad() != null &&
-                                          stats.rentabilidad()! < 0
-                                      ? Colors.red
-                                      : Colors.green,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          if (stats.rentabilidad() != null &&
-                              stats.anualizar(stats.rentabilidad()!) != null)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'TAE',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                Text(
-                                  NumberUtil.percent(
-                                      stats.anualizar(stats.rentabilidad()!)!),
-                                  style: TextStyle(
-                                    color: stats.anualizar(
-                                                stats.rentabilidad()!)! <
-                                            0
-                                        ? Colors.red
-                                        : Colors.green,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
+                          if (_allStatsIsNull())
+                            const Text('Error en los cálculos'),
+                          if (_inversion != null)
+                            RowBalance(
+                              label: 'Inversión',
+                              data: NumberUtil.decimalFixed(_inversion),
                             ),
-                          const SizedBox(height: 10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'TWR',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              Text(
-                                stats.twr() != null
-                                    ? NumberUtil.percent(stats.twr()!)
-                                    : '',
-                                style: TextStyle(
-                                  color: stats.twr() != null && stats.twr()! < 0
-                                      ? Colors.red
-                                      : Colors.green,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          if (stats.twr() != null &&
-                              stats.anualizar(stats.twr()!) != null)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'TWR Anual',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                Text(
-                                  NumberUtil.percent(
-                                      stats.anualizar(stats.twr()!)!),
-                                  style: TextStyle(
-                                    color: stats.anualizar(stats.twr()!)! < 0
-                                        ? Colors.red
-                                        : Colors.green,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
+                          if (_resultado != null) const SizedBox(height: 10),
+                          if (_resultado != null)
+                            RowBalance(
+                              label: 'Resultado',
+                              data: NumberUtil.decimalFixed(_resultado),
+                            ),
+                          if (_rendimiento != null) const SizedBox(height: 10),
+                          if (_rendimiento != null)
+                            RowBalance(
+                              label: 'Rendimiento',
+                              data: NumberUtil.decimalFixed(_rendimiento),
+                            ),
+                          if (_rentabilidad != null) const SizedBox(height: 10),
+                          if (_rentabilidad != null)
+                            RowBalance(
+                              label: 'Rentabilidad',
+                              data: NumberUtil.percent(_rentabilidad),
+                              color: textRedGreen(_rentabilidad),
+                            ),
+                          if (_rentAnual != null) const SizedBox(height: 10),
+                          if (_rentAnual != null)
+                            RowBalance(
+                              label: 'Rentab. anual',
+                              data: NumberUtil.percent(_rentAnual),
+                              color: textRedGreen(_rentAnual),
+                            ),
+                          if (_twr != null) const SizedBox(height: 10),
+                          if (_twr != null)
+                            RowBalance(
+                              label: 'TWR',
+                              data: NumberUtil.percent(_twr),
+                              color: textRedGreen(_twr),
+                            ),
+                          if (_tae != null) const SizedBox(height: 10),
+                          if (_tae != null)
+                            RowBalance(
+                              label: 'TAE',
+                              data: NumberUtil.percent(_tae),
+                              color: textRedGreen(_tae),
+                            ),
+                          if (_mwr != null) const SizedBox(height: 10),
+                          if (_mwr != null)
+                            RowBalance(
+                              label: 'MWR',
+                              data: NumberUtil.percent(_mwr),
+                              color: textRedGreen(_mwr),
+                            ),
+                          if (_mwrAcum != null) const SizedBox(height: 10),
+                          if (_mwrAcum != null)
+                            RowBalance(
+                              label: 'MWR Acum.',
+                              data: NumberUtil.percent(_mwrAcum),
+                              color: textRedGreen(_mwrAcum),
                             ),
                         ],
                       ),
@@ -704,6 +623,42 @@ class _MainFondoState extends State<MainFondo> {
               ),
             ),
           ),
+      ],
+    );
+  }
+}
+
+class RowBalance extends StatelessWidget {
+  final String label;
+  final String data;
+  final Color color;
+  const RowBalance({
+    Key? key,
+    required this.label,
+    required this.data,
+    this.color = Colors.black,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 16)),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: FittedBox(
+              //fit: BoxFit.scaleDown,
+              child: Text(
+                data,
+                style: TextStyle(color: color, fontSize: 16),
+                maxLines: 1,
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }

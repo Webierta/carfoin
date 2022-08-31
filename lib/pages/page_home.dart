@@ -10,7 +10,7 @@ import '../router/routes_const.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../utils/file_util.dart';
-import '../utils/konstantes.dart';
+import '../utils/styles.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
 import '../widgets/my_drawer.dart';
@@ -55,7 +55,6 @@ class _PageHomeState extends State<PageHome> {
 
   setCarteras() async {
     try {
-      //throw Exception();
       carteraProvider.carteras =
           await database.getCarteras(byOrder: _isCarterasByOrder);
       for (var cartera in carteraProvider.carteras) {
@@ -508,7 +507,7 @@ class _PageHomeState extends State<PageHome> {
   }
 
   _deleteCartera(Cartera cartera) async {
-    _eliminar() async {
+    /*_eliminar() async {
       //await database.deleteAllValores(cartera)
 
       await database.deleteAllFondos(cartera);
@@ -516,26 +515,36 @@ class _PageHomeState extends State<PageHome> {
       carteraProvider.removeAllFondos(cartera);
       carteraProvider.removeCartera(cartera);
       await setCarteras();
-    }
+    }*/
 
     if (_isConfirmDeleteCartera) {
       var resp = await _dialogDeleteConfirm(context, cartera.name);
       if (resp == null || resp == false) {
         setState(() {});
       } else {
-        _eliminar();
+        _eliminar(cartera);
       }
     } else {
-      _eliminar();
+      _eliminar(cartera);
     }
+  }
+
+  _eliminar(Cartera cartera) async {
+    //await database.deleteAllValores(cartera)
+    await database.deleteAllFondos(cartera);
+    await database.deleteCartera(cartera);
+    carteraProvider.removeAllFondos(cartera);
+    carteraProvider.removeCartera(cartera);
+    await setCarteras();
   }
 
   void _deleteConfirm(BuildContext context) async {
     var resp = await _dialogDeleteConfirm(context);
     if (resp == true) {
       for (var cartera in carteraProvider.carteras) {
-        await database.deleteAllFondos(cartera);
-        carteraProvider.removeAllFondos(cartera);
+        //await database.deleteAllFondos(cartera);
+        //carteraProvider.removeAllFondos(cartera);
+        _eliminar(cartera);
       }
       await database.deleteAllCarteras();
       carteraProvider.removeAllCarteras();

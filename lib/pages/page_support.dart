@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../router/routes_const.dart';
-import '../utils/konstantes.dart';
+import '../utils/styles.dart';
 import '../widgets/my_drawer.dart';
 
 const String btcAddress = '15ZpNzqbYFx9P7wg4U438JMwZr2q3W6fkS';

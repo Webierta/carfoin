@@ -3,7 +3,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
 
 import '../router/routes_const.dart';
-import '../utils/konstantes.dart';
+import '../utils/styles.dart';
 import '../widgets/my_drawer.dart';
 
 class PageInfo extends StatelessWidget {

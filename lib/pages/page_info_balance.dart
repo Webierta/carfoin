@@ -3,7 +3,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
 
 import '../router/routes_const.dart';
-import '../utils/konstantes.dart';
+import '../utils/styles.dart';
 
 class PageInfoBalance extends StatelessWidget {
   const PageInfoBalance({Key? key}) : super(key: key);
@@ -53,15 +53,15 @@ Balance calculado por la diferencia entre el **resultado** obtenido y la **inver
 
 **Rentabilidad acumulada** desde la suscripción del Fondo. Se calcula como la proporción entre el **rendimiento** y la **inversión** realizada.
 
-Se trata de un índice muy básico que solo es fiable cuando existe una única aportación inicial que se mantiene en el tiempo sin incorporar aportaciones o reembolsos.
+Se trata de un índice muy básico que solo es fiable cuando existe una única aportación inicial que se mantiene en el tiempo sin incorporar aportaciones o reembolsos. Un calculo rápido y apoximado al estilo de la cuenta de la vieja.
 
-## TAE
+## RENTABILIDAD ANUAL
 
-Índice anualizado de la rentabilidad acumulada (con sus mismas limitaciones). 
+Índice anualizado a partir de la rentabilidad acumulada (con sus mismas limitaciones). 
 
 ## RENTABILIDAD TWR (*Time Weighted Return*)
 
-Índice de rentabilidad ponderada por el tiempo, adecuado cuando se producen situaciones de entradas o retiradas de dinero en una cartera para poder calcular la rentabilidad de forma más precisa.
+Índice de rentabilidad ponderada por el tiempo, adecuado cuando se producen situaciones de entradas o retiradas de dinero en una cartera para poder calcular la rentabilidad de forma más precisa. Básicamente se trata de una **rentabilidad acumulada durante un periodo**.
 
 Resulta útil para comparar la rentabilidad de un Fondo o una Cartera con las rentabilidades de otros fondos o carteras, aunque lo ideal es tener los valores diarios del fondo o al menos mensuales.
 
@@ -73,23 +73,30 @@ RENTABILIDAD PERIODO (RP) = (VALOR FINAL - VALOR INICIAL - VALOR OPERACIÓN) / V
 RENTABILIDAD TWR = (1 + RP) x (1 + RP) x … – 1
 ```
 
-## TWR ANUAL
+## TAE
 
-Rentabilidad TWR anualizada.
+**Rentabilidad TWR anualizada**. Rendimiento efectivo de un Fondo, un bonito resumen de tus logros como inversor.
+
+La **Tasa Anual Equivalente** es útil como índice de comparación entre fondos y con otros productos de inversión y ahorro.
 
 ## RENTABILIDAD MWR (*Money Weighted Return*)
 
-Índice de rentabilidad ponderanda por el dinero que básicamente informa sobre si se ha ganado o no dinero con el Fondo.
+Índice de rentabilidad ponderanda por el dinero que básicamente informa sobre si se ha ganado o no dinero con el Fondo durante un periodo en forma de **rentabilidad anualizada**.
 
-Mide lo que realmente has hecho crecer tu dinero considerando la cantidad de dinero invertido, el tiempo que lo has tenido y a qué interés o rendimiento para obtener ese dinero.
+Mide lo que realmente has hecho crecer tu dinero considerando la cantidad de dinero invertido, el tiempo que lo has tenido y su rendimiento.
 
-Resulta muy variable en función de los movimientos de efectivo y los momentos en que se han realizado.
+Resulta muy variable en función de los movimientos de efectivo y los momentos en que se han realizado y puede resultar útil para determinar si hemos escogido bien el timing de nuestras inversiones. Por definición se trata de un valor anualizado.
 
-## MWR ANUAL
+Para su cálculo se utiliza la fórmula de la TIR (IRR en inglés) o Tasa Interna de Retorno adaptada para flujos de caja no regulares o periódicos (*XIRR: eXtended Internal Rate of Return*). Para ello se necesitan, además de los movimientos realizados (aportaciones y reembolsos), el último valor de la inversión con fecha distinta del último movimiento. El resultado es similar al obtenido con la función TIR.NO.PER en una hoja de cálculo.
 
-Rentabilidad MWR anualizada.
+## MWR ACUMULADO
 
-> Únicamente cuando no existen entradas y salidas de capital del Fondo las rentabilidades obtenidas por estos métodos son iguales.
+Indice de rentabilidad acumulada calculado a partir del MWR con esta fórmula:
 
+```
+MWRA = ((1 + MWR) ^ días) - 1
+```
+
+> Las rentabilidades obtenidas por estos métodos serán iguales únicamente cuando en el Fondo no existen entradas y salidas de capital.
 
 """;

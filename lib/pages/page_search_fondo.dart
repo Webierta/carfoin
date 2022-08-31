@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../models/cartera.dart';
-import '../utils/konstantes.dart';
+import '../utils/styles.dart';
 
 class PageSearchFondo extends StatefulWidget {
   const PageSearchFondo({Key? key}) : super(key: key);
@@ -37,8 +37,12 @@ class _PageSearchFondoState extends State<PageSearchFondo> {
         ? _allFondos
         : _allFondos
             .where((fondo) =>
-                fondo['name']?.toUpperCase().contains(enteredKeyword.toUpperCase()) ||
-                fondo['isin']?.toUpperCase().contains(enteredKeyword.toUpperCase()))
+                fondo['name']
+                    ?.toUpperCase()
+                    .contains(enteredKeyword.toUpperCase()) ||
+                fondo['isin']
+                    ?.toUpperCase()
+                    .contains(enteredKeyword.toUpperCase()))
             .toList();
     setState(() => _filterFondos = results);
   }
@@ -76,7 +80,8 @@ class _PageSearchFondoState extends State<PageSearchFondo> {
                               margin: const EdgeInsets.symmetric(vertical: 10),
                               child: ListTile(
                                 title: Text(_filterFondos[index]['name']),
-                                subtitle: Text(_filterFondos[index]['isin'].toString()),
+                                subtitle: Text(
+                                    _filterFondos[index]['isin'].toString()),
                                 onTap: () {
                                   var fondo = Fondo(
                                       name: _filterFondos[index]['name'],

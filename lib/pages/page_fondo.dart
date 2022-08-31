@@ -11,7 +11,7 @@ import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../utils/fecha_util.dart';
-import '../utils/konstantes.dart';
+import '../utils/styles.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
 import '../widgets/tabs/grafico_fondo.dart';
