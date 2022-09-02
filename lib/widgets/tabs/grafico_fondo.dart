@@ -118,8 +118,8 @@ class GraficoFondo extends StatelessWidget {
             //interval: ((epochMax - epochMin) / spots.length) * 10,
             //interval: 1650057221 / spots.length,
             //TODO: REVISAR INTERVALO OPTIMO
-            interval:
-                (epochMax - epochMin) > 2592000 ? 22592000 : 2592000, // 1 mes
+            //interval: (epochMax - epochMin) > 2592000 ? 22592000 : 2592000, // 1 mes
+            interval: 20000000,
             //interval: (spots.last.x - spots.first.x),
             //interval: fechas.length / 2,
             getTitlesWidget: (double value, TitleMeta meta) {
@@ -134,8 +134,9 @@ class GraficoFondo extends StatelessWidget {
               }*/
               //return Text(DateFormat.MMMd().format(dateTime));
               //return Text(DateFormat.yMMM('es').format(dateTime));
+              //return Text(FechaUtil.dateToString(date: dateTime, formato: 'yMMM'));
               return Text(
-                  FechaUtil.dateToString(date: dateTime, formato: 'yMMM'));
+                  FechaUtil.dateToString(date: dateTime, formato: 'MM/yy'));
             },
           ),
         ),

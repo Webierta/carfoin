@@ -330,7 +330,7 @@ class Stats {
     }*/
     //opCashFlows.last.tipo = 0;
     List<CashFlow> cashFlows = [];
-    if (allOpSort.isNotEmpty && allOpSort.length > 2) {
+    if (allOpSort.isNotEmpty) {
       for (var op in allOpSort) {
         var fecha = FechaUtil.epochToDate(op.date);
         var date = DateTime(fecha.year, fecha.month, fecha.day);

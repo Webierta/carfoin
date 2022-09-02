@@ -366,27 +366,58 @@ class _MainFondoState extends State<MainFondo> {
                                 child: Row(
                                   children: [
                                     DiaCalendario(epoch: valores.first.date),
+                                    if (fondoSelect.divisa == 'EUR' ||
+                                        fondoSelect.divisa == 'USD')
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
+                                        child: Text(
+                                          '${fondoSelect.divisa}',
+                                          textScaleFactor: 2.5,
+                                          style: const TextStyle(
+                                              color: Color(0xFF90CAF9)),
+                                        ),
+                                      ),
                                     const Spacer(),
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.end,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          'V.L. ${valores.first.precio} ${fondoSelect.divisa}',
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF0D47A1),
-                                          ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              '${valores.first.precio}',
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w400,
+                                                //fontSize: 16,
+                                                //fontWeight: FontWeight.bold,
+                                                color: Color(0xFF0D47A1),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            const Icon(Icons.sell,
+                                                color: Color(0xFF2196F3)),
+                                          ],
                                         ),
                                         if (_getDiferencia() != null)
-                                          Text(
-                                            _getDiferencia()!
-                                                .toStringAsFixed(2),
-                                            style: TextStyle(
-                                                //fontSize: 16,
-                                                color: textRedGreen(
-                                                    _getDiferencia()!)),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                _getDiferencia()!
+                                                    .toStringAsFixed(2),
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: textRedGreen(
+                                                        _getDiferencia()!)),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              const Icon(Icons.iso,
+                                                  color: Color(0xFF2196F3)),
+                                            ],
                                           ),
                                       ],
                                     ),
@@ -573,19 +604,20 @@ class _MainFondoState extends State<MainFondo> {
                               label: 'Rendimiento',
                               data: NumberUtil.decimalFixed(_rendimiento),
                             ),
+                          if (_rentabilidad != null ||
+                              _twr != null ||
+                              _mwrAcum != null)
+                            const SizedBox(height: 10),
+                          if (_rentabilidad != null ||
+                              _twr != null ||
+                              _mwrAcum != null)
+                            const Center(child: Text('RENTABILIDAD')),
                           if (_rentabilidad != null) const SizedBox(height: 10),
                           if (_rentabilidad != null)
                             RowBalance(
-                              label: 'Rentabilidad',
+                              label: 'Simple',
                               data: NumberUtil.percent(_rentabilidad),
                               color: textRedGreen(_rentabilidad),
-                            ),
-                          if (_rentAnual != null) const SizedBox(height: 10),
-                          if (_rentAnual != null)
-                            RowBalance(
-                              label: 'Rentab. anual',
-                              data: NumberUtil.percent(_rentAnual),
-                              color: textRedGreen(_rentAnual),
                             ),
                           if (_twr != null) const SizedBox(height: 10),
                           if (_twr != null)
@@ -594,10 +626,32 @@ class _MainFondoState extends State<MainFondo> {
                               data: NumberUtil.percent(_twr),
                               color: textRedGreen(_twr),
                             ),
+                          if (_mwr != null) const SizedBox(height: 10),
+                          if (_mwrAcum != null)
+                            RowBalance(
+                              label: 'MWR Acum.',
+                              data: NumberUtil.percent(_mwrAcum),
+                              color: textRedGreen(_mwrAcum),
+                            ),
+                          if (_rentAnual != null ||
+                              _tae != null ||
+                              _mwr != null)
+                            const SizedBox(height: 10),
+                          if (_rentAnual != null ||
+                              _tae != null ||
+                              _mwr != null)
+                            const Center(child: Text('RENTABILIDAD ANUAL')),
+                          if (_rentAnual != null) const SizedBox(height: 10),
+                          if (_rentAnual != null)
+                            RowBalance(
+                              label: 'Simple Anual',
+                              data: NumberUtil.percent(_rentAnual),
+                              color: textRedGreen(_rentAnual),
+                            ),
                           if (_tae != null) const SizedBox(height: 10),
                           if (_tae != null)
                             RowBalance(
-                              label: 'TAE',
+                              label: 'TWR (TAE)',
                               data: NumberUtil.percent(_tae),
                               color: textRedGreen(_tae),
                             ),
@@ -607,13 +661,6 @@ class _MainFondoState extends State<MainFondo> {
                               label: 'MWR',
                               data: NumberUtil.percent(_mwr),
                               color: textRedGreen(_mwr),
-                            ),
-                          if (_mwrAcum != null) const SizedBox(height: 10),
-                          if (_mwrAcum != null)
-                            RowBalance(
-                              label: 'MWR Acum.',
-                              data: NumberUtil.percent(_mwrAcum),
-                              color: textRedGreen(_mwrAcum),
                             ),
                         ],
                       ),

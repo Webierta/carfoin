@@ -18,6 +18,7 @@ enum AppPage {
   support,
   settings,
   error,
+  global
 }
 
 extension AppPageExtension on AppPage {
@@ -41,6 +42,8 @@ extension AppPageExtension on AppPage {
         return supportPage;
       case AppPage.settings:
         return settingsPage;
+      case AppPage.global:
+        return globalPage;
       case AppPage.error:
         return errorPage;
       default:

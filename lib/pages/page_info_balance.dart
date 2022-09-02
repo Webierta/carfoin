@@ -49,7 +49,7 @@ Importe actual del Fondo. **Valor** de tu participación en el Fondo según el �
 
 Balance calculado por la diferencia entre el **resultado** obtenido y la **inversión** realizada.
 
-## RENTABILIDAD
+## RENTABILIDAD O RENTABILIDAD SIMPLE
 
 **Rentabilidad acumulada** desde la suscripción del Fondo. Se calcula como la proporción entre el **rendimiento** y la **inversión** realizada.
 
@@ -85,18 +85,18 @@ La **Tasa Anual Equivalente** es útil como índice de comparación entre fondos
 
 Mide lo que realmente has hecho crecer tu dinero considerando la cantidad de dinero invertido, el tiempo que lo has tenido y su rendimiento.
 
-Resulta muy variable en función de los movimientos de efectivo y los momentos en que se han realizado y puede resultar útil para determinar si hemos escogido bien el timing de nuestras inversiones. Por definición se trata de un valor anualizado.
+Resulta muy variable en función de los movimientos de efectivo y los momentos en que se han realizado y puede resultar útil para determinar si has escogido bien el timing de tus inversiones (en cambio el TWR no tiene en cuenta cuánto dinero realmente has puesto en cada fase a lo largo de los años). Por definición se trata de un valor anualizado.
 
 Para su cálculo se utiliza la fórmula de la TIR (IRR en inglés) o Tasa Interna de Retorno adaptada para flujos de caja no regulares o periódicos (*XIRR: eXtended Internal Rate of Return*). Para ello se necesitan, además de los movimientos realizados (aportaciones y reembolsos), el último valor de la inversión con fecha distinta del último movimiento. El resultado es similar al obtenido con la función TIR.NO.PER en una hoja de cálculo.
 
 ## MWR ACUMULADO
 
-Indice de rentabilidad acumulada calculado a partir del MWR con esta fórmula:
+Indice de rentabilidad acumulada comparable a los índices de **Rentabilidad** y **TWR**. Se calcula a partir del MWR con esta fórmula:
 
 ```
 MWRA = ((1 + MWR) ^ días) - 1
 ```
 
-> Las rentabilidades obtenidas por estos métodos serán iguales únicamente cuando en el Fondo no existen entradas y salidas de capital.
+> Las rentabilidades obtenidas por estos métodos son iguales únicamente cuando en el Fondo no existen entradas y salidas de capital.
 
 """;

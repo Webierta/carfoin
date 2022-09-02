@@ -21,7 +21,28 @@ class VistaCompacta extends StatelessWidget {
       direction: DismissDirection.endToStart,
       background: bgDismissible,
       onDismissed: (_) => delete(cartera),
-      child: Padding(
+      child: Card(
+        child: ListTile(
+          onTap: () => goCartera(context, cartera),
+          enabled: true,
+          leading: CircleAvatar(
+            backgroundColor: const Color(0xFFFFC107),
+            child: Text(
+              cartera.name[0],
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+                color: Color(0xFF0D47A1),
+              ),
+            ),
+          ),
+          title: Text(
+            cartera.name,
+            style: const TextStyle(fontSize: 20),
+          ),
+        ),
+      ),
+      /*child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: InputChip(
             labelPadding:
@@ -45,7 +66,7 @@ class VistaCompacta extends StatelessWidget {
               color: Color(0xFF2196F3),
             ),
             onPressed: () => goCartera(context, cartera)),
-      ),
+      ),*/
     );
   }
 }

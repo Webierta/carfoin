@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../models/cartera.dart';
-import '../../utils/number_util.dart';
 import '../../utils/stats.dart';
 import '../../utils/styles.dart';
+import '../stepper_balance.dart';
 
 class VistaDetalle extends StatelessWidget {
   final Cartera cartera;
@@ -24,16 +24,23 @@ class VistaDetalle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Fondo> fondos = cartera.fondos ?? [];
+    double inversionCarteraEur = 0.0;
+    double inversionCarteraUsd = 0.0;
+    double inversionCarteraOtra = 0.0;
     double capitalCarteraEur = 0.0;
     double capitalCarteraUsd = 0.0;
     double capitalCarteraOtra = 0.0;
     double rendimientoCarteraEur = 0.0;
     double rendimientoCarteraUsd = 0.0;
     double rendimientoCarteraOtra = 0.0;
-    double participacionesCartera = 0.0;
-    double taeCartera = 0.0;
-    int fondosConTae = 0;
 
+    //double participacionesCartera = 0.0;
+    //double taeCartera = 0.0;
+    //int fondosConTae = 0;
+
+    bool isTrueInversionCarteraEur = false;
+    bool isTrueInversionCarteraUsd = false;
+    bool isTrueInversionCarteraOtra = false;
     bool isTrueCapitalCarteraEur = false;
     bool isTrueCapitalCarteraUsd = false;
     bool isTrueCapitalCarteraOtra = false;
@@ -46,111 +53,93 @@ class VistaDetalle extends StatelessWidget {
         if (fondo.valores != null && fondo.valores!.isNotEmpty) {
           Stats stats = Stats(fondo.valores!);
           double participacionesFondo = stats.totalParticipaciones() ?? 0.0;
-          double? twrFondo = stats.twr();
-          double? taeFondo;
-          if (twrFondo != null) {
-            taeFondo = stats.anualizar(twrFondo);
-          }
-          if (taeFondo != null) {
-            fondosConTae++;
-            taeCartera += taeFondo;
-          }
-          participacionesCartera += participacionesFondo;
+          //participacionesCartera += participacionesFondo;
           if (participacionesFondo > 0) {
             if (fondo.divisa == 'EUR') {
+              if (stats.inversion() != null) {
+                isTrueInversionCarteraEur = true;
+              }
               if (stats.resultado() != null) {
                 isTrueCapitalCarteraEur = true;
               }
               if (stats.balance() != null) {
                 isTrueRendCarteraEur = true;
               }
+              inversionCarteraEur += stats.inversion() ?? 0.0;
               capitalCarteraEur += stats.resultado() ?? 0.0;
               rendimientoCarteraEur += stats.balance() ?? 0.0;
             } else if (fondo.divisa == 'USD') {
+              if (stats.inversion() != null) {
+                isTrueInversionCarteraUsd = true;
+              }
               if (stats.resultado() != null) {
                 isTrueCapitalCarteraUsd = true;
               }
               if (stats.balance() != null) {
                 isTrueRendCarteraUsd = true;
               }
+              inversionCarteraUsd += stats.inversion() ?? 0.0;
               capitalCarteraUsd += stats.resultado() ?? 0.0;
               rendimientoCarteraUsd += stats.balance() ?? 0.0;
             } else {
+              if (stats.inversion() != null) {
+                isTrueInversionCarteraOtra = true;
+              }
               if (stats.resultado() != null) {
                 isTrueCapitalCarteraOtra = true;
               }
               if (stats.balance() != null) {
                 isTrueRendCarteraOtra = true;
               }
+              inversionCarteraOtra += stats.inversion() ?? 0.0;
               capitalCarteraOtra += stats.resultado() ?? 0.0;
               rendimientoCarteraOtra += stats.balance() ?? 0.0;
             }
           }
         }
       }
-      if (fondosConTae > 0) {
-        taeCartera = taeCartera / fondos.length;
-      }
     }
 
-    int countItems() {
+    bool isTrueDivisaEur() {
+      if (isTrueInversionCarteraEur &&
+          isTrueCapitalCarteraEur &&
+          isTrueRendCarteraEur) {
+        return true;
+      }
+      return false;
+    }
+
+    bool isTrueDivisaUsd() {
+      if (isTrueInversionCarteraUsd &&
+          isTrueCapitalCarteraUsd &&
+          isTrueRendCarteraUsd) {
+        return true;
+      }
+      return false;
+    }
+
+    bool isTrueDivisaOtra() {
+      if (isTrueInversionCarteraOtra &&
+          isTrueCapitalCarteraOtra &&
+          isTrueRendCarteraOtra) {
+        return true;
+      }
+      return false;
+    }
+
+    /*int countDivisas() {
       int count = 0;
-      if (isTrueCapitalCarteraEur && isTrueRendCarteraEur) {
+      if (isTrueDivisaEur()) {
         count++;
       }
-      if (isTrueCapitalCarteraUsd && isTrueRendCarteraUsd) {
+      if (isTrueDivisaUsd()) {
         count++;
       }
-      if (isTrueCapitalCarteraOtra && isTrueRendCarteraOtra) {
+      if (isTrueDivisaOtra()) {
         count++;
       }
       return count;
-    }
-
-    String selectedValue() {
-      if (isTrueCapitalCarteraEur && isTrueRendCarteraEur) {
-        return '€';
-      }
-      if (isTrueCapitalCarteraUsd && isTrueRendCarteraUsd) {
-        return '\$';
-      }
-      return '?';
-    }
-
-    List<DropdownMenuItem<String>> getDropdownItems() {
-      List<DropdownMenuItem<String>> menuItems = [];
-      if (isTrueCapitalCarteraEur && isTrueRendCarteraEur) {
-        menuItems.add(DropdownMenuItem(
-          value: '€',
-          child: ListTileCart(
-            capital: capitalCarteraEur,
-            balance: rendimientoCarteraEur,
-            divisa: '€',
-          ),
-        ));
-      }
-      if (isTrueCapitalCarteraUsd && isTrueRendCarteraUsd) {
-        menuItems.add(DropdownMenuItem(
-          value: '\$',
-          child: ListTileCart(
-            capital: capitalCarteraUsd,
-            balance: rendimientoCarteraUsd,
-            divisa: '\$',
-          ),
-        ));
-      }
-      if (isTrueCapitalCarteraOtra && isTrueRendCarteraOtra) {
-        menuItems.add(DropdownMenuItem(
-          value: '?',
-          child: ListTileCart(
-            capital: capitalCarteraOtra,
-            balance: rendimientoCarteraOtra,
-            divisa: '',
-          ),
-        ));
-      }
-      return menuItems;
-    }
+    }*/
 
     return Dismissible(
       key: UniqueKey(),
@@ -160,8 +149,6 @@ class VistaDetalle extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Card(
-          //padding: const EdgeInsets.all(12),
-          //decoration: boxDeco,
           child: Padding(
             padding: const EdgeInsets.all(8),
             child: Column(
@@ -224,7 +211,7 @@ class VistaDetalle extends StatelessWidget {
                 ),
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   child: Container(
                     padding: const EdgeInsets.only(right: 12),
                     decoration: boxDecoBlue,
@@ -266,43 +253,33 @@ class VistaDetalle extends StatelessWidget {
                           ),
                   ),
                 ),
-                if (fondos.isNotEmpty &&
-                    participacionesCartera > 0 &&
-                    countItems() > 0 &&
-                    getDropdownItems().isNotEmpty)
-                  ListTile(
-                    //visualDensity: const VisualDensity(horizontal: 0),
-                    //horizontalTitleGap: double.infinity,
-                    //contentPadding: const EdgeInsets.only(left: 50),
-                    //minVerticalPadding: 0,
-                    leading: Chip(
-                      backgroundColor: backgroundRedGreen(taeCartera),
-                      padding: const EdgeInsets.only(left: 10, right: 5),
-                      avatar: const FittedBox(
-                        child: Text('TAE'),
-                      ),
-                      label: Text(NumberUtil.percent(taeCartera)),
-                      labelStyle: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    title: Align(
-                      alignment: Alignment.centerRight,
-                      child: DropdownButton(
-                        //alignment: Alignment.centerRight,
-                        //isExpanded: true,
-                        value: selectedValue(),
-                        items: getDropdownItems(),
-                        onChanged:
-                            countItems() == 1 ? null : (String? newValue) {},
-                        icon: Visibility(
-                            visible: countItems() > 1,
-                            child: const Icon(Icons.arrow_downward)),
-                        //underline: DropdownButtonHideUnderline(child: Container()),
-                        underline: Container(),
-                        //iconSize: countItems() == 1 ? 0.0 : 22,
-                      ),
-                    ),
+                if (isTrueDivisaEur())
+                  StepperBalance(
+                    input: inversionCarteraEur,
+                    output: capitalCarteraEur,
+                    balance: rendimientoCarteraEur,
+                    divisa: '€',
                   ),
+                if (isTrueDivisaEur() && isTrueDivisaUsd())
+                  const SizedBox(height: 10),
+                if (isTrueDivisaUsd())
+                  StepperBalance(
+                    input: inversionCarteraUsd,
+                    output: capitalCarteraUsd,
+                    balance: rendimientoCarteraUsd,
+                    divisa: '\$',
+                  ),
+                if ((isTrueDivisaEur() || isTrueDivisaUsd()) &&
+                    isTrueDivisaOtra())
+                  const SizedBox(height: 10),
+                if (isTrueDivisaOtra())
+                  StepperBalance(
+                    input: inversionCarteraOtra,
+                    output: capitalCarteraOtra,
+                    balance: rendimientoCarteraOtra,
+                    divisa: '',
+                  ),
+                const SizedBox(height: 10),
               ],
             ),
           ),
@@ -340,6 +317,8 @@ class ChipFondo extends StatelessWidget {
     );
   }
 }
+
+/*
 
 class ListTileCart extends StatelessWidget {
   final double capital;
@@ -404,3 +383,54 @@ class ListTileCart extends StatelessWidget {
     );
   }
 }
+
+String selectedValue() {
+      if (isTrueInversionCarteraEur &&
+          isTrueCapitalCarteraEur &&
+          isTrueRendCarteraEur) {
+        return '€';
+      }
+      if (isTrueInversionCarteraUsd &&
+          isTrueCapitalCarteraUsd &&
+          isTrueRendCarteraUsd) {
+        return '\$';
+      }
+      return '?';
+    }
+
+    List<DropdownMenuItem<String>> getDropdownItems() {
+      List<DropdownMenuItem<String>> menuItems = [];
+      if (isTrueCapitalCarteraEur && isTrueRendCarteraEur) {
+        menuItems.add(DropdownMenuItem(
+          value: '€',
+          child: ListTileCart(
+            capital: capitalCarteraEur,
+            balance: rendimientoCarteraEur,
+            divisa: '€',
+          ),
+        ));
+      }
+      if (isTrueCapitalCarteraUsd && isTrueRendCarteraUsd) {
+        menuItems.add(DropdownMenuItem(
+          value: '\$',
+          child: ListTileCart(
+            capital: capitalCarteraUsd,
+            balance: rendimientoCarteraUsd,
+            divisa: '\$',
+          ),
+        ));
+      }
+      if (isTrueCapitalCarteraOtra && isTrueRendCarteraOtra) {
+        menuItems.add(DropdownMenuItem(
+          value: '?',
+          child: ListTileCart(
+            capital: capitalCarteraOtra,
+            balance: rendimientoCarteraOtra,
+            divisa: '',
+          ),
+        ));
+      }
+      return menuItems;
+    }
+
+ */

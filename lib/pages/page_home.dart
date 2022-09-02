@@ -57,6 +57,7 @@ class _PageHomeState extends State<PageHome> {
     try {
       carteraProvider.carteras =
           await database.getCarteras(byOrder: _isCarterasByOrder);
+
       for (var cartera in carteraProvider.carteras) {
         await database.createTableCartera(cartera).whenComplete(() async {
           carteraProvider.fondos =
@@ -135,14 +136,18 @@ class _PageHomeState extends State<PageHome> {
                     title: const Text('Carteras'),
                     actions: [
                       IconButton(
-                        icon: const Icon(Icons.settings),
-                        onPressed: () => context.go(settingsPage),
+                        icon: const Icon(Icons.cases_rounded),
+                        onPressed: () => context.go(globalPage),
                       ),
                       IconButton(
                         icon: _isViewDetalleCarteras
                             ? const Icon(Icons.format_list_bulleted)
-                            : const Icon(Icons.view_stream),
+                            : const Icon(Icons.splitscreen),
                         onPressed: () => _viewCarteras(),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.refresh),
+                        onPressed: () {},
                       ),
                       PopupMenuButton(
                         color: const Color(0xFF2196F3),
@@ -196,6 +201,9 @@ class _PageHomeState extends State<PageHome> {
                               ),
                             ),
                           );
+                        } else {
+                          // calcular GOBAL INVERSION...
+                          //calcularGlobal(data.carteras);
                         }
                         if (!_isViewDetalleCarteras) {
                           return ListView.builder(

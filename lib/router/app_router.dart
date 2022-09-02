@@ -4,6 +4,7 @@ import '../pages/page_about.dart';
 import '../pages/page_cartera.dart';
 import '../pages/page_error.dart';
 import '../pages/page_fondo.dart';
+import '../pages/page_global.dart';
 import '../pages/page_home.dart';
 import '../pages/page_info.dart';
 import '../pages/page_info_balance.dart';
@@ -25,6 +26,10 @@ class AppRouter {
       GoRoute(
         path: AppPage.home.routePath,
         builder: (context, state) => const PageHome(),
+      ),
+      GoRoute(
+        path: AppPage.global.routePath,
+        builder: (context, state) => const PageGlobal(),
       ),
       GoRoute(
         path: AppPage.cartera.routePath,

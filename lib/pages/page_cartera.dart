@@ -18,6 +18,7 @@ import '../utils/styles.dart';
 import '../widgets/hoja_calendario.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
+import '../widgets/stepper_balance.dart';
 
 class PageCartera extends StatefulWidget {
   const PageCartera({Key? key}) : super(key: key);
@@ -523,14 +524,27 @@ class DataCartera extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Valor>? valores = fondo.valores;
     Stats? stats;
+    double? _inversion;
     double? _resultado;
+    double? _balance;
     double? _tae;
     String lastDate = '';
     int dia = 0;
     String mesYear = '';
     String lastPrecio = '';
-    String divisa = fondo.divisa ?? '';
+
     double? diferencia;
+
+    String divisa = fondo.divisa ?? '';
+    String symbolDivisa = '';
+    IconData icon = Icons.payments_outlined;
+    if (divisa == 'EUR') {
+      icon = Icons.euro;
+      symbolDivisa = '€';
+    } else if (divisa == 'USD') {
+      icon = Icons.attach_money;
+      symbolDivisa = '\$';
+    }
 
     if (valores != null && valores.isNotEmpty) {
       int lastEpoch = valores.first.date;
@@ -545,7 +559,9 @@ class DataCartera extends StatelessWidget {
         diferencia = valores.first.precio - valores[1].precio;
       }
       stats = Stats(valores);
+      _inversion = stats.inversion();
       _resultado = stats.resultado();
+      _balance = stats.balance();
       double? twr = stats.twr();
       if (twr != null) {
         _tae = stats.anualizar(twr);
@@ -598,7 +614,7 @@ class DataCartera extends StatelessWidget {
                 ),
                 if (valores != null && valores.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: boxDecoBlue,
@@ -608,72 +624,229 @@ class DataCartera extends StatelessWidget {
                           children: [
                             DiaCalendario(epoch: valores.first.date),
                             Expanded(
+                              child: ListTile(
+                                dense: true,
+                                contentPadding: const EdgeInsets.all(0),
+                                title: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      //'V.L. $lastPrecio $divisa',
+                                      lastPrecio,
+                                      textAlign: TextAlign.end,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        //fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF0D47A1),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    const Icon(Icons.sell,
+                                        color: Color(0xFF2196F3)),
+                                  ],
+                                ),
+                                subtitle: diferencia != null
+                                    ? Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            diferencia.toStringAsFixed(2),
+                                            textAlign: TextAlign.end,
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w400,
+                                              color: textRedGreen(diferencia),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          const Icon(Icons.iso,
+                                              color: Color(0xFF2196F3)),
+                                        ],
+                                      )
+                                    : null,
+                                leading: (divisa == 'EUR' || divisa == 'USD')
+                                    ? Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
+                                        child: Text(
+                                          symbolDivisa,
+                                          textScaleFactor: 2.5,
+                                          style: const TextStyle(
+                                              color: Color(0xFF90CAF9)),
+                                        ),
+                                      )
+                                    : null,
+                              ),
+                            ),
+                            /*Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        'V.L. $lastPrecio $divisa',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF0D47A1),
-                                        ),
-                                      ),
-                                      if (diferencia != null)
-                                        const SizedBox(width: 10),
-                                      if (diferencia != null)
-                                        Text(
-                                          diferencia.toStringAsFixed(2),
-                                          style: TextStyle(
-                                            color: textRedGreen(diferencia),
-                                          ),
-                                        ),
-                                    ],
+                                  Text(
+                                    //'V.L. $lastPrecio $divisa',
+                                    lastPrecio,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      //fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF0D47A1),
+                                    ),
                                   ),
-                                  _resultado != null
-                                      ? FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Text(
-                                            'Capital: ${NumberUtil.decimalFixed(_resultado)} $divisa',
-                                            style: const TextStyle(
-                                              color: Color(0xFF0D47A1),
-                                              //fontSize: 14
-                                            ),
-                                          ),
-                                        )
-                                      : const Text('Sin inversiones'),
-                                  if (_tae != null)
-                                    Text.rich(TextSpan(
-                                      style: const TextStyle(fontSize: 16),
-                                      text: 'TAE: ',
-                                      children: [
-                                        TextSpan(
-                                          text: NumberUtil.percent(_tae),
-                                          style: TextStyle(
-                                            //fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: textRedGreen(_tae),
-                                          ),
-                                        )
-                                      ],
-                                    )),
+                                  if (diferencia != null)
+                                    Text(
+                                      diferencia.toStringAsFixed(2),
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400,
+                                        color: textRedGreen(diferencia),
+                                      ),
+                                    ),
                                 ],
                               ),
-                            ),
+                            ),*/
+                            /*if (divisa == 'EUR' || divisa == 'USD')
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8),
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.transparent,
+                                  foregroundColor: Colors.blue,
+                                  child: Icon(icon),
+                                ),
+                              ),*/
                           ],
                         ),
                       ),
                     ),
                   ),
+                if (_inversion != null &&
+                    _resultado != null &&
+                    _balance != null &&
+                    _tae != null)
+                  StepperBalance(
+                    input: _inversion,
+                    output: _resultado,
+                    balance: _balance,
+                    divisa: symbolDivisa,
+                    tae: _tae,
+                  ),
+                /*ListTile(
+                    leading: Chip(
+                      backgroundColor: backgroundRedGreen(_tae),
+                      padding: const EdgeInsets.only(left: 10, right: 5),
+                      avatar: const FittedBox(
+                        child: Text('TAE'),
+                      ),
+                      label: Text(NumberUtil.percent(_tae)),
+                      labelStyle: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    title: RowListTile(
+                        stats: _resultado,
+                        color: const Color(0xFF000000),
+                        icon: Icons.savings),
+                    subtitle: RowListTile(
+                        stats: _balance,
+                        color: textRedGreen(_balance),
+                        icon: Icons.iso),
+                  ),*/
+                // TODO: Texto: sin inversiones ??
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class RowListTile extends StatelessWidget {
+  final double stats;
+  final Color color;
+  final IconData icon;
+  const RowListTile(
+      {Key? key, required this.stats, required this.color, required this.icon})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      //mainAxisSize: MainAxisSize.min,
+      children: [
+        FittedBox(
+          child: Text(
+            //'${NumberUtil.decimalFixed(stats, long: false)} $divisa',
+            NumberUtil.decimalFixed(stats, long: false),
+            textAlign: TextAlign.end,
+            maxLines: 1,
+            style: TextStyle(
+              //fontWeight: FontWeight.w900,
+              fontSize: 16,
+              color: color,
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Icon(icon, color: const Color(0xFF0D47A1)),
+      ],
+    );
+  }
+}
+
+class ListTileCart extends StatelessWidget {
+  final double capital;
+  final double balance;
+  final String divisa;
+  const ListTileCart(
+      {Key? key,
+      required this.capital,
+      required this.balance,
+      required this.divisa})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Row _buildRow(double stats, {bool isTitle = true}) {
+      Color fontColor = const Color(0xFF000000);
+      double fontSsize = 16;
+      IconData icon = Icons.savings;
+      if (!isTitle) {
+        fontColor = textRedGreen(stats);
+        //stats < 0 ? const Color(0xFFF44336) : const Color(0xFF4CAF50);
+        fontSsize = 14;
+        icon = Icons.iso;
+      }
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        //mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '${NumberUtil.decimalFixed(stats, long: false)} $divisa',
+            textAlign: TextAlign.end,
+            maxLines: 1,
+            style: TextStyle(
+              //fontWeight: FontWeight.w900,
+              fontSize: fontSsize,
+              color: fontColor,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Icon(icon, color: const Color(0xFF0D47A1)),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        _buildRow(capital),
+        _buildRow(balance, isTitle: false),
+      ],
     );
   }
 }
