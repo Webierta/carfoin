@@ -126,21 +126,18 @@ class _PageFondoState extends State<PageFondo>
                     fondoSelect.name,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    style: const TextStyle(color: Color(0xFF0D47A1)),
+                    style: const TextStyle(color: blue900),
                   ),
                   subtitle: Row(
                     children: [
-                      const Icon(
-                        Icons.business_center,
-                        color: Color(0xFF0D47A1),
-                      ),
+                      const Icon(Icons.business_center, color: blue900),
                       const SizedBox(width: 10),
                       Flexible(
                         child: Text(
                           carteraSelect.name,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
-                          style: const TextStyle(color: Color(0xFF0D47A1)),
+                          style: const TextStyle(color: blue900),
                         ),
                       ),
                     ],
@@ -148,7 +145,7 @@ class _PageFondoState extends State<PageFondo>
                 ),
                 actions: [
                   PopupMenuButton(
-                    color: const Color(0xFF2196F3),
+                    color: blue,
                     offset: Offset(0.0, AppBar().preferredSize.height),
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -189,7 +186,7 @@ class _PageFondoState extends State<PageFondo>
                 children: const [MainFondo(), TablaFondo(), GraficoFondo()],
               ),
               bottomNavigationBar: BottomAppBar(
-                color: const Color(0xFF0D47A1),
+                color: blue900,
                 shape: const CircularNotchedRectangle(),
                 notchMargin: 5,
                 child: FractionallySizedBox(
@@ -201,7 +198,7 @@ class _PageFondoState extends State<PageFondo>
                     unselectedLabelColor: const Color(0x62FFFFFF),
                     indicatorSize: TabBarIndicatorSize.tab,
                     indicatorPadding: const EdgeInsets.all(5.0),
-                    indicatorColor: const Color(0xFF2196F3),
+                    indicatorColor: blue,
                     tabs: const [
                       Tab(icon: Icon(Icons.assessment, size: 32)),
                       Tab(icon: Icon(Icons.table_rows_outlined, size: 32)),
@@ -214,11 +211,11 @@ class _PageFondoState extends State<PageFondo>
                   FloatingActionButtonLocation.endDocked,
               floatingActionButton: SpeedDial(
                 icon: Icons.refresh,
-                foregroundColor: const Color(0xFF0D47A1),
-                backgroundColor: const Color(0xFFFFC107),
+                foregroundColor: blue900,
+                backgroundColor: amber,
                 spacing: 8,
                 spaceBetweenChildren: 4,
-                overlayColor: const Color(0xFF9E9E9E),
+                overlayColor: gris,
                 overlayOpacity: 0.4,
                 children: [
                   _buildSpeedDialChild(
@@ -362,13 +359,12 @@ class _PageFondoState extends State<PageFondo>
             actions: [
               ElevatedButton(
                 onPressed: () => Navigator.pop(context, false),
-                //onPressed: () => Navigator.of(context).pop(),
                 child: const Text('CANCELAR'),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xFFF44336),
+                  backgroundColor: red,
                   primary: const Color(0xFFFFFFFF),
                 ),
                 /*onPressed: () async {

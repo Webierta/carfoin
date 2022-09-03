@@ -49,8 +49,8 @@ class PageInfo extends StatelessWidget {
             child: Markdown(
               data: mdstring,
               styleSheet: MarkdownStyleSheet(
-                h1: const TextStyle(color: Colors.blue, fontSize: 40),
-                h2: const TextStyle(color: Colors.blue, fontSize: 22),
+                h1: const TextStyle(color: blue, fontSize: 40),
+                h2: const TextStyle(color: blue, fontSize: 22),
                 p: const TextStyle(fontSize: 18),
               ),
             ),

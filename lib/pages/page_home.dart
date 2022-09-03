@@ -7,10 +7,12 @@ import 'package:restart_app/restart_app.dart';
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
 import '../router/routes_const.dart';
+import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../utils/file_util.dart';
 import '../utils/styles.dart';
+import '../utils/update_all.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
 import '../widgets/my_drawer.dart';
@@ -31,6 +33,10 @@ class _PageHomeState extends State<PageHome> {
   late TextEditingController _controller;
   DatabaseHelper database = DatabaseHelper();
   late CarteraProvider carteraProvider;
+
+  late ApiService apiService;
+  final GlobalKey _dialogKey = GlobalKey();
+  String _loadingText = '';
 
   getSharedPrefs() async {
     bool? isCarterasByOrder;
@@ -86,6 +92,25 @@ class _PageHomeState extends State<PageHome> {
     }
   }
 
+  /*setFondos(Cartera cartera) async {
+    try {
+      carteraProvider.fondos =
+          await database.getFondos(cartera, byOrder: _isFondosByOrder);
+      for (var fondo in carteraProvider.fondos) {
+        await database.createTableFondo(cartera, fondo).whenComplete(() async {
+          carteraProvider.valores = await database.getValores(cartera, fondo);
+          fondo.valores = carteraProvider.valores;
+          carteraProvider.operaciones =
+              await database.getOperaciones(cartera, fondo);
+        });
+      }
+    } catch (e) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        context.go(errorPage);
+      });
+    }
+  }*/
+
   @override
   void initState() {
     carteraProvider = context.read<CarteraProvider>();
@@ -94,6 +119,7 @@ class _PageHomeState extends State<PageHome> {
       await setCarteras();
     });
     _controller = TextEditingController();
+    apiService = ApiService();
     super.initState();
   }
 
@@ -135,9 +161,13 @@ class _PageHomeState extends State<PageHome> {
                   appBar: AppBar(
                     title: const Text('Carteras'),
                     actions: [
-                      IconButton(
+                      /*IconButton(
                         icon: const Icon(Icons.cases_rounded),
                         onPressed: () => context.go(globalPage),
+                      ),*/
+                      IconButton(
+                        icon: const Icon(Icons.refresh),
+                        onPressed: () async => await _dialogUpdateAll(context),
                       ),
                       IconButton(
                         icon: _isViewDetalleCarteras
@@ -145,12 +175,8 @@ class _PageHomeState extends State<PageHome> {
                             : const Icon(Icons.splitscreen),
                         onPressed: () => _viewCarteras(),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.refresh),
-                        onPressed: () {},
-                      ),
                       PopupMenuButton(
-                        color: const Color(0xFF2196F3),
+                        color: blue,
                         offset: Offset(0.0, AppBar().preferredSize.height),
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -179,8 +205,8 @@ class _PageHomeState extends State<PageHome> {
                   ),
                   drawer: const MyDrawer(),
                   floatingActionButton: FloatingActionButton(
-                    backgroundColor: const Color(0xFFFFC107),
-                    child: const Icon(Icons.add, color: Color(0xFF0D47A1)),
+                    backgroundColor: amber,
+                    child: const Icon(Icons.add, color: blue900),
                     onPressed: () => _inputName(context),
                   ),
                   body: Padding(
@@ -201,9 +227,6 @@ class _PageHomeState extends State<PageHome> {
                               ),
                             ),
                           );
-                        } else {
-                          // calcular GOBAL INVERSION...
-                          //calcularGlobal(data.carteras);
                         }
                         if (!_isViewDetalleCarteras) {
                           return ListView.builder(
@@ -241,6 +264,135 @@ class _PageHomeState extends State<PageHome> {
         } else {
           return const LoadingProgress(titulo: 'Actualizando carteras...');
         }
+      },
+    );
+  }
+
+  _dialogUpdateAll(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          key: _dialogKey,
+          builder: (context, setState) {
+            // return Dialog(child: Loading(...); ???
+            return Loading(
+                titulo: 'ACTUALIZANDO FONDOS...', subtitulo: _loadingText);
+          },
+        );
+      },
+    );
+    //var updateResultados = await _updateAll(context);
+    List<Update> updateResultados = [];
+    if (carteraProvider.carteras.isNotEmpty) {
+      var updateAll =
+          UpdateAll(context: context, setStateDialog: _setStateDialog);
+      updateResultados = await updateAll.updateCarteras();
+      if (updateResultados.isNotEmpty) {
+        await setCarteras();
+      }
+    }
+    _pop();
+    updateResultados.isNotEmpty
+        ? await _showResultados(updateResultados)
+        : _showMsg(msg: 'Nada que actualizar');
+  }
+
+  _setStateDialog(String newText) {
+    if (_dialogKey.currentState != null && _dialogKey.currentState!.mounted) {
+      _dialogKey.currentState!.setState(() {
+        _loadingText = newText;
+      });
+    }
+  }
+
+  /*Future<List<Update>> _updateAll(BuildContext context) async {
+    _setStateDialog('Conectando...');
+    List<Update> updates = [];
+    final List<Cartera> carteras = context.read<CarteraProvider>().carteras;
+    if (carteras.isNotEmpty) {
+      for (var cartera in carteras) {
+        List<Fondo>? fondos = cartera.fondos;
+        if (fondos != null && fondos.isNotEmpty) {
+          for (var fondo in fondos) {
+            _setStateDialog('${fondo.name}\n${cartera.name}');
+
+            /// ???? CREATE TABLE FONDO ??
+            await database.createTableFondo(cartera, fondo);
+            final getDataApi = await apiService.getDataApi(fondo.isin);
+            if (getDataApi != null) {
+              var newValor =
+                  Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
+              fondo.divisa = getDataApi.market;
+              await database.updateFondo(cartera, fondo);
+              await database.updateOperacion(cartera, fondo, newValor);
+              updates.add(Update(
+                  nameCartera: cartera.name,
+                  nameFondo: fondo.name,
+                  isUpdate: true));
+            } else {
+              updates.add(Update(
+                  nameCartera: cartera.name,
+                  nameFondo: fondo.name,
+                  isUpdate: false));
+            }
+          }
+          //await setFondos(cartera);
+        }
+      }
+      await setCarteras();
+    }
+    return updates;
+  }*/
+
+  _showResultados(List<Update> updates) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        Icon getIconUpdate(bool isUpdate) {
+          if (isUpdate) {
+            return const Icon(Icons.check_box, color: green);
+          }
+          return const Icon(Icons.disabled_by_default, color: red);
+        }
+
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: AlertDialog(
+            insetPadding: const EdgeInsets.all(10),
+            title: const Text('Resultado'),
+            actions: [
+              TextButton(
+                child: const Text('Cerrar'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+            content: SingleChildScrollView(
+              child: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    /*for (var res in mapResultados.entries)
+                      ListTile(
+                          dense: true,
+                          title: Text(res.key),
+                          trailing: res.value),*/
+                    for (var update in updates)
+                      ListTile(
+                        dense: true,
+                        title: Text(update.nameFondo),
+                        subtitle: Text(update.nameCartera),
+                        trailing: getIconUpdate(update.isUpdate),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
       },
     );
   }
@@ -503,7 +655,7 @@ class _PageHomeState extends State<PageHome> {
               ),
               ElevatedButton(
                 style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xFFF44336),
+                  backgroundColor: red,
                   primary: const Color(0xFFFFFFFF),
                 ),
                 onPressed: () => Navigator.pop(context, true),

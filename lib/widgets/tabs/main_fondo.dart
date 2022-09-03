@@ -611,7 +611,14 @@ class _MainFondoState extends State<MainFondo> {
                           if (_rentabilidad != null ||
                               _twr != null ||
                               _mwrAcum != null)
-                            const Center(child: Text('RENTABILIDAD')),
+                            //const Center(child: Text('RENTABILIDAD')),
+                            Row(
+                              children: const [
+                                Expanded(child: Divider(endIndent: 10)),
+                                Text('RENTABILIDAD'),
+                                Expanded(child: Divider(indent: 10)),
+                              ],
+                            ),
                           if (_rentabilidad != null) const SizedBox(height: 10),
                           if (_rentabilidad != null)
                             RowBalance(
@@ -640,7 +647,13 @@ class _MainFondoState extends State<MainFondo> {
                           if (_rentAnual != null ||
                               _tae != null ||
                               _mwr != null)
-                            const Center(child: Text('RENTABILIDAD ANUAL')),
+                            Row(
+                              children: const [
+                                Expanded(child: Divider(endIndent: 10)),
+                                Text('RENTABILIDAD ANUAL'),
+                                Expanded(child: Divider(indent: 10)),
+                              ],
+                            ),
                           if (_rentAnual != null) const SizedBox(height: 10),
                           if (_rentAnual != null)
                             RowBalance(

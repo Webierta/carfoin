@@ -8,14 +8,14 @@ class StepperBalance extends StatelessWidget {
   final double output;
   final double balance;
   final String divisa;
-  final double? tae;
+  //final double? tae;
   const StepperBalance({
     Key? key,
     required this.input,
     required this.output,
     required this.balance,
     required this.divisa,
-    this.tae,
+    //this.tae,
   }) : super(key: key);
 
   @override
@@ -27,20 +27,20 @@ class StepperBalance extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Text(
                 '${NumberUtil.decimalFixed(input, long: false)}$spaceDivisa',
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 14),
               ),
               Text(
                 '${NumberUtil.decimalFixed(output, long: false)}$spaceDivisa',
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 14),
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+          Transform.translate(
+            offset: const Offset(0.0, -5.0),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -49,62 +49,51 @@ class StepperBalance extends StatelessWidget {
                   padding: const EdgeInsets.all(4),
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color(0xFF9E9E9E),
+                    color: gris,
                   ),
-                  child: const Icon(Icons.login, color: Color(0xFFFFFFFF)),
+                  child: const Icon(Icons.first_page, color: Color(0xFFFFFFFF)),
                 ),
                 const Expanded(
                   child: Divider(
-                    thickness: 1,
-                    indent: 4,
-                    endIndent: 4,
-                    color: Color(0xFF9E9E9E),
-                  ),
+                      thickness: 1, indent: 4, endIndent: 4, color: gris),
                 ),
                 Chip(
                   backgroundColor: const Color(0xFFFFFFFF),
                   //backgroundColor: const Color(0xFFBDBDBD),
-                  padding: const EdgeInsets.only(left: 5, right: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
                   visualDensity: const VisualDensity(vertical: -4),
-                  shape: const StadiumBorder(
-                      side: BorderSide(color: Color(0xFF9E9E9E))),
+                  shape: const StadiumBorder(side: BorderSide(color: gris)),
                   /*avatar: const Icon(
                     Icons.iso,
                     color: Color(0xFFFFFFFF),
                   ),*/
-                  onDeleted: () {},
+                  /*onDeleted: () {},
                   deleteIcon: const Icon(
                     Icons.savings,
                     color: Color(0xFF9E9E9E),
-                  ),
+                  ),*/
                   label: Text(
                       '${NumberUtil.decimalFixed(balance, long: false)}$spaceDivisa'),
                   labelStyle: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: textRedGreen(balance),
                   ),
                 ),
                 const Expanded(
                   child: Divider(
-                    thickness: 1,
-                    indent: 4,
-                    endIndent: 4,
-                    color: Color(0xFF9E9E9E),
-                  ),
+                      thickness: 1, indent: 4, endIndent: 4, color: gris),
                 ),
                 Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color(0xFF9E9E9E),
-                  ),
-                  child: const Icon(Icons.logout, color: Color(0xFFFFFFFF)),
+                  decoration:
+                      const BoxDecoration(shape: BoxShape.circle, color: gris),
+                  child: const Icon(Icons.last_page, color: Color(0xFFFFFFFF)),
                 ),
               ],
             ),
           ),
-          if (tae != null)
+          /*if (tae != null)
             const SizedBox(
               height: 10,
               child: VerticalDivider(
@@ -125,7 +114,7 @@ class StepperBalance extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
-            ),
+            ),*/
         ],
       ),
     );

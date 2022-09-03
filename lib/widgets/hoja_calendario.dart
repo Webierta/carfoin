@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../utils/fecha_util.dart';
+import '../utils/styles.dart';
 
 class DiaCalendario extends StatelessWidget {
   final int epoch;
@@ -13,7 +14,7 @@ class DiaCalendario extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFF2196F3),
+        color: blue,
         shape: BoxShape.rectangle,
         //border: Border.all(width: 1.0, color: Colors.blue),
         borderRadius: BorderRadius.circular(2),

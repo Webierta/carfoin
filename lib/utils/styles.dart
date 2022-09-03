@@ -44,6 +44,17 @@ const TextStyle styleTitle = TextStyle(
   color: Color(0xFF2196F3),
 );
 
+/* PALETA DE COLORES */
+
+const Color blue = Color(0xFF2196F3);
+const Color blue100 = Color(0xFFBBDEFB);
+const Color blue200 = Color(0xFF90CAF9);
+const Color blue900 = Color(0xFF0D47A1);
+const Color amber = Color(0xFFFFC107);
+const Color gris = Color(0xFF9E9E9E);
+const Color green = Color(0xFF4CAF50);
+const Color red = Color(0xFFF44336);
+
 Color textRedGreen(num number) {
   return number < 0 ? const Color(0xFFF44336) : const Color(0xFF4CAF50);
 }

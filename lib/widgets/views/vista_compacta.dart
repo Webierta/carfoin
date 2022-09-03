@@ -26,13 +26,13 @@ class VistaCompacta extends StatelessWidget {
           onTap: () => goCartera(context, cartera),
           enabled: true,
           leading: CircleAvatar(
-            backgroundColor: const Color(0xFFFFC107),
+            backgroundColor: amber,
             child: Text(
               cartera.name[0],
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 22,
-                color: Color(0xFF0D47A1),
+                color: blue900,
               ),
             ),
           ),

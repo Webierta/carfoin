@@ -172,11 +172,20 @@ class DatabaseHelper {
 
   Future<void> deleteAllFondos(Cartera cartera) async {
     if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
-      for (var fondo in cartera.fondos!) {
+      /*for (var fondo in cartera.fondos!) {
         await deleteFondo(cartera, fondo);
+      }*/
+      /*List<Fondo>.from(cartera.fondos!).forEach((fondo) async {
+        if (cartera.fondos!.contains(fondo)) {
+          await deleteFondo(cartera, fondo);
+        }
+      });*/
+      for (var fondo in List<Fondo>.from(cartera.fondos!)) {
+        if (cartera.fondos!.contains(fondo)) {
+          await deleteFondo(cartera, fondo);
+        }
       }
     }
-
     Database db = await database;
     var nameTable = '_${cartera.id}';
     await db.delete(nameTable);

@@ -158,13 +158,10 @@ class VistaDetalle extends StatelessWidget {
                     radius: 22,
                     backgroundColor: const Color(0xFFFFFFFF),
                     child: CircleAvatar(
-                      backgroundColor: const Color(0xFFFFC107),
+                      backgroundColor: amber,
                       child: IconButton(
                         onPressed: () => goCartera(context, cartera),
-                        icon: const Icon(
-                          Icons.business_center,
-                          color: Color(0xFF0D47A1),
-                        ),
+                        icon: const Icon(Icons.business_center, color: blue900),
                       ),
                     ),
                   ),
@@ -175,8 +172,8 @@ class VistaDetalle extends StatelessWidget {
                     style: styleTitle,
                   ),
                   trailing: PopupMenuButton(
-                    color: const Color(0xFF2196F3),
-                    icon: const Icon(Icons.more_vert, color: Color(0xFF2196F3)),
+                    color: blue,
+                    icon: const Icon(Icons.more_vert, color: blue),
                     itemBuilder: (context) => const [
                       PopupMenuItem(
                         value: 1,
@@ -226,10 +223,10 @@ class VistaDetalle extends StatelessWidget {
                                   CrossAxisAlignment.start,
                               expandedAlignment: Alignment.topLeft,
                               maintainState: true,
-                              iconColor: Colors.blue,
-                              collapsedIconColor: Colors.blue,
+                              iconColor: blue,
+                              collapsedIconColor: blue,
                               tilePadding: const EdgeInsets.all(0.0),
-                              backgroundColor: const Color(0xFFBBDEFB),
+                              backgroundColor: blue100,
                               title: ChipFondo(lengthFondos: fondos.length),
                               children: [
                                 for (var fondo in fondos)
@@ -241,7 +238,16 @@ class VistaDetalle extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                       style: const TextStyle(
-                                          color: Color(0xFF0D47A1)),
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: blue,
+                                        color: Colors.transparent,
+                                        shadows: [
+                                          Shadow(
+                                            offset: Offset(0, -5),
+                                            color: blue900,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   )
                               ],
@@ -253,6 +259,7 @@ class VistaDetalle extends StatelessWidget {
                           ),
                   ),
                 ),
+                if (isTrueDivisaEur()) const SizedBox(height: 10),
                 if (isTrueDivisaEur())
                   StepperBalance(
                     input: inversionCarteraEur,
@@ -307,11 +314,11 @@ class ChipFondo extends StatelessWidget {
       alignment: Alignment.topLeft,
       child: Chip(
         padding: const EdgeInsets.only(left: 10, right: 20),
-        backgroundColor: const Color(0xFFBBDEFB),
-        avatar: const Icon(Icons.poll, color: Color(0xFF0D47A1), size: 32),
+        backgroundColor: blue100,
+        avatar: const Icon(Icons.poll, color: blue900, size: 32),
         label: Text(
           title,
-          style: const TextStyle(color: Color(0xFF0D47A1), fontSize: 16),
+          style: const TextStyle(color: blue900, fontSize: 16),
         ),
       ),
     );

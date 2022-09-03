@@ -86,7 +86,6 @@ class PageSupport extends StatelessWidget {
                       TextSpan(
                         style: const TextStyle(
                           color: Colors.blueAccent,
-                          //fontSize: 18,
                           decoration: TextDecoration.underline,
                         ),
                         text: 'GitHub issues.',
@@ -144,9 +143,9 @@ class PageSupport extends StatelessWidget {
                         Container(
                           height: 50,
                           padding: const EdgeInsets.all(8.0),
-                          decoration: ShapeDecoration(
-                            color: Colors.grey[100],
-                            shape: const RoundedRectangleBorder(
+                          decoration: const ShapeDecoration(
+                            color: Color(0xFFF5F5F5),
+                            shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.only(
                                 bottomLeft: Radius.circular(8),
                                 topLeft: Radius.circular(8),
@@ -191,9 +190,9 @@ class PageSupport extends StatelessWidget {
                   widthFactor: 0.4,
                   child: ElevatedButton(
                     style: TextButton.styleFrom(
-                      backgroundColor: Colors.white,
+                      backgroundColor: const Color(0xFFFFFFFF),
                       elevation: 10.0,
-                      padding: EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
                     ),
                     onPressed: () => _launchUrl(urlPayPal),
                     child: Image.asset('assets/paypal_logo.png'),

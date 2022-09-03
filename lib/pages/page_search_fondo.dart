@@ -75,7 +75,7 @@ class _PageSearchFondoState extends State<PageSearchFondo> {
                             itemCount: _filterFondos.length,
                             itemBuilder: (context, index) => Card(
                               key: ValueKey(_filterFondos[index]['isin']),
-                              color: Colors.amber,
+                              color: amber,
                               elevation: 4,
                               margin: const EdgeInsets.symmetric(vertical: 10),
                               child: ListTile(

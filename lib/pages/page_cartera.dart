@@ -15,6 +15,7 @@ import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
 import '../utils/stats.dart';
 import '../utils/styles.dart';
+import '../utils/update_all.dart';
 import '../widgets/hoja_calendario.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
@@ -102,8 +103,8 @@ class _PageCarteraState extends State<PageCartera> {
     return SpeedDialChild(
       child: Icon(icono),
       label: label,
-      backgroundColor: const Color(0xFFFFC107),
-      foregroundColor: const Color(0xFF0D47A1),
+      backgroundColor: amber,
+      foregroundColor: blue900,
       onTap: () async {
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
         //final newFondo = await Navigator.of(context).pushNamed(page);
@@ -160,14 +161,17 @@ class _PageCarteraState extends State<PageCartera> {
                     onPressed: () async => await _dialogUpdateAll(context),
                   ),
                   PopupMenuButton(
-                    color: const Color(0xFF2196F3),
+                    color: blue,
                     offset: Offset(0.0, AppBar().preferredSize.height),
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(8.0)),
                     ),
                     itemBuilder: (ctx) => [
-                      buildMenuItem(MenuCartera.ordenar, Icons.sort_by_alpha,
-                          isOrder: _isFondosByOrder),
+                      buildMenuItem(
+                        MenuCartera.ordenar,
+                        Icons.sort_by_alpha,
+                        isOrder: _isFondosByOrder,
+                      ),
                       buildMenuItem(MenuCartera.eliminar, Icons.delete_forever)
                     ],
                     onSelected: (item) async {
@@ -182,11 +186,11 @@ class _PageCarteraState extends State<PageCartera> {
               ),
               floatingActionButton: SpeedDial(
                 icon: Icons.addchart,
-                foregroundColor: const Color(0xFF0D47A1),
-                backgroundColor: const Color(0xFFFFC107),
+                foregroundColor: blue900,
+                backgroundColor: amber,
                 spacing: 8,
                 spaceBetweenChildren: 4,
-                overlayColor: const Color(0xFF9E9E9E),
+                overlayColor: gris,
                 overlayOpacity: 0.4,
                 children: [
                   _buildSpeedDialChild(
@@ -214,7 +218,9 @@ class _PageCarteraState extends State<PageCartera> {
                           child: Text(
                             'Añade fondos a esta cartera',
                             style: TextStyle(
-                                color: Color(0xFFFFFFFF), fontSize: 22),
+                              color: Color(0xFFFFFFFF),
+                              fontSize: 22,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -262,10 +268,21 @@ class _PageCarteraState extends State<PageCartera> {
         );
       },
     );
-    var mapResultados = await _updateAll(context);
+    //var mapResultados = await _updateAll(context);
+
+    List<Update> updateResultados = [];
+    if (carteraSelect.fondos != null && carteraSelect.fondos!.isNotEmpty) {
+      var updateAll =
+          UpdateAll(context: context, setStateDialog: _setStateDialog);
+      updateResultados =
+          await updateAll.updateFondos(carteraSelect, carteraSelect.fondos!);
+      if (updateResultados.isNotEmpty) {
+        await setFondos(carteraSelect);
+      }
+    }
     _pop();
-    mapResultados.isNotEmpty
-        ? await _showResultados(mapResultados)
+    updateResultados.isNotEmpty
+        ? await _showResultados(updateResultados)
         : _showMsg(msg: 'Nada que actualizar');
   }
 
@@ -277,7 +294,7 @@ class _PageCarteraState extends State<PageCartera> {
     }
   }
 
-  Future<Map<String, Icon>> _updateAll(BuildContext context) async {
+  /*Future<Map<String, Icon>> _updateAll(BuildContext context) async {
     //var carteraOn = context.read<CarfoinProvider>().getCartera!;
     //var fondosOn = carteraOn.fondos;
 
@@ -323,13 +340,20 @@ class _PageCarteraState extends State<PageCartera> {
       await setFondos(carteraSelect);
     }
     return mapResultados;
-  }
+  }*/
 
-  _showResultados(Map<String, Icon> mapResultados) {
+  _showResultados(List<Update> updates) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
+        Icon getIconUpdate(bool isUpdate) {
+          if (isUpdate) {
+            return const Icon(Icons.check_box, color: green);
+          }
+          return const Icon(Icons.disabled_by_default, color: red);
+        }
+
         return WillPopScope(
           onWillPop: () async => false,
           child: AlertDialog(
@@ -347,11 +371,12 @@ class _PageCarteraState extends State<PageCartera> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    for (var res in mapResultados.entries)
+                    for (var update in updates)
                       ListTile(
-                          dense: true,
-                          title: Text(res.key),
-                          trailing: res.value),
+                        dense: true,
+                        title: Text(update.nameFondo),
+                        trailing: getIconUpdate(update.isUpdate),
+                      ),
                   ],
                 ),
               ),
@@ -441,7 +466,7 @@ class _PageCarteraState extends State<PageCartera> {
               ),
               ElevatedButton(
                 style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xFFF44336),
+                  backgroundColor: red,
                   primary: const Color(0xFFFFFFFF),
                 ),
                 onPressed: () => Navigator.pop(context, true),
@@ -586,10 +611,10 @@ class DataCartera extends StatelessWidget {
                     radius: 22,
                     backgroundColor: const Color(0xFFFFFFFF),
                     child: CircleAvatar(
-                      backgroundColor: const Color(0xFFFFC107),
+                      backgroundColor: amber,
                       child: IconButton(
                         onPressed: () => goFondo(context, fondo),
-                        icon: const Icon(Icons.poll, color: Color(0xFF0D47A1)),
+                        icon: const Icon(Icons.poll, color: blue900),
                       ),
                     ),
                   ),
@@ -598,18 +623,10 @@ class DataCartera extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                     style: styleTitle,
-                    /*style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Color(0xFF2196F3),
-                    ),*/
                   ),
                   subtitle: Text(
                     fondo.isin,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFF0D47A1),
-                    ),
+                    style: const TextStyle(fontSize: 16, color: blue900),
                   ),
                 ),
                 if (valores != null && valores.isNotEmpty)
@@ -636,14 +653,12 @@ class DataCartera extends StatelessWidget {
                                       textAlign: TextAlign.end,
                                       style: const TextStyle(
                                         fontSize: 18,
-                                        //fontWeight: FontWeight.bold,
                                         fontWeight: FontWeight.w400,
-                                        color: Color(0xFF0D47A1),
+                                        color: blue900,
                                       ),
                                     ),
                                     const SizedBox(width: 4),
-                                    const Icon(Icons.sell,
-                                        color: Color(0xFF2196F3)),
+                                    const Icon(Icons.sell, color: blue),
                                   ],
                                 ),
                                 subtitle: diferencia != null
@@ -661,8 +676,7 @@ class DataCartera extends StatelessWidget {
                                             ),
                                           ),
                                           const SizedBox(width: 4),
-                                          const Icon(Icons.iso,
-                                              color: Color(0xFF2196F3)),
+                                          const Icon(Icons.iso, color: blue),
                                         ],
                                       )
                                     : null,
@@ -673,8 +687,8 @@ class DataCartera extends StatelessWidget {
                                         child: Text(
                                           symbolDivisa,
                                           textScaleFactor: 2.5,
-                                          style: const TextStyle(
-                                              color: Color(0xFF90CAF9)),
+                                          style:
+                                              const TextStyle(color: blue200),
                                         ),
                                       )
                                     : null,
@@ -730,8 +744,58 @@ class DataCartera extends StatelessWidget {
                     output: _resultado,
                     balance: _balance,
                     divisa: symbolDivisa,
-                    tae: _tae,
+                    //tae: _tae,
                   ),
+                if (_tae != null)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 10, 20, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          NumberUtil.percent(_tae),
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w300,
+                            color: textRedGreen(_tae),
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        const Text('TAE'),
+                      ],
+                    ),
+                    /*child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.blue[700],
+                        border: Border.all(
+                            color: const Color(0xFFFFFFFF), width: 1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('TAE'),
+                          Expanded(
+                              child: VerticalDivider(
+                            thickness: 5,
+                          )),
+                          Column(
+                            children: [
+                              Text(
+                                NumberUtil.percent(_tae),
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),*/
+                  ),
+
                 /*ListTile(
                     leading: Chip(
                       backgroundColor: backgroundRedGreen(_tae),
@@ -792,7 +856,7 @@ class RowListTile extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        Icon(icon, color: const Color(0xFF0D47A1)),
+        Icon(icon, color: blue900),
       ],
     );
   }
@@ -836,7 +900,7 @@ class ListTileCart extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          Icon(icon, color: const Color(0xFF0D47A1)),
+          Icon(icon, color: blue900),
         ],
       );
     }

@@ -5,20 +5,40 @@ import 'package:provider/provider.dart';
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
 import '../router/routes_const.dart';
+import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
 import '../utils/stats.dart';
 import '../utils/styles.dart';
+import '../widgets/my_drawer.dart';
+
+class CarteraFondo {
+  final Cartera cartera;
+  final Fondo fondo;
+  const CarteraFondo({required this.cartera, required this.fondo});
+}
+
+class Destacado extends CarteraFondo {
+  final double tae;
+  const Destacado(
+      {required super.cartera, required super.fondo, required this.tae});
+}
+
+class LastOp extends CarteraFondo {
+  final Valor valor;
+  const LastOp(
+      {required super.cartera, required super.fondo, required this.valor});
+}
 
 class PageGlobal extends StatelessWidget {
   const PageGlobal({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final List<Cartera> carteras = context.read<CarteraProvider>().carteras;
+    CarteraProvider carteraProvider = context.read<CarteraProvider>();
+    final List<Cartera> carteras = carteraProvider.carteras;
     int nFondos = 0;
-
-    Map<List<String>, double> fondosTae = {};
-    Map<List<String>, double> fondosTaeSort = {};
+    List<Destacado> destacados = [];
+    List<LastOp> lastOps = [];
 
     double inversionGlobalEur = 0.0;
     double inversionGlobalUsd = 0.0;
@@ -42,7 +62,25 @@ class PageGlobal extends StatelessWidget {
               if (participacionesFondo > 0) {
                 double? twr = stats.twr();
                 if (twr != null) {
-                  fondosTae[[fondo.name, cartera.name]] = stats.anualizar(twr)!;
+                  destacados.add(Destacado(
+                      cartera: cartera,
+                      fondo: fondo,
+                      tae: stats.anualizar(twr)!));
+                }
+                List<Valor>? operaciones = fondo.valores
+                    ?.where((v) => v.tipo == 1 || v.tipo == 0)
+                    .toList();
+                if (operaciones != null && operaciones.isNotEmpty) {
+                  // ORDENAR OPERACIONES POR DATE ??
+                  var lastOp = operaciones.first;
+                  lastOps.add(
+                      LastOp(cartera: cartera, fondo: fondo, valor: lastOp));
+                  if (operaciones.length > 1) {
+                    //var lastOp2 = operaciones[operaciones.length - 2];
+                    var lastOp2 = operaciones[1];
+                    lastOps.add(
+                        LastOp(cartera: cartera, fondo: fondo, valor: lastOp2));
+                  }
                 }
                 if (fondo.divisa == 'EUR') {
                   inversionGlobalEur += stats.inversion() ?? 0.0;
@@ -62,13 +100,24 @@ class PageGlobal extends StatelessWidget {
           }
         }
       }
-      if (fondosTae.isNotEmpty) {
-        fondosTaeSort = Map.fromEntries(fondosTae.entries.toList()
-          ..sort((e1, e2) => e1.value.compareTo(e2.value)));
-      }
+      destacados.sort((a, b) => a.tae.compareTo(b.tae));
+      lastOps.sort((a, b) => a.valor.date.compareTo(b.valor.date));
     }
 
     calcularGlobal();
+
+    /*_goCartera(BuildContext context, Cartera cartera) {
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      carteraProvider.carteraSelect = cartera;
+      context.go(carteraPage);
+    }*/
+
+    _goFondo(BuildContext context, Cartera cartera, Fondo fondo) {
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      carteraProvider.carteraSelect = cartera;
+      carteraProvider.fondoSelect = fondo;
+      context.go(fondoPage);
+    }
 
     return WillPopScope(
       onWillPop: () async => false,
@@ -76,120 +125,225 @@ class PageGlobal extends StatelessWidget {
         decoration: scaffoldGradient,
         child: Scaffold(
           backgroundColor: Colors.transparent,
+          drawer: const MyDrawer(),
           appBar: AppBar(
-            leading: IconButton(
+            /*leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
                 ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 context.go(homePage);
               },
-            ),
+            ),*/
             title: const Text('Posición Global'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  context.go(homePage);
+                },
+              ),
+            ],
           ),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: ListView(
-              children: [
-                const Text('PORTAFOLIO', textAlign: TextAlign.start),
-                ListTile(
-                  leading: const Icon(
-                    Icons.business_center,
-                    color: Color(0xFF2196F3),
+          body: carteras.isEmpty
+              ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      'Resumen global de tu portafolio (empieza creando una cartera)',
+                      style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 22),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  title: Text('${carteras.length} Carteras'),
-                ),
-                ListTile(
-                  leading: const Icon(
-                    Icons.assessment,
-                    color: Color(0xFF2196F3),
+                )
+              : Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: ListView(
+                    children: [
+                      const Text('PORTAFOLIO', textAlign: TextAlign.start),
+                      ListTile(
+                        leading: const Icon(
+                          Icons.business_center,
+                          color: blue900,
+                        ),
+                        title: Text('${carteras.length} Carteras'),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.assessment, color: blue900),
+                        title: Text('$nFondos Fondos'),
+                      ),
+                      const LineDivider(),
+                      const SizedBox(height: 20),
+                      const Text('CAPITAL: VALOR / INVERSIÓN'),
+                      if (inversionGlobalEur > 0)
+                        ListTileCapital(
+                            inversion: inversionGlobalEur,
+                            capital: valorGlobalEur,
+                            balance: balanceGlobalEur,
+                            divisa: '€',
+                            icon: Icons.euro),
+                      if (inversionGlobalUsd > 0)
+                        ListTileCapital(
+                            inversion: inversionGlobalUsd,
+                            capital: valorGlobalUsd,
+                            balance: balanceGlobalUsd,
+                            divisa: '\$',
+                            icon: Icons.attach_money),
+                      if (inversionGlobalOtra > 0)
+                        ListTileCapital(
+                            inversion: inversionGlobalOtra,
+                            capital: valorGlobalOtra,
+                            balance: balanceGlobalOtra,
+                            divisa: '',
+                            icon: Icons.payments),
+                      if (inversionGlobalEur == 0.0 &&
+                          inversionGlobalUsd == 0.0 &&
+                          inversionGlobalOtra == 0.0)
+                        const Padding(
+                            padding: EdgeInsets.all(10),
+                            child:
+                                Text('No se ha encontrado ninguna inversión')),
+                      const LineDivider(),
+                      const SizedBox(height: 20),
+                      const Text('FONDOS DESTACADOS (TAE)'),
+                      if (destacados.isNotEmpty && destacados.length > 1)
+                        ListTileDestacado(
+                            destacado: destacados.last,
+                            icon: Icons.stars,
+                            goFondo: _goFondo),
+                      if (destacados.isNotEmpty && destacados.length > 1)
+                        ListTileDestacado(
+                            destacado: destacados.first,
+                            icon: Icons.warning,
+                            goFondo: _goFondo),
+                      if (destacados.isEmpty || destacados.length < 2)
+                        const Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: Text('Nada que destacar')),
+                      const LineDivider(),
+                      const SizedBox(height: 20),
+                      const Text('ÚLTIMAS OPERACIONES'),
+                      if (lastOps.isNotEmpty)
+                        ListTileLastOp(lastOp: lastOps.last, goFondo: _goFondo),
+                      if (lastOps.isNotEmpty && lastOps.length > 1)
+                        ListTileLastOp(
+                            lastOp: lastOps[lastOps.length - 2],
+                            goFondo: _goFondo),
+                      if (lastOps.isEmpty)
+                        const Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child:
+                                Text('No se ha encontrado ninguna operación')),
+                    ],
                   ),
-                  title: Text('$nFondos Fondos'),
                 ),
-                const Divider(
-                    color: Color(0xFF9E9E9E),
-                    height: 0,
-                    thickness: 0.5,
-                    indent: 20,
-                    endIndent: 20),
-                const SizedBox(height: 20),
-                const Text('FONDOS DESTACADOS (TAE)'),
-                if (fondosTaeSort.isNotEmpty && fondosTaeSort.length > 1)
-                  ListTileDestacado(
-                      listKey: fondosTaeSort.keys.last,
-                      value: fondosTaeSort.values.last,
-                      icon: Icons.stars),
-                if (fondosTaeSort.isNotEmpty && fondosTaeSort.length > 1)
-                  ListTileDestacado(
-                      listKey: fondosTaeSort.keys.first,
-                      value: fondosTaeSort.values.first,
-                      icon: Icons.warning),
-                if (fondosTaeSort.isEmpty || fondosTaeSort.length < 2)
-                  const Text('No es posible comparar fondos por rentabilidad.'),
-                const Divider(
-                    color: Color(0xFF9E9E9E),
-                    height: 0,
-                    thickness: 0.5,
-                    indent: 20,
-                    endIndent: 20),
-                const SizedBox(height: 20),
-                const Text('VALOR (BALANCE CAPITAL)'),
-                if (inversionGlobalEur > 0)
-                  ListTileCapital(
-                      inversion: inversionGlobalEur,
-                      capital: valorGlobalEur,
-                      balance: balanceGlobalEur,
-                      divisa: '€',
-                      icon: Icons.euro),
-                if (inversionGlobalUsd > 0)
-                  ListTileCapital(
-                      inversion: inversionGlobalUsd,
-                      capital: valorGlobalUsd,
-                      balance: balanceGlobalUsd,
-                      divisa: '\$',
-                      icon: Icons.attach_money),
-                if (inversionGlobalOtra > 0)
-                  ListTileCapital(
-                      inversion: inversionGlobalOtra,
-                      capital: valorGlobalOtra,
-                      balance: balanceGlobalOtra,
-                      divisa: '',
-                      icon: Icons.payments),
-              ],
-            ),
-          ),
         ),
       ),
     );
   }
 }
 
+class LineDivider extends StatelessWidget {
+  const LineDivider({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return const Divider(
+        color: gris, height: 0, thickness: 0.5, indent: 20, endIndent: 20);
+  }
+}
+
 class ListTileDestacado extends StatelessWidget {
-  final List<String> listKey;
-  final double value;
+  final Destacado destacado;
   final IconData icon;
+  final Function goFondo;
   const ListTileDestacado(
       {Key? key,
-      required this.listKey,
-      required this.value,
-      required this.icon})
+      required this.destacado,
+      required this.icon,
+      required this.goFondo})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: const Color(0xFF2196F3)),
-      title: Text(listKey[0]),
+      //onTap: () => goFondo(context, destacado.cartera, destacado.fondo),
+      //selected: true,
+      //selectedColor: Colors.white,
+      leading: Icon(icon, color: blue900),
+      title: InkWell(
+        onTap: () => goFondo(context, destacado.cartera, destacado.fondo),
+        child: Text(
+          destacado.fondo.name,
+          style: const TextStyle(
+            decoration: TextDecoration.underline,
+            decorationColor: blue,
+            color: Colors.transparent,
+            shadows: [Shadow(offset: Offset(0, -5), color: Colors.black)],
+          ),
+        ),
+      ),
       subtitle: Row(
         children: [
           const Icon(Icons.business_center),
           const SizedBox(width: 5),
-          Text(listKey[1]),
+          Text(destacado.cartera.name),
         ],
       ),
       trailing: Text(
-        NumberUtil.percent(value),
-        style: TextStyle(fontSize: 16, color: textRedGreen(value)),
+        NumberUtil.percent(destacado.tae),
+        style: TextStyle(fontSize: 16, color: textRedGreen(destacado.tae)),
       ),
+    );
+  }
+}
+
+class ListTileLastOp extends StatelessWidget {
+  final LastOp lastOp;
+  final Function goFondo;
+  const ListTileLastOp({Key? key, required this.lastOp, required this.goFondo})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      //onTap: () => goFondo(context, lastOp.cartera, lastOp.fondo),
+      //selected: true,
+      //selectedColor: Colors.white,
+      //leading: Text(FechaUtil.epochToString(lastOp.valor.date)),
+      leading: Icon(
+        lastOp.valor.tipo == 1 ? Icons.add_circle : Icons.remove_circle,
+        color: blue900,
+      ),
+      title: InkWell(
+        onTap: () => goFondo(context, lastOp.cartera, lastOp.fondo),
+        child: Text(
+          lastOp.fondo.name,
+          style: const TextStyle(
+            decoration: TextDecoration.underline,
+            decorationColor: blue,
+            color: Colors.transparent,
+            shadows: [Shadow(offset: Offset(0, -5), color: Colors.black)],
+          ),
+        ),
+      ),
+      subtitle: Row(
+        children: [
+          const Icon(Icons.business_center),
+          const SizedBox(width: 5),
+          Text(lastOp.cartera.name),
+        ],
+      ),
+      trailing: Text(
+        FechaUtil.epochToString(lastOp.valor.date),
+        style: const TextStyle(color: Color(0xFF000000)),
+      ),
+      /*trailing: Text(
+        NumberUtil.decimalFixed(
+            lastOp.valor.precio * lastOp.valor.participaciones!,
+            long: false),
+        style: TextStyle(
+            color: lastOp.valor.tipo == 1 ? Colors.green : Colors.red),
+      ),*/
     );
   }
 }
@@ -212,7 +366,7 @@ class ListTileCapital extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: Color(0xFF2196F3)),
+      leading: Icon(icon, color: blue900),
       title: Row(
         children: [
           Text('${NumberUtil.decimalFixed(capital)} $divisa'),

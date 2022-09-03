@@ -38,8 +38,8 @@ class _PageInputRangeState extends State<PageInputRange> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ListTile(
-                        leading: const Icon(Icons.assessment,
-                            size: 32, color: Color(0xFF2196F3)),
+                        leading:
+                            const Icon(Icons.assessment, size: 32, color: blue),
                         title: Text(fondoSelect.name),
                       ),
                       const SizedBox(height: 10),
@@ -74,17 +74,17 @@ class _PageInputRangeState extends State<PageInputRange> {
                                       '${DateFormat('dd/MM/yyyy').format(_dateRange?.end ?? _initDateRange.end)}',
                                     ),
                                     const Icon(Icons.arrow_drop_down,
-                                        color: Color(0xFF2196F3)),
+                                        color: blue),
                                   ],
                                 ),
                               ),
                             ),
                           ),
                           trailing: CircleAvatar(
-                            backgroundColor: const Color(0xFFFFC107),
+                            backgroundColor: amber,
                             child: IconButton(
-                              icon: const Icon(Icons.date_range,
-                                  color: Color(0xFF0D47A1)),
+                              icon:
+                                  const Icon(Icons.date_range, color: blue900),
                               onPressed: () async {
                                 var newRange = await _datePicker(
                                     context, DatePickerEntryMode.calendarOnly);
@@ -139,7 +139,7 @@ class _PageInputRangeState extends State<PageInputRange> {
             primarySwatch: Colors.blue,
             dialogBackgroundColor: Colors.white,
             appBarTheme: const AppBarTheme(
-              backgroundColor: Color(0xFF2196F3),
+              backgroundColor: blue,
               elevation: 10,
               foregroundColor: Color(0xFFFFFFFF),
             ),

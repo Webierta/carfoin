@@ -56,19 +56,19 @@ class _PageInputFondoState extends State<PageInputFondo> {
                       //leading: const Icon(Icons.business_center),
                       //title: Text(carteraOn.name),
                       //subtitle: const Text('Introduce el ISIN del nuevo Fondo'),
-                      leading: const Icon(Icons.add_chart,
-                          size: 32, color: Color(0xFF2196F3)),
+                      leading:
+                          const Icon(Icons.add_chart, size: 32, color: blue),
                       title: const Text('Introduce el ISIN del nuevo Fondo'),
                       subtitle: Align(
                         alignment: Alignment.centerLeft,
                         child: Chip(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
-                          avatar: const Icon(Icons.business_center,
-                              color: Color(0xFF0D47A1)),
-                          backgroundColor: const Color(0xFFBBDEFB),
+                          avatar:
+                              const Icon(Icons.business_center, color: blue900),
+                          backgroundColor: blue100,
                           label: Text(
                             carteraSelect.name,
-                            style: const TextStyle(color: Color(0xFF0D47A1)),
+                            style: const TextStyle(color: blue900),
                           ),
                         ),
                       ),
@@ -154,9 +154,9 @@ class _PageInputFondoState extends State<PageInputFondo> {
 
   Icon _resultIsValid() {
     if (_validIsin == true) {
-      return const Icon(Icons.check_box, color: Color(0xFF4CAF50));
+      return const Icon(Icons.check_box, color: green);
     } else if (_validIsin == false) {
-      return const Icon(Icons.disabled_by_default, color: Color(0xFFF44336));
+      return const Icon(Icons.disabled_by_default, color: red);
     } else {
       return const Icon(Icons.check_box_outline_blank);
     }

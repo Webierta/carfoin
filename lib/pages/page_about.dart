@@ -39,7 +39,6 @@ class PageAbout extends StatelessWidget {
                 icon: const Icon(Icons.home),
                 onPressed: () {
                   ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                  //Navigator.of(context).pushNamed(RouteGenerator.homePage);
                   context.go(homePage);
                 },
               ),
@@ -53,15 +52,13 @@ class PageAbout extends StatelessWidget {
                 if (text != 'donación') {
                   _launchUrl(Uri.parse(url!));
                 } else {
-                  //Navigator.of(context).pop();
-                  //Navigator.of(context).pushNamed(RouteGenerator.supportPage);
                   context.go(supportPage);
                 }
               },
               data: mdstring,
               styleSheet: MarkdownStyleSheet(
-                h1: const TextStyle(color: Colors.blue, fontSize: 40),
-                h2: const TextStyle(color: Colors.blue, fontSize: 22),
+                h1: const TextStyle(color: blue, fontSize: 40),
+                h2: const TextStyle(color: blue, fontSize: 22),
                 p: const TextStyle(fontSize: 18),
               ),
             ),

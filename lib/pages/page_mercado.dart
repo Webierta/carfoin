@@ -104,14 +104,11 @@ class _MercadoState extends State<PageMercado> {
                   alignment: Alignment.center,
                   child: Chip(
                     padding: const EdgeInsets.only(left: 10, right: 20),
-                    backgroundColor: const Color(0xFFBBDEFB),
-                    avatar: const Icon(
-                      Icons.business_center,
-                      color: Color(0xFF0D47A1),
-                    ),
+                    backgroundColor: blue100,
+                    avatar: const Icon(Icons.business_center, color: blue900),
                     label: Text(
                       carteraSelect.name,
-                      style: const TextStyle(color: Color(0xFF0D47A1)),
+                      style: const TextStyle(color: blue900),
                     ),
                   ),
                 ),
@@ -123,11 +120,11 @@ class _MercadoState extends State<PageMercado> {
                   child: FittedBox(
                     child: ToggleButtons(
                       isSelected: _isSelected,
-                      color: const Color(0xFF9E9E9E),
-                      selectedColor: const Color(0xFF2196F3),
-                      fillColor: const Color(0xFFBBDEFB),
-                      borderColor: const Color(0xFF9E9E9E),
-                      selectedBorderColor: const Color(0xFF2196F3),
+                      color: gris,
+                      selectedColor: blue,
+                      fillColor: blue100,
+                      borderColor: gris,
+                      selectedBorderColor: blue,
                       borderRadius: const BorderRadius.all(Radius.circular(4)),
                       onPressed: (int index) {
                         setState(() {
@@ -247,10 +244,7 @@ class _MercadoState extends State<PageMercado> {
                           errorStyle: const TextStyle(fontSize: 0, height: 0),
                           labelText: 'Precio',
                           suffixIcon: IconButton(
-                            icon: const Icon(
-                              Icons.download,
-                              color: Color(0xFF2196F3),
-                            ),
+                            icon: const Icon(Icons.download, color: blue),
                             onPressed: () async {
                               //Loading(context).openDialog(title: 'Obteniendo valor liquidativo...');
                               //const LoadingProgress(titulo: 'Obteniendo valor liquidativo...');

@@ -71,6 +71,7 @@ class _PageSettingsState extends State<PageSettings> {
         decoration: scaffoldGradient,
         child: Scaffold(
           backgroundColor: Colors.transparent,
+          drawer: const MyDrawer(),
           appBar: AppBar(
             title: const Text('Ajustes'),
             actions: [
@@ -78,13 +79,11 @@ class _PageSettingsState extends State<PageSettings> {
                 icon: const Icon(Icons.home),
                 onPressed: () {
                   ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                  //Navigator.of(context).pushNamed(RouteGenerator.homePage);
                   context.go(homePage);
                 },
               ),
             ],
           ),
-          drawer: const MyDrawer(),
           body: ListView(
             padding: const EdgeInsets.symmetric(vertical: 10),
             children: [
@@ -95,8 +94,7 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading:
-                    const Icon(Icons.sort_by_alpha, color: Color(0xFF2196F3)),
+                leading: const Icon(Icons.sort_by_alpha, color: blue900),
                 title: const Text('Ordenadas por nombre'),
                 trailing: Switch(
                   value: _isCarterasByOrder,
@@ -110,8 +108,7 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading:
-                    const Icon(Icons.view_stream, color: Color(0xFF2196F3)),
+                leading: const Icon(Icons.view_stream, color: blue900),
                 title: const Text('Modo presentación: detalle'),
                 subtitle: const Text('En caso contrario, vista compacta'),
                 trailing: Switch(
@@ -126,8 +123,7 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading:
-                    const Icon(Icons.delete_forever, color: Color(0xFF2196F3)),
+                leading: const Icon(Icons.delete_forever, color: blue900),
                 title: const Text(
                     'Confirmar antes de eliminar una cartera y sus fondos'),
                 subtitle: const Text(
@@ -141,11 +137,7 @@ class _PageSettingsState extends State<PageSettings> {
                   },
                 ),
               ),
-              const Divider(
-                  color: Color(0xFF9E9E9E),
-                  height: 30,
-                  indent: 20,
-                  endIndent: 20),
+              const Divider(color: gris, height: 30, indent: 20, endIndent: 20),
               const Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text('FONDOS'),
@@ -153,8 +145,7 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading:
-                    const Icon(Icons.sort_by_alpha, color: Color(0xFF2196F3)),
+                leading: const Icon(Icons.sort_by_alpha, color: blue900),
                 title: const Text('Ordenados por nombre'),
                 subtitle: const Text(
                     'En caso contrario por fecha de creación o actualización'),
@@ -170,8 +161,7 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading:
-                    const Icon(Icons.delete_forever, color: Color(0xFF2196F3)),
+                leading: const Icon(Icons.delete_forever, color: blue900),
                 title: const Text('Confirmar antes de eliminar'),
                 subtitle: const Text('Eliminar todos los fondos de una cartera '
                     'siempre requiere confirmación'),
@@ -184,11 +174,7 @@ class _PageSettingsState extends State<PageSettings> {
                   },
                 ),
               ),
-              const Divider(
-                  color: Color(0xFF9E9E9E),
-                  height: 30,
-                  indent: 20,
-                  endIndent: 20),
+              const Divider(color: gris, height: 30, indent: 20, endIndent: 20),
               const Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text('VALORES'),
@@ -196,7 +182,7 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.sync, color: Color(0xFF2196F3)),
+                leading: const Icon(Icons.refresh, color: blue900),
                 title: const Text('Actualizar último valor al añadir Fondo'),
                 subtitle:
                     const Text('Recomendado para obtener la divisa del fondo'),
@@ -209,11 +195,7 @@ class _PageSettingsState extends State<PageSettings> {
                   },
                 ),
               ),
-              const Divider(
-                  color: Color(0xFF9E9E9E),
-                  height: 30,
-                  indent: 20,
-                  endIndent: 20),
+              const Divider(color: gris, height: 30, indent: 20, endIndent: 20),
               const Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text('OPERACIONES'),
@@ -221,8 +203,7 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading:
-                    const Icon(Icons.delete_forever, color: Color(0xFF2196F3)),
+                leading: const Icon(Icons.delete_forever, color: blue900),
                 title: const Text('Confirmar antes de eliminar'),
                 subtitle: const Text(
                     'Eliminar operaciones de suscripción siempre requiere confirmación '
