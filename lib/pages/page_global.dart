@@ -11,6 +11,10 @@ import '../utils/stats.dart';
 import '../utils/styles.dart';
 import '../widgets/my_drawer.dart';
 
+const double minLeadingWidth0 = 0.0;
+const double horizontalTitleGap10 = 10.0;
+const double trailingMaxWidth80 = 80.0;
+
 class CarteraFondo {
   final Cartera cartera;
   final Fondo fondo;
@@ -150,8 +154,8 @@ class PageGlobal extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
-                      'Resumen global de tu portafolio (empieza creando una cartera)',
-                      style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 22),
+                      'Resumen global de tu portafolio: empieza creando una cartera',
+                      style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 20),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -162,6 +166,8 @@ class PageGlobal extends StatelessWidget {
                     children: [
                       const Text('PORTAFOLIO', textAlign: TextAlign.start),
                       ListTile(
+                        minLeadingWidth: minLeadingWidth0,
+                        horizontalTitleGap: horizontalTitleGap10,
                         leading: const Icon(
                           Icons.business_center,
                           color: blue900,
@@ -169,6 +175,8 @@ class PageGlobal extends StatelessWidget {
                         title: Text('${carteras.length} Carteras'),
                       ),
                       ListTile(
+                        minLeadingWidth: minLeadingWidth0,
+                        horizontalTitleGap: horizontalTitleGap10,
                         leading: const Icon(Icons.assessment, color: blue900),
                         title: Text('$nFondos Fondos'),
                       ),
@@ -266,6 +274,8 @@ class ListTileDestacado extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      minLeadingWidth: minLeadingWidth0,
+      horizontalTitleGap: horizontalTitleGap10,
       //onTap: () => goFondo(context, destacado.cartera, destacado.fondo),
       //selected: true,
       //selectedColor: Colors.white,
@@ -274,24 +284,39 @@ class ListTileDestacado extends StatelessWidget {
         onTap: () => goFondo(context, destacado.cartera, destacado.fondo),
         child: Text(
           destacado.fondo.name,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
           style: const TextStyle(
             decoration: TextDecoration.underline,
             decorationColor: blue,
             color: Colors.transparent,
-            shadows: [Shadow(offset: Offset(0, -5), color: Colors.black)],
+            shadows: [Shadow(offset: Offset(0, -4), color: Colors.black)],
           ),
         ),
       ),
       subtitle: Row(
         children: [
           const Icon(Icons.business_center),
-          const SizedBox(width: 5),
-          Text(destacado.cartera.name),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              destacado.cartera.name,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
         ],
       ),
-      trailing: Text(
-        NumberUtil.percent(destacado.tae),
-        style: TextStyle(fontSize: 16, color: textRedGreen(destacado.tae)),
+      trailing: Container(
+        constraints: const BoxConstraints(maxWidth: trailingMaxWidth80),
+        child: Text(
+          NumberUtil.percentCompact(destacado.tae),
+          //'123%',
+          //'1234%5678%9123456789',
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+          style: TextStyle(color: textRedGreen(destacado.tae)),
+        ),
       ),
     );
   }
@@ -306,6 +331,8 @@ class ListTileLastOp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      minLeadingWidth: minLeadingWidth0,
+      horizontalTitleGap: horizontalTitleGap10,
       //onTap: () => goFondo(context, lastOp.cartera, lastOp.fondo),
       //selected: true,
       //selectedColor: Colors.white,
@@ -318,24 +345,36 @@ class ListTileLastOp extends StatelessWidget {
         onTap: () => goFondo(context, lastOp.cartera, lastOp.fondo),
         child: Text(
           lastOp.fondo.name,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
           style: const TextStyle(
             decoration: TextDecoration.underline,
             decorationColor: blue,
             color: Colors.transparent,
-            shadows: [Shadow(offset: Offset(0, -5), color: Colors.black)],
+            shadows: [Shadow(offset: Offset(0, -4), color: Colors.black)],
           ),
         ),
       ),
       subtitle: Row(
         children: [
           const Icon(Icons.business_center),
-          const SizedBox(width: 5),
-          Text(lastOp.cartera.name),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              lastOp.cartera.name,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
         ],
       ),
-      trailing: Text(
-        FechaUtil.epochToString(lastOp.valor.date),
-        style: const TextStyle(color: Color(0xFF000000)),
+      //TODO: hacerlo columna para evitar overflow ??
+      trailing: Container(
+        constraints: const BoxConstraints(maxWidth: trailingMaxWidth80),
+        child: Text(
+          FechaUtil.epochToString(lastOp.valor.date),
+          style: const TextStyle(color: Color(0xFF000000)),
+        ),
       ),
       /*trailing: Text(
         NumberUtil.decimalFixed(
@@ -366,22 +405,34 @@ class ListTileCapital extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      minLeadingWidth: minLeadingWidth0,
+      horizontalTitleGap: horizontalTitleGap10,
       leading: Icon(icon, color: blue900),
       title: Row(
         children: [
-          Text('${NumberUtil.decimalFixed(capital)} $divisa'),
+          Text(
+            '${NumberUtil.decimalFixed(capital, long: false)} $divisa',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
         ],
       ),
       subtitle: Row(
         children: [
-          Text('${NumberUtil.decimalFixed(inversion)} $divisa'),
+          Text(
+            '${NumberUtil.decimalFixed(inversion, long: false)} $divisa',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
         ],
       ),
-      trailing: Text(
-        '${NumberUtil.decimalFixed(balance)} $divisa',
-        style: TextStyle(
-          color: textRedGreen(balance),
-          fontSize: 16,
+      trailing: Container(
+        constraints: const BoxConstraints(maxWidth: trailingMaxWidth80),
+        child: Text(
+          '${NumberUtil.decimalFixed(balance, long: false)} $divisa',
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+          style: TextStyle(color: textRedGreen(balance)),
         ),
       ),
     );

@@ -579,7 +579,7 @@ class DataCartera extends StatelessWidget {
       //ano = FechaUtil.epochToDate(lastEpoch).year;
       mesYear = FechaUtil.epochToString(lastEpoch, formato: 'MMM yy');
       //lastPrecio = NumberFormat.decimalPattern('es').format(valores.first.precio);
-      lastPrecio = NumberUtil.decimal(valores.first.precio);
+      lastPrecio = NumberUtil.decimalFixed(valores.first.precio, long: false);
       if (valores.length > 1) {
         diferencia = valores.first.precio - valores[1].precio;
       }
@@ -649,7 +649,10 @@ class DataCartera extends StatelessWidget {
                                   children: [
                                     Text(
                                       //'V.L. $lastPrecio $divisa',
+                                      //NumberUtil.compactFixed(lastPrecio),
                                       lastPrecio,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       textAlign: TextAlign.end,
                                       style: const TextStyle(
                                         fontSize: 18,
@@ -667,8 +670,11 @@ class DataCartera extends StatelessWidget {
                                             MainAxisAlignment.end,
                                         children: [
                                           Text(
-                                            diferencia.toStringAsFixed(2),
+                                            //diferencia.toStringAsFixed(2),
+                                            NumberUtil.compactFixed(diferencia),
                                             textAlign: TextAlign.end,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.w400,
@@ -753,12 +759,19 @@ class DataCartera extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          NumberUtil.percent(_tae),
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w300,
-                            color: textRedGreen(_tae),
+                        Expanded(
+                          child: Text(
+                            //NumberUtil.percent(_tae),
+                            NumberUtil.percentCompact(_tae),
+                            //'${NumberUtil.compactFixed(_tae * 100)} %',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w300,
+                              color: textRedGreen(_tae),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 5),
@@ -862,7 +875,8 @@ class RowListTile extends StatelessWidget {
   }
 }
 
-class ListTileCart extends StatelessWidget {
+/// REVISAR
+/*class ListTileCart extends StatelessWidget {
   final double capital;
   final double balance;
   final String divisa;
@@ -913,4 +927,4 @@ class ListTileCart extends StatelessWidget {
       ],
     );
   }
-}
+}*/

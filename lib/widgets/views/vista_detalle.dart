@@ -154,6 +154,8 @@ class VistaDetalle extends StatelessWidget {
             child: Column(
               children: [
                 ListTile(
+                  minLeadingWidth: 0,
+                  horizontalTitleGap: 10,
                   leading: CircleAvatar(
                     radius: 22,
                     backgroundColor: const Color(0xFFFFFFFF),
@@ -218,7 +220,7 @@ class VistaDetalle extends StatelessWidget {
                                 .copyWith(dividerColor: Colors.transparent),
                             child: ExpansionTile(
                               childrenPadding:
-                                  const EdgeInsets.only(bottom: 10, left: 20),
+                                  const EdgeInsets.only(bottom: 5, left: 20),
                               expandedCrossAxisAlignment:
                                   CrossAxisAlignment.start,
                               expandedAlignment: Alignment.topLeft,
@@ -238,16 +240,7 @@ class VistaDetalle extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                       style: const TextStyle(
-                                        decoration: TextDecoration.underline,
-                                        decorationColor: blue,
-                                        color: Colors.transparent,
-                                        shadows: [
-                                          Shadow(
-                                            offset: Offset(0, -5),
-                                            color: blue900,
-                                          ),
-                                        ],
-                                      ),
+                                          decoration: TextDecoration.underline),
                                     ),
                                   )
                               ],
@@ -267,8 +260,7 @@ class VistaDetalle extends StatelessWidget {
                     balance: rendimientoCarteraEur,
                     divisa: '€',
                   ),
-                if (isTrueDivisaEur() && isTrueDivisaUsd())
-                  const SizedBox(height: 10),
+                if (isTrueDivisaUsd()) const SizedBox(height: 10),
                 if (isTrueDivisaUsd())
                   StepperBalance(
                     input: inversionCarteraUsd,
@@ -276,9 +268,7 @@ class VistaDetalle extends StatelessWidget {
                     balance: rendimientoCarteraUsd,
                     divisa: '\$',
                   ),
-                if ((isTrueDivisaEur() || isTrueDivisaUsd()) &&
-                    isTrueDivisaOtra())
-                  const SizedBox(height: 10),
+                if (isTrueDivisaOtra()) const SizedBox(height: 10),
                 if (isTrueDivisaOtra())
                   StepperBalance(
                     input: inversionCarteraOtra,
@@ -318,7 +308,7 @@ class ChipFondo extends StatelessWidget {
         avatar: const Icon(Icons.poll, color: blue900, size: 32),
         label: Text(
           title,
-          style: const TextStyle(color: blue900, fontSize: 16),
+          style: const TextStyle(color: blue900, fontSize: 14),
         ),
       ),
     );

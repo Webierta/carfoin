@@ -53,7 +53,7 @@ Balance calculado por la diferencia entre el **resultado** obtenido y la **inver
 
 **Rentabilidad acumulada** desde la suscripción del Fondo. Se calcula como la proporción entre el **rendimiento** y la **inversión** realizada.
 
-Se trata de un índice muy básico que solo es fiable cuando existe una única aportación inicial que se mantiene en el tiempo sin incorporar aportaciones o reembolsos. Un calculo rápido y apoximado al estilo de la cuenta de la vieja.
+Se trata de un índice muy básico que solo es fiable cuando existe una única aportación inicial que se mantiene en el tiempo sin incorporar aportaciones o reembolsos. Un calculo rápido y aproximado al estilo de la cuenta de la vieja.
 
 ## RENTABILIDAD ANUAL
 

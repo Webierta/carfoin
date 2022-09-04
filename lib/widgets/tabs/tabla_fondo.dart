@@ -5,6 +5,7 @@ import '../../models/cartera.dart';
 import '../../models/cartera_provider.dart';
 import '../../services/database_helper.dart';
 import '../../utils/fecha_util.dart';
+import '../../utils/number_util.dart';
 import '../../utils/styles.dart';
 
 class TablaFondo extends StatefulWidget {
@@ -65,7 +66,8 @@ class _TablaFondoState extends State<TablaFondo> {
       if (condition) {
         var dif = valor.precio - valores[valores.indexOf(valor) + index].precio;
         return Text(
-          dif.toStringAsFixed(2),
+          //dif.toStringAsFixed(2),
+          NumberUtil.decimalFixed(dif, long: false),
           textAlign: TextAlign.center,
           style: TextStyle(color: textRedGreen(dif)),
         );
@@ -83,9 +85,7 @@ class _TablaFondoState extends State<TablaFondo> {
 
       if (tipo == 1 || tipo == 0) {
         return CircleAvatar(
-          backgroundColor:
-              tipo == 1 ? const Color(0xFF4CAF50) : const Color(0xFFF44336),
-          //const Color(0xFFF44336) : const Color(0xFF4CAF50))
+          backgroundColor: tipo == 1 ? green : red,
           child: _getTxt(),
         );
       }
@@ -99,7 +99,7 @@ class _TablaFondoState extends State<TablaFondo> {
             child: Column(
               children: [
                 Container(
-                  color: const Color(0xFFFFC107),
+                  color: amber,
                   child: Row(
                     children: [
                       Expanded(
@@ -140,10 +140,7 @@ class _TablaFondoState extends State<TablaFondo> {
                   child: ListView.separated(
                     padding: const EdgeInsets.only(top: 10),
                     separatorBuilder: (context, index) => const Divider(
-                        color: Color(0xFF9E9E9E),
-                        height: 4,
-                        indent: 10,
-                        endIndent: 10),
+                        color: gris, height: 4, indent: 10, endIndent: 10),
                     shrinkWrap: true,
                     physics: const ClampingScrollPhysics(),
                     itemCount: valores.length,
@@ -192,7 +189,10 @@ class _TablaFondoState extends State<TablaFondo> {
                                 Expanded(
                                     flex: 3,
                                     child: Text(
-                                      '${valores[index].precio}',
+                                      //'${valores[index].precio}',
+                                      NumberUtil.decimalFixed(
+                                          valores[index].precio,
+                                          long: false),
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(fontSize: 16),
                                     )),

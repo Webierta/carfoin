@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/cartera_provider.dart';
 import '../../utils/fecha_util.dart';
+import '../../utils/number_util.dart';
 
 class GraficoFondo extends StatelessWidget {
   const GraficoFondo({Key? key}) : super(key: key);
@@ -159,7 +160,8 @@ class GraficoFondo extends StatelessWidget {
               ),
               alignment: Alignment.topRight,
               labelResolver: (line) =>
-                  'Media: ${precioMedio.toStringAsFixed(2)}',
+                  'Media: ${NumberUtil.decimalFixed(precioMedio)}',
+              //'Media: ${precioMedio.toStringAsFixed(2)}',
             ),
           ),
           HorizontalLine(
@@ -177,7 +179,8 @@ class GraficoFondo extends StatelessWidget {
               ),
               alignment: Alignment.topRight,
               labelResolver: (line) =>
-                  'Máx: ${precioMax.toStringAsFixed(2)} - ${fechaMax ?? ''}',
+                  'Máx: ${NumberUtil.decimalFixed(precioMax)} - ${fechaMax ?? ''}',
+              //'Máx: ${precioMax.toStringAsFixed(2)} - ${fechaMax ?? ''}',
             ),
           ),
           HorizontalLine(
@@ -195,7 +198,8 @@ class GraficoFondo extends StatelessWidget {
               ),
               alignment: Alignment.topRight,
               labelResolver: (line) =>
-                  'Mín: ${precioMin.toStringAsFixed(2)} - ${fechaMin ?? ''}',
+                  'Mín: ${NumberUtil.decimalFixed(precioMin)} - ${fechaMin ?? ''}',
+              //'Mín: ${precioMin.toStringAsFixed(2)} - ${fechaMin ?? ''}',
             ),
           ),
         ],
