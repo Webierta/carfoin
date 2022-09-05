@@ -92,25 +92,6 @@ class _PageHomeState extends State<PageHome> {
     }
   }
 
-  /*setFondos(Cartera cartera) async {
-    try {
-      carteraProvider.fondos =
-          await database.getFondos(cartera, byOrder: _isFondosByOrder);
-      for (var fondo in carteraProvider.fondos) {
-        await database.createTableFondo(cartera, fondo).whenComplete(() async {
-          carteraProvider.valores = await database.getValores(cartera, fondo);
-          fondo.valores = carteraProvider.valores;
-          carteraProvider.operaciones =
-              await database.getOperaciones(cartera, fondo);
-        });
-      }
-    } catch (e) {
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        context.go(errorPage);
-      });
-    }
-  }*/
-
   @override
   void initState() {
     carteraProvider = context.read<CarteraProvider>();
@@ -210,7 +191,7 @@ class _PageHomeState extends State<PageHome> {
                     onPressed: () => _inputName(context),
                   ),
                   body: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.all(8),
                     child: Consumer<CarteraProvider>(
                       builder: (context, data, child) {
                         if (data.carteras.isEmpty) {
@@ -230,6 +211,7 @@ class _PageHomeState extends State<PageHome> {
                         }
                         if (!_isViewDetalleCarteras) {
                           return ListView.builder(
+                            //padding: const EdgeInsets.all(8),
                             itemCount: data.carteras.length,
                             itemBuilder: (context, index) {
                               Cartera cartera = data.carteras[index];
@@ -276,18 +258,20 @@ class _PageHomeState extends State<PageHome> {
         return StatefulBuilder(
           key: _dialogKey,
           builder: (context, setState) {
-            // return Dialog(child: Loading(...); ???
             return Loading(
-                titulo: 'ACTUALIZANDO FONDOS...', subtitulo: _loadingText);
+              titulo: 'ACTUALIZANDO FONDOS...',
+              subtitulo: _loadingText,
+            );
           },
         );
       },
     );
-    //var updateResultados = await _updateAll(context);
     List<Update> updateResultados = [];
     if (carteraProvider.carteras.isNotEmpty) {
-      var updateAll =
-          UpdateAll(context: context, setStateDialog: _setStateDialog);
+      var updateAll = UpdateAll(
+        context: context,
+        setStateDialog: _setStateDialog,
+      );
       updateResultados = await updateAll.updateCarteras();
       if (updateResultados.isNotEmpty) {
         await setCarteras();
@@ -306,45 +290,6 @@ class _PageHomeState extends State<PageHome> {
       });
     }
   }
-
-  /*Future<List<Update>> _updateAll(BuildContext context) async {
-    _setStateDialog('Conectando...');
-    List<Update> updates = [];
-    final List<Cartera> carteras = context.read<CarteraProvider>().carteras;
-    if (carteras.isNotEmpty) {
-      for (var cartera in carteras) {
-        List<Fondo>? fondos = cartera.fondos;
-        if (fondos != null && fondos.isNotEmpty) {
-          for (var fondo in fondos) {
-            _setStateDialog('${fondo.name}\n${cartera.name}');
-
-            /// ???? CREATE TABLE FONDO ??
-            await database.createTableFondo(cartera, fondo);
-            final getDataApi = await apiService.getDataApi(fondo.isin);
-            if (getDataApi != null) {
-              var newValor =
-                  Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
-              fondo.divisa = getDataApi.market;
-              await database.updateFondo(cartera, fondo);
-              await database.updateOperacion(cartera, fondo, newValor);
-              updates.add(Update(
-                  nameCartera: cartera.name,
-                  nameFondo: fondo.name,
-                  isUpdate: true));
-            } else {
-              updates.add(Update(
-                  nameCartera: cartera.name,
-                  nameFondo: fondo.name,
-                  isUpdate: false));
-            }
-          }
-          //await setFondos(cartera);
-        }
-      }
-      await setCarteras();
-    }
-    return updates;
-  }*/
 
   _showResultados(List<Update> updates) {
     showDialog(
@@ -375,11 +320,6 @@ class _PageHomeState extends State<PageHome> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    /*for (var res in mapResultados.entries)
-                      ListTile(
-                          dense: true,
-                          title: Text(res.key),
-                          trailing: res.value),*/
                     for (var update in updates)
                       ListTile(
                         dense: true,
@@ -667,16 +607,6 @@ class _PageHomeState extends State<PageHome> {
   }
 
   _deleteCartera(Cartera cartera) async {
-    /*_eliminar() async {
-      //await database.deleteAllValores(cartera)
-
-      await database.deleteAllFondos(cartera);
-      await database.deleteCartera(cartera);
-      carteraProvider.removeAllFondos(cartera);
-      carteraProvider.removeCartera(cartera);
-      await setCarteras();
-    }*/
-
     if (_isConfirmDeleteCartera) {
       var resp = await _dialogDeleteConfirm(context, cartera.name);
       if (resp == null || resp == false) {

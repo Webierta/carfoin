@@ -70,13 +70,6 @@ class _MainFondoState extends State<MainFondo> {
     final List<Valor> operaciones =
         context.watch<CarteraProvider>().operaciones;
 
-    /*int dia = 0;
-    String mesYear = '';
-    if (valores.isNotEmpty) {
-      dia = FechaUtil.epochToDate(valores.first.date).day;
-      mesYear = FechaUtil.epochToString(valores.first.date, formato: 'MMM yy');
-    }*/
-
     stats = Stats(valores);
     //carteraProvider.addValores(carteraSelect, fondoSelect, valores);
 
@@ -158,13 +151,10 @@ class _MainFondoState extends State<MainFondo> {
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
-              //child: Text(NumberFormat.decimalPattern('es').format(op.precio)),
               child: Text(NumberUtil.decimal(op.precio)),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
-              /*child: Text(NumberFormat.decimalPattern('es').format(double.parse(
-                  ((op.participaciones ?? 0) * op.precio).toStringAsFixed(2)))),*/
               child: Text(NumberUtil.decimalFixed(
                   (op.participaciones ?? 0) * op.precio,
                   long: false)),
@@ -206,8 +196,6 @@ class _MainFondoState extends State<MainFondo> {
               alignment: Alignment.centerRight,
               child: Text(
                 stats.totalParticipaciones() != null
-                    /*? NumberFormat.decimalPattern('es').format(double.parse(
-                        stats.totalParticipaciones()!.toStringAsFixed(2)))*/
                     ? NumberUtil.decimalFixed(stats.totalParticipaciones()!,
                         long: false)
                     : '',
@@ -218,7 +206,6 @@ class _MainFondoState extends State<MainFondo> {
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
-                //NumberFormat.decimalPattern('es').format(valores.first.precio),
                 NumberUtil.decimal(valores.first.precio),
                 style: const TextStyle(
                     fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
@@ -228,8 +215,6 @@ class _MainFondoState extends State<MainFondo> {
               alignment: Alignment.centerRight,
               child: Text(
                 stats.resultado() != null
-                    /*? NumberFormat.decimalPattern('es').format(
-                        double.parse(stats.resultado()!.toStringAsFixed(2)))*/
                     ? NumberUtil.decimalFixed(stats.resultado()!, long: false)
                     : '',
                 style: const TextStyle(
@@ -317,8 +302,6 @@ class _MainFondoState extends State<MainFondo> {
       children: [
         Card(
           child: Padding(
-            //padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            //padding: const EdgeInsets.only(top: 10, left: 20, right: 20),
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
@@ -329,11 +312,6 @@ class _MainFondoState extends State<MainFondo> {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 3,
                     style: styleTitle,
-                    /*style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Color(0xFF2196F3),
-                    ),*/
                   ),
                   subtitle: Text(
                     fondoSelect.isin,
@@ -355,21 +333,6 @@ class _MainFondoState extends State<MainFondo> {
                                 child: Row(
                                   children: [
                                     DiaCalendario(epoch: valores.first.date),
-                                    if (fondoSelect.divisa == 'EUR' ||
-                                        fondoSelect.divisa == 'USD')
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 10),
-                                        child: Text(
-                                          //'${fondoSelect.divisa}',
-                                          fondoSelect.divisa == 'EUR'
-                                              ? '€'
-                                              : '\$',
-                                          textScaleFactor: 2.5,
-                                          style:
-                                              const TextStyle(color: blue200),
-                                        ),
-                                      ),
                                     const Spacer(),
                                     Column(
                                       crossAxisAlignment:
@@ -383,14 +346,11 @@ class _MainFondoState extends State<MainFondo> {
                                               NumberUtil.decimalFixed(
                                                   valores.first.precio,
                                                   long: false),
-                                              //'${valores.first.precio}',
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.w400,
-                                                //fontSize: 16,
-                                                //fontWeight: FontWeight.bold,
                                                 color: blue900,
                                               ),
                                             ),
@@ -404,7 +364,6 @@ class _MainFondoState extends State<MainFondo> {
                                               Text(
                                                 NumberUtil.compactFixed(
                                                     _getDiferencia()!),
-                                                //_getDiferencia()!.toStringAsFixed(2),
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
@@ -420,6 +379,20 @@ class _MainFondoState extends State<MainFondo> {
                                           ),
                                       ],
                                     ),
+                                    if (fondoSelect.divisa == 'EUR' ||
+                                        fondoSelect.divisa == 'USD')
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
+                                        child: Text(
+                                          fondoSelect.divisa == 'EUR'
+                                              ? '€'
+                                              : '\$',
+                                          textScaleFactor: 2.5,
+                                          style:
+                                              const TextStyle(color: blue200),
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ),
@@ -474,7 +447,7 @@ class _MainFondoState extends State<MainFondo> {
         const SizedBox(height: 10),
         Card(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            padding: const EdgeInsets.all(8),
             child: Column(
               children: [
                 ListTile(
@@ -507,35 +480,37 @@ class _MainFondoState extends State<MainFondo> {
                 operaciones.isEmpty
                     ? const Text('Sin datos de operaciones.\n'
                         'Ordena transacciones en el mercado para seguir la evolución de tu inversión.')
-                    : Column(
-                        //crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          FittedBox(
-                            fit: BoxFit.fill,
-                            child: DataTable(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: blue, width: 2),
-                                borderRadius: BorderRadius.circular(10),
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Column(
+                          children: [
+                            FittedBox(
+                              fit: BoxFit.fill,
+                              child: DataTable(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: blue, width: 2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                //headingRowHeight: 0,
+                                columnSpacing: 20,
+                                dataRowHeight: 70,
+                                //horizontalMargin: 10,
+                                headingRowColor: MaterialStateColor.resolveWith(
+                                    (states) => Colors.blue),
+                                headingTextStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                dataTextStyle: const TextStyle(
+                                    fontSize: 18, color: Colors.black),
+                                columns: _createColumns(),
+                                rows: _createRows(),
                               ),
-                              //headingRowHeight: 0,
-                              columnSpacing: 20,
-                              dataRowHeight: 70,
-                              //horizontalMargin: 10,
-                              headingRowColor: MaterialStateColor.resolveWith(
-                                  (states) => Colors.blue),
-                              headingTextStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              dataTextStyle: const TextStyle(
-                                  fontSize: 18, color: Colors.black),
-                              columns: _createColumns(),
-                              rows: _createRows(),
                             ),
-                          ),
-                          const SizedBox(height: 10),
-                        ],
+                            const SizedBox(height: 10),
+                          ],
+                        ),
                       ),
               ],
             ),
@@ -545,16 +520,13 @@ class _MainFondoState extends State<MainFondo> {
         if (operaciones.isNotEmpty)
           Card(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              padding: const EdgeInsets.all(8),
               child: Column(
                 children: [
                   ListTile(
                     minLeadingWidth: 0,
-                    leading: const Icon(
-                      Icons.balance,
-                      size: 32,
-                      color: blue,
-                    ), // Icons.balance
+                    leading: const Icon(Icons.balance,
+                        size: 32, color: blue), // Icons.balance
                     title: const Text(
                       'BALANCE',
                       style: TextStyle(fontSize: 18),
@@ -600,6 +572,7 @@ class _MainFondoState extends State<MainFondo> {
                               label: 'Rendimiento',
                               data: NumberUtil.decimalFixed(_rendimiento,
                                   long: false),
+                              color: textRedGreen(_rendimiento),
                             ),
                           if (_rentabilidad != null ||
                               _twr != null ||
@@ -608,12 +581,19 @@ class _MainFondoState extends State<MainFondo> {
                           if (_rentabilidad != null ||
                               _twr != null ||
                               _mwrAcum != null)
-                            //const Center(child: Text('RENTABILIDAD')),
                             Row(
                               children: const [
-                                Expanded(child: Divider(endIndent: 10)),
+                                Expanded(
+                                    child: Divider(
+                                  endIndent: 10,
+                                  thickness: 1,
+                                )),
                                 Text('RENTABILIDAD'),
-                                Expanded(child: Divider(indent: 10)),
+                                Expanded(
+                                    child: Divider(
+                                  indent: 10,
+                                  thickness: 1,
+                                )),
                               ],
                             ),
                           if (_rentabilidad != null) const SizedBox(height: 10),
@@ -627,7 +607,6 @@ class _MainFondoState extends State<MainFondo> {
                           if (_twr != null)
                             RowBalance(
                               label: 'TWR',
-                              //data: NumberUtil.percent(_twr),
                               data: NumberUtil.percentCompact(_twr),
                               color: textRedGreen(_twr),
                             ),
@@ -647,9 +626,12 @@ class _MainFondoState extends State<MainFondo> {
                               _mwr != null)
                             Row(
                               children: const [
-                                Expanded(child: Divider(endIndent: 10)),
+                                Expanded(
+                                    child:
+                                        Divider(endIndent: 10, thickness: 1)),
                                 Text('RENTABILIDAD ANUAL'),
-                                Expanded(child: Divider(indent: 10)),
+                                Expanded(
+                                    child: Divider(indent: 10, thickness: 1)),
                               ],
                             ),
                           if (_rentAnual != null) const SizedBox(height: 10),

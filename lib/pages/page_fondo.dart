@@ -34,7 +34,6 @@ class _PageFondoState extends State<PageFondo>
   late List<Valor> operacionesSelect;
   late ApiService apiService;
   late TabController _tabController;
-
   bool _deleteOp = false;
 
   setValores(Cartera cartera, Fondo fondo) async {
@@ -59,9 +58,6 @@ class _PageFondoState extends State<PageFondo>
     carteraProvider = context.read<CarteraProvider>();
     carteraSelect = carteraProvider.carteraSelect;
     fondoSelect = carteraProvider.fondoSelect;
-
-    //valoresSelect = [];
-    //operacionesSelect = [];
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       database
@@ -264,13 +260,10 @@ class _PageFondoState extends State<PageFondo>
 
       ///?
       //await database.insertFondo(carteraSelect, fondoSelect);
-
       //await database.insertValor(carteraSelect, fondoSelect, newValor);
-
       // NUEVO EN PRUEBA
       await database.updateFondo(carteraSelect, fondoSelect);
       // END PRUEBA
-
       await database.updateOperacion(carteraSelect, fondoSelect, newValor);
       await setValores(carteraSelect, fondoSelect);
       _pop();
@@ -314,7 +307,6 @@ class _PageFondoState extends State<PageFondo>
           await database.updateOperacion(carteraSelect, fondoSelect, valor);
         }
         await setValores(carteraSelect, fondoSelect);
-
         // TODO set last valor (date y precio) desde VALORES cada vez en _updateValores
         _pop();
         _showMsg(msg: 'Descarga de datos completada.');
@@ -367,12 +359,6 @@ class _PageFondoState extends State<PageFondo>
                   backgroundColor: red,
                   primary: const Color(0xFFFFFFFF),
                 ),
-                /*onPressed: () async {
-                    await database.deleteAllValores(carteraSelect, fondoSelect);
-                    await setValores(carteraSelect, fondoSelect);
-                    _pop();
-                    //_tabController.animateTo(_tabController.index);
-                  },*/
                 child: const Text('ACEPTAR'),
               ),
             ],

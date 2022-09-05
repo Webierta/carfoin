@@ -34,10 +34,6 @@ class VistaDetalle extends StatelessWidget {
     double rendimientoCarteraUsd = 0.0;
     double rendimientoCarteraOtra = 0.0;
 
-    //double participacionesCartera = 0.0;
-    //double taeCartera = 0.0;
-    //int fondosConTae = 0;
-
     bool isTrueInversionCarteraEur = false;
     bool isTrueInversionCarteraUsd = false;
     bool isTrueInversionCarteraOtra = false;
@@ -53,7 +49,6 @@ class VistaDetalle extends StatelessWidget {
         if (fondo.valores != null && fondo.valores!.isNotEmpty) {
           Stats stats = Stats(fondo.valores!);
           double participacionesFondo = stats.totalParticipaciones() ?? 0.0;
-          //participacionesCartera += participacionesFondo;
           if (participacionesFondo > 0) {
             if (fondo.divisa == 'EUR') {
               if (stats.inversion() != null) {
@@ -127,158 +122,143 @@ class VistaDetalle extends StatelessWidget {
       return false;
     }
 
-    /*int countDivisas() {
-      int count = 0;
-      if (isTrueDivisaEur()) {
-        count++;
-      }
-      if (isTrueDivisaUsd()) {
-        count++;
-      }
-      if (isTrueDivisaOtra()) {
-        count++;
-      }
-      return count;
-    }*/
-
     return Dismissible(
       key: UniqueKey(),
       direction: DismissDirection.endToStart,
       background: bgDismissible,
       onDismissed: (_) => delete(cartera),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              children: [
-                ListTile(
-                  minLeadingWidth: 0,
-                  horizontalTitleGap: 10,
-                  leading: CircleAvatar(
-                    radius: 22,
-                    backgroundColor: const Color(0xFFFFFFFF),
-                    child: CircleAvatar(
-                      backgroundColor: amber,
-                      child: IconButton(
-                        onPressed: () => goCartera(context, cartera),
-                        icon: const Icon(Icons.business_center, color: blue900),
-                      ),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            children: [
+              ListTile(
+                minLeadingWidth: 0,
+                horizontalTitleGap: 10,
+                leading: CircleAvatar(
+                  radius: 22,
+                  backgroundColor: const Color(0xFFFFFFFF),
+                  child: CircleAvatar(
+                    backgroundColor: amber,
+                    child: IconButton(
+                      onPressed: () => goCartera(context, cartera),
+                      icon: const Icon(Icons.business_center, color: blue900),
                     ),
                   ),
-                  title: Text(
-                    cartera.name,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: styleTitle,
-                  ),
-                  trailing: PopupMenuButton(
-                    color: blue,
-                    icon: const Icon(Icons.more_vert, color: blue),
-                    itemBuilder: (context) => const [
-                      PopupMenuItem(
-                        value: 1,
-                        child: ListTile(
-                          leading: Icon(Icons.edit, color: Color(0xFFFFFFFF)),
-                          title: Text(
-                            'Renombrar',
-                            style: TextStyle(color: Color(0xFFFFFFFF)),
-                          ),
+                ),
+                title: Text(
+                  cartera.name,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: styleTitle,
+                ),
+                trailing: PopupMenuButton(
+                  color: blue,
+                  icon: const Icon(Icons.more_vert, color: blue),
+                  itemBuilder: (context) => const [
+                    PopupMenuItem(
+                      value: 1,
+                      child: ListTile(
+                        leading: Icon(Icons.edit, color: Color(0xFFFFFFFF)),
+                        title: Text(
+                          'Renombrar',
+                          style: TextStyle(color: Color(0xFFFFFFFF)),
                         ),
                       ),
-                      PopupMenuItem(
-                        value: 2,
-                        child: ListTile(
-                          leading: Icon(Icons.delete_forever,
-                              color: Color(0xFFFFFFFF)),
-                          title: Text(
-                            'Eliminar',
-                            style: TextStyle(color: Color(0xFFFFFFFF)),
-                          ),
+                    ),
+                    PopupMenuItem(
+                      value: 2,
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.delete_forever,
+                          color: Color(0xFFFFFFFF),
                         ),
-                      )
-                    ],
-                    onSelected: (value) {
-                      if (value == 1) {
-                        inputName(context, cartera: cartera);
-                      } else if (value == 2) {
-                        delete(cartera);
-                      }
-                    },
-                  ),
+                        title: Text(
+                          'Eliminar',
+                          style: TextStyle(color: Color(0xFFFFFFFF)),
+                        ),
+                      ),
+                    )
+                  ],
+                  onSelected: (value) {
+                    if (value == 1) {
+                      inputName(context, cartera: cartera);
+                    } else if (value == 2) {
+                      delete(cartera);
+                    }
+                  },
                 ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  child: Container(
-                    padding: const EdgeInsets.only(right: 12),
-                    decoration: boxDecoBlue,
-                    child: fondos.isNotEmpty
-                        ? Theme(
-                            data: Theme.of(context)
-                                .copyWith(dividerColor: Colors.transparent),
-                            child: ExpansionTile(
-                              childrenPadding:
-                                  const EdgeInsets.only(bottom: 5, left: 20),
-                              expandedCrossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                              expandedAlignment: Alignment.topLeft,
-                              maintainState: true,
-                              iconColor: blue,
-                              collapsedIconColor: blue,
-                              tilePadding: const EdgeInsets.all(0.0),
-                              backgroundColor: blue100,
-                              title: ChipFondo(lengthFondos: fondos.length),
-                              children: [
-                                for (var fondo in fondos)
-                                  TextButton(
-                                    onPressed: () =>
-                                        goFondo(context, cartera, fondo),
-                                    child: Text(
-                                      fondo.name,
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      style: const TextStyle(
-                                          decoration: TextDecoration.underline),
-                                    ),
-                                  )
-                              ],
-                            ),
-                          )
-                        : const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 6),
-                            child: ChipFondo(lengthFondos: null),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                child: Container(
+                  padding: const EdgeInsets.only(right: 12),
+                  decoration: boxDecoBlue,
+                  child: fondos.isNotEmpty
+                      ? Theme(
+                          data: Theme.of(context)
+                              .copyWith(dividerColor: Colors.transparent),
+                          child: ExpansionTile(
+                            childrenPadding:
+                                const EdgeInsets.only(bottom: 5, left: 20),
+                            expandedCrossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            expandedAlignment: Alignment.topLeft,
+                            maintainState: true,
+                            iconColor: blue,
+                            collapsedIconColor: blue,
+                            tilePadding: const EdgeInsets.all(0.0),
+                            backgroundColor: blue100,
+                            title: ChipFondo(lengthFondos: fondos.length),
+                            children: [
+                              for (var fondo in fondos)
+                                TextButton(
+                                  onPressed: () =>
+                                      goFondo(context, cartera, fondo),
+                                  child: Text(
+                                    fondo.name,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                        decoration: TextDecoration.underline),
+                                  ),
+                                )
+                            ],
                           ),
-                  ),
+                        )
+                      : const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 6),
+                          child: ChipFondo(lengthFondos: null),
+                        ),
                 ),
-                if (isTrueDivisaEur()) const SizedBox(height: 10),
-                if (isTrueDivisaEur())
-                  StepperBalance(
-                    input: inversionCarteraEur,
-                    output: capitalCarteraEur,
-                    balance: rendimientoCarteraEur,
-                    divisa: '€',
-                  ),
-                if (isTrueDivisaUsd()) const SizedBox(height: 10),
-                if (isTrueDivisaUsd())
-                  StepperBalance(
-                    input: inversionCarteraUsd,
-                    output: capitalCarteraUsd,
-                    balance: rendimientoCarteraUsd,
-                    divisa: '\$',
-                  ),
-                if (isTrueDivisaOtra()) const SizedBox(height: 10),
-                if (isTrueDivisaOtra())
-                  StepperBalance(
-                    input: inversionCarteraOtra,
-                    output: capitalCarteraOtra,
-                    balance: rendimientoCarteraOtra,
-                    divisa: '',
-                  ),
-                const SizedBox(height: 10),
-              ],
-            ),
+              ),
+              if (isTrueDivisaEur()) const SizedBox(height: 10),
+              if (isTrueDivisaEur())
+                StepperBalance(
+                  input: inversionCarteraEur,
+                  output: capitalCarteraEur,
+                  balance: rendimientoCarteraEur,
+                  divisa: '€',
+                ),
+              if (isTrueDivisaUsd()) const SizedBox(height: 10),
+              if (isTrueDivisaUsd())
+                StepperBalance(
+                  input: inversionCarteraUsd,
+                  output: capitalCarteraUsd,
+                  balance: rendimientoCarteraUsd,
+                  divisa: '\$',
+                ),
+              if (isTrueDivisaOtra()) const SizedBox(height: 10),
+              if (isTrueDivisaOtra())
+                StepperBalance(
+                  input: inversionCarteraOtra,
+                  output: capitalCarteraOtra,
+                  balance: rendimientoCarteraOtra,
+                  divisa: '',
+                ),
+              const SizedBox(height: 10),
+            ],
           ),
         ),
       ),
@@ -314,120 +294,3 @@ class ChipFondo extends StatelessWidget {
     );
   }
 }
-
-/*
-
-class ListTileCart extends StatelessWidget {
-  final double capital;
-  final double balance;
-  final String divisa;
-  const ListTileCart(
-      {Key? key,
-      required this.capital,
-      required this.balance,
-      required this.divisa})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    Row _buildRow(double stats, {bool isTitle = true}) {
-      Color fontColor = const Color(0xFF000000);
-      double fontSsize = 16;
-      IconData icon = Icons.savings;
-      if (!isTitle) {
-        fontColor = textRedGreen(stats);
-        //stats < 0 ? const Color(0xFFF44336) : const Color(0xFF4CAF50);
-        fontSsize = 14;
-        icon = Icons.iso;
-      }
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        //mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '${NumberUtil.decimalFixed(stats, long: false)} $divisa',
-            textAlign: TextAlign.end,
-            maxLines: 1,
-            style: TextStyle(
-              //fontWeight: FontWeight.w900,
-              fontSize: fontSsize,
-              color: fontColor,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Icon(icon, color: const Color(0xFF0D47A1)),
-        ],
-      );
-    }
-
-    // sizebox 200
-    /*return SizedBox(
-      width: 200,
-      child: ListTile(
-        //visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
-        //dense: true,
-        //leading: Text(divisa),
-        title: _buildRow(capital),
-        subtitle: _buildRow(balance, isTitle: false),
-      ),
-    );*/
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        _buildRow(capital),
-        _buildRow(balance, isTitle: false),
-      ],
-    );
-  }
-}
-
-String selectedValue() {
-      if (isTrueInversionCarteraEur &&
-          isTrueCapitalCarteraEur &&
-          isTrueRendCarteraEur) {
-        return '€';
-      }
-      if (isTrueInversionCarteraUsd &&
-          isTrueCapitalCarteraUsd &&
-          isTrueRendCarteraUsd) {
-        return '\$';
-      }
-      return '?';
-    }
-
-    List<DropdownMenuItem<String>> getDropdownItems() {
-      List<DropdownMenuItem<String>> menuItems = [];
-      if (isTrueCapitalCarteraEur && isTrueRendCarteraEur) {
-        menuItems.add(DropdownMenuItem(
-          value: '€',
-          child: ListTileCart(
-            capital: capitalCarteraEur,
-            balance: rendimientoCarteraEur,
-            divisa: '€',
-          ),
-        ));
-      }
-      if (isTrueCapitalCarteraUsd && isTrueRendCarteraUsd) {
-        menuItems.add(DropdownMenuItem(
-          value: '\$',
-          child: ListTileCart(
-            capital: capitalCarteraUsd,
-            balance: rendimientoCarteraUsd,
-            divisa: '\$',
-          ),
-        ));
-      }
-      if (isTrueCapitalCarteraOtra && isTrueRendCarteraOtra) {
-        menuItems.add(DropdownMenuItem(
-          value: '?',
-          child: ListTileCart(
-            capital: capitalCarteraOtra,
-            balance: rendimientoCarteraOtra,
-            divisa: '',
-          ),
-        ));
-      }
-      return menuItems;
-    }
-
- */

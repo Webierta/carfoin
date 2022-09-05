@@ -100,11 +100,11 @@ const String mdstring = """
 
 **CARFOIN** es una utilidad para la gestión de múltiples Carteras de Fondos de Inversión. Permite crear fácilmente Carteras personalizadas y seguir su evolución. Opera rápidamente con los Fondos para consultar, actualizar y archivar sus valores liquidativos.
 
-Después de crear una Cartera, incorpora los Fondos de Inversión que te interesa seguir. Puedes añadir un nuevo Fondo desde la base de datos que incorpora el programa o bien online a partir de su código ISIN —el programa utiliza el dígito de control para verificarlo—.
+Después de crear una Cartera, incorpora los Fondos de Inversión que te interesa seguir. Puedes añadir un nuevo Fondo desde una base de datos local o bien online a partir de su código ISIN —el programa utiliza el dígito de control para verificarlo—.
 
 Después puedes seguir la evolución de los Fondos añadidos actualizando periódicamente su cotización y archivando el histórico de valores.
 
-El programa muestra los valores en una tabla y en un gráfico, y además calcula algunos estadísticos de los fondos (valor liquidativo medio, volatilidad...) e índices de rentabilidad (rendimiento, rentabilidad acumulada...). Ten en cuenta que estos cálculos dependen de los valores descargados y por tanto no son valores absolutos del fondo.
+El programa muestra los valores en una tabla y en un gráfico, y además calcula algunos estadísticos de los fondos (valor liquidativo medio, volatilidad...) e índices de rentabilidad acumulada y anualizada (TWR, MWR...). Ten en cuenta que estos cálculos dependen de los valores descargados y por tanto no son valores absolutos del fondo.
 
 ---
 
@@ -113,9 +113,9 @@ El programa muestra los valores en una tabla y en un gráfico, y además calcula
 * Permite crear múltiples Carteras personalizadas de Fondos de Inversión y seguir su evolución.
 * Verifica el código ISIN de los Fondos con el dígito de control.
 * Actualiza vía internet la última cotización o un intervalo de tiempo y archiva los valores liquidativos obtenidos.
-* Consulta la evolución de los valores guardados y muestra algunos índices de rentabilidad.
-* Permite simular operaciones de suscripción y reembolso para seguir la evolución del capital invertido.
-* Hace copias de seguridad e importa el archivo de las Carteras.
+* Consulta la evolución de los valores guardados y muestra algunos índices estadísticos.
+* Permite simular operaciones de suscripción y reembolso para seguir la evolución del capital invertido y su rentabilidad (TWR y MWR).
+* Hace copias de seguridad del archivo principal del portafolio.
 * Próximamente más funciones...
 
 """;

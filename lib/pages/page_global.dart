@@ -5,33 +5,14 @@ import 'package:provider/provider.dart';
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
 import '../router/routes_const.dart';
-import '../utils/fecha_util.dart';
-import '../utils/number_util.dart';
 import '../utils/stats.dart';
 import '../utils/styles.dart';
 import '../widgets/my_drawer.dart';
-
-const double minLeadingWidth0 = 0.0;
-const double horizontalTitleGap10 = 10.0;
-const double trailingMaxWidth80 = 80.0;
-
-class CarteraFondo {
-  final Cartera cartera;
-  final Fondo fondo;
-  const CarteraFondo({required this.cartera, required this.fondo});
-}
-
-class Destacado extends CarteraFondo {
-  final double tae;
-  const Destacado(
-      {required super.cartera, required super.fondo, required this.tae});
-}
-
-class LastOp extends CarteraFondo {
-  final Valor valor;
-  const LastOp(
-      {required super.cartera, required super.fondo, required this.valor});
-}
+import '../widgets/subglobal/listtile_capital.dart';
+import '../widgets/subglobal/listtile_destacado.dart';
+import '../widgets/subglobal/listtile_lastop.dart';
+import '../widgets/subglobal/models.dart';
+import '../widgets/subglobal/pie_chart_global.dart';
 
 class PageGlobal extends StatelessWidget {
   const PageGlobal({Key? key}) : super(key: key);
@@ -131,13 +112,6 @@ class PageGlobal extends StatelessWidget {
           backgroundColor: Colors.transparent,
           drawer: const MyDrawer(),
           appBar: AppBar(
-            /*leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                context.go(homePage);
-              },
-            ),*/
             title: const Text('Posición Global'),
             actions: [
               IconButton(
@@ -163,9 +137,41 @@ class PageGlobal extends StatelessWidget {
               : Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: ListView(
+                    //padding: EdgeInsets.fromLTRB(0, 30, 0, 30),
                     children: [
                       const Text('PORTAFOLIO', textAlign: TextAlign.start),
-                      ListTile(
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        children: [
+                          Chip(
+                            backgroundColor: blue100,
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            avatar: const Icon(
+                              Icons.business_center,
+                              color: blue900,
+                            ),
+                            label: Text('${carteras.length} Carteras'),
+                            labelStyle: const TextStyle(fontSize: 16),
+                          ),
+                          Chip(
+                            backgroundColor: blue100,
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            avatar: const Icon(
+                              Icons.assessment,
+                              color: blue900,
+                            ),
+                            label: Text('$nFondos Fondos'),
+                            labelStyle: const TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(0),
+                        width: MediaQuery.of(context).size.width * 0.95,
+                        height: MediaQuery.of(context).size.width * 0.95 * 0.65,
+                        child: PieChartGlobal(carteras: carteras),
+                      ),
+                      /*ListTile(
                         minLeadingWidth: minLeadingWidth0,
                         horizontalTitleGap: horizontalTitleGap10,
                         leading: const Icon(
@@ -179,7 +185,7 @@ class PageGlobal extends StatelessWidget {
                         horizontalTitleGap: horizontalTitleGap10,
                         leading: const Icon(Icons.assessment, color: blue900),
                         title: Text('$nFondos Fondos'),
-                      ),
+                      ),*/
                       const LineDivider(),
                       const SizedBox(height: 20),
                       const Text('CAPITAL: VALOR / INVERSIÓN'),
@@ -257,184 +263,5 @@ class LineDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Divider(
         color: gris, height: 0, thickness: 0.5, indent: 20, endIndent: 20);
-  }
-}
-
-class ListTileDestacado extends StatelessWidget {
-  final Destacado destacado;
-  final IconData icon;
-  final Function goFondo;
-  const ListTileDestacado(
-      {Key? key,
-      required this.destacado,
-      required this.icon,
-      required this.goFondo})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      minLeadingWidth: minLeadingWidth0,
-      horizontalTitleGap: horizontalTitleGap10,
-      //onTap: () => goFondo(context, destacado.cartera, destacado.fondo),
-      //selected: true,
-      //selectedColor: Colors.white,
-      leading: Icon(icon, color: blue900),
-      title: InkWell(
-        onTap: () => goFondo(context, destacado.cartera, destacado.fondo),
-        child: Text(
-          destacado.fondo.name,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-          style: const TextStyle(
-            decoration: TextDecoration.underline,
-            decorationColor: blue,
-            color: Colors.transparent,
-            shadows: [Shadow(offset: Offset(0, -4), color: Colors.black)],
-          ),
-        ),
-      ),
-      subtitle: Row(
-        children: [
-          const Icon(Icons.business_center),
-          const SizedBox(width: 4),
-          Expanded(
-            child: Text(
-              destacado.cartera.name,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-        ],
-      ),
-      trailing: Container(
-        constraints: const BoxConstraints(maxWidth: trailingMaxWidth80),
-        child: Text(
-          NumberUtil.percentCompact(destacado.tae),
-          //'123%',
-          //'1234%5678%9123456789',
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-          style: TextStyle(color: textRedGreen(destacado.tae)),
-        ),
-      ),
-    );
-  }
-}
-
-class ListTileLastOp extends StatelessWidget {
-  final LastOp lastOp;
-  final Function goFondo;
-  const ListTileLastOp({Key? key, required this.lastOp, required this.goFondo})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      minLeadingWidth: minLeadingWidth0,
-      horizontalTitleGap: horizontalTitleGap10,
-      //onTap: () => goFondo(context, lastOp.cartera, lastOp.fondo),
-      //selected: true,
-      //selectedColor: Colors.white,
-      //leading: Text(FechaUtil.epochToString(lastOp.valor.date)),
-      leading: Icon(
-        lastOp.valor.tipo == 1 ? Icons.add_circle : Icons.remove_circle,
-        color: blue900,
-      ),
-      title: InkWell(
-        onTap: () => goFondo(context, lastOp.cartera, lastOp.fondo),
-        child: Text(
-          lastOp.fondo.name,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-          style: const TextStyle(
-            decoration: TextDecoration.underline,
-            decorationColor: blue,
-            color: Colors.transparent,
-            shadows: [Shadow(offset: Offset(0, -4), color: Colors.black)],
-          ),
-        ),
-      ),
-      subtitle: Row(
-        children: [
-          const Icon(Icons.business_center),
-          const SizedBox(width: 4),
-          Expanded(
-            child: Text(
-              lastOp.cartera.name,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-        ],
-      ),
-      //TODO: hacerlo columna para evitar overflow ??
-      trailing: Container(
-        constraints: const BoxConstraints(maxWidth: trailingMaxWidth80),
-        child: Text(
-          FechaUtil.epochToString(lastOp.valor.date),
-          style: const TextStyle(color: Color(0xFF000000)),
-        ),
-      ),
-      /*trailing: Text(
-        NumberUtil.decimalFixed(
-            lastOp.valor.precio * lastOp.valor.participaciones!,
-            long: false),
-        style: TextStyle(
-            color: lastOp.valor.tipo == 1 ? Colors.green : Colors.red),
-      ),*/
-    );
-  }
-}
-
-class ListTileCapital extends StatelessWidget {
-  final double inversion;
-  final double capital;
-  final double balance;
-  final String divisa;
-  final IconData icon;
-  const ListTileCapital(
-      {Key? key,
-      required this.inversion,
-      required this.capital,
-      required this.balance,
-      required this.divisa,
-      required this.icon})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      minLeadingWidth: minLeadingWidth0,
-      horizontalTitleGap: horizontalTitleGap10,
-      leading: Icon(icon, color: blue900),
-      title: Row(
-        children: [
-          Text(
-            '${NumberUtil.decimalFixed(capital, long: false)} $divisa',
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ),
-        ],
-      ),
-      subtitle: Row(
-        children: [
-          Text(
-            '${NumberUtil.decimalFixed(inversion, long: false)} $divisa',
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ),
-        ],
-      ),
-      trailing: Container(
-        constraints: const BoxConstraints(maxWidth: trailingMaxWidth80),
-        child: Text(
-          '${NumberUtil.decimalFixed(balance, long: false)} $divisa',
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-          style: TextStyle(color: textRedGreen(balance)),
-        ),
-      ),
-    );
   }
 }
