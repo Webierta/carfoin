@@ -28,7 +28,8 @@ PopupMenuItem<Enum> buildMenuItem(Enum menu, IconData iconData,
                 )
               : null,
         ),
-        if (divider == true) const Divider(color: Color(0xFFFFFFFF)), // PopMenuDivider
+        if (divider == true)
+          const Divider(color: Color(0xFFFFFFFF)), // PopMenuDivider
       ],
     ),
   );

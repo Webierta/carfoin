@@ -84,6 +84,36 @@ class DatabaseHelper {
     return isDatabase;
   }
 
+  Future<List<String>> getNamesTables() async {
+    Database db = await database;
+    var namesTables = (await db
+            .query('sqlite_master', where: 'type = ?', whereArgs: ['table']))
+        .map((row) => row['name'] as String)
+        .toList(growable: false);
+    /*if (namesTables.isNotEmpty) {
+      for (var name in namesTables) {
+        print('TABLA: $name');
+      }
+    }*/
+    return namesTables;
+  }
+
+  dropTable(String nameTable) async {
+    Database db = await database;
+    await db.execute("DROP TABLE IF EXISTS $nameTable");
+  }
+
+  dropAllTables() async {
+    List<String> namesTables = await getNamesTables();
+    if (namesTables.isNotEmpty) {
+      for (var name in namesTables) {
+        if (name != table) {
+          await dropTable(name);
+        }
+      }
+    }
+  }
+
   // TODO: comprobar si se ejecuta desde aquí sin error
   /*deleteDatabase(String dbPath) async {
     await deleteDatabase(dbPath);
@@ -103,6 +133,14 @@ class DatabaseHelper {
         ? await db.query(table, orderBy: '$columnNameCartera ASC')
         : await db.query(table);
     return query.map((e) => Cartera.fromMap(e)).toList();
+  }
+
+  Future<int> getLastId({bool byOrder = true}) async {
+    Database db = await database;
+    final List<Map<String, dynamic>> query = byOrder
+        ? await db.query(table, orderBy: '$columnId ASC')
+        : await db.query(table);
+    return query.map((e) => Cartera.fromMap(e)).toList().last.id ?? 0;
   }
 
   Future<int> updateCartera(Cartera cartera) async {
@@ -139,10 +177,20 @@ class DatabaseHelper {
     ''');
   }
 
+  dropTableCartera(Cartera cartera) async {
+    Database db = await database;
+    var nameTable = '_${cartera.id}';
+    //await db.delete(nameTable);
+    //await db.rawUpdate("DELETE FROM $table");
+    await db.execute("DROP TABLE IF EXISTS $nameTable");
+  }
+
   Future<void> insertFondo(Cartera cartera, Fondo fondo) async {
     Database db = await database;
     var nameTable = '_${cartera.id}';
     await db.insert(nameTable, fondo.toDb());
+    //await db.insert(nameTable, fondo.toDb(),
+    //    conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<Fondo>> getFondos(Cartera cartera, {bool byOrder = false}) async {
@@ -203,6 +251,24 @@ class DatabaseHelper {
         $columnTipoOperacion INTEGER,
         $columnParticipaciones REAL)
       ''');
+  }
+
+  dropTableFondo(Cartera cartera, Fondo fondo) async {
+    Database db = await database;
+    var nameTable = '_${cartera.id}${fondo.isin}';
+    //await db.delete(nameTable);
+    //await db.rawUpdate("DELETE FROM $table");
+    await db.execute("DROP TABLE IF EXISTS $nameTable");
+  }
+
+  dropAllTablesFondos(Cartera cartera) async {
+    if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
+      for (var fondo in List<Fondo>.from(cartera.fondos!)) {
+        if (cartera.fondos!.contains(fondo)) {
+          await dropTableFondo(cartera, fondo);
+        }
+      }
+    }
   }
 
   Future<void> insertValor(Cartera cartera, Fondo fondo, Valor valor) async {

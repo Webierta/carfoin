@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
@@ -10,6 +11,7 @@ import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
+import '../services/share_csv.dart';
 import '../utils/file_util.dart';
 import '../utils/styles.dart';
 import '../utils/update_all.dart';
@@ -37,6 +39,8 @@ class _PageHomeState extends State<PageHome> {
   late ApiService apiService;
   final GlobalKey _dialogKey = GlobalKey();
   String _loadingText = '';
+
+  bool cargandoShare = false;
 
   getSharedPrefs() async {
     bool? isCarterasByOrder;
@@ -131,6 +135,9 @@ class _PageHomeState extends State<PageHome> {
     return FutureBuilder(
       future: database.getCarteras(byOrder: _isCarterasByOrder),
       builder: (BuildContext context, AsyncSnapshot<List<Cartera>> snapshot) {
+        if (cargandoShare) {
+          return const LoadingProgress(titulo: 'Cargando cartera...');
+        }
         if (snapshot.connectionState == ConnectionState.done) {
           return WillPopScope(
             onWillPop: () async => false,
@@ -142,10 +149,6 @@ class _PageHomeState extends State<PageHome> {
                   appBar: AppBar(
                     title: const Text('Carteras'),
                     actions: [
-                      /*IconButton(
-                        icon: const Icon(Icons.cases_rounded),
-                        onPressed: () => context.go(globalPage),
-                      ),*/
                       IconButton(
                         icon: const Icon(Icons.refresh),
                         onPressed: () async => await _dialogUpdateAll(context),
@@ -185,10 +188,67 @@ class _PageHomeState extends State<PageHome> {
                     ],
                   ),
                   drawer: const MyDrawer(),
-                  floatingActionButton: FloatingActionButton(
+                  /*floatingActionButton: FloatingActionButton(
                     backgroundColor: amber,
                     child: const Icon(Icons.add, color: blue900),
                     onPressed: () => _inputName(context),
+                  ),*/
+                  floatingActionButton: SpeedDial(
+                    icon: Icons.add,
+                    foregroundColor: blue900,
+                    backgroundColor: amber,
+                    spacing: 8,
+                    spaceBetweenChildren: 4,
+                    overlayColor: gris,
+                    overlayOpacity: 0.4,
+                    children: [
+                      SpeedDialChild(
+                        child: const Icon(Icons.share),
+                        label: 'Archivada',
+                        backgroundColor: amber,
+                        foregroundColor: blue900,
+                        onTap: () async {
+                          // TODO: get last index cartera:
+                          // 1. by database
+                          // 2. by Provider (MEJOR)
+                          int index = 0;
+                          if (carteraProvider.carteras.isNotEmpty) {
+                            var carterasConIndex = carteraProvider.carteras
+                                .where((item) => item.id != null)
+                                .toList();
+                            carterasConIndex
+                                .sort((a, b) => a.id!.compareTo(b.id!));
+                            if (carterasConIndex.isNotEmpty) {
+                              index = carterasConIndex.last.id!;
+                            }
+                          }
+                          //await database.getNamesTables();
+                          setState(() => cargandoShare = true);
+                          Cartera? loadCartera =
+                              await ShareCsv.loadCartera(index)
+                                  .then((Cartera? value) async {
+                            if (value != null) {
+                              await _loadCartera(value);
+                            } else {
+                              _showMsg(
+                                  msg: 'Proceso abortado', color: Colors.red);
+                            }
+                          }).catchError((onError) {
+                            _showMsg(
+                                msg: 'Proceso abortado', color: Colors.red);
+                          }).whenComplete(() {
+                            setState(() => cargandoShare = false);
+                          });
+                        },
+                      ),
+                      SpeedDialChild(
+                        child: const Icon(Icons.create),
+                        label: 'Nueva',
+                        backgroundColor: amber,
+                        foregroundColor: blue900,
+                        onTap: () => _inputName(context),
+                      ),
+                    ],
                   ),
                   body: Padding(
                     padding: const EdgeInsets.all(8),
@@ -533,6 +593,44 @@ class _PageHomeState extends State<PageHome> {
     return null;
   }
 
+  _loadCartera(Cartera cartera) async {
+    var existe = [for (var cartera in carteraProvider.carteras) cartera.name]
+        .contains(cartera.name);
+
+    if (existe) {
+      _showMsg(msg: 'Ya existe una cartera con ese nombre.', color: Colors.red);
+    } else {
+      await database.createTableCartera(cartera).whenComplete(() async {
+        await database.insertCartera(cartera);
+        await setCarteras();
+      });
+
+      if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
+        for (var fondo in cartera.fondos!) {
+          await database
+              .createTableFondo(cartera, fondo)
+              .whenComplete(() async {
+            await database.insertFondo(
+                cartera,
+                Fondo(
+                    isin: fondo.isin,
+                    name: fondo.name,
+                    divisa: fondo.divisa,
+                    valores: fondo.valores));
+            await setCarteras();
+            if (fondo.valores != null && fondo.valores!.isNotEmpty) {
+              for (var valor in fondo.valores!) {
+                await database.insertValor(cartera, fondo, valor);
+                await setCarteras();
+              }
+            }
+          });
+        }
+      }
+      await setCarteras();
+    }
+  }
+
   void _submit(Cartera? cartera) async {
     if (_errorText == null) {
       var input = _controller.value.text.trim();
@@ -544,8 +642,6 @@ class _PageHomeState extends State<PageHome> {
         _showMsg(
             msg: 'Ya existe una cartera con ese nombre.', color: Colors.red);
       } else if (cartera != null) {
-        print('RENAME RENAME');
-        print('${cartera.id}');
         cartera.name = input;
         await database.updateCartera(cartera);
         await setCarteras();
@@ -623,6 +719,10 @@ class _PageHomeState extends State<PageHome> {
     //await database.deleteAllValores(cartera)
     await database.deleteAllFondos(cartera);
     await database.deleteCartera(cartera);
+
+    await database.dropAllTablesFondos(cartera);
+    await database.dropTableCartera(cartera);
+
     carteraProvider.removeAllFondos(cartera);
     carteraProvider.removeCartera(cartera);
     await setCarteras();
@@ -637,6 +737,8 @@ class _PageHomeState extends State<PageHome> {
         _eliminar(cartera);
       }
       await database.deleteAllCarteras();
+      await database.dropAllTables();
+
       carteraProvider.removeAllCarteras();
       await setCarteras();
     }

@@ -115,7 +115,8 @@ El programa muestra los valores en una tabla y en un gráfico, y además calcula
 * Actualiza vía internet la última cotización o un intervalo de tiempo y archiva los valores liquidativos obtenidos.
 * Consulta la evolución de los valores guardados y muestra algunos índices estadísticos.
 * Permite simular operaciones de suscripción y reembolso para seguir la evolución del capital invertido y su rentabilidad (TWR y MWR).
-* Hace copias de seguridad del archivo principal del portafolio.
+* Hace copias de seguridad del archivo principal del portafolio (base de datos SQLite3).
+* Permite compartir carteras con otros usuarios de la App (archivos con extensión cfi).
 * Próximamente más funciones...
 
 """;

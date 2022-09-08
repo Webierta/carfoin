@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
@@ -11,6 +14,7 @@ import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
+import '../services/share_csv.dart';
 import '../utils/styles.dart';
 import '../utils/update_all.dart';
 import '../widgets/data_cartera.dart';
@@ -115,6 +119,39 @@ class _PageCarteraState extends State<PageCartera> {
     );
   }
 
+  _dialogConfirmShare(BuildContext context) async {
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Compartir Cartera'),
+          content: const Text('Primero selecciona una carpeta donde almacenar '
+              'el archivo generado y luego una aplicación para compartirlo, '
+              'por ejemplo vía email.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Continuar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  _onShare(Cartera cartera, File file) async {
+    final box = context.findRenderObject() as RenderBox?;
+    if (file.path.isNotEmpty) {
+      await Share.shareFiles([file.path],
+          text: cartera.name,
+          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -156,6 +193,20 @@ class _PageCarteraState extends State<PageCartera> {
                     icon: const Icon(Icons.refresh),
                     onPressed: () async => await _dialogUpdateAll(context),
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.share),
+                    onPressed: () async {
+                      // TODO DIALOG:
+                      var confirmShare = await _dialogConfirmShare(context);
+                      if (confirmShare) {
+                        var shareCartera =
+                            await ShareCsv.shareCartera(carteraSelect);
+                        if (shareCartera != null) {
+                          _onShare(carteraSelect, shareCartera);
+                        }
+                      }
+                    },
+                  ),
                   PopupMenuButton(
                     color: blue,
                     offset: Offset(0.0, AppBar().preferredSize.height),
@@ -168,6 +219,7 @@ class _PageCarteraState extends State<PageCartera> {
                         Icons.sort_by_alpha,
                         isOrder: _isFondosByOrder,
                       ),
+                      //buildMenuItem(MenuCartera.compartir, Icons.share),
                       buildMenuItem(MenuCartera.eliminar, Icons.delete_forever)
                     ],
                     onSelected: (item) async {
@@ -428,6 +480,10 @@ class _PageCarteraState extends State<PageCartera> {
     _eliminarFondo() async {
       await database.deleteAllValores(carteraSelect, fondo);
       await database.deleteFondo(carteraSelect, fondo);
+
+      // PRUEBA ??
+      await database.dropTableFondo(carteraSelect, fondo);
+
       carteraProvider.removeFondo(carteraSelect, fondo);
       await setFondos(carteraSelect);
     }
@@ -451,6 +507,10 @@ class _PageCarteraState extends State<PageCartera> {
         await database.deleteAllValores(carteraSelect, fondo);
       }
       await database.deleteAllFondos(carteraSelect);
+
+      // PRUEBA
+      await database.dropAllTablesFondos(carteraSelect);
+
       carteraProvider.removeAllFondos(carteraSelect);
 
       /// ???

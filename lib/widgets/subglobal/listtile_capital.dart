@@ -22,6 +22,7 @@ class ListTileCapital extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      //contentPadding: const EdgeInsets.only(left: 0.0, right: 10.0),
       minLeadingWidth: minLeadingWidth0,
       horizontalTitleGap: horizontalTitleGap10,
       leading: Icon(icon, color: blue900),

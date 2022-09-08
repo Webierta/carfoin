@@ -5,6 +5,11 @@ class Cartera {
   Cartera({this.id, required this.name, this.fondos}) {
     fondos ??= [];
   }
+
+  /*set id(int? valor) {
+    id = valor;
+  }*/
+
   //List<Fondo> fondos;
   //Cartera({this.id, required this.name, this.fondos = []});
 
