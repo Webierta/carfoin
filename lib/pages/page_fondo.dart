@@ -249,8 +249,10 @@ class _PageFondoState extends State<PageFondo>
     _dialogProgress(context);
     final getDataApi = await apiService.getDataApi(fondoSelect.isin);
     if (getDataApi != null) {
-      var newValor =
-          Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
+      /// TEST EPOCH HMS
+      var date = FechaUtil.epochToEpochHms(getDataApi.epochSecs);
+
+      var newValor = Valor(date: date, precio: getDataApi.price);
       fondoSelect.divisa = getDataApi.market;
       //TODO: POSIBLE ERROR SI CHOCA CON VALOR INTRODUCIDO DESDE MERCADO CON FECHA ANTERIOR
       //TODO check newvalor repetido por date ??
@@ -275,7 +277,6 @@ class _PageFondoState extends State<PageFondo>
   }
 
   void _getRangeApi(BuildContext context) async {
-    //final newRange = await Navigator.of(context).pushNamed(RouteGenerator.inputRange);
     final newRange = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => AppPage.inputRange.routeClass),
@@ -297,10 +298,10 @@ class _PageFondoState extends State<PageFondo>
       var newListValores = <Valor>[];
       if (getDateApiRange != null) {
         for (var dataApi in getDateApiRange) {
-          newListValores.add(Valor(
-            date: dataApi.epochSecs,
-            precio: dataApi.price,
-          ));
+          /// TEST EPOCH HMS
+          var date = FechaUtil.epochToEpochHms(dataApi.epochSecs);
+
+          newListValores.add(Valor(date: date, precio: dataApi.price));
         }
         for (var valor in newListValores) {
           //await database.insertValor(carteraSelect, fondoSelect, valor);

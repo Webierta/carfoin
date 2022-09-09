@@ -84,6 +84,16 @@ class DatabaseHelper {
     return isDatabase;
   }
 
+  /*Future<bool> tableExists(String table) async {
+    Database db = await database;
+    int? count = firstIntValue(await db.query('sqlite_master',
+        columns: ['COUNT(*)'],
+        where: 'type = ? AND name = ?',
+        whereArgs: ['table', table]));
+    if (count != null) return count > 0;
+    return false;
+  }*/
+
   Future<List<String>> getNamesTables() async {
     Database db = await database;
     var namesTables = (await db
@@ -96,6 +106,11 @@ class DatabaseHelper {
       }
     }*/
     return namesTables;
+  }
+
+  close() async {
+    Database db = await database;
+    await database.close();
   }
 
   dropTable(String nameTable) async {
@@ -153,6 +168,7 @@ class DatabaseHelper {
     Database db = await database;
     return await db
         .delete(table, where: '$columnId = ?', whereArgs: [cartera.id]);
+    //return await db.rawDelete('DELETE FROM $table WHERE $columnId = ?', [cartera.id]);
   }
 
   Future<int> deleteAllCarteras() async {
@@ -196,6 +212,7 @@ class DatabaseHelper {
   Future<List<Fondo>> getFondos(Cartera cartera, {bool byOrder = false}) async {
     Database db = await database;
     var nameTable = '_${cartera.id}';
+
     final List<Map<String, dynamic>> query = byOrder
         ? await db.query(nameTable, orderBy: '$columnNameFondo ASC')
         : await db.query(nameTable);
@@ -205,17 +222,22 @@ class DatabaseHelper {
   Future<void> updateFondo(Cartera cartera, Fondo fondo) async {
     Database db = await database;
     var nameTable = '_${cartera.id}';
+
     await db.update(nameTable, fondo.toDb(),
         where: '$columnIsin = ?', whereArgs: [fondo.isin]);
   }
 
   Future<void> deleteFondo(Cartera cartera, Fondo fondo) async {
     Database db = await database;
-    var nameTable = '_${cartera.id}';
     // ELIMINA TODOS SUS VALORES
     await deleteAllValores(cartera, fondo);
-    await db
-        .delete(nameTable, where: '$columnIsin = ?', whereArgs: [fondo.isin]);
+    var nameTable = '_${cartera.id}';
+    try {
+      await db
+          .delete(nameTable, where: '$columnIsin = ?', whereArgs: [fondo.isin]);
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> deleteAllFondos(Cartera cartera) async {
@@ -230,13 +252,22 @@ class DatabaseHelper {
       });*/
       for (var fondo in List<Fondo>.from(cartera.fondos!)) {
         if (cartera.fondos!.contains(fondo)) {
-          await deleteFondo(cartera, fondo);
+          try {
+            await deleteFondo(cartera, fondo);
+          } catch (e) {
+            print(e);
+            //continue;
+          }
         }
       }
     }
     Database db = await database;
     var nameTable = '_${cartera.id}';
-    await db.delete(nameTable);
+    try {
+      await db.delete(nameTable);
+    } catch (e) {
+      print(e);
+    }
   }
 
   /* TABLA _CARTERA.ID DE FONDOS */
@@ -274,6 +305,7 @@ class DatabaseHelper {
   Future<void> insertValor(Cartera cartera, Fondo fondo, Valor valor) async {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
+
     await db.insert(nameTable, valor.toDb(),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
@@ -307,6 +339,7 @@ class DatabaseHelper {
   Future<void> updateValor(Cartera cartera, Fondo fondo, Valor valor) async {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
+
     await db.update(nameTable, valor.toDb(),
         where: '$columnDate = ?', whereArgs: [valor.date]);
   }
@@ -347,28 +380,44 @@ class DatabaseHelper {
   Future<void> deleteValor(Cartera cartera, Fondo fondo, Valor valor) async {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
-    await db
-        .delete(nameTable, where: '$columnDate = ?', whereArgs: [valor.date]);
+    try {
+      await db
+          .delete(nameTable, where: '$columnDate = ?', whereArgs: [valor.date]);
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> deleteValorByDate(Cartera cartera, Fondo fondo, int date) async {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
-    await db.delete(nameTable, where: '$columnDate = ?', whereArgs: [date]);
+    try {
+      await db.delete(nameTable, where: '$columnDate = ?', whereArgs: [date]);
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> deleteAllValores(Cartera cartera, Fondo fondo) async {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
-    await db.delete(nameTable);
+    try {
+      await db.delete(nameTable);
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> deleteOnlyValores(Cartera cartera, Fondo fondo) async {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
     //await db.delete(nameTable, where: '$columnTipoOperacion = ?', whereArgs: [-1]);
-    await db.delete(nameTable,
-        where: '$columnTipoOperacion IN (?)', whereArgs: [-1]);
+    try {
+      await db.delete(nameTable,
+          where: '$columnTipoOperacion IN (?)', whereArgs: [-1]);
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> deleteOperacion(Cartera cartera, Fondo fondo, Valor op) async {
@@ -383,8 +432,12 @@ class DatabaseHelper {
   Future<void> deleteAllOperaciones(Cartera cartera, Fondo fondo) async {
     Database db = await database;
     var nameTable = '_${cartera.id}${fondo.isin}';
-    await db.delete(nameTable,
-        where: '$columnTipoOperacion IN (?, ?)', whereArgs: [1, 0]);
+    try {
+      await db.delete(nameTable,
+          where: '$columnTipoOperacion IN (?, ?)', whereArgs: [1, 0]);
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> deleteAllOperacionesPosteriores(

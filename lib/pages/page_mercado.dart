@@ -36,12 +36,20 @@ class _MercadoState extends State<PageMercado> {
   bool? _isValido = false;
   final _isSelected = <bool>[true, false];
   var _tipo = true;
-  int _date = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+  DateTime now = DateTime.now();
+  int _date = 0;
+  //int _date = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
   double _participaciones = 0;
   double _precio = 0;
 
   @override
   void initState() {
+    /// TEST EPOCH HMS
+    _date = FechaUtil.dateToEpoch(now);
+    _date = FechaUtil.epochToEpochHms(_date);
+
     carteraProvider = context.read<CarteraProvider>();
     // mejor? => carteraSelect = carteraProvider.carteraSelect;
     carteraSelect = context.read<CarteraProvider>().carteraSelect;
@@ -190,9 +198,16 @@ class _MercadoState extends State<PageMercado> {
                             setState(() {
                               // TODO: CONTROL OTRAS TIME ZONE PARA NO REPETIR DATE ??
                               // o epoch +/- 1 day ??
-                              DateTime timeZone =
-                                  fecha.add(const Duration(hours: 2));
-                              _date = timeZone.millisecondsSinceEpoch ~/ 1000;
+
+                              ///DateTime timeZone = fecha.add(const Duration(hours: 2));
+                              ///_date = timeZone.millisecondsSinceEpoch ~/ 1000;
+
+                              /// TEST EPOCH HMS
+                              //DateTime fechaHMS = DateTime(fecha.year, fecha.month, fecha.day, 0, 0, 0, 0, 0);
+                              //_date = fecha.millisecondsSinceEpoch ~/ 1000;
+                              _date = FechaUtil.dateToEpoch(fecha);
+                              _date = FechaUtil.epochToEpochHms(_date);
+
                               _dateController.text =
                                   FechaUtil.dateToString(date: fecha);
                             });
@@ -352,7 +367,6 @@ class _MercadoState extends State<PageMercado> {
       //TODO: check tipo Op 0 permitida
       Stats stats = Stats(valoresSelect);
       var participaciones = stats.totalParticipaciones() ?? 0;
-      print('PARTICIPACIONES: $participaciones');
       if (tipoOp == 0 && _participaciones > participaciones) {
         _showMsg(
           //msg: 'Operación no permitida: no puedes reembolsar las participaciones que no tienes.',
@@ -387,6 +401,11 @@ class _MercadoState extends State<PageMercado> {
       firstDate: DateTime(1997, 1, 1),
       lastDate: DateTime.now(),
     );
+    if (picked != null) {
+      /// TEST EPOCH HMS
+      //return  = DateTime(picked.year, picked.month, picked.day, 0, 0, 0, 0, 0);
+      return FechaUtil.dateToDateHms(picked);
+    }
     return picked;
   }
 

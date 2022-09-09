@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../router/routes_const.dart';
+import '../services/database_helper.dart';
 import '../utils/konstantes.dart';
 import '../utils/styles.dart';
 
@@ -139,7 +140,11 @@ class MyDrawer extends StatelessWidget {
                   ListTile(
                     leading: const Icon(Icons.exit_to_app, color: blue900),
                     title: const Text('Salir'),
-                    onTap: () => SystemNavigator.pop(),
+                    onTap: () async {
+                      DatabaseHelper database = DatabaseHelper();
+                      await database.close();
+                      SystemNavigator.pop();
+                    },
                   ),
                 ],
               ),

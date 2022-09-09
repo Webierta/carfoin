@@ -602,7 +602,7 @@ class _PageHomeState extends State<PageHome> {
     } else {
       await database.createTableCartera(cartera).whenComplete(() async {
         await database.insertCartera(cartera);
-        await setCarteras();
+        //await setCarteras();
       });
 
       if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
@@ -617,11 +617,11 @@ class _PageHomeState extends State<PageHome> {
                     name: fondo.name,
                     divisa: fondo.divisa,
                     valores: fondo.valores));
-            await setCarteras();
+            //await setCarteras();
             if (fondo.valores != null && fondo.valores!.isNotEmpty) {
               for (var valor in fondo.valores!) {
                 await database.insertValor(cartera, fondo, valor);
-                await setCarteras();
+                //await setCarteras();
               }
             }
           });

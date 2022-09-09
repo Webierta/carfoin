@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:carfoin/utils/fecha_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -391,8 +392,10 @@ class _PageCarteraState extends State<PageCartera> {
     await database.createTableFondo(carteraSelect, fondo);
     final getDataApi = await apiService.getDataApi(fondo.isin);
     if (getDataApi != null) {
-      var newValor =
-          Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
+      /// TEST EPOCH HMS
+      var date = FechaUtil.epochToEpochHms(getDataApi.epochSecs);
+
+      var newValor = Valor(date: date, precio: getDataApi.price);
       fondo.divisa = getDataApi.market;
 
       ///await carfoin.insertFondoCartera(fondo);

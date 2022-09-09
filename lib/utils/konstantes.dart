@@ -1,4 +1,4 @@
-const String kVersion = '1.2.0';
+const String kVersion = '1.2.1';
 
 /*const String keyByOrderCarterasPref = 'isByOrderCarteras';
 

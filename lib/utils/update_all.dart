@@ -5,6 +5,7 @@ import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
+import 'fecha_util.dart';
 
 class Update {
   final String nameCartera;
@@ -43,8 +44,10 @@ class UpdateAll {
             await database.createTableFondo(cartera, fondo);
             final getDataApi = await apiService.getDataApi(fondo.isin);
             if (getDataApi != null) {
-              var newValor =
-                  Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
+              /// TEST EPOCH HMS
+              var date = FechaUtil.epochToEpochHms(getDataApi.epochSecs);
+
+              var newValor = Valor(date: date, precio: getDataApi.price);
               fondo.divisa = getDataApi.market;
               await database.updateFondo(cartera, fondo);
               await database.updateOperacion(cartera, fondo, newValor);
@@ -80,8 +83,10 @@ class UpdateAll {
         await database.createTableFondo(cartera, fondo);
         final getDataApi = await apiService.getDataApi(fondo.isin);
         if (getDataApi != null) {
-          var newValor =
-              Valor(date: getDataApi.epochSecs, precio: getDataApi.price);
+          /// TEST EPOCH HMS
+          var date = FechaUtil.epochToEpochHms(getDataApi.epochSecs);
+
+          var newValor = Valor(date: date, precio: getDataApi.price);
           fondo.divisa = getDataApi.market;
           await database.updateFondo(cartera, fondo);
           await database.updateOperacion(cartera, fondo, newValor);

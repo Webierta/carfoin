@@ -1,3 +1,4 @@
+import 'package:carfoin/utils/fecha_util.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +26,7 @@ class _PageInputRangeState extends State<PageInputRange> {
       decoration: scaffoldGradient,
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(title: const Text('Descarga valores')),
+        appBar: AppBar(title: const Text('Descarga histórico')),
         body: ListView(
           padding: const EdgeInsets.all(12),
           children: [
@@ -131,7 +132,7 @@ class _PageInputRangeState extends State<PageInputRange> {
   }
 
   _datePicker(BuildContext context, DatePickerEntryMode mode) async {
-    final DateTimeRange? newRange = await showDateRangePicker(
+    DateTimeRange? newRange = await showDateRangePicker(
       context: context,
       builder: (BuildContext context, Widget? child) {
         return Theme(
@@ -171,6 +172,13 @@ class _PageInputRangeState extends State<PageInputRange> {
       errorInvalidText: 'Fuera de rango.',
       errorInvalidRangeText: 'Período no válido.',
     );
+
+    /// TEST EPOCH HMS
+    if (newRange != null) {
+      DateTime start = FechaUtil.dateToDateHms(newRange.start);
+      DateTime end = FechaUtil.dateToDateHms(newRange.end);
+      newRange = DateTimeRange(start: start, end: end);
+    }
     return newRange;
   }
 }

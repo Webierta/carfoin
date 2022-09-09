@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../utils/fecha_util.dart';
 import '../../utils/styles.dart';
-import 'konstantes_global.dart';
 import 'models.dart';
 
 class ListTileLastOp extends StatelessWidget {
@@ -13,59 +12,59 @@ class ListTileLastOp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      minLeadingWidth: minLeadingWidth0,
-      horizontalTitleGap: horizontalTitleGap10,
-      //onTap: () => goFondo(context, lastOp.cartera, lastOp.fondo),
-      //selected: true,
-      //selectedColor: Colors.white,
-      //leading: Text(FechaUtil.epochToString(lastOp.valor.date)),
-      leading: Icon(
-        lastOp.valor.tipo == 1 ? Icons.add_circle : Icons.remove_circle,
-        color: blue900,
-      ),
-      title: InkWell(
-        onTap: () => goFondo(context, lastOp.cartera, lastOp.fondo),
-        child: Text(
-          lastOp.fondo.name,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-          style: const TextStyle(
-            decoration: TextDecoration.underline,
-            decorationColor: blue,
-            color: Colors.transparent,
-            shadows: [Shadow(offset: Offset(0, -4), color: Colors.black)],
-          ),
-        ),
-      ),
-      subtitle: Row(
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.business_center),
-          const SizedBox(width: 4),
+          Icon(lastOp.valor.tipo == 1 ? Icons.add_circle : Icons.remove_circle,
+              color: blue900),
+          const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              lastOp.cartera.name,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                    onTap: () => goFondo(context, lastOp.cartera, lastOp.fondo),
+                    child: Text(
+                      lastOp.fondo.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        decoration: TextDecoration.underline,
+                        decorationColor: blue,
+                        color: Colors.transparent,
+                        shadows: [
+                          Shadow(
+                            offset: Offset(0, -4),
+                            color: Colors.black,
+                          )
+                        ],
+                      ),
+                    )),
+                Row(
+                  children: [
+                    const Icon(Icons.business_center, color: Colors.black54),
+                    const SizedBox(width: 4),
+                    Text(lastOp.cartera.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Colors.black54)),
+                  ],
+                ),
+              ],
             ),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            FechaUtil.epochToString(lastOp.valor.date),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Color(0xFF000000)),
           ),
         ],
       ),
-      //TODO: hacerlo columna para evitar overflow ??
-      trailing: Container(
-        constraints: const BoxConstraints(maxWidth: trailingMaxWidth80),
-        child: Text(
-          FechaUtil.epochToString(lastOp.valor.date),
-          style: const TextStyle(color: Color(0xFF000000)),
-        ),
-      ),
-      /*trailing: Text(
-        NumberUtil.decimalFixed(
-            lastOp.valor.precio * lastOp.valor.participaciones!,
-            long: false),
-        style: TextStyle(
-            color: lastOp.valor.tipo == 1 ? Colors.green : Colors.red),
-      ),*/
     );
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../utils/number_util.dart';
 import '../../utils/styles.dart';
-import 'konstantes_global.dart';
 
 class ListTileCapital extends StatelessWidget {
   final double inversion;
@@ -21,37 +20,41 @@ class ListTileCapital extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      //contentPadding: const EdgeInsets.only(left: 0.0, right: 10.0),
-      minLeadingWidth: minLeadingWidth0,
-      horizontalTitleGap: horizontalTitleGap10,
-      leading: Icon(icon, color: blue900),
-      title: Row(
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Icon(icon, color: blue900),
+          const SizedBox(width: 10),
+          Expanded(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${NumberUtil.decimalFixed(capital, long: false)} $divisa',
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: const TextStyle(fontSize: 16),
+              ),
+              Text(
+                '${NumberUtil.decimalFixed(inversion, long: false)} $divisa',
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ],
+          )),
+          const SizedBox(width: 10),
           Text(
-            '${NumberUtil.decimalFixed(capital, long: false)} $divisa',
+            '${NumberUtil.decimalFixed(balance, long: false, limit: 100000)} $divisa',
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
+            style: TextStyle(
+              fontSize: 16,
+              color: textRedGreen(balance),
+            ),
           ),
         ],
-      ),
-      subtitle: Row(
-        children: [
-          Text(
-            '${NumberUtil.decimalFixed(inversion, long: false)} $divisa',
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ),
-        ],
-      ),
-      trailing: Container(
-        constraints: const BoxConstraints(maxWidth: trailingMaxWidth80),
-        child: Text(
-          '${NumberUtil.decimalFixed(balance, long: false, limit: 100000)} $divisa',
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-          style: TextStyle(color: textRedGreen(balance)),
-        ),
       ),
     );
   }

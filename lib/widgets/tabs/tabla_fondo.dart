@@ -145,6 +145,9 @@ class _TablaFondoState extends State<TablaFondo> {
                     physics: const ClampingScrollPhysics(),
                     itemCount: valores.length,
                     itemBuilder: (context, index) {
+                      int fecha = valores[index].date;
+                      var fechaString = FechaUtil.epochToString(fecha);
+                      print('$fecha $fechaString');
                       return Dismissible(
                           key: UniqueKey(),
                           direction: DismissDirection.endToStart,

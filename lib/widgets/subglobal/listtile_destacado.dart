@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../utils/number_util.dart';
 import '../../utils/styles.dart';
-import 'konstantes_global.dart';
 import 'models.dart';
 
 class ListTileDestacado extends StatelessWidget {
@@ -18,50 +17,58 @@ class ListTileDestacado extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      minLeadingWidth: minLeadingWidth0,
-      horizontalTitleGap: horizontalTitleGap10,
-      //onTap: () => goFondo(context, destacado.cartera, destacado.fondo),
-      //selected: true,
-      //selectedColor: Colors.white,
-      leading: Icon(icon, color: blue900),
-      title: InkWell(
-        onTap: () => goFondo(context, destacado.cartera, destacado.fondo),
-        child: Text(
-          destacado.fondo.name,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-          style: const TextStyle(
-            decoration: TextDecoration.underline,
-            decorationColor: blue,
-            color: Colors.transparent,
-            shadows: [Shadow(offset: Offset(0, -4), color: Colors.black)],
-          ),
-        ),
-      ),
-      subtitle: Row(
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.business_center),
-          const SizedBox(width: 4),
+          Icon(icon, color: blue900),
+          const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              destacado.cartera.name,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                    onTap: () =>
+                        goFondo(context, destacado.cartera, destacado.fondo),
+                    child: Text(
+                      destacado.fondo.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        decoration: TextDecoration.underline,
+                        decorationColor: blue,
+                        color: Colors.transparent,
+                        shadows: [
+                          Shadow(
+                            offset: Offset(0, -4),
+                            color: Colors.black,
+                          )
+                        ],
+                      ),
+                    )),
+                Row(
+                  children: [
+                    const Icon(Icons.business_center, color: Colors.black54),
+                    const SizedBox(width: 4),
+                    Text(destacado.cartera.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Colors.black54)),
+                  ],
+                ),
+              ],
             ),
           ),
+          const SizedBox(width: 10),
+          Text(
+            NumberUtil.percentCompact(destacado.tae),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 16, color: textRedGreen(destacado.tae)),
+          ),
         ],
-      ),
-      trailing: Container(
-        constraints: const BoxConstraints(maxWidth: trailingMaxWidth80),
-        child: Text(
-          NumberUtil.percentCompact(destacado.tae),
-          //'123%',
-          //'1234%5678%9123456789',
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-          style: TextStyle(color: textRedGreen(destacado.tae)),
-        ),
       ),
     );
   }

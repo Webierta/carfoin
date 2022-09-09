@@ -135,7 +135,8 @@ class PageGlobal extends StatelessWidget {
                   ),
                 )
               : Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   child: ListView(
                     //padding: EdgeInsets.fromLTRB(0, 30, 0, 30),
                     children: [
@@ -165,12 +166,14 @@ class PageGlobal extends StatelessWidget {
                           ),
                         ],
                       ),
-                      Container(
-                        padding: const EdgeInsets.all(0),
-                        width: MediaQuery.of(context).size.width * 0.95,
-                        height: MediaQuery.of(context).size.width * 0.95 * 0.65,
-                        child: PieChartGlobal(carteras: carteras),
-                      ),
+                      if (nFondos > 0)
+                        Container(
+                          padding: const EdgeInsets.all(0),
+                          width: MediaQuery.of(context).size.width * 0.95,
+                          height:
+                              MediaQuery.of(context).size.width * 0.95 * 0.65,
+                          child: PieChartGlobal(carteras: carteras),
+                        ),
                       /*ListTile(
                         minLeadingWidth: minLeadingWidth0,
                         horizontalTitleGap: horizontalTitleGap10,
@@ -262,6 +265,6 @@ class LineDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Divider(
-        color: gris, height: 0, thickness: 0.5, indent: 20, endIndent: 20);
+        color: gris, height: 0, thickness: 0.5, indent: 8, endIndent: 8);
   }
 }
