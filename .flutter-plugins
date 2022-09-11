@@ -1,7 +1,11 @@
 # This is a generated file; do not edit or check into version control.
 file_picker=/home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/file_picker-5.0.1/
 flutter_plugin_android_lifecycle=/home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_plugin_android_lifecycle-2.0.7/
+path_provider=/home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider-2.0.11/
+path_provider_android=/home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_android-2.0.20/
+path_provider_ios=/home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_ios-2.0.11/
 path_provider_linux=/home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_linux-2.1.7/
+path_provider_macos=/home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_macos-2.0.6/
 path_provider_windows=/home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_windows-2.1.0/
 permission_handler=/home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/permission_handler-9.2.0/
 permission_handler_android=/home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/permission_handler_android-9.0.2+1/

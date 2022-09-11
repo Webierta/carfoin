@@ -5,91 +5,50 @@ import 'package:provider/provider.dart';
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
 import '../router/routes_const.dart';
-import '../utils/stats.dart';
+import '../services/preferences_service.dart';
+import '../utils/konstantes.dart';
+import '../utils/stats_global.dart';
 import '../utils/styles.dart';
 import '../widgets/my_drawer.dart';
 import '../widgets/subglobal/listtile_capital.dart';
 import '../widgets/subglobal/listtile_destacado.dart';
 import '../widgets/subglobal/listtile_lastop.dart';
-import '../widgets/subglobal/models.dart';
 import '../widgets/subglobal/pie_chart_global.dart';
 
-class PageGlobal extends StatelessWidget {
+class PageGlobal extends StatefulWidget {
   const PageGlobal({Key? key}) : super(key: key);
+
+  @override
+  State<PageGlobal> createState() => _PageGlobalState();
+}
+
+class _PageGlobalState extends State<PageGlobal> {
+  var criterioPie = CriterioPie.Fondos;
+  double _rateExchange = 0.0;
+  late StatsGlobal _statsGlobal; // = StatsGlobal(rateExchange: 0.0);
+
+  getRateExchangePref() async {
+    double? rateExchange;
+    await PreferencesService.getRateExchange(keyRateExchange)
+        .then((value) => rateExchange = value);
+    setState(() => _rateExchange = rateExchange ?? 0.0);
+  }
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await getRateExchangePref();
+      //_statsGlobal = StatsGlobal(rateExchange: _rateExchange);
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     CarteraProvider carteraProvider = context.read<CarteraProvider>();
     final List<Cartera> carteras = carteraProvider.carteras;
-    int nFondos = 0;
-    List<Destacado> destacados = [];
-    List<LastOp> lastOps = [];
-
-    double inversionGlobalEur = 0.0;
-    double inversionGlobalUsd = 0.0;
-    double inversionGlobalOtra = 0.0;
-    double valorGlobalEur = 0.0;
-    double valorGlobalUsd = 0.0;
-    double valorGlobalOtra = 0.0;
-    double balanceGlobalEur = 0.0;
-    double balanceGlobalUsd = 0.0;
-    double balanceGlobalOtra = 0.0;
-
-    calcularGlobal() {
-      for (var cartera in carteras) {
-        List<Fondo> fondos = cartera.fondos ?? [];
-        nFondos += fondos.length;
-        if (fondos.isNotEmpty) {
-          for (var fondo in fondos) {
-            if (fondo.valores != null && fondo.valores!.isNotEmpty) {
-              Stats stats = Stats(fondo.valores!);
-              double participacionesFondo = stats.totalParticipaciones() ?? 0.0;
-              if (participacionesFondo > 0) {
-                double? twr = stats.twr();
-                if (twr != null) {
-                  destacados.add(Destacado(
-                      cartera: cartera,
-                      fondo: fondo,
-                      tae: stats.anualizar(twr)!));
-                }
-                List<Valor>? operaciones = fondo.valores
-                    ?.where((v) => v.tipo == 1 || v.tipo == 0)
-                    .toList();
-                if (operaciones != null && operaciones.isNotEmpty) {
-                  // ORDENAR OPERACIONES POR DATE ??
-                  var lastOp = operaciones.first;
-                  lastOps.add(
-                      LastOp(cartera: cartera, fondo: fondo, valor: lastOp));
-                  if (operaciones.length > 1) {
-                    //var lastOp2 = operaciones[operaciones.length - 2];
-                    var lastOp2 = operaciones[1];
-                    lastOps.add(
-                        LastOp(cartera: cartera, fondo: fondo, valor: lastOp2));
-                  }
-                }
-                if (fondo.divisa == 'EUR') {
-                  inversionGlobalEur += stats.inversion() ?? 0.0;
-                  valorGlobalEur += stats.resultado() ?? 0.0;
-                  balanceGlobalEur += stats.balance() ?? 0.0;
-                } else if (fondo.divisa == 'USD') {
-                  inversionGlobalUsd += stats.inversion() ?? 0.0;
-                  valorGlobalUsd += stats.resultado() ?? 0.0;
-                  balanceGlobalUsd += stats.balance() ?? 0.0;
-                } else {
-                  inversionGlobalOtra += stats.inversion() ?? 0.0;
-                  valorGlobalOtra += stats.resultado() ?? 0.0;
-                  balanceGlobalOtra += stats.balance() ?? 0.0;
-                }
-              }
-            }
-          }
-        }
-      }
-      destacados.sort((a, b) => a.tae.compareTo(b.tae));
-      lastOps.sort((a, b) => a.valor.date.compareTo(b.valor.date));
-    }
-
-    calcularGlobal();
+    _statsGlobal = StatsGlobal(rateExchange: _rateExchange);
+    _statsGlobal.calcular(carteras);
 
     /*_goCartera(BuildContext context, Cartera cartera) {
       ScaffoldMessenger.of(context).removeCurrentSnackBar();
@@ -161,61 +120,57 @@ class PageGlobal extends StatelessWidget {
                               Icons.assessment,
                               color: blue900,
                             ),
-                            label: Text('$nFondos Fondos'),
+                            label: Text('${_statsGlobal.nFondos} Fondos'),
                             labelStyle: const TextStyle(fontSize: 16),
                           ),
                         ],
                       ),
-                      if (nFondos > 0)
-                        Container(
-                          padding: const EdgeInsets.all(0),
-                          width: MediaQuery.of(context).size.width * 0.95,
-                          height:
-                              MediaQuery.of(context).size.width * 0.95 * 0.65,
-                          child: PieChartGlobal(carteras: carteras),
+                      if (_statsGlobal.nFondos > 0)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'Peso relativo de las Carteras: ',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            const SizedBox(width: 10),
+                            DropdownButton<CriterioPie>(
+                              value: criterioPie,
+                              onChanged: (CriterioPie? value) {
+                                if (value! != criterioPie) {
+                                  setState(() => criterioPie = value);
+                                }
+                              },
+                              items: CriterioPie.values
+                                  .map((CriterioPie criterioPie) {
+                                return DropdownMenuItem<CriterioPie>(
+                                  value: criterioPie,
+                                  child: Text(
+                                    criterioPie.toString().split('.')[1],
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ],
                         ),
-                      /*ListTile(
-                        minLeadingWidth: minLeadingWidth0,
-                        horizontalTitleGap: horizontalTitleGap10,
-                        leading: const Icon(
-                          Icons.business_center,
-                          color: blue900,
+                      if (_statsGlobal.nFondos > 0)
+                        PieChartGlobal(
+                          carteras: carteras,
+                          criterioPie: criterioPie,
+                          rateExchange: _rateExchange,
+                          statsGlobal: _statsGlobal,
                         ),
-                        title: Text('${carteras.length} Carteras'),
-                      ),
-                      ListTile(
-                        minLeadingWidth: minLeadingWidth0,
-                        horizontalTitleGap: horizontalTitleGap10,
-                        leading: const Icon(Icons.assessment, color: blue900),
-                        title: Text('$nFondos Fondos'),
-                      ),*/
                       const LineDivider(),
                       const SizedBox(height: 20),
                       const Text('CAPITAL: VALOR / INVERSIÓN'),
-                      if (inversionGlobalEur > 0)
+                      if (_statsGlobal.inversionGlobal > 0)
                         ListTileCapital(
-                            inversion: inversionGlobalEur,
-                            capital: valorGlobalEur,
-                            balance: balanceGlobalEur,
-                            divisa: '€',
-                            icon: Icons.euro),
-                      if (inversionGlobalUsd > 0)
-                        ListTileCapital(
-                            inversion: inversionGlobalUsd,
-                            capital: valorGlobalUsd,
-                            balance: balanceGlobalUsd,
-                            divisa: '\$',
-                            icon: Icons.attach_money),
-                      if (inversionGlobalOtra > 0)
-                        ListTileCapital(
-                            inversion: inversionGlobalOtra,
-                            capital: valorGlobalOtra,
-                            balance: balanceGlobalOtra,
-                            divisa: '',
-                            icon: Icons.payments),
-                      if (inversionGlobalEur == 0.0 &&
-                          inversionGlobalUsd == 0.0 &&
-                          inversionGlobalOtra == 0.0)
+                          inversion: _statsGlobal.inversionGlobal,
+                          capital: _statsGlobal.valorGlobal,
+                          balance: _statsGlobal.balanceGlobal,
+                        ),
+                      if (_statsGlobal.inversionGlobal == 0)
                         const Padding(
                             padding: EdgeInsets.all(10),
                             child:
@@ -223,30 +178,33 @@ class PageGlobal extends StatelessWidget {
                       const LineDivider(),
                       const SizedBox(height: 20),
                       const Text('FONDOS DESTACADOS (TAE)'),
-                      if (destacados.isNotEmpty && destacados.length > 1)
+                      if (_statsGlobal.destacados.isNotEmpty)
                         ListTileDestacado(
-                            destacado: destacados.last,
+                            destacado: _statsGlobal.destacados.last,
                             icon: Icons.stars,
                             goFondo: _goFondo),
-                      if (destacados.isNotEmpty && destacados.length > 1)
+                      if (_statsGlobal.destacados.length > 1)
                         ListTileDestacado(
-                            destacado: destacados.first,
+                            destacado: _statsGlobal.destacados.first,
                             icon: Icons.warning,
                             goFondo: _goFondo),
-                      if (destacados.isEmpty || destacados.length < 2)
+                      if (_statsGlobal.destacados.isEmpty)
                         const Padding(
                             padding: EdgeInsets.all(10.0),
                             child: Text('Nada que destacar')),
                       const LineDivider(),
                       const SizedBox(height: 20),
                       const Text('ÚLTIMAS OPERACIONES'),
-                      if (lastOps.isNotEmpty)
-                        ListTileLastOp(lastOp: lastOps.last, goFondo: _goFondo),
-                      if (lastOps.isNotEmpty && lastOps.length > 1)
+                      if (_statsGlobal.lastOps.isNotEmpty)
                         ListTileLastOp(
-                            lastOp: lastOps[lastOps.length - 2],
+                            lastOp: _statsGlobal.lastOps.last,
                             goFondo: _goFondo),
-                      if (lastOps.isEmpty)
+                      if (_statsGlobal.lastOps.length > 1)
+                        ListTileLastOp(
+                            lastOp: _statsGlobal
+                                .lastOps[_statsGlobal.lastOps.length - 2],
+                            goFondo: _goFondo),
+                      if (_statsGlobal.lastOps.isEmpty)
                         const Padding(
                             padding: EdgeInsets.all(10.0),
                             child:

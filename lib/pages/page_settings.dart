@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../router/routes_const.dart';
+import '../services/exchange_api.dart';
 import '../services/preferences_service.dart';
+import '../utils/fecha_util.dart';
+import '../utils/konstantes.dart';
+import '../utils/number_util.dart';
 import '../utils/styles.dart';
 import '../widgets/my_drawer.dart';
+
+enum ResultStatus { pendiente, nuevo, viejo, error }
 
 class PageSettings extends StatefulWidget {
   const PageSettings({Key? key}) : super(key: key);
@@ -21,6 +27,11 @@ class _PageSettingsState extends State<PageSettings> {
   bool _isAutoUpdate = true;
   bool _isConfirmDelete = true;
 
+  bool _isAutoExchange = false;
+  int _dateExchange = dateExchangeInit;
+  double _rateExchange = rateExchangeInit;
+  bool onSyncExchange = false;
+
   getSharedPrefs() async {
     bool isCarterasByOrder = true;
     bool isViewDetalleCarteras = true;
@@ -29,6 +40,10 @@ class _PageSettingsState extends State<PageSettings> {
     bool isConfirmDeleteFondo = true;
     bool isAutoUpdate = true;
     bool isConfirmDelete = true;
+
+    bool isAutoExchange = false;
+    int? dateExchange;
+    double? rateExchange;
 
     await PreferencesService.getBool(keyByOrderCarterasPref)
         .then((value) => isCarterasByOrder = value);
@@ -44,6 +59,14 @@ class _PageSettingsState extends State<PageSettings> {
         .then((value) => isAutoUpdate = value);
     await PreferencesService.getBool(keyConfirmDeletePref)
         .then((value) => isConfirmDelete = value);
+
+    await PreferencesService.getBool(keyAutoExchangePref)
+        .then((value) => isAutoExchange = value);
+    await PreferencesService.getDateExchange(keyDateExchange)
+        .then((value) => dateExchange = value);
+    await PreferencesService.getRateExchange(keyRateExchange)
+        .then((value) => rateExchange = value);
+
     setState(() {
       _isCarterasByOrder = isCarterasByOrder;
       _isViewDetalleCarteras = isViewDetalleCarteras;
@@ -52,6 +75,10 @@ class _PageSettingsState extends State<PageSettings> {
       _isConfirmDeleteFondo = isConfirmDeleteFondo;
       _isAutoUpdate = isAutoUpdate;
       _isConfirmDelete = isConfirmDelete;
+
+      _isAutoExchange = isAutoExchange;
+      _dateExchange = dateExchange ?? _dateExchange;
+      _rateExchange = rateExchange ?? _rateExchange;
     });
   }
 
@@ -61,6 +88,35 @@ class _PageSettingsState extends State<PageSettings> {
       await getSharedPrefs();
     });
     super.initState();
+  }
+
+  syncExchange() async {
+    ResultStatus result = ResultStatus.pendiente;
+    Rate? exchangeApi = await ExchangeApi().latestRate();
+    if (exchangeApi != null) {
+      if (_dateExchange >= exchangeApi.date) {
+        result = ResultStatus.viejo;
+      } else {
+        result = ResultStatus.nuevo;
+        setState(() {
+          _dateExchange = exchangeApi.date;
+          _rateExchange = exchangeApi.rate;
+        });
+        await PreferencesService.saveDateExchange(
+            keyDateExchange, _dateExchange);
+        await PreferencesService.saveRateExchange(
+            keyRateExchange, _rateExchange);
+      }
+    } else {
+      result = ResultStatus.error;
+    }
+    if (result == ResultStatus.nuevo) {
+      _showMsg(msg: 'Cotización actualizada');
+    } else if (result == ResultStatus.viejo) {
+      _showMsg(msg: 'No se requiere actualización');
+    } else if (result == ResultStatus.error) {
+      _showMsg(msg: 'Servicio no disponible', color: Colors.red);
+    }
   }
 
   @override
@@ -87,6 +143,69 @@ class _PageSettingsState extends State<PageSettings> {
           body: ListView(
             padding: const EdgeInsets.symmetric(vertical: 10),
             children: [
+              const Padding(
+                padding: EdgeInsets.only(left: 20),
+                child: Text('GENERAL'),
+              ),
+              ListTile(
+                dense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                leading: const Icon(Icons.currency_exchange, color: blue900),
+                title: const Text('Cotización USD EUR'),
+                subtitle: const Text(
+                    'Actualiza el tipo de cambio para combinar importes en euros '
+                    'de carteras con distintas divisas (si la cartera no tiene '
+                    'moneda definida se presupone en euros)'),
+                trailing: onSyncExchange
+                    ? const CircularProgressIndicator()
+                    : OutlinedButton(
+                        onPressed: () async {
+                          setState(() => onSyncExchange = true);
+                          await syncExchange();
+                          setState(() => onSyncExchange = false);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          side: const BorderSide(color: blue, width: 2),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              FechaUtil.epochToString(_dateExchange),
+                              style: const TextStyle(
+                                  fontSize: 10, color: Colors.black),
+                            ),
+                            FittedBox(
+                              fit: BoxFit.fill,
+                              child: Text(
+                                NumberUtil.decimalFixed(_rateExchange,
+                                    decimals: 3),
+                                //style: const TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+              ),
+              ListTile(
+                dense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                leading: const Icon(Icons.update, color: blue900),
+                title: const Text('Actualización automática'),
+                subtitle: const Text('El tipo de cambio se actualiza '
+                    'cuando se inicia la aplicación si hace más de un '
+                    'día desde la cotización almacenada'),
+                trailing: Switch(
+                  value: _isAutoExchange,
+                  onChanged: (value) {
+                    setState(() => _isAutoExchange = value);
+                    PreferencesService.saveBool(
+                        keyAutoExchangePref, _isAutoExchange);
+                  },
+                ),
+              ),
+              const Divider(color: gris, height: 30, indent: 20, endIndent: 20),
               const Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text('CARTERAS'),
@@ -223,4 +342,9 @@ class _PageSettingsState extends State<PageSettings> {
       ),
     );
   }
+
+  void _showMsg({required String msg, MaterialColor color = Colors.grey}) =>
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(msg), backgroundColor: color),
+      );
 }

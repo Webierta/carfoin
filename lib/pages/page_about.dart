@@ -98,6 +98,10 @@ Los únicos permisos que requiere esta App son:
 * Acceso a internet (básicamente para buscar fondos y actualizar sus valores).
 * Acceso al almacenamiento del dispositivo (para almacenar o rescatar copias de seguridad).
 
+Esta aplicación usa una base de datos SQLite. Normalmente Android la cerrará cuando finalice la aplicación, pero si desea asegurarse de liberar recursos y cerrar la base de datos, cierre la aplicación desde la opción <<Salir>>.
+
+Además, si ha compartido alguna Cartera, se ha almacenado un archivo con extensión .cfi en el directorio temporal de la aplicación. Puede eliminarlo limpiando la caché de la aplicación desde los Ajustes de su dispositivo.
+
 ---
 
 ## Garantía, Seguridad y Privacidad

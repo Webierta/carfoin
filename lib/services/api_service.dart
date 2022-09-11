@@ -21,7 +21,6 @@ class ApiService {
       var response = await http.get(Uri.parse(url), headers: headers);
       //TODO: timeout
       //.timeout(const Duration(seconds: 10));
-      print(response.statusCode);
       if (response.body.contains('Access denied')) {
         // status = Status.accessDenied;
         //TODO: status Code == 200 pero sin resultados
@@ -44,7 +43,8 @@ class ApiService {
     return null;
   }
 
-  Future<List<DataApiRange>?>? getDataApiRange(String isin, String to, String from) async {
+  Future<List<DataApiRange>?>? getDataApiRange(
+      String isin, String to, String from) async {
     String urlRange = 'https://funds.p.rapidapi.com/v1/historicalPrices/';
     var url = '$urlRange$isin?to=$to&from=$from';
     Map<String, String> headers = {

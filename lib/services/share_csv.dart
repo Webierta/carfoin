@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../models/cartera.dart';
 
@@ -43,7 +43,21 @@ class ShareCsv {
   }
 
   static Future<File?> _storageFile(String csv, String nameCartera) async {
-    String filePath = '';
+    File? file;
+    try {
+      Directory? tempDir = await getTemporaryDirectory();
+      String tempPath = tempDir.path;
+      print(tempPath);
+      String nameFile = '${nameCartera.trim()}.cfi'; // csv
+      String filePath = '$tempPath/$nameFile';
+      file = File(filePath);
+      file.writeAsString(csv);
+    } catch (e) {
+      print(e);
+    }
+    return file;
+
+    /*String filePath = '';
     String nameFile = '${nameCartera.trim()}.cfi'; // csv
     if (await Permission.storage.request().isGranted) {
       try {
@@ -63,7 +77,7 @@ class ShareCsv {
         Permission.storage,
       ].request();
     }
-    return null;
+    return null;*/
   }
 
   static Future<File?> shareCartera(Cartera cartera) async {

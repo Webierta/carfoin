@@ -26,12 +26,12 @@ class NumberUtil {
   }
 
   static String decimalFixed(double number,
-      {bool long = true, double limit = limitUp}) {
+      {int decimals = 2, bool long = true, double limit = limitUp}) {
     if (!inLimit(number, limit)) {
       return long ? compactLongFixed(number) : compactFixed(number);
     }
     return NumberFormat.decimalPattern(locEs)
-        .format(double.parse(number.toStringAsFixed(2)));
+        .format(double.parse(number.toStringAsFixed(decimals)));
   }
 
   static String compactFixed(double number) {

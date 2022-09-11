@@ -141,6 +141,7 @@ class MyDrawer extends StatelessWidget {
                     leading: const Icon(Icons.exit_to_app, color: blue900),
                     title: const Text('Salir'),
                     onTap: () async {
+                      Navigator.of(context).pop();
                       DatabaseHelper database = DatabaseHelper();
                       await database.close();
                       SystemNavigator.pop();

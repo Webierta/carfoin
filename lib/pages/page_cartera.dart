@@ -16,6 +16,7 @@ import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../services/share_csv.dart';
+import '../utils/konstantes.dart';
 import '../utils/styles.dart';
 import '../utils/update_all.dart';
 import '../widgets/data_cartera.dart';
@@ -120,7 +121,7 @@ class _PageCarteraState extends State<PageCartera> {
     );
   }
 
-  _dialogConfirmShare(BuildContext context) async {
+  /*_dialogConfirmShare(BuildContext context) async {
     return showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -142,7 +143,7 @@ class _PageCarteraState extends State<PageCartera> {
         );
       },
     );
-  }
+  }*/
 
   _onShare(Cartera cartera, File file) async {
     final box = context.findRenderObject() as RenderBox?;
@@ -181,11 +182,8 @@ class _PageCarteraState extends State<PageCartera> {
                     const Icon(Icons.business_center),
                     const SizedBox(width: 10),
                     Flexible(
-                      child: Text(
-                        carteraSelect.name,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
+                      child: Text(carteraSelect.name,
+                          overflow: TextOverflow.ellipsis, maxLines: 1),
                     ),
                   ],
                 ),
@@ -194,20 +192,17 @@ class _PageCarteraState extends State<PageCartera> {
                     icon: const Icon(Icons.refresh),
                     onPressed: () async => await _dialogUpdateAll(context),
                   ),
-                  IconButton(
+                  /*IconButton(
                     icon: const Icon(Icons.share),
                     onPressed: () async {
-                      // TODO DIALOG:
-                      var confirmShare = await _dialogConfirmShare(context);
-                      if (confirmShare) {
-                        var shareCartera =
-                            await ShareCsv.shareCartera(carteraSelect);
-                        if (shareCartera != null) {
-                          _onShare(carteraSelect, shareCartera);
-                        }
+                      //var confirmShare = await _dialogConfirmShare(context);
+                      var shareCartera =
+                          await ShareCsv.shareCartera(carteraSelect);
+                      if (shareCartera != null) {
+                        _onShare(carteraSelect, shareCartera);
                       }
                     },
-                  ),
+                  ),*/
                   PopupMenuButton(
                     color: blue,
                     offset: Offset(0.0, AppBar().preferredSize.height),
@@ -220,12 +215,18 @@ class _PageCarteraState extends State<PageCartera> {
                         Icons.sort_by_alpha,
                         isOrder: _isFondosByOrder,
                       ),
-                      //buildMenuItem(MenuCartera.compartir, Icons.share),
+                      buildMenuItem(MenuCartera.compartir, Icons.share),
                       buildMenuItem(MenuCartera.eliminar, Icons.delete_forever)
                     ],
                     onSelected: (item) async {
                       if (item == MenuCartera.ordenar) {
                         _ordenarFondos();
+                      } else if (item == MenuCartera.compartir) {
+                        var shareCartera =
+                            await ShareCsv.shareCartera(carteraSelect);
+                        if (shareCartera != null) {
+                          _onShare(carteraSelect, shareCartera);
+                        }
                       } else if (item == MenuCartera.eliminar) {
                         _deleteAllConfirm(context);
                       }

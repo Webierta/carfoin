@@ -8,6 +8,7 @@ import '../../router/routes_const.dart';
 import '../../services/database_helper.dart';
 import '../../services/preferences_service.dart';
 import '../../utils/fecha_util.dart';
+import '../../utils/konstantes.dart';
 import '../../utils/number_util.dart';
 import '../../utils/stats.dart';
 import '../../utils/styles.dart';
@@ -538,7 +539,7 @@ class _MainFondoState extends State<MainFondo> {
                         backgroundColor: amber,
                         child: IconButton(
                           onPressed: () => context.go(infoBalancePage),
-                          icon: const Icon(Icons.info_outline, color: blue),
+                          icon: const Icon(Icons.info_outline, color: blue900),
                         ),
                       ),
                     ),

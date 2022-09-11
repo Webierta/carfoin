@@ -300,7 +300,6 @@ class _PageFondoState extends State<PageFondo>
         for (var dataApi in getDateApiRange) {
           /// TEST EPOCH HMS
           var date = FechaUtil.epochToEpochHms(dataApi.epochSecs);
-
           newListValores.add(Valor(date: date, precio: dataApi.price));
         }
         for (var valor in newListValores) {

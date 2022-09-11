@@ -10,9 +10,12 @@ import '../models/cartera_provider.dart';
 import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
+import '../services/exchange_api.dart';
 import '../services/preferences_service.dart';
 import '../services/share_csv.dart';
+import '../utils/fecha_util.dart';
 import '../utils/file_util.dart';
+import '../utils/konstantes.dart';
 import '../utils/styles.dart';
 import '../utils/update_all.dart';
 import '../widgets/loading_progress.dart';
@@ -28,6 +31,9 @@ class PageHome extends StatefulWidget {
 }
 
 class _PageHomeState extends State<PageHome> {
+  bool _isAutoExchange = false;
+  int _dateExchange = dateExchangeInit;
+
   bool _isCarterasByOrder = true;
   bool _isViewDetalleCarteras = true;
   bool _isFondosByOrder = true;
@@ -47,6 +53,9 @@ class _PageHomeState extends State<PageHome> {
     bool? isFondosByOrder;
     bool? isConfirmDeleteCartera;
     bool? isViewDetalleCarteras;
+    bool? isAutoExchange;
+    int? dateExchange;
+
     await PreferencesService.getBool(keyByOrderCarterasPref)
         .then((value) => isCarterasByOrder = value);
     await PreferencesService.getBool(keyViewCarterasPref)
@@ -55,12 +64,26 @@ class _PageHomeState extends State<PageHome> {
         .then((value) => isFondosByOrder = value);
     await PreferencesService.getBool(keyConfirmDeleteCarteraPref)
         .then((value) => isConfirmDeleteCartera = value);
+    await PreferencesService.getBool(keyAutoExchangePref)
+        .then((value) => isAutoExchange = value);
+    await PreferencesService.getDateExchange(keyDateExchange)
+        .then((value) => dateExchange = value);
     setState(() {
       _isCarterasByOrder = isCarterasByOrder ?? true;
       _isViewDetalleCarteras = isViewDetalleCarteras ?? true;
       _isFondosByOrder = isFondosByOrder ?? true;
       _isConfirmDeleteCartera = isConfirmDeleteCartera ?? true;
+      _isAutoExchange = isAutoExchange ?? false;
+      _dateExchange = dateExchange ?? _dateExchange;
     });
+
+    DateTime now = DateTime.now();
+    DateTime dateRate = FechaUtil.epochToDate(_dateExchange);
+    int difDays = now.difference(dateRate).inDays;
+    if (_isAutoExchange && difDays > 1) {
+      print('AUTO EXCHANGE');
+      await syncExchange();
+    }
   }
 
   setCarteras() async {
@@ -93,6 +116,19 @@ class _PageHomeState extends State<PageHome> {
       SchedulerBinding.instance.addPostFrameCallback((_) {
         context.go(errorPage);
       });
+    }
+  }
+
+  syncExchange() async {
+    Rate? exchangeApi = await ExchangeApi().latestRate();
+    if (exchangeApi != null) {
+      if (_dateExchange < exchangeApi.date) {
+        setState(() => _dateExchange = exchangeApi.date);
+        await PreferencesService.saveDateExchange(
+            keyDateExchange, exchangeApi.date);
+        await PreferencesService.saveRateExchange(
+            keyRateExchange, exchangeApi.rate);
+      }
     }
   }
 
@@ -149,6 +185,13 @@ class _PageHomeState extends State<PageHome> {
                   appBar: AppBar(
                     title: const Text('Carteras'),
                     actions: [
+                      /*IconButton(
+                        icon: const Icon(Icons.currency_exchange),
+                        onPressed: () async {
+                          var exchangeApi = await ExchangeApi().latestRate();
+                          print(exchangeApi?.rate);
+                        },
+                      ),*/
                       IconButton(
                         icon: const Icon(Icons.refresh),
                         onPressed: () async => await _dialogUpdateAll(context),
@@ -224,18 +267,19 @@ class _PageHomeState extends State<PageHome> {
                           }
                           //await database.getNamesTables();
                           setState(() => cargandoShare = true);
-                          Cartera? loadCartera =
-                              await ShareCsv.loadCartera(index)
-                                  .then((Cartera? value) async {
+                          await ShareCsv.loadCartera(index)
+                              .then((Cartera? value) async {
                             if (value != null) {
                               await _loadCartera(value);
                             } else {
-                              _showMsg(
-                                  msg: 'Proceso abortado', color: Colors.red);
+                              _showMsg(msg: 'Proceso desestimado');
                             }
                           }).catchError((onError) {
                             _showMsg(
-                                msg: 'Proceso abortado', color: Colors.red);
+                              msg:
+                                  'Error en el proceso de carga de la cartera compartida',
+                              color: Colors.red,
+                            );
                           }).whenComplete(() {
                             setState(() => cargandoShare = false);
                           });

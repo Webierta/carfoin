@@ -110,7 +110,7 @@ class DatabaseHelper {
 
   close() async {
     Database db = await database;
-    await database.close();
+    await db.close();
   }
 
   dropTable(String nameTable) async {
@@ -212,7 +212,6 @@ class DatabaseHelper {
   Future<List<Fondo>> getFondos(Cartera cartera, {bool byOrder = false}) async {
     Database db = await database;
     var nameTable = '_${cartera.id}';
-
     final List<Map<String, dynamic>> query = byOrder
         ? await db.query(nameTable, orderBy: '$columnNameFondo ASC')
         : await db.query(nameTable);

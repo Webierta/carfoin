@@ -176,12 +176,16 @@ class DataCartera extends StatelessWidget {
               if (_inversion != null &&
                   _resultado != null &&
                   _balance != null &&
-                  _tae != null)
+                  _tae != null &&
+                  valores != null &&
+                  valores.isNotEmpty)
                 StepperBalance(
                   input: _inversion,
                   output: _resultado,
                   balance: _balance,
                   divisa: symbolDivisa,
+                  firstDate: valores.reversed.first.date,
+                  lastDate: valores.reversed.last.date,
                   //tae: _tae,
                 ),
               if (_tae != null)

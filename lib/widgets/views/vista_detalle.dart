@@ -34,6 +34,9 @@ class VistaDetalle extends StatelessWidget {
     double rendimientoCarteraUsd = 0.0;
     double rendimientoCarteraOtra = 0.0;
 
+    int firstDate = 0;
+    int lastDate = 0;
+
     bool isTrueInversionCarteraEur = false;
     bool isTrueInversionCarteraUsd = false;
     bool isTrueInversionCarteraOtra = false;
@@ -45,8 +48,12 @@ class VistaDetalle extends StatelessWidget {
     bool isTrueRendCarteraOtra = false;
 
     if (fondos.isNotEmpty) {
+      List<int> firstDates = [];
+      List<int> lastDates = [];
       for (var fondo in fondos) {
         if (fondo.valores != null && fondo.valores!.isNotEmpty) {
+          firstDates.add(fondo.valores!.reversed.first.date);
+          lastDates.add(fondo.valores!.reversed.last.date);
           Stats stats = Stats(fondo.valores!);
           double participacionesFondo = stats.totalParticipaciones() ?? 0.0;
           if (participacionesFondo > 0) {
@@ -92,6 +99,12 @@ class VistaDetalle extends StatelessWidget {
             }
           }
         }
+      }
+      firstDates.sort();
+      lastDates.sort();
+      if (firstDates.isNotEmpty && lastDates.isNotEmpty) {
+        firstDate = firstDates.first;
+        lastDate = lastDates.last;
       }
     }
 
@@ -240,6 +253,8 @@ class VistaDetalle extends StatelessWidget {
                   output: capitalCarteraEur,
                   balance: rendimientoCarteraEur,
                   divisa: '€',
+                  firstDate: firstDate,
+                  lastDate: lastDate,
                 ),
               if (isTrueDivisaUsd()) const SizedBox(height: 10),
               if (isTrueDivisaUsd())
@@ -248,6 +263,8 @@ class VistaDetalle extends StatelessWidget {
                   output: capitalCarteraUsd,
                   balance: rendimientoCarteraUsd,
                   divisa: '\$',
+                  firstDate: firstDate,
+                  lastDate: lastDate,
                 ),
               if (isTrueDivisaOtra()) const SizedBox(height: 10),
               if (isTrueDivisaOtra())
@@ -256,6 +273,8 @@ class VistaDetalle extends StatelessWidget {
                   output: capitalCarteraOtra,
                   balance: rendimientoCarteraOtra,
                   divisa: '',
+                  firstDate: firstDate,
+                  lastDate: lastDate,
                 ),
               const SizedBox(height: 10),
             ],
