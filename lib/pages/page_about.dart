@@ -93,14 +93,16 @@ Esta App utiliza la API *Funds by rpi4g* para obtener información de los mercad
 
 Por tanto, esta aplicación requiere conexión a internet para recabar la información y depende de la disponibilidad de ese servidor y de la funcionalidad de esa API. Esta aplicación no tiene ninguna vinculación oficial con Financial Times.
 
+Además, la aplicación obtiene la cotización del Dólar a través de Frankfurter, una API de código abierto para tipos de cambio de divisas publicados por el Banco Central Europeo. Los datos se actualizan todos los días laborables en torno a las 16:00 CET. Esto se utiliza para combinar importes en euros de carteras con distintas divisas (si la cartera no tiene moneda definida se presupone en euros).
+
 Los únicos permisos que requiere esta App son:
 
-* Acceso a internet (básicamente para buscar fondos y actualizar sus valores).
-* Acceso al almacenamiento del dispositivo (para almacenar o rescatar copias de seguridad).
+* Acceso a internet (básicamente para buscar fondos y actualizar sus valores; también para actualizar la cotización del dólar).
+* Acceso al almacenamiento del dispositivo (para almacenar o rescatar copias de seguridad). Algunas versiones de Android no otorgan permiso para acceder al almacenamiento externo de la tarjeta SD.
 
 Esta aplicación usa una base de datos SQLite. Normalmente Android la cerrará cuando finalice la aplicación, pero si desea asegurarse de liberar recursos y cerrar la base de datos, cierre la aplicación desde la opción <<Salir>>.
 
-Además, si ha compartido alguna Cartera, se ha almacenado un archivo con extensión .cfi en el directorio temporal de la aplicación. Puede eliminarlo limpiando la caché de la aplicación desde los Ajustes de su dispositivo.
+Además, si ha compartido alguna Cartera, un archivo con extensión cfi (nombre-cartera.cfi) ha quedado almacenado en el directorio temporal de la aplicación. Puede eliminarlo limpiando la caché de la aplicación desde los Ajustes de su dispositivo.
 
 ---
 
@@ -110,13 +112,16 @@ Además, si ha compartido alguna Cartera, se ha almacenado un archivo con extens
 
 No puede garantizarse que el contenido ofrecido esté libre de errores, ya sean errores en el servidor origen de los datos, en el proceso de acceso a los datos o en su tratamiento, por lo que la información presentada no cuenta con ninguna garantía, ni explícita ni implícita. El usuario acepta expresamente conocer esta circunstancia. La utilización de la información obtenida por esta App se realiza por parte del usuario bajo su propia cuenta y riesgo, correspondiéndole en exclusiva a él responder frente a terceros por daños que pudieran derivarse de ella.
 
-El acceso, navegación y uso de los servicios webs de *Financial Times* (FT) derivados del uso de la API está sujeta a sus Términos y condiciones y puede implicar la aceptación de su Política de Privacidad y uso Cookies. En concreto, FT advierte que *All content on FT.com is for your general information and use only and is not intended to address your particular requirements. In particular, the content does not constitute any form of advice, recommendation, representation, endorsement or arrangement by FT and is not intended to be relied upon by users in making (or refraining from making) any specific investment or other decisions. Any information that you receive via FT.com is at best delayed intraday data and not "real time". Share price information may be rounded up/down and therefore not entirely accurate. FT is not responsible for any use of content by you outside its scope as stated in the FT Terms & Conditions*.
+El acceso, navegación y uso de los servicios webs de *Financial Times* (FT) derivados del uso de la API están sujetos a sus Términos y condiciones y puede implicar la aceptación de su Política de Privacidad y uso Cookies. En concreto, FT advierte que *All content on FT.com is for your general information and use only and is not intended to address your particular requirements. In particular, the content does not constitute any form of advice, recommendation, representation, endorsement or arrangement by FT and is not intended to be relied upon by users in making (or refraining from making) any specific investment or other decisions. Any information that you receive via FT.com is at best delayed intraday data and not "real time". Share price information may be rounded up/down and therefore not entirely accurate. FT is not responsible for any use of content by you outside its scope as stated in the FT Terms & Conditions*.
+
+Frankfurter website doesn't track you. Its content is licensed CC BY NC SA 4.0. 
 
 ---
 
 ## Reconocimientos
 
 * API Funds (v1) by rpi4g in RapidAPI.
+* Frankfurter currency conversion service.
 * Icono de la aplicación: Created by Freepik from [Flaticon](https://www.flaticon.com) (Flaticon License: Free for personal and commercial purpose with attribution).
 
 """;

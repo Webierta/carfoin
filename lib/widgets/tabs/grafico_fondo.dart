@@ -2,18 +2,43 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/cartera.dart';
 import '../../models/cartera_provider.dart';
 import '../../utils/fecha_util.dart';
 import '../../utils/number_util.dart';
 
-class GraficoFondo extends StatelessWidget {
+class GraficoFondo extends StatefulWidget {
   const GraficoFondo({Key? key}) : super(key: key);
+
+  @override
+  State<GraficoFondo> createState() => _GraficoFondoState();
+}
+
+const Map<String, int> filtroTemp = {
+  'Total': 0,
+  'Últimos 30 días': 30,
+  'Últimos 6 meses': 30 * 6,
+  'Último año': 365,
+  'Últimos 3 años': 365 * 3
+};
+
+class _GraficoFondoState extends State<GraficoFondo> {
+  int filtroTempSelect = filtroTemp.values.first;
 
   @override
   Widget build(BuildContext context) {
     final valores = context.watch<CarteraProvider>().valores;
-    final List<double> precios = valores.reversed.map((v) => v.precio).toList();
-    final List<int> fechas = valores.reversed.map((v) => v.date).toList();
+    List<Valor> valoresFilter = valores;
+    if (filtroTempSelect != 0) {
+      DateTime now = DateTime.now();
+      DateTime? lastTime;
+      lastTime = now.subtract(Duration(days: filtroTempSelect));
+      var lastEpoch = FechaUtil.dateToEpoch(lastTime);
+      valoresFilter = valores.where((v) => v.date > lastEpoch).toList();
+    }
+    final List<double> precios =
+        valoresFilter.reversed.map((v) => v.precio).toList();
+    final List<int> fechas = valoresFilter.reversed.map((v) => v.date).toList();
 
     double precioMedio = 0;
     double precioMax = 0;
@@ -22,19 +47,23 @@ class GraficoFondo extends StatelessWidget {
     String? fechaMin;
     int epochMax = 0; // int? nullable
     int epochMin = 0;
+    int timestamp = 0;
     if (precios.length > 1) {
       precioMedio = precios.reduce((a, b) => a + b) / precios.length;
       precioMax = precios.reduce((curr, next) => curr > next ? curr : next);
       precioMin = precios.reduce((curr, next) => curr < next ? curr : next);
       //fechaMax = _epochFormat(fechas[precios.indexOf(precioMax)]);
-      //fechaMin = _epochFormat(fechas[precios.indexOf(precioMin)]);
+      // fechaMin = _epochFormat(fechas[precios.indexOf(precioMin)]);
       fechaMax = FechaUtil.epochToString(fechas[precios.indexOf(precioMax)]);
       fechaMin = FechaUtil.epochToString(fechas[precios.indexOf(precioMin)]);
       epochMax = fechas[precios.indexOf(precioMax)];
       epochMin = fechas[precios.indexOf(precioMin)];
+      timestamp = FechaUtil.epochToDate(fechas.last)
+          .difference(FechaUtil.epochToDate(fechas.first))
+          .inDays;
     }
 
-    var mapData = {for (var valor in valores) valor.date: valor.precio};
+    var mapData = {for (var valor in valoresFilter) valor.date: valor.precio};
     final spots = <FlSpot>[
       for (final entry in mapData.entries)
         FlSpot(entry.key.toDouble(), entry.value)
@@ -120,7 +149,9 @@ class GraficoFondo extends StatelessWidget {
             //interval: 1650057221 / spots.length,
             //TODO: REVISAR INTERVALO OPTIMO
             //interval: (epochMax - epochMin) > 2592000 ? 22592000 : 2592000, // 1 mes
-            interval: 20000000,
+            //interval: 20000000,
+            //interval: (epochMax - epochMin) / spots.length,
+            interval: 2629743 * 6,
             //interval: (spots.last.x - spots.first.x),
             //interval: fechas.length / 2,
             getTitlesWidget: (double value, TitleMeta meta) {
@@ -206,21 +237,52 @@ class GraficoFondo extends StatelessWidget {
       ),
     );
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        padding: const EdgeInsets.only(top: 30, left: 5, right: 5, bottom: 10),
-        width: spots.length < 100
-            ? MediaQuery.of(context).size.width
-            : MediaQuery.of(context).size.height * 2,
-        child: spots.length > 1
-            ? LineChart(
-                lineChartData,
-                //swapAnimationDuration: const Duration(milliseconds: 2000),
-                //swapAnimationCurve: Curves.linear,
-              )
-            : const Center(child: Text('No hay suficientes datos')),
-      ),
+    return Column(
+      children: [
+        DropdownButton<int>(
+          isDense: true,
+          value: filtroTempSelect,
+          onChanged: (int? value) {
+            setState(() => filtroTempSelect = value ?? 0);
+          },
+          items: filtroTemp
+              .map((String txt, int value) => MapEntry(
+                  txt,
+                  DropdownMenuItem<int>(
+                    value: value,
+                    child: Text(txt),
+                  )))
+              .values
+              .toList(),
+        ),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(0),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                padding: const EdgeInsets.only(
+                    top: 30, left: 5, right: 5, bottom: 10),
+                /*width: spots.length < 100 && timestamp < 100
+                    //|| (filtroTempSelect != 0 && filtroTempSelect < 30 * 60)
+                    ? MediaQuery.of(context).size.width
+                    : MediaQuery.of(context).size.height * 2,*/
+                width: spots.length > 50 || timestamp > 30 * 3
+                    //|| (filtroTempSelect != 0 && filtroTempSelect > 364)
+                    ? MediaQuery.of(context).size.height * 2
+                    : MediaQuery.of(context).size.width,
+                child: spots.length > 1
+                    ? LineChart(
+                        lineChartData,
+                        //swapAnimationDuration: const Duration(milliseconds: 2000),
+                        //swapAnimationCurve: Curves.linear,
+                      )
+                    : const Center(child: Text('No hay suficientes datos')),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

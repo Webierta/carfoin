@@ -113,8 +113,10 @@ El programa muestra los valores en una tabla y en un gráfico, y además calcula
 * Permite crear múltiples Carteras personalizadas de Fondos de Inversión y seguir su evolución.
 * Verifica el código ISIN de los Fondos con el dígito de control.
 * Actualiza vía internet la última cotización o un intervalo de tiempo y archiva los valores liquidativos obtenidos.
-* Consulta la evolución de los valores guardados y muestra algunos índices estadísticos.
+* Presenta los datos mediante tablas y gráficos y calcula algunos índices estadísticos.  
 * Permite simular operaciones de suscripción y reembolso para seguir la evolución del capital invertido y su rentabilidad (TWR y MWR).
+* Vista resumida y gráfica de la posición global del portafolio.
+* Obtiene la cotización del Dólar para comparar carteras con distintas divisas.
 * Hace copias de seguridad del archivo principal del portafolio (base de datos SQLite3).
 * Permite compartir carteras con otros usuarios de la App (archivos con extensión cfi).
 * Próximamente más funciones...

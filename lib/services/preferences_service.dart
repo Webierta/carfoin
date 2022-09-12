@@ -10,8 +10,12 @@ class PreferencesService {
   static Future<bool> getBool(String key) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences.containsKey(key)) {
+      if (key == keyAutoExchangePref) {
+        return sharedPreferences.getBool(key) ?? false;
+      }
       return sharedPreferences.getBool(key) ?? true;
     }
+    if (key == keyAutoExchangePref) return false;
     return true;
   }
 

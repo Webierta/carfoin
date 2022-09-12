@@ -192,17 +192,6 @@ class _PageCarteraState extends State<PageCartera> {
                     icon: const Icon(Icons.refresh),
                     onPressed: () async => await _dialogUpdateAll(context),
                   ),
-                  /*IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: () async {
-                      //var confirmShare = await _dialogConfirmShare(context);
-                      var shareCartera =
-                          await ShareCsv.shareCartera(carteraSelect);
-                      if (shareCartera != null) {
-                        _onShare(carteraSelect, shareCartera);
-                      }
-                    },
-                  ),*/
                   PopupMenuButton(
                     color: blue,
                     offset: Offset(0.0, AppBar().preferredSize.height),

@@ -186,20 +186,22 @@ class BarChartBalance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<BarChartGroupData> barChartGroupDatas = [];
-    //List<double> importes = [];
     for (int i = 0; i < carteras.length; i++) {
       var cartera = carteras[i];
       var statsGlobalCartera = StatsGlobal(rateExchange: rateExchange);
       statsGlobalCartera.calcular([cartera]);
-      //importes.add(statsGlobalCartera.inversionGlobal);
-      //importes.add(statsGlobalCartera.valorGlobal);
+
       var bcgd = BarChartGroupData(
         x: i,
         barRods: [
           BarChartRodData(
-              toY: statsGlobalCartera.inversionGlobal, color: Colors.blue),
+            toY: statsGlobalCartera.inversionGlobal,
+            color: Colors.blue,
+            borderRadius: const BorderRadius.all(Radius.zero),
+          ),
           BarChartRodData(
             toY: statsGlobalCartera.valorGlobal,
+            borderRadius: const BorderRadius.all(Radius.zero),
             color: statsGlobalCartera.balanceGlobal > 0
                 ? Colors.green
                 : Colors.red,
@@ -208,8 +210,6 @@ class BarChartBalance extends StatelessWidget {
       );
       barChartGroupDatas.add(bcgd);
     }
-
-    //importes.sort();
 
     return Container(
       padding: const EdgeInsets.all(0),
@@ -235,7 +235,7 @@ class BarChartBalance extends StatelessWidget {
                 reservedSize: 20,
                 getTitlesWidget: (value, _) {
                   final index = value.toInt();
-                  return Text(carteras[index].name);
+                  return Text(carteras[index].name.substring(0, 3));
                 },
               ),
             ),

@@ -152,10 +152,7 @@ class _PageSettingsState extends State<PageSettings> {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 leading: const Icon(Icons.currency_exchange, color: blue900),
                 title: const Text('Cotización USD EUR'),
-                subtitle: const Text(
-                    'Actualiza el tipo de cambio para combinar importes en euros '
-                    'de carteras con distintas divisas (si la cartera no tiene '
-                    'moneda definida se presupone en euros)'),
+                subtitle: const Text('Pulsa para actualizar el tipo de cambio'),
                 trailing: onSyncExchange
                     ? const CircularProgressIndicator()
                     : OutlinedButton(
@@ -174,7 +171,9 @@ class _PageSettingsState extends State<PageSettings> {
                             Text(
                               FechaUtil.epochToString(_dateExchange),
                               style: const TextStyle(
-                                  fontSize: 10, color: Colors.black),
+                                fontSize: 10,
+                                color: Colors.black,
+                              ),
                             ),
                             FittedBox(
                               fit: BoxFit.fill,

@@ -1,7 +1,6 @@
-import 'package:carfoin/utils/stats.dart';
-
 import '../models/cartera.dart';
 import '../widgets/subglobal/models.dart';
+import 'stats.dart';
 
 class StatsGlobal {
   final double rateExchange;

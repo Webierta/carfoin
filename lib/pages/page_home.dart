@@ -81,7 +81,6 @@ class _PageHomeState extends State<PageHome> {
     DateTime dateRate = FechaUtil.epochToDate(_dateExchange);
     int difDays = now.difference(dateRate).inDays;
     if (_isAutoExchange && difDays > 1) {
-      print('AUTO EXCHANGE');
       await syncExchange();
     }
   }

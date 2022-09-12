@@ -78,7 +78,7 @@ class StepperBalance extends StatelessWidget {
               ),
               const Expanded(
                 child:
-                    Divider(thickness: 1, indent: 0, endIndent: 4, color: gris),
+                    Divider(thickness: 1, indent: 4, endIndent: 4, color: gris),
               ),
               //const Icon(Icons.last_page, color: gris),
               /*Container(
