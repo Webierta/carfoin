@@ -6,7 +6,7 @@ Aplicación para la gestión de múltiples Carteras de Fondos de Inversión. Per
 
 Permite operaciones simuladas de suscripción y reembolso para seguir la evolución del capital invertido y su rentabilidad. También presenta una visión global del portafolio y permite hacer copias de seguridad y compartir carteras con otros usuarios.
 
-Funciones:
+## Funciones:
 
 * Permite crear múltiples Carteras personalizadas de Fondos de Inversión y seguir su evolución.</li><li>Verifica el código ISIN de los Fondos con el dígito de control.
 * Actualiza vía internet la última cotización o un intervalo de tiempo y archiva los valores liquidativos obtenidos.
@@ -18,3 +18,14 @@ Funciones:
 * Permite compartir carteras con otros usuarios de la App.
 * Próximamente más funciones...
 
+![Screenshot](https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_1.png)
+
+![Screenshot](https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_2.png)
+
+![Screenshot](https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_3.png)
+
+![Screenshot](https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_4.png)
+
+![Screenshot](https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_5.png)
+
+![Screenshot](https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_6.png)
