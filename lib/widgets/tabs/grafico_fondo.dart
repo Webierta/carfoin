@@ -7,13 +7,6 @@ import '../../models/cartera_provider.dart';
 import '../../utils/fecha_util.dart';
 import '../../utils/number_util.dart';
 
-class GraficoFondo extends StatefulWidget {
-  const GraficoFondo({Key? key}) : super(key: key);
-
-  @override
-  State<GraficoFondo> createState() => _GraficoFondoState();
-}
-
 const Map<String, int> filtroTemp = {
   'Total': 0,
   'Últimos 30 días': 30,
@@ -21,6 +14,12 @@ const Map<String, int> filtroTemp = {
   'Último año': 365,
   'Últimos 3 años': 365 * 3
 };
+
+class GraficoFondo extends StatefulWidget {
+  const GraficoFondo({Key? key}) : super(key: key);
+  @override
+  State<GraficoFondo> createState() => _GraficoFondoState();
+}
 
 class _GraficoFondoState extends State<GraficoFondo> {
   int filtroTempSelect = filtroTemp.values.first;
@@ -69,6 +68,46 @@ class _GraficoFondoState extends State<GraficoFondo> {
         FlSpot(entry.key.toDouble(), entry.value)
     ];
 
+    List<VerticalLine> getVerticalLines() {
+      List<VerticalLine> verticalLines = [];
+      for (var valor in valoresFilter) {
+        if (valor.tipo == 0 || valor.tipo == 1) {
+          var color = valor.tipo == 0 ? Colors.red : Colors.green;
+          double date = valor.date.toDouble();
+          verticalLines.add(VerticalLine(
+            x: date,
+            color: color,
+            strokeWidth: 2,
+            dashArray: [2, 2],
+            label: VerticalLineLabel(
+              show: true,
+              alignment: Alignment.topRight,
+              style: const TextStyle(fontSize: 12),
+              labelResolver: (line) =>
+                  'Part: ${valor.participaciones}\nImporte: '
+                  '${NumberUtil.currency(valor.participaciones! * valor.precio)}',
+            ),
+          ));
+        }
+      }
+      return verticalLines;
+    }
+
+    getDotPainter(int index) {
+      if (valoresFilter[index].tipo == 0 || valoresFilter[index].tipo == 1) {
+        var color = valoresFilter[index].tipo == 0 ? Colors.red : Colors.green;
+        return FlDotSquarePainter(
+          size: 10,
+          color: color,
+          strokeWidth: 5,
+          strokeColor: Colors.blue[900],
+        );
+      }
+      return FlDotCirclePainter(
+        color: const Color(0xFF2196F3),
+      );
+    }
+
     final lineChartData = LineChartData(
       lineBarsData: [
         LineChartBarData(
@@ -76,7 +115,11 @@ class _GraficoFondoState extends State<GraficoFondo> {
           color: const Color(0xFF2196F3),
           barWidth: 2,
           isCurved: false,
-          dotData: FlDotData(show: true),
+          dotData: FlDotData(
+            show: true,
+            getDotPainter: (spot, percent, barData, index) =>
+                getDotPainter(index),
+          ),
           belowBarData: BarAreaData(show: true, color: const Color(0x802196F3)),
           // Colors.blue.withOpacity(0.5)),
         ),
@@ -174,6 +217,9 @@ class _GraficoFondoState extends State<GraficoFondo> {
         ),
       ),
       extraLinesData: ExtraLinesData(
+        verticalLines:
+            //VerticalLine(x: x),
+            getVerticalLines(),
         horizontalLines: [
           HorizontalLine(
             y: precioMedio,
