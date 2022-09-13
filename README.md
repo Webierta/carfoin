@@ -17,3 +17,4 @@ Funciones:
 * Hace copias de seguridad del archivo principal del portafolio (base de datos SQLite3).
 * Permite compartir carteras con otros usuarios de la App.
 * Próximamente más funciones...
+
