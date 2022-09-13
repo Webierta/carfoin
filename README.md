@@ -20,14 +20,4 @@ Permite operaciones simuladas de suscripción y reembolso para seguir la evoluci
 * Permite compartir carteras con otros usuarios de la App.
 * Próximamente más funciones...
 
-![Screenshot](https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_1.png)
-
-![Screenshot](https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_2.png)
-
-![Screenshot](https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_3.png)
-
-![Screenshot](https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_4.png)
-
-![Screenshot](https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_5.png)
-
-![Screenshot](https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_6.png)
+<img src="https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_1.png" width="200"> <img src="https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_2.png" width="200"> <img src="https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_3.png" width="200"> <img src="https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_4.png" width="200"> <img src="https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_5.png" width="200"> <img src="https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/phoneScreenshots/screenshot_6.png" width="200">
