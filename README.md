@@ -1,5 +1,7 @@
 # carfoin
 
+<img src="https://raw.githubusercontent.com/Webierta/carfoin/main/fastlane/metadata/en-US/images/icon.png" width="100">
+
 ## Gestor de Carteras de Fondos de Inversión
 
 Aplicación para la gestión de múltiples Carteras de Fondos de Inversión. Permite crear fácilmente Carteras personalizadas y seguir su evolución. Opera rápidamente con los Fondos para consultar, actualizar y archivar sus valores liquidativos.
