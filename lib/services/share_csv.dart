@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../models/cartera.dart';
+import '../models/logger.dart';
 
 class ShareCsv {
   const ShareCsv();
@@ -47,13 +48,21 @@ class ShareCsv {
     try {
       Directory? tempDir = await getTemporaryDirectory();
       String tempPath = tempDir.path;
-      print(tempPath);
       String nameFile = '${nameCartera.trim()}.cfi'; // csv
       String filePath = '$tempPath/$nameFile';
       file = File(filePath);
       file.writeAsString(csv);
-    } catch (e) {
-      print(e);
+    } catch (e, s) {
+      Logger.log(
+        dataLog: DataLog(
+          msg: 'Catch Storage File',
+          file: 'share_csv.dart',
+          clase: 'ShareCsv',
+          funcion: '_storageFile',
+          error: e,
+          stackTrace: s,
+        ),
+      );
     }
     return file;
 
@@ -171,5 +180,21 @@ class ShareCsv {
       //return dbCartera;
     }
     return null;
+  }
+
+  static Future<bool> clearCache() async {
+    //var appDir = (await getTemporaryDirectory()).path;
+    //Directory(appDir).delete(recursive: true);
+    try {
+      final cacheDir = await getTemporaryDirectory();
+      if (cacheDir.existsSync()) {
+        cacheDir.deleteSync(recursive: true);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      Logger.log(dataLog: DataLog(msg: 'Catch clear cache'));
+      return false;
+    }
   }
 }

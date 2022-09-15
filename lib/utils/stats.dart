@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import '../models/cartera.dart';
+import '../models/logger.dart';
 import 'fecha_util.dart';
 import 'xirr_calculator.dart';
 
@@ -346,16 +347,19 @@ class Stats {
     double? mwr;
     List<CashFlow> cashFlows = _getCashFlows();
     if (cashFlows.isNotEmpty && cashFlows.length > 1) {
-      print('CASHFLOWS');
-      for (var cf in cashFlows) {
-        print('${cf.importe} ${cf.date}');
-      }
       try {
         mwr = CalculationWrapper.xirr(cashFlows);
-        print(mwr?.toStringAsPrecision(6));
-        print('XIRR: $mwr');
-      } catch (e) {
-        print('ERROR XIRR: $e');
+      } catch (e, s) {
+        Logger.log(
+          dataLog: DataLog(
+            msg: 'Catch Calculation Wrapper Xirr CashFlows',
+            file: 'stats.dart',
+            clase: 'Stats',
+            funcion: 'mwr',
+            error: e,
+            stackTrace: s,
+          ),
+        );
         mwr = null;
       }
     }

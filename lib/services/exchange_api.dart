@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../models/logger.dart';
 import '../utils/fecha_util.dart';
 
 class Rate {
@@ -32,8 +33,17 @@ class ExchangeApi {
         var date = FechaUtil.dateToEpoch(dateTime);
         lastRate = Rate(date: date, rate: lastRateEUR);
       }
-    } catch (e) {
-      print(e.toString());
+    } catch (e, s) {
+      Logger.log(
+        dataLog: DataLog(
+          msg: 'Catch Response Frankfurter API',
+          file: 'exchange_api.dart',
+          clase: 'ExchangeApi',
+          funcion: 'latestRate',
+          error: e,
+          stackTrace: s,
+        ),
+      );
     }
     return lastRate;
   }

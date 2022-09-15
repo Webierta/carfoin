@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'models/cartera_provider.dart';
+import 'models/preferences_provider.dart';
 import 'router/app_router.dart';
 
 Future main() async {
@@ -12,7 +13,10 @@ Future main() async {
   await dotenv.load();
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => CarteraProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => CarteraProvider()),
+        Provider<PreferencesProvider>(create: (_) => PreferencesProvider()),
+      ],
       child: const MyApp(),
     ),
   );

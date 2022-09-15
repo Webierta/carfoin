@@ -252,44 +252,44 @@ class _MainFondoState extends State<MainFondo> {
       return '';
     }
 
-    double? _inversion;
-    double? _resultado;
-    double? _rendimiento;
-    double? _rentabilidad;
-    double? _rentAnual;
-    double? _twr;
-    double? _tae;
-    double? _mwr;
-    double? _mwrAcum;
+    double? inversion;
+    double? resultado;
+    double? rendimiento;
+    double? rentabilidad;
+    double? rentAnual;
+    double? twr;
+    double? tae;
+    double? mwr;
+    double? mwrAcum;
     if (operaciones.isNotEmpty) {
-      _inversion = stats.inversion();
-      _resultado = stats.resultado();
-      _rendimiento = stats.balance();
-      _rentabilidad = stats.rentabilidad();
-      if (_rentabilidad != null) {
-        _rentAnual = stats.anualizar(_rentabilidad);
+      inversion = stats.inversion();
+      resultado = stats.resultado();
+      rendimiento = stats.balance();
+      rentabilidad = stats.rentabilidad();
+      if (rentabilidad != null) {
+        rentAnual = stats.anualizar(rentabilidad);
       }
-      _twr = stats.twr();
-      if (_twr != null) {
-        _tae = stats.anualizar(_twr);
+      twr = stats.twr();
+      if (twr != null) {
+        tae = stats.anualizar(twr);
       }
-      _mwr = stats.mwr();
-      if (_mwr != null) {
-        _mwrAcum = stats.mwrAcum(_mwr);
+      mwr = stats.mwr();
+      if (mwr != null) {
+        mwrAcum = stats.mwrAcum(mwr);
       }
     }
 
     bool _allStatsIsNull() {
       List<double?> listStats = [
-        _inversion,
-        _resultado,
-        _rendimiento,
-        _rentabilidad,
-        _rentAnual,
-        _twr,
-        _tae,
-        _mwr,
-        _mwrAcum
+        inversion,
+        resultado,
+        rendimiento,
+        rentabilidad,
+        rentAnual,
+        twr,
+        tae,
+        mwr,
+        mwrAcum
       ];
       for (var st in listStats) {
         if (st != null) return false;
@@ -554,34 +554,34 @@ class _MainFondoState extends State<MainFondo> {
                         children: [
                           if (_allStatsIsNull())
                             const Text('Error en los cálculos'),
-                          if (_inversion != null)
+                          if (inversion != null)
                             RowBalance(
                               label: 'Inversión',
-                              data: NumberUtil.decimalFixed(_inversion,
+                              data: NumberUtil.decimalFixed(inversion,
                                   long: false),
                             ),
-                          if (_resultado != null) const SizedBox(height: 10),
-                          if (_resultado != null)
+                          if (resultado != null) const SizedBox(height: 10),
+                          if (resultado != null)
                             RowBalance(
                               label: 'Resultado',
-                              data: NumberUtil.decimalFixed(_resultado,
+                              data: NumberUtil.decimalFixed(resultado,
                                   long: false),
                             ),
-                          if (_rendimiento != null) const SizedBox(height: 10),
-                          if (_rendimiento != null)
+                          if (rendimiento != null) const SizedBox(height: 10),
+                          if (rendimiento != null)
                             RowBalance(
                               label: 'Rendimiento',
-                              data: NumberUtil.decimalFixed(_rendimiento,
+                              data: NumberUtil.decimalFixed(rendimiento,
                                   long: false),
-                              color: textRedGreen(_rendimiento),
+                              color: textRedGreen(rendimiento),
                             ),
-                          if (_rentabilidad != null ||
-                              _twr != null ||
-                              _mwrAcum != null)
+                          if (rentabilidad != null ||
+                              twr != null ||
+                              mwrAcum != null)
                             const SizedBox(height: 10),
-                          if (_rentabilidad != null ||
-                              _twr != null ||
-                              _mwrAcum != null)
+                          if (rentabilidad != null ||
+                              twr != null ||
+                              mwrAcum != null)
                             Row(
                               children: const [
                                 Expanded(
@@ -597,34 +597,30 @@ class _MainFondoState extends State<MainFondo> {
                                 )),
                               ],
                             ),
-                          if (_rentabilidad != null) const SizedBox(height: 10),
-                          if (_rentabilidad != null)
+                          if (rentabilidad != null) const SizedBox(height: 10),
+                          if (rentabilidad != null)
                             RowBalance(
                               label: 'Simple',
-                              data: NumberUtil.percentCompact(_rentabilidad),
-                              color: textRedGreen(_rentabilidad),
+                              data: NumberUtil.percentCompact(rentabilidad),
+                              color: textRedGreen(rentabilidad),
                             ),
-                          if (_twr != null) const SizedBox(height: 10),
-                          if (_twr != null)
+                          if (twr != null) const SizedBox(height: 10),
+                          if (twr != null)
                             RowBalance(
                               label: 'TWR',
-                              data: NumberUtil.percentCompact(_twr),
-                              color: textRedGreen(_twr),
+                              data: NumberUtil.percentCompact(twr),
+                              color: textRedGreen(twr),
                             ),
-                          if (_mwr != null) const SizedBox(height: 10),
-                          if (_mwrAcum != null)
+                          if (mwr != null) const SizedBox(height: 10),
+                          if (mwrAcum != null)
                             RowBalance(
                               label: 'MWR Acum.',
-                              data: NumberUtil.percentCompact(_mwrAcum),
-                              color: textRedGreen(_mwrAcum),
+                              data: NumberUtil.percentCompact(mwrAcum),
+                              color: textRedGreen(mwrAcum),
                             ),
-                          if (_rentAnual != null ||
-                              _tae != null ||
-                              _mwr != null)
+                          if (rentAnual != null || tae != null || mwr != null)
                             const SizedBox(height: 10),
-                          if (_rentAnual != null ||
-                              _tae != null ||
-                              _mwr != null)
+                          if (rentAnual != null || tae != null || mwr != null)
                             Row(
                               children: const [
                                 Expanded(
@@ -635,27 +631,27 @@ class _MainFondoState extends State<MainFondo> {
                                     child: Divider(indent: 10, thickness: 1)),
                               ],
                             ),
-                          if (_rentAnual != null) const SizedBox(height: 10),
-                          if (_rentAnual != null)
+                          if (rentAnual != null) const SizedBox(height: 10),
+                          if (rentAnual != null)
                             RowBalance(
                               label: 'Simple Anual',
-                              data: NumberUtil.percentCompact(_rentAnual),
-                              color: textRedGreen(_rentAnual),
+                              data: NumberUtil.percentCompact(rentAnual),
+                              color: textRedGreen(rentAnual),
                             ),
-                          if (_tae != null) const SizedBox(height: 10),
-                          if (_tae != null)
+                          if (tae != null) const SizedBox(height: 10),
+                          if (tae != null)
                             RowBalance(
                               label: 'TWR (TAE)',
-                              data: NumberUtil.percentCompact(_tae),
+                              data: NumberUtil.percentCompact(tae),
                               //data: NumberUtil.percentCompact(_tae),
-                              color: textRedGreen(_tae),
+                              color: textRedGreen(tae),
                             ),
-                          if (_mwr != null) const SizedBox(height: 10),
-                          if (_mwr != null)
+                          if (mwr != null) const SizedBox(height: 10),
+                          if (mwr != null)
                             RowBalance(
                               label: 'MWR',
-                              data: NumberUtil.percentCompact(_mwr),
-                              color: textRedGreen(_mwr),
+                              data: NumberUtil.percentCompact(mwr),
+                              color: textRedGreen(mwr),
                             ),
                         ],
                       ),

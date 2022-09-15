@@ -7,6 +7,7 @@ import 'package:restart_app/restart_app.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
+import '../models/preferences_provider.dart';
 import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
@@ -31,6 +32,7 @@ class PageHome extends StatefulWidget {
 }
 
 class _PageHomeState extends State<PageHome> {
+  bool _isStorageLogger = false;
   bool _isAutoExchange = false;
   int _dateExchange = dateExchangeInit;
 
@@ -55,6 +57,7 @@ class _PageHomeState extends State<PageHome> {
     bool? isViewDetalleCarteras;
     bool? isAutoExchange;
     int? dateExchange;
+    bool? isStorageLogger;
 
     await PreferencesService.getBool(keyByOrderCarterasPref)
         .then((value) => isCarterasByOrder = value);
@@ -68,6 +71,8 @@ class _PageHomeState extends State<PageHome> {
         .then((value) => isAutoExchange = value);
     await PreferencesService.getDateExchange(keyDateExchange)
         .then((value) => dateExchange = value);
+    await PreferencesService.getBool(keyStorageLoggerPref)
+        .then((value) => isStorageLogger = value);
     setState(() {
       _isCarterasByOrder = isCarterasByOrder ?? true;
       _isViewDetalleCarteras = isViewDetalleCarteras ?? true;
@@ -75,6 +80,7 @@ class _PageHomeState extends State<PageHome> {
       _isConfirmDeleteCartera = isConfirmDeleteCartera ?? true;
       _isAutoExchange = isAutoExchange ?? false;
       _dateExchange = dateExchange ?? _dateExchange;
+      _isStorageLogger = isStorageLogger ?? false;
     });
 
     DateTime now = DateTime.now();
@@ -167,6 +173,9 @@ class _PageHomeState extends State<PageHome> {
 
   @override
   Widget build(BuildContext context) {
+    //context.read<PreferencesProvider>().storage = _isStorageLogger;
+    Provider.of<PreferencesProvider>(context).storage = _isStorageLogger;
+
     return FutureBuilder(
       future: database.getCarteras(byOrder: _isCarterasByOrder),
       builder: (BuildContext context, AsyncSnapshot<List<Cartera>> snapshot) {
@@ -440,12 +449,11 @@ class _PageHomeState extends State<PageHome> {
     );
   }
 
-  _showResult({
-    required bool isImport,
-    required Status status,
-    String? msg,
-    bool? requiredRestart,
-  }) async {
+  _showResult(
+      {required bool isImport,
+      required Status status,
+      String? msg,
+      bool? requiredRestart}) async {
     String line1 = '';
     String line2 = '';
     if (isImport) {
@@ -458,9 +466,12 @@ class _PageHomeState extends State<PageHome> {
       }
       if (requiredRestart == true) {
         line2 = 'La app se reiniciará.';
-      } else if (msg != null) {
-        line2 = msg;
+      } else {
+        line2 = msg ?? '';
       }
+      /*} else if (msg != null) {
+        line2 = msg;
+      }*/
     } else {
       if (status == Status.ok) {
         line1 = 'Proceso de exportación terminado con éxito.';
@@ -480,6 +491,7 @@ class _PageHomeState extends State<PageHome> {
             'que la App no tenga permiso para escribir en la tarjeta SD).';
       } else if (status == Status.abortado) {
         line1 = 'Proceso abortado';
+        line2 = msg ?? '';
       }
     }
 
@@ -734,8 +746,8 @@ class _PageHomeState extends State<PageHome> {
               ),
               ElevatedButton(
                 style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFFFFFFFF),
                   backgroundColor: red,
-                  primary: const Color(0xFFFFFFFF),
                 ),
                 onPressed: () => Navigator.pop(context, true),
                 child: const Text('ACEPTAR'),

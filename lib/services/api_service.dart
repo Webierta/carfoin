@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/data_api.dart';
+import '../models/logger.dart';
 
 // TODO: CHECK INTERNET
 class ApiService {
@@ -28,8 +29,17 @@ class ApiService {
       } else if (response.statusCode == 200) {
         return dataApiFromJson(response.body);
       }
-    } catch (e) {
-      print(e.toString());
+    } catch (e, s) {
+      Logger.log(
+        dataLog: DataLog(
+          msg: 'Catch Response Funds API',
+          file: 'api_service.dart',
+          clase: 'ApiService',
+          funcion: 'getDataApi',
+          error: e,
+          stackTrace: s,
+        ),
+      );
     }
     /*on TimeoutException {
       //status = Status.tiempoExcedido;
@@ -56,14 +66,30 @@ class ApiService {
       var response = await http.get(Uri.parse(url), headers: headers);
       // TODO: timeout
       //.timeout(const Duration(seconds: 10));
-      print(response.statusCode);
-      if (response.body.contains('Access denied')) {
-        // status = Status.accessDenied;
+      if (response.body.contains('Access denied') ||
+          response.statusCode != 200) {
+        Logger.log(
+          dataLog: DataLog(
+              msg:
+                  'Funds Api Access denied, Status Code: ${response.statusCode}',
+              file: 'api_service.dart',
+              clase: 'ApiService',
+              funcion: 'getDataApiRange'),
+        );
       } else if (response.statusCode == 200) {
         return dataApiRangeFromJson(response.body);
       }
-    } catch (e) {
-      print(e.toString());
+    } catch (e, s) {
+      Logger.log(
+        dataLog: DataLog(
+          msg: 'Catch Response Funds API',
+          file: 'api_service.dart',
+          clase: 'ApiService',
+          funcion: 'getDataApiRange',
+          error: e,
+          stackTrace: s,
+        ),
+      );
     }
     /*on TimeoutException {
       //status = Status.tiempoExcedido;

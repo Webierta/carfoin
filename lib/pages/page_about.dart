@@ -13,17 +13,12 @@ class PageAbout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /*Future<void> _launchInBrowser(Uri url) async {
-      if (!await launchUrl(
-        url,
-        mode: LaunchMode.externalApplication,
-      )) {
-        throw 'Could not launch $url';
-      }
-    }*/
-
-    void _launchUrl(url) async {
+    /*void _launchUrl(url) async {
       if (!await launchUrl(url)) throw 'Could not launch $url';
+    }*/
+    void launchweb(url) async {
+      if (!await launchUrl(Uri.parse(url),
+          mode: LaunchMode.externalApplication)) throw 'Could not launch $url';
     }
 
     return WillPopScope(
@@ -50,7 +45,8 @@ class PageAbout extends StatelessWidget {
             child: Markdown(
               onTapLink: (String text, String? url, String title) {
                 if (text != 'donación') {
-                  _launchUrl(Uri.parse(url!));
+                  //_launchUrl(Uri.parse(url!));
+                  launchweb(url!);
                 } else {
                   context.go(supportPage);
                 }

@@ -23,19 +23,20 @@ class PageSupport extends StatelessWidget {
         'https://www.paypal.com/donate?hosted_button_id=986PSAHLH6N4L';
     const String urlGitHub = 'https://github.com/Webierta/carfoin/issues';
 
-    void _launchUrl(url) async {
-      if (!await launchUrl(Uri.parse(url))) throw 'Could not launch $url';
+    void launchweb(url) async {
+      if (!await launchUrl(Uri.parse(url),
+          mode: LaunchMode.externalApplication)) throw 'Could not launch $url';
     }
 
-    _showSnackBar() {
+    showSnackBar() {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('BTC Address copied to Clipboard.'),
       ));
     }
 
-    _clipboard() async {
+    clipboard() async {
       await Clipboard.setData(const ClipboardData(text: btcAddress));
-      _showSnackBar();
+      showSnackBar();
     }
 
     return WillPopScope(
@@ -90,7 +91,7 @@ class PageSupport extends StatelessWidget {
                         ),
                         text: 'GitHub issues.',
                         recognizer: TapGestureRecognizer()
-                          ..onTap = () => _launchUrl(urlGitHub),
+                          ..onTap = () => launchweb(urlGitHub),
                       ),
                     ],
                   ),
@@ -169,7 +170,7 @@ class PageSupport extends StatelessWidget {
                           ),
                           child: IconButton(
                             icon: const Icon(Icons.copy),
-                            onPressed: () => _clipboard(),
+                            onPressed: () => clipboard(),
                           ),
                         ),
                       ],
@@ -194,7 +195,7 @@ class PageSupport extends StatelessWidget {
                       elevation: 10.0,
                       padding: const EdgeInsets.all(10),
                     ),
-                    onPressed: () => _launchUrl(urlPayPal),
+                    onPressed: () => launchweb(urlPayPal),
                     child: Image.asset('assets/paypal_logo.png'),
                   ),
                 ),

@@ -15,3 +15,5 @@ const String keyDateExchange = 'dateExchange';
 const String keyRateExchange = 'rateExchange';
 const int dateExchangeInit = 1662681600;
 const double rateExchangeInit = 0.99512;
+
+const String keyStorageLoggerPref = 'isStorageLogger';

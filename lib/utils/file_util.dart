@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../models/logger.dart';
 import '../services/database_helper.dart';
 
 enum Status { ok, error, abortado }
@@ -42,9 +43,18 @@ class FileUtil {
         //await database.deleteDatabase(dbPath);
         await File(dbPath).writeAsBytes(dbAsBytes);
         return Resultado(Status.ok);
-      } catch (e) {
-        print('EXCEPCION');
-        print(e);
+      } catch (e, s) {
+        Logger.log(
+          dataLog: DataLog(
+            msg: 'Catch Read and Write File',
+            file: 'file_util.dart',
+            clase: 'FileUtil',
+            funcion: 'importar',
+            error: e,
+            stackTrace: s,
+          ),
+        );
+
         // TODO: DIALOGO ERROR: RECUPERAR BD ??
         //await deleteDatabase(dbPath);
         //await database.deleteDatabase(dbPath);
@@ -70,41 +80,37 @@ class FileUtil {
     final dbAsBytes = await dbFile.readAsBytes();
     String filePath = '';
 
-    /* Future<String> _getFilePath() async {
-      Directory? directory = await getExternalStorageDirectory();
-      //if (directory == null || directory.path.isEmpty || !await directory.exists()) return '';
-      if (directory == null) return '';
-      if ((!await directory.exists())) directory.create();
-      String path = directory.path;
-      String filePath = '$path/$nombreDb';
-      return filePath;
-    } */
+    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+    if (selectedDirectory == null) {
+      return Resultado(Status.abortado, msg: 'Destino no seleccionado');
+    }
+    filePath = '$selectedDirectory/$nombreDb';
+    File file = File(filePath);
 
-    try {
-      ///var storages = await ExternalPath.getExternalStorageDirectories();
-
-      String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-      if (selectedDirectory == null) return Resultado(Status.abortado);
-
-      filePath = '$selectedDirectory/$nombreDb';
-      //filePath = await _getFilePath();
-      if (filePath.isEmpty) throw Exception(); // o return okSave ??
-      File file = File(filePath);
-
-      var permiso = await Permission.storage.status;
-      if (!permiso.isGranted) {
-        permiso = await Permission.storage.request();
-      }
-      if (permiso.isGranted) {
+    var permiso = await Permission.storage.status;
+    if (!permiso.isGranted) {
+      permiso = await Permission.storage.request();
+    }
+    if (permiso.isGranted) {
+      try {
         await file.writeAsBytes(dbAsBytes);
         return Resultado(Status.ok, msg: filePath);
-      } else {
-        throw Exception();
+      } catch (e, s) {
+        Logger.log(
+          dataLog: DataLog(
+            msg: 'Catch Write File',
+            file: 'file_util.dart',
+            clase: 'FileUtil',
+            funcion: 'exportar',
+            error: e,
+            stackTrace: s,
+          ),
+        );
+
+        return Resultado(Status.error, msg: e.toString());
       }
-    } catch (e) {
-      //TODO: mensaje de error : msg: e ??
-      print(e.toString());
-      return Resultado(Status.error);
+    } else {
+      return Resultado(Status.abortado, msg: 'Permiso denegado');
     }
   }
 }
