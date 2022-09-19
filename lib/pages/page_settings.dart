@@ -24,75 +24,9 @@ class PageSettings extends StatefulWidget {
 }
 
 class _PageSettingsState extends State<PageSettings> {
-  bool _isCarterasByOrder = true;
-  bool _isViewDetalleCarteras = true;
-  bool _isConfirmDeleteCartera = true;
-  bool _isFondosByOrder = true;
-  bool _isConfirmDeleteFondo = true;
-  bool _isAutoUpdate = true;
-  bool _isConfirmDelete = true;
-
-  bool _isStorageLogger = false;
-  bool _isAutoExchange = false;
-  int _dateExchange = dateExchangeInit;
-  double _rateExchange = rateExchangeInit;
+  late PreferencesProvider prefProvider;
   bool onSyncExchange = false;
-
   String pathLogger = '';
-
-  getSharedPrefs() async {
-    bool isCarterasByOrder = true;
-    bool isViewDetalleCarteras = true;
-    bool isConfirmDeleteCartera = true;
-    bool isFondosByOrder = true;
-    bool isConfirmDeleteFondo = true;
-    bool isAutoUpdate = true;
-    bool isConfirmDelete = true;
-
-    bool isStorageLogger = false;
-    bool isAutoExchange = false;
-    int? dateExchange;
-    double? rateExchange;
-
-    await PreferencesService.getBool(keyByOrderCarterasPref)
-        .then((value) => isCarterasByOrder = value);
-    await PreferencesService.getBool(keyViewCarterasPref)
-        .then((value) => isViewDetalleCarteras = value);
-    await PreferencesService.getBool(keyConfirmDeleteCarteraPref)
-        .then((value) => isConfirmDeleteCartera = value);
-    await PreferencesService.getBool(keyByOrderFondosPref)
-        .then((value) => isFondosByOrder = value);
-    await PreferencesService.getBool(keyConfirmDeleteFondoPref)
-        .then((value) => isConfirmDeleteFondo = value);
-    await PreferencesService.getBool(keyAutoUpdatePref)
-        .then((value) => isAutoUpdate = value);
-    await PreferencesService.getBool(keyConfirmDeletePref)
-        .then((value) => isConfirmDelete = value);
-
-    await PreferencesService.getBool(keyAutoExchangePref)
-        .then((value) => isAutoExchange = value);
-    await PreferencesService.getDateExchange(keyDateExchange)
-        .then((value) => dateExchange = value);
-    await PreferencesService.getRateExchange(keyRateExchange)
-        .then((value) => rateExchange = value);
-    await PreferencesService.getBool(keyStorageLoggerPref)
-        .then((value) => isStorageLogger = value);
-
-    setState(() {
-      _isCarterasByOrder = isCarterasByOrder;
-      _isViewDetalleCarteras = isViewDetalleCarteras;
-      _isConfirmDeleteCartera = isConfirmDeleteCartera;
-      _isFondosByOrder = isFondosByOrder;
-      _isConfirmDeleteFondo = isConfirmDeleteFondo;
-      _isAutoUpdate = isAutoUpdate;
-      _isConfirmDelete = isConfirmDelete;
-
-      _isAutoExchange = isAutoExchange;
-      _dateExchange = dateExchange ?? _dateExchange;
-      _rateExchange = rateExchange ?? _rateExchange;
-      _isStorageLogger = isStorageLogger;
-    });
-  }
 
   Future<String> getPathLogger() async {
     return await const Logger().localPath;
@@ -100,11 +34,10 @@ class _PageSettingsState extends State<PageSettings> {
 
   @override
   void initState() {
+    prefProvider = context.read<PreferencesProvider>();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await getSharedPrefs();
       pathLogger = await getPathLogger();
     });
-
     super.initState();
   }
 
@@ -112,18 +45,20 @@ class _PageSettingsState extends State<PageSettings> {
     ResultStatus result = ResultStatus.pendiente;
     Rate? exchangeApi = await ExchangeApi().latestRate();
     if (exchangeApi != null) {
-      if (_dateExchange >= exchangeApi.date) {
+      if (prefProvider.dateExchange >= exchangeApi.date) {
         result = ResultStatus.viejo;
       } else {
         result = ResultStatus.nuevo;
-        setState(() {
+        /*setState(() {
           _dateExchange = exchangeApi.date;
           _rateExchange = exchangeApi.rate;
-        });
+        });*/
+        prefProvider.dateExchange = exchangeApi.date;
+        prefProvider.rateExchange = exchangeApi.rate;
         await PreferencesService.saveDateExchange(
-            keyDateExchange, _dateExchange);
+            keyDateExchange, exchangeApi.date);
         await PreferencesService.saveRateExchange(
-            keyRateExchange, _rateExchange);
+            keyRateExchange, exchangeApi.rate);
       }
     } else {
       result = ResultStatus.error;
@@ -139,8 +74,6 @@ class _PageSettingsState extends State<PageSettings> {
 
   @override
   Widget build(BuildContext context) {
-    var prefProvider = Provider.of<PreferencesProvider>(context);
-
     return WillPopScope(
       onWillPop: () async => false,
       child: Container(
@@ -189,7 +122,8 @@ class _PageSettingsState extends State<PageSettings> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              FechaUtil.epochToString(_dateExchange),
+                              FechaUtil.epochToString(
+                                  prefProvider.dateExchange),
                               style: const TextStyle(
                                 fontSize: 10,
                                 color: Colors.black,
@@ -198,7 +132,8 @@ class _PageSettingsState extends State<PageSettings> {
                             FittedBox(
                               fit: BoxFit.fill,
                               child: Text(
-                                NumberUtil.decimalFixed(_rateExchange,
+                                NumberUtil.decimalFixed(
+                                    prefProvider.rateExchange,
                                     decimals: 3),
                                 //style: const TextStyle(fontSize: 16),
                               ),
@@ -216,11 +151,10 @@ class _PageSettingsState extends State<PageSettings> {
                     'cuando se inicia la aplicación si hace más de un '
                     'día desde la cotización almacenada'),
                 trailing: Switch(
-                  value: _isAutoExchange,
+                  value: prefProvider.isAutoExchange,
                   onChanged: (value) {
-                    setState(() => _isAutoExchange = value);
-                    PreferencesService.saveBool(
-                        keyAutoExchangePref, _isAutoExchange);
+                    setState(() => prefProvider.isAutoExchange = value);
+                    PreferencesService.saveBool(keyAutoExchangePref, value);
                   },
                 ),
               ),
@@ -235,11 +169,10 @@ class _PageSettingsState extends State<PageSettings> {
                 leading: const Icon(Icons.sort_by_alpha, color: blue900),
                 title: const Text('Ordenadas por nombre'),
                 trailing: Switch(
-                  value: _isCarterasByOrder,
+                  value: prefProvider.isByOrderCarteras,
                   onChanged: (value) {
-                    setState(() => _isCarterasByOrder = value);
-                    PreferencesService.saveBool(
-                        keyByOrderCarterasPref, _isCarterasByOrder);
+                    setState(() => prefProvider.isByOrderCarteras = value);
+                    PreferencesService.saveBool(keyByOrderCarterasPref, value);
                   },
                 ),
               ),
@@ -250,11 +183,10 @@ class _PageSettingsState extends State<PageSettings> {
                 title: const Text('Modo presentación: detalle'),
                 subtitle: const Text('En caso contrario, vista compacta'),
                 trailing: Switch(
-                  value: _isViewDetalleCarteras,
+                  value: prefProvider.isViewDetalleCarteras,
                   onChanged: (value) {
-                    setState(() => _isViewDetalleCarteras = value);
-                    PreferencesService.saveBool(
-                        keyViewCarterasPref, _isViewDetalleCarteras);
+                    setState(() => prefProvider.isViewDetalleCarteras = value);
+                    PreferencesService.saveBool(keyViewCarterasPref, value);
                   },
                 ),
               ),
@@ -267,11 +199,11 @@ class _PageSettingsState extends State<PageSettings> {
                 subtitle: const Text(
                     'Eliminar todas las carteras siempre requiere confirmación'),
                 trailing: Switch(
-                  value: _isConfirmDeleteCartera,
+                  value: prefProvider.isConfirmDeleteCartera,
                   onChanged: (value) {
-                    setState(() => _isConfirmDeleteCartera = value);
+                    setState(() => prefProvider.isConfirmDeleteCartera = value);
                     PreferencesService.saveBool(
-                        keyConfirmDeleteCarteraPref, _isConfirmDeleteCartera);
+                        keyConfirmDeleteCarteraPref, value);
                   },
                 ),
               ),
@@ -288,11 +220,10 @@ class _PageSettingsState extends State<PageSettings> {
                 subtitle: const Text(
                     'En caso contrario por fecha de creación o actualización'),
                 trailing: Switch(
-                  value: _isFondosByOrder,
+                  value: prefProvider.isByOrderFondos,
                   onChanged: (value) {
-                    setState(() => _isFondosByOrder = value);
-                    PreferencesService.saveBool(
-                        keyByOrderFondosPref, _isFondosByOrder);
+                    setState(() => prefProvider.isByOrderFondos = value);
+                    PreferencesService.saveBool(keyByOrderFondosPref, value);
                   },
                 ),
               ),
@@ -304,11 +235,11 @@ class _PageSettingsState extends State<PageSettings> {
                 subtitle: const Text('Eliminar todos los fondos de una cartera '
                     'siempre requiere confirmación'),
                 trailing: Switch(
-                  value: _isConfirmDeleteFondo,
+                  value: prefProvider.isConfirmDeleteFondo,
                   onChanged: (value) {
-                    setState(() => _isConfirmDeleteFondo = value);
+                    setState(() => prefProvider.isConfirmDeleteFondo = value);
                     PreferencesService.saveBool(
-                        keyConfirmDeleteFondoPref, _isConfirmDeleteFondo);
+                        keyConfirmDeleteFondoPref, value);
                   },
                 ),
               ),
@@ -325,11 +256,10 @@ class _PageSettingsState extends State<PageSettings> {
                 subtitle:
                     const Text('Recomendado para obtener la divisa del fondo'),
                 trailing: Switch(
-                  value: _isAutoUpdate,
+                  value: prefProvider.isAutoAudate,
                   onChanged: (value) {
-                    setState(() => _isAutoUpdate = value);
-                    PreferencesService.saveBool(
-                        keyAutoUpdatePref, _isAutoUpdate);
+                    setState(() => prefProvider.isAutoAudate = value);
+                    PreferencesService.saveBool(keyAutoUpdatePref, value);
                   },
                 ),
               ),
@@ -347,11 +277,10 @@ class _PageSettingsState extends State<PageSettings> {
                     'Eliminar operaciones de suscripción siempre requiere confirmación '
                     'y conlleva la eliminación de todas las operaciones posteriores'),
                 trailing: Switch(
-                  value: _isConfirmDelete,
+                  value: prefProvider.isConfirmDelete,
                   onChanged: (value) {
-                    setState(() => _isConfirmDelete = value);
-                    PreferencesService.saveBool(
-                        keyConfirmDeletePref, _isConfirmDelete);
+                    setState(() => prefProvider.isConfirmDelete = value);
+                    PreferencesService.saveBool(keyConfirmDeletePref, value);
                   },
                 ),
               ),
@@ -394,14 +323,10 @@ class _PageSettingsState extends State<PageSettings> {
                     'No almacena ninguna información personal ni envía ningún dato'),
                 // TODO: Switch storage true or false
                 trailing: Switch(
-                  value: _isStorageLogger,
-                  //value: prefProvider.storage,
+                  value: prefProvider.isStorageLogger,
                   onChanged: (value) {
-                    setState(() => _isStorageLogger = value);
-                    PreferencesService.saveBool(
-                        keyStorageLoggerPref, _isStorageLogger);
-                    //context.read<PreferencesProvider>().storage = _isStorageLogger;
-                    prefProvider.storage = _isStorageLogger;
+                    setState(() => prefProvider.isStorageLogger = value);
+                    PreferencesService.saveBool(keyStorageLoggerPref, value);
                   },
                 ),
               ),

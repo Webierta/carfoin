@@ -486,7 +486,8 @@ class DatabaseHelper {
 
   Future<void> deleteOperacion(Cartera cartera, Fondo fondo, Valor op) async {
     if (op.tipo == 1) {
-      await deleteAllOperacionesPosteriores(cartera, fondo, op);
+      //await deleteAllOperacionesPosteriores(cartera, fondo, op);
+      await deleteAllReembolsosPosteriores(cartera, fondo, op);
     }
     Valor newValor = Valor(
         date: op.date, precio: op.precio, tipo: null, participaciones: null);
@@ -498,7 +499,7 @@ class DatabaseHelper {
     var nameTable = '_${cartera.id}${fondo.isin}';
     try {
       await db.delete(nameTable,
-          where: '$columnTipoOperacion IN (?, ?)', whereArgs: [1, 0]);
+          where: '$columnTipoOperacion IN (?, ?)', whereArgs: [0, 1]);
     } catch (e, s) {
       Logger.log(
         dataLog: DataLog(
@@ -519,6 +520,23 @@ class DatabaseHelper {
     if (operaciones.isNotEmpty) {
       for (var ope in operaciones) {
         if (ope.date > op.date) {
+          Valor newValor = Valor(
+              date: ope.date,
+              precio: ope.precio,
+              tipo: null,
+              participaciones: null);
+          await updateValor(cartera, fondo, newValor);
+        }
+      }
+    }
+  }
+
+  Future<void> deleteAllReembolsosPosteriores(
+      Cartera cartera, Fondo fondo, Valor op) async {
+    List<Valor> operaciones = await getOperaciones(cartera, fondo);
+    if (operaciones.isNotEmpty) {
+      for (var ope in operaciones) {
+        if (ope.date > op.date && ope.tipo == 0) {
           Valor newValor = Valor(
               date: ope.date,
               precio: ope.precio,

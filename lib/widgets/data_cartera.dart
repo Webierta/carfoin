@@ -1,4 +1,3 @@
-import 'package:carfoin/widgets/stepper_balance.dart';
 import 'package:flutter/material.dart';
 
 import '../models/cartera.dart';
@@ -7,6 +6,7 @@ import '../utils/number_util.dart';
 import '../utils/stats.dart';
 import '../utils/styles.dart';
 import 'hoja_calendario.dart';
+import 'stepper_balance.dart';
 
 class DataCartera extends StatelessWidget {
   final Fondo fondo;

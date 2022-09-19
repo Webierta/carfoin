@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:carfoin/utils/fecha_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -10,12 +9,14 @@ import 'package:share_plus/share_plus.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
+import '../models/preferences_provider.dart';
 import '../router/router_utils.dart';
 import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../services/share_csv.dart';
+import '../utils/fecha_util.dart';
 import '../utils/konstantes.dart';
 import '../utils/styles.dart';
 import '../utils/update_all.dart';
@@ -30,38 +31,24 @@ class PageCartera extends StatefulWidget {
 }
 
 class _PageCarteraState extends State<PageCartera> {
-  bool _isFondosByOrder = true;
+  /*bool _isFondosByOrder = true;
   bool _isAutoUpdate = true;
-  bool _isConfirmDeleteFondo = true;
+  bool _isConfirmDeleteFondo = true;*/
+
   late ApiService apiService;
   DatabaseHelper database = DatabaseHelper();
+
   late CarteraProvider carteraProvider;
   late Cartera carteraSelect;
+  late PreferencesProvider prefProvider;
+
   final GlobalKey _dialogKey = GlobalKey();
   String _loadingText = '';
 
-  //late Stats stats;
-  getSharedPrefs() async {
-    bool? isFondosByOrder;
-    bool? isAutoUpdate;
-    bool? isConfirmDeleteFondo;
-    await PreferencesService.getBool(keyByOrderFondosPref)
-        .then((value) => isFondosByOrder = value);
-    await PreferencesService.getBool(keyAutoUpdatePref)
-        .then((value) => isAutoUpdate = value);
-    await PreferencesService.getBool(keyConfirmDeleteFondoPref)
-        .then((value) => isConfirmDeleteFondo = value);
-    setState(() {
-      _isFondosByOrder = isFondosByOrder ?? true;
-      _isAutoUpdate = isAutoUpdate ?? true;
-      _isConfirmDeleteFondo = isConfirmDeleteFondo ?? true;
-    });
-  }
-
   setFondos(Cartera cartera) async {
     try {
-      carteraProvider.fondos =
-          await database.getFondos(cartera, byOrder: _isFondosByOrder);
+      carteraProvider.fondos = await database.getFondos(cartera,
+          byOrder: prefProvider.isByOrderFondos);
       //carteraProvider.addFondos(cartera, carteraProvider.fondos);
       /// ????
       carteraSelect.fondos = carteraProvider.fondos;
@@ -84,8 +71,8 @@ class _PageCarteraState extends State<PageCartera> {
   void initState() {
     carteraProvider = context.read<CarteraProvider>();
     carteraSelect = carteraProvider.carteraSelect;
+    prefProvider = context.read<PreferencesProvider>();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await getSharedPrefs();
       await database.createTableCartera(carteraSelect).whenComplete(() async {
         await setFondos(carteraSelect);
       });
@@ -95,9 +82,10 @@ class _PageCarteraState extends State<PageCartera> {
   }
 
   _ordenarFondos() async {
-    setState(() => _isFondosByOrder = !_isFondosByOrder);
+    prefProvider.isByOrderFondos = !prefProvider.isByOrderFondos;
     await setFondos(carteraSelect);
-    PreferencesService.saveBool(keyByOrderFondosPref, _isFondosByOrder);
+    PreferencesService.saveBool(
+        keyByOrderFondosPref, prefProvider.isByOrderFondos);
   }
 
   SpeedDialChild _buildSpeedDialChild(BuildContext context,
@@ -121,30 +109,6 @@ class _PageCarteraState extends State<PageCartera> {
     );
   }
 
-  /*_dialogConfirmShare(BuildContext context) async {
-    return showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Compartir Cartera'),
-          content: const Text('Primero selecciona una carpeta donde almacenar '
-              'el archivo generado y luego una aplicación para compartirlo, '
-              'por ejemplo vía email.'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Continuar'),
-            ),
-          ],
-        );
-      },
-    );
-  }*/
-
   _onShare(Cartera cartera, File file) async {
     final box = context.findRenderObject() as RenderBox?;
     if (file.path.isNotEmpty) {
@@ -157,7 +121,8 @@ class _PageCarteraState extends State<PageCartera> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: database.getFondos(carteraSelect, byOrder: _isFondosByOrder),
+      future: database.getFondos(carteraSelect,
+          byOrder: prefProvider.isByOrderFondos),
       builder: (BuildContext context, AsyncSnapshot<List<Fondo>> snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const LoadingProgress(titulo: 'Actualizando fondos...');
@@ -182,8 +147,11 @@ class _PageCarteraState extends State<PageCartera> {
                     const Icon(Icons.business_center),
                     const SizedBox(width: 10),
                     Flexible(
-                      child: Text(carteraSelect.name,
-                          overflow: TextOverflow.ellipsis, maxLines: 1),
+                      child: Text(
+                        carteraSelect.name,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     ),
                   ],
                 ),
@@ -202,7 +170,7 @@ class _PageCarteraState extends State<PageCartera> {
                       buildMenuItem(
                         MenuCartera.ordenar,
                         Icons.sort_by_alpha,
-                        isOrder: _isFondosByOrder,
+                        isOrder: prefProvider.isByOrderFondos,
                       ),
                       buildMenuItem(MenuCartera.compartir, Icons.share),
                       buildMenuItem(MenuCartera.eliminar, Icons.delete_forever)
@@ -298,13 +266,12 @@ class _PageCarteraState extends State<PageCartera> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return StatefulBuilder(
-          key: _dialogKey,
-          builder: (context, setState) {
-            // return Dialog(child: Loading(...); ???
-            return Loading(
-                titulo: 'ACTUALIZANDO FONDOS...', subtitulo: _loadingText);
-          },
-        );
+            key: _dialogKey,
+            builder: (context, setState) {
+              // return Dialog(child: Loading(...); ???
+              return Loading(
+                  titulo: 'ACTUALIZANDO FONDOS...', subtitulo: _loadingText);
+            });
       },
     );
 
@@ -428,7 +395,7 @@ class _PageCarteraState extends State<PageCartera> {
     } else {
       await database.insertFondo(carteraSelect, newFondo);
       await setFondos(carteraSelect);
-      if (_isAutoUpdate) {
+      if (prefProvider.isAutoAudate) {
         if (!mounted) return;
         await _dialogAutoUpdate(context, newFondo);
       } else {
@@ -458,8 +425,8 @@ class _PageCarteraState extends State<PageCartera> {
               ),
               ElevatedButton(
                 style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFFFFFFFF),
                   backgroundColor: red,
-                  primary: const Color(0xFFFFFFFF),
                 ),
                 onPressed: () => Navigator.pop(context, true),
                 child: const Text('ACEPTAR'),
@@ -470,7 +437,7 @@ class _PageCarteraState extends State<PageCartera> {
   }
 
   _removeFondo(Fondo fondo) async {
-    _eliminarFondo() async {
+    eliminarFondo() async {
       await database.deleteAllValores(carteraSelect, fondo);
       await database.deleteFondo(carteraSelect, fondo);
 
@@ -481,20 +448,20 @@ class _PageCarteraState extends State<PageCartera> {
       await setFondos(carteraSelect);
     }
 
-    if (_isConfirmDeleteFondo) {
+    if (prefProvider.isConfirmDeleteFondo) {
       var resp = await _dialogDeleteConfirm(context, fondo.name);
       if (resp == null || resp == false) {
         setState(() {});
       } else {
-        _eliminarFondo();
+        eliminarFondo();
       }
     } else {
-      _eliminarFondo();
+      eliminarFondo();
     }
   }
 
   void _deleteAllConfirm(BuildContext context) async {
-    _removeAllFondos() async {
+    removeAllFondos() async {
       //carteraSelect.fondos
       for (var fondo in carteraProvider.fondos) {
         await database.deleteAllValores(carteraSelect, fondo);
@@ -517,7 +484,7 @@ class _PageCarteraState extends State<PageCartera> {
       if (resp == null || resp == false) {
         setState(() {});
       } else {
-        _removeAllFondos();
+        removeAllFondos();
       }
     }
   }

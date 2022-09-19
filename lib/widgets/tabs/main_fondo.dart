@@ -4,11 +4,10 @@ import 'package:provider/provider.dart';
 
 import '../../models/cartera.dart';
 import '../../models/cartera_provider.dart';
+import '../../models/preferences_provider.dart';
 import '../../router/routes_const.dart';
 import '../../services/database_helper.dart';
-import '../../services/preferences_service.dart';
 import '../../utils/fecha_util.dart';
-import '../../utils/konstantes.dart';
 import '../../utils/number_util.dart';
 import '../../utils/stats.dart';
 import '../../utils/styles.dart';
@@ -27,14 +26,15 @@ class _MainFondoState extends State<MainFondo> {
   late Fondo fondoSelect;
   late List<Valor> valoresSelect;
   late List<Valor> operacionesSelect;
-  bool _isConfirmDelete = true;
+
+  //bool _isConfirmDelete = true;
   late Stats stats;
 
-  getSharedPrefs() async {
+  /*getSharedPrefs() async {
     await PreferencesService.getBool(keyConfirmDeletePref).then((value) {
       setState(() => _isConfirmDelete = value);
     });
-  }
+  }*/
 
   setValores(Cartera cartera, Fondo fondo) async {
     carteraProvider.valores = await database.getValores(cartera, fondo);
@@ -56,7 +56,7 @@ class _MainFondoState extends State<MainFondo> {
     carteraSelect = carteraProvider.carteraSelect;
     fondoSelect = carteraProvider.fondoSelect;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await getSharedPrefs();
+      //await getSharedPrefs();
       await setValores(carteraSelect, fondoSelect);
     });
     super.initState();
@@ -64,6 +64,7 @@ class _MainFondoState extends State<MainFondo> {
 
   @override
   Widget build(BuildContext context) {
+    PreferencesProvider prefProvider = context.read<PreferencesProvider>();
     //final carteraProvider = context.read<CarteraProvider>();
     //final carteraSelect = carteraProvider.carteraSelect;
     //final fondoSelect = carteraProvider.fondoSelect;
@@ -74,7 +75,7 @@ class _MainFondoState extends State<MainFondo> {
     stats = Stats(valores);
     //carteraProvider.addValores(carteraSelect, fondoSelect, valores);
 
-    double? _getDiferencia() {
+    double? getDiferencia() {
       if (valores.length > 1) {
         var last = valores.first.precio;
         var prev = valores[1].precio;
@@ -83,15 +84,17 @@ class _MainFondoState extends State<MainFondo> {
       return null;
     }
 
-    _confirmDeleteOperacion(BuildContext context, Valor op) async {
+    confirmDeleteOperacion(BuildContext context, Valor op) async {
+      String aviso = op.tipo == 1
+          ? 'Esta acción elimina esta operación y los reembolsos posteriores '
+              'pero mantiene los valores liquidativos de las fechas afectadas.'
+          : 'Esta acción elimina esta operación manteniendo su valor liquidativo.';
       return showDialog(
           context: context,
           builder: (BuildContext ctx) {
             return AlertDialog(
               title: const Text('Eliminar Operación'),
-              content: const Text(
-                  'Esta acción elimina esta operación (y eventualmente operaciones posteriores) '
-                  'pero mantiene los valores liquidativos de las fechas afectadas'),
+              content: Text(aviso),
               actions: [
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context, false),
@@ -99,8 +102,8 @@ class _MainFondoState extends State<MainFondo> {
                 ),
                 ElevatedButton(
                   style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFFFFFFFF),
                     backgroundColor: red,
-                    primary: const Color(0xFFFFFFFF),
                   ),
                   onPressed: () => Navigator.pop(context, true),
                   child: const Text('ACEPTAR'),
@@ -110,13 +113,13 @@ class _MainFondoState extends State<MainFondo> {
           });
     }
 
-    _deleteOperacion(Valor op) async {
+    deleteOperacion(Valor op) async {
       await database.deleteOperacion(carteraSelect, fondoSelect, op);
       carteraProvider.removeOperacion(fondoSelect, op);
       await setValores(carteraSelect, fondoSelect);
     }
 
-    List<DataColumn> _createColumns() {
+    List<DataColumn> createColumns() {
       return const <DataColumn>[
         DataColumn(label: Text('FECHA')),
         DataColumn(label: Text('PART.')),
@@ -126,7 +129,7 @@ class _MainFondoState extends State<MainFondo> {
       ];
     }
 
-    List<DataRow> _createRows() {
+    List<DataRow> createRows() {
       if (operaciones.isEmpty || valores.isEmpty) return <DataRow>[];
       return [
         for (var op in operaciones)
@@ -162,19 +165,19 @@ class _MainFondoState extends State<MainFondo> {
             )),
             DataCell(IconButton(
               onPressed: () async {
-                if (_isConfirmDelete) {
-                  var resp = await _confirmDeleteOperacion(context, op);
+                if (prefProvider.isConfirmDelete) {
+                  var resp = await confirmDeleteOperacion(context, op);
                   if (resp) {
-                    _deleteOperacion(op);
+                    deleteOperacion(op);
                   }
                 } else {
                   if (op.tipo == 1) {
-                    var resp = await _confirmDeleteOperacion(context, op);
+                    var resp = await confirmDeleteOperacion(context, op);
                     if (resp) {
-                      _deleteOperacion(op);
+                      deleteOperacion(op);
                     }
                   } else {
-                    _deleteOperacion(op);
+                    deleteOperacion(op);
                   }
                 }
               },
@@ -279,7 +282,7 @@ class _MainFondoState extends State<MainFondo> {
       }
     }
 
-    bool _allStatsIsNull() {
+    bool allStatsIsNull() {
       List<double?> listStats = [
         inversion,
         resultado,
@@ -359,19 +362,19 @@ class _MainFondoState extends State<MainFondo> {
                                             const Icon(Icons.sell, color: blue),
                                           ],
                                         ),
-                                        if (_getDiferencia() != null)
+                                        if (getDiferencia() != null)
                                           Row(
                                             children: [
                                               Text(
                                                 NumberUtil.compactFixed(
-                                                    _getDiferencia()!),
+                                                    getDiferencia()!),
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.w400,
                                                     color: textRedGreen(
-                                                        _getDiferencia()!)),
+                                                        getDiferencia()!)),
                                               ),
                                               const SizedBox(width: 4),
                                               const Icon(Icons.iso,
@@ -505,8 +508,8 @@ class _MainFondoState extends State<MainFondo> {
                                 ),
                                 dataTextStyle: const TextStyle(
                                     fontSize: 18, color: Colors.black),
-                                columns: _createColumns(),
-                                rows: _createRows(),
+                                columns: createColumns(),
+                                rows: createRows(),
                               ),
                             ),
                             const SizedBox(height: 10),
@@ -552,7 +555,7 @@ class _MainFondoState extends State<MainFondo> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          if (_allStatsIsNull())
+                          if (allStatsIsNull())
                             const Text('Error en los cálculos'),
                           if (inversion != null)
                             RowBalance(

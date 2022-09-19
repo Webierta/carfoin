@@ -4,9 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
+import '../models/preferences_provider.dart';
 import '../router/routes_const.dart';
-import '../services/preferences_service.dart';
-import '../utils/konstantes.dart';
 import '../utils/stats_global.dart';
 import '../utils/styles.dart';
 import '../widgets/my_drawer.dart';
@@ -24,39 +23,23 @@ class PageGlobal extends StatefulWidget {
 
 class _PageGlobalState extends State<PageGlobal> {
   var criterioPie = CriterioPie.Fondos;
-  double _rateExchange = 0.0;
-  late StatsGlobal _statsGlobal; // = StatsGlobal(rateExchange: 0.0);
-
-  getRateExchangePref() async {
-    double? rateExchange;
-    await PreferencesService.getRateExchange(keyRateExchange)
-        .then((value) => rateExchange = value);
-    setState(() => _rateExchange = rateExchange ?? 0.0);
-  }
-
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await getRateExchangePref();
-      //_statsGlobal = StatsGlobal(rateExchange: _rateExchange);
-    });
-    super.initState();
-  }
+  late StatsGlobal _statsGlobal;
 
   @override
   Widget build(BuildContext context) {
     CarteraProvider carteraProvider = context.read<CarteraProvider>();
+    PreferencesProvider prefProvider = context.read<PreferencesProvider>();
     final List<Cartera> carteras = carteraProvider.carteras;
-    _statsGlobal = StatsGlobal(rateExchange: _rateExchange);
+    _statsGlobal = StatsGlobal(rateExchange: prefProvider.rateExchange);
     _statsGlobal.calcular(carteras);
 
-    /*_goCartera(BuildContext context, Cartera cartera) {
+    /*goCartera(BuildContext context, Cartera cartera) {
       ScaffoldMessenger.of(context).removeCurrentSnackBar();
       carteraProvider.carteraSelect = cartera;
       context.go(carteraPage);
     }*/
 
-    _goFondo(BuildContext context, Cartera cartera, Fondo fondo) {
+    goFondo(BuildContext context, Cartera cartera, Fondo fondo) {
       ScaffoldMessenger.of(context).removeCurrentSnackBar();
       carteraProvider.carteraSelect = cartera;
       carteraProvider.fondoSelect = fondo;
@@ -158,7 +141,7 @@ class _PageGlobalState extends State<PageGlobal> {
                         PieChartGlobal(
                           carteras: carteras,
                           criterioPie: criterioPie,
-                          rateExchange: _rateExchange,
+                          rateExchange: prefProvider.rateExchange,
                           statsGlobal: _statsGlobal,
                         ),
                       const LineDivider(),
@@ -182,12 +165,12 @@ class _PageGlobalState extends State<PageGlobal> {
                         ListTileDestacado(
                             destacado: _statsGlobal.destacados.last,
                             icon: Icons.stars,
-                            goFondo: _goFondo),
+                            goFondo: goFondo),
                       if (_statsGlobal.destacados.length > 1)
                         ListTileDestacado(
                             destacado: _statsGlobal.destacados.first,
                             icon: Icons.warning,
-                            goFondo: _goFondo),
+                            goFondo: goFondo),
                       if (_statsGlobal.destacados.isEmpty)
                         const Padding(
                             padding: EdgeInsets.all(10.0),
@@ -198,12 +181,12 @@ class _PageGlobalState extends State<PageGlobal> {
                       if (_statsGlobal.lastOps.isNotEmpty)
                         ListTileLastOp(
                             lastOp: _statsGlobal.lastOps.last,
-                            goFondo: _goFondo),
+                            goFondo: goFondo),
                       if (_statsGlobal.lastOps.length > 1)
                         ListTileLastOp(
                             lastOp: _statsGlobal
                                 .lastOps[_statsGlobal.lastOps.length - 2],
-                            goFondo: _goFondo),
+                            goFondo: goFondo),
                       if (_statsGlobal.lastOps.isEmpty)
                         const Padding(
                             padding: EdgeInsets.all(10.0),

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -10,7 +12,6 @@ import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
-import '../utils/stats.dart';
 import '../utils/styles.dart';
 import '../widgets/loading_progress.dart';
 
@@ -82,6 +83,45 @@ class _MercadoState extends State<PageMercado> {
     super.dispose();
   }
 
+  Future<void> _dialogMercado(BuildContext context) async {
+    return await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 0),
+            scrollable: true,
+            title: const Text('Operaciones'),
+            content: ListBody(
+              children: const [
+                Text('Todas las operaciones de suscripción y reembolso son '
+                    'simulaciones con intención de ser comparadas con '
+                    'transacciones reales, ficticias o potenciales.'),
+                SizedBox(height: 8),
+                Text('Cuando se realiza una operación en una fecha en la que '
+                    'existe otra, la app consulta si se quiere sobrescribir '
+                    'la primera o combinar ambas (una forma de añadir distintas '
+                    'operaciones en una misma fecha).'),
+                SizedBox(height: 8),
+                Text('El resultado de combinar dos operaciones será una '
+                    'nueva transacción: por ejemplo, combinar un aporte inicial de '
+                    '20 part. con un reembolso de 30, resulta un reembolso de 10.'),
+                SizedBox(height: 8),
+                Text('Ten en cuenta que tanto añadir un reembolso como '
+                    'eliminar un aporte (o reducir su número de part.) entre '
+                    'operaciones, conlleva eliminar todos los reembolsos posteriores, '
+                    'si los hubiera (para evitar potenciales descuadres).'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cerrar')),
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     //var carteraSelect = context.read<CarteraProvider>().carteraSelect;
@@ -93,21 +133,30 @@ class _MercadoState extends State<PageMercado> {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                  context.go(fondoPage);
-                },
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                context.go(fondoPage);
+              },
+            ),
+            title: const Text('MERCADO'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.info_outline),
+                onPressed: () async => await _dialogMercado(context),
               ),
-              title: const Text('MERCADO')),
+            ],
+          ),
           body: ListView(
             shrinkWrap: true,
             padding: const EdgeInsets.all(10),
             children: [
               ListTile(
                 title: Align(
-                    alignment: Alignment.center, child: Text(fondoSelect.name)),
+                  alignment: Alignment.center,
+                  child: Text(fondoSelect.name),
+                ),
                 subtitle: Align(
                   alignment: Alignment.center,
                   child: Chip(
@@ -359,36 +408,232 @@ class _MercadoState extends State<PageMercado> {
     );
   }
 
+  _showDialogOp(Valor valorDb) async {
+    String tipoOp = valorDb.tipo == 1 ? 'una suscripción' : 'un reembolso';
+    return await showDialog<bool?>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 0),
+          scrollable: true,
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          title: const Text('Operación previa'),
+          content: ListBody(
+            children: [
+              Text('En esa fecha ya existe una operación: '
+                  '$tipoOp de ${valorDb.participaciones} participaciones.'),
+              const SizedBox(height: 8),
+              const Text('Puedes sobrescribirla o combinar ambas '
+                  'transacciones en una nueva operación.'),
+              const SizedBox(height: 8),
+              const Text('Si el resultado es un reembolso o una reducción de '
+                  'participaciones se eliminarán los reembolsos posteriores, si existen.'),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+                onPressed: () => Navigator.pop(context, null),
+                child: const Text('Cancelar')),
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Sobreescribir'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Combinar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  double getPartPrev(Valor valor) {
+    double partPre = 0.0;
+    List<Valor> valoresPre = [];
+    valoresPre = valoresSelect.where((v) => v.date < valor.date).toList();
+    for (var valor in valoresPre) {
+      if (valor.tipo == 1) {
+        partPre += valor.participaciones ?? 0;
+      } else if (valor.tipo == 0) {
+        partPre -= valor.participaciones ?? 0;
+      }
+    }
+    return partPre;
+  }
+
   _submit(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      // TODO: valores duplicados ??
+      //Stats stats = Stats(valoresSelect);
+      //var participaciones = stats.totalParticipaciones() ?? 0;
+
+      // NUEVA OPERACION
       int tipoOp = _tipo ? 1 : 0;
+      Valor newOp = Valor(
+          tipo: tipoOp,
+          date: _date,
+          participaciones: _participaciones,
+          precio: _precio);
+      bool opCheck = false;
+      bool minusPart = false;
 
-      //TODO: check tipo Op 0 permitida
-      Stats stats = Stats(valoresSelect);
-      var participaciones = stats.totalParticipaciones() ?? 0;
-      if (tipoOp == 0 && _participaciones > participaciones) {
-        _showMsg(
-          //msg: 'Operación no permitida: no puedes reembolsar las participaciones que no tienes.',
-          msg: 'Máximo de participaciones: $participaciones',
-          color: Colors.red,
-        );
-      } else {
-        Valor newOp = Valor(
-            tipo: tipoOp,
-            date: _date,
-            participaciones: _participaciones,
-            precio: _precio);
-
-        //TODO: insert or update ??
-        // TODO: setValores para update UI ??
-        await database.insertValor(carteraSelect, fondoSelect, newOp);
-        carteraProvider.addValor(carteraSelect, fondoSelect, newOp);
-
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).removeCurrentSnackBar();
-        context.go(fondoPage);
+      var valorDb =
+          await database.getValorByDate(carteraSelect, fondoSelect, newOp);
+      double partPre = 0.0;
+      List<Valor> valoresPre = [];
+      if (valorDb != null) {
+        valoresPre =
+            valoresSelect.where((valor) => valor.date < valorDb.date).toList();
+        for (var valor in valoresPre) {
+          if (valor.tipo == 1) {
+            partPre += valor.participaciones ?? 0;
+          } else if (valor.tipo == 0) {
+            partPre -= valor.participaciones ?? 0;
+          }
+        }
       }
+      log('PARTICIPACIONES PRE: $partPre');
+
+      if (valorDb != null && valorDb.date == newOp.date && valorDb.tipo != -1) {
+        // OPERACIONES EN MISMA FECHA
+        log('Ya existe una operación en esa fecha');
+        // DIALOGO SOBREESCRIBIR / COMBINAR / CANCELAR
+        bool? combinarOp = await _showDialogOp(valorDb);
+        if (combinarOp == true) {
+          // COMBINAR
+          double partValordb = valorDb.tipo == 0
+              ? -valorDb.participaciones!
+              : valorDb.participaciones!;
+          double partNewValor = newOp.tipo == 0
+              ? -newOp.participaciones!
+              : newOp.participaciones!;
+          double partComb = partValordb + partNewValor;
+          int tipoComb = partComb > 0 ? 1 : 0;
+          partComb = partComb.abs();
+          // CHECK OP COMB
+          if (newOp.tipo == 0) {
+            minusPart = true;
+            var partPrev = getPartPrev(valorDb);
+            log('PART PREVIAS: $partPrev');
+            var partResto = partPrev + valorDb.participaciones!;
+            if (partResto <= 0 || partComb > partResto || partComb == 0) {
+              opCheck = false;
+            } else {
+              opCheck = true;
+            }
+          } else {
+            if (valorDb.participaciones! > partComb) {
+              minusPart = true;
+            }
+            opCheck = true;
+          }
+          if (opCheck) {
+            newOp.tipo = tipoComb;
+            newOp.participaciones = partComb;
+            if (partComb == 0) {
+              newOp.tipo = -1;
+              newOp.participaciones = null;
+            }
+          }
+          log('COMBINADO: TIPO: ${newOp.tipo}, PART: ${newOp.participaciones}');
+          log('CHECK: $opCheck, REDUCE: $minusPart');
+        } else if (combinarOp == false) {
+          // SOBRESCRIBIR  // CHECK OP
+          if (newOp.tipo == 0) {
+            minusPart = true;
+            var partPrev = getPartPrev(newOp);
+            log('PART PREVIAS: $partPrev');
+            var partResto = partPrev; // - valorDb.participaciones!;
+            if (partResto <= 0 || newOp.participaciones! > partResto) {
+              opCheck = false;
+            } else {
+              opCheck = true;
+            }
+          } else {
+            if (valorDb.participaciones! > newOp.participaciones!) {
+              minusPart = true;
+            }
+            opCheck = true;
+          }
+          log('SOBREESCRIBIR: TIPO: ${newOp.tipo}, PART: ${newOp.participaciones}');
+          log('CHECK: $opCheck, REDUCE: $minusPart');
+        } else {
+          // CANCELAR
+          log('CANCELAR');
+          return;
+        }
+      } else {
+        // NO OP EN MISMA FECHA // CHECK OP
+        if (newOp.tipo == 0) {
+          minusPart = true;
+          var partPrev = getPartPrev(newOp);
+          log('PART PREVIAS: $partPrev');
+          var partResto = partPrev; // - valorDb.participaciones!;
+          if (partResto <= 0 || newOp.participaciones! > partResto) {
+            opCheck = false;
+          } else {
+            opCheck = true;
+          }
+        } else {
+          opCheck = true;
+        }
+      }
+
+      if (opCheck == false) {
+        _showMsg(
+            msg: 'No se puede hacer un reembolso de participaciones no '
+                'disponibles ni operaciones sin ninguna participación',
+            color: Colors.red);
+        return;
+      }
+
+      if (minusPart) {
+        await database.deleteAllReembolsosPosteriores(
+            carteraSelect, fondoSelect, newOp);
+      }
+      await database.insertValor(carteraSelect, fondoSelect, newOp);
+      carteraProvider.addValor(carteraSelect, fondoSelect, newOp);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      context.go(fondoPage);
+
+      // CHECK NEW OPERACION EN CASO DE TIPO 0
+      /*if (newOp.tipo == 0) {
+        var parResto = participaciones - newOp.participaciones!;
+        if (parResto <= 0) {
+          _showMsg(
+              msg: 'Operación no permitida: no se puede hacer un reembolso '
+                  'de participaciones no disponibles',
+              color: Colors.red);
+          return;
+        } else {
+          if (valorDb != null && valorDb.tipo != -1) {
+            log('DELETE OP DB');
+            if (valorDb.participaciones! < newOp.participaciones!) {
+              log('DIFERENCIA: ${valorDb.participaciones} - ${newOp.participaciones}');
+              await database.deleteAllOperacionesPosteriores(
+                  carteraSelect, fondoSelect, valorDb);
+              //carteraProvider.removeAllOperaciones(fondo);
+            }
+            await database.deleteOperacion(carteraSelect, fondoSelect, valorDb);
+            carteraProvider.removeOperacion(fondoSelect, valorDb);
+          }
+        }
+      }*/
+
+      /*if (newOp.participaciones == participaciones) {
+        newOp.tipo = -1;
+        newOp.participaciones = null;
+      }*/
+
+      /*// INSERT O UPDATE OP ?? (SET VALORES PARA UPDATE UI ??)
+      await database.insertValor(carteraSelect, fondoSelect, newOp);
+      carteraProvider.addValor(carteraSelect, fondoSelect, newOp);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      context.go(fondoPage);*/
     }
   }
 

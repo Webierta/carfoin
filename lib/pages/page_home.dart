@@ -32,61 +32,36 @@ class PageHome extends StatefulWidget {
 }
 
 class _PageHomeState extends State<PageHome> {
-  bool _isStorageLogger = false;
-  bool _isAutoExchange = false;
-  int _dateExchange = dateExchangeInit;
-
-  bool _isCarterasByOrder = true;
-  bool _isViewDetalleCarteras = true;
-  bool _isFondosByOrder = true;
-  bool _isConfirmDeleteCartera = true;
-  late TextEditingController _controller;
-  DatabaseHelper database = DatabaseHelper();
+  late PreferencesProvider prefProvider;
   late CarteraProvider carteraProvider;
 
+  late TextEditingController _controller;
+  DatabaseHelper database = DatabaseHelper();
   late ApiService apiService;
   final GlobalKey _dialogKey = GlobalKey();
   String _loadingText = '';
-
   bool cargandoShare = false;
 
   getSharedPrefs() async {
-    bool? isCarterasByOrder;
-    bool? isFondosByOrder;
-    bool? isConfirmDeleteCartera;
-    bool? isViewDetalleCarteras;
-    bool? isAutoExchange;
-    int? dateExchange;
-    bool? isStorageLogger;
-
     await PreferencesService.getBool(keyByOrderCarterasPref)
-        .then((value) => isCarterasByOrder = value);
+        .then((value) => prefProvider.isByOrderCarteras = value);
     await PreferencesService.getBool(keyViewCarterasPref)
-        .then((value) => isViewDetalleCarteras = value);
+        .then((value) => prefProvider.isViewDetalleCarteras = value);
     await PreferencesService.getBool(keyByOrderFondosPref)
-        .then((value) => isFondosByOrder = value);
+        .then((value) => prefProvider.isByOrderFondos = value);
     await PreferencesService.getBool(keyConfirmDeleteCarteraPref)
-        .then((value) => isConfirmDeleteCartera = value);
+        .then((value) => prefProvider.isConfirmDeleteCartera = value);
     await PreferencesService.getBool(keyAutoExchangePref)
-        .then((value) => isAutoExchange = value);
+        .then((value) => prefProvider.isAutoExchange = value);
     await PreferencesService.getDateExchange(keyDateExchange)
-        .then((value) => dateExchange = value);
+        .then((value) => prefProvider.dateExchange = value);
     await PreferencesService.getBool(keyStorageLoggerPref)
-        .then((value) => isStorageLogger = value);
-    setState(() {
-      _isCarterasByOrder = isCarterasByOrder ?? true;
-      _isViewDetalleCarteras = isViewDetalleCarteras ?? true;
-      _isFondosByOrder = isFondosByOrder ?? true;
-      _isConfirmDeleteCartera = isConfirmDeleteCartera ?? true;
-      _isAutoExchange = isAutoExchange ?? false;
-      _dateExchange = dateExchange ?? _dateExchange;
-      _isStorageLogger = isStorageLogger ?? false;
-    });
+        .then((value) => prefProvider.isStorageLogger = value);
 
     DateTime now = DateTime.now();
-    DateTime dateRate = FechaUtil.epochToDate(_dateExchange);
+    DateTime dateRate = FechaUtil.epochToDate(prefProvider.dateExchange);
     int difDays = now.difference(dateRate).inDays;
-    if (_isAutoExchange && difDays > 1) {
+    if (prefProvider.isAutoExchange && difDays > 1) {
       await syncExchange();
     }
   }
@@ -94,12 +69,12 @@ class _PageHomeState extends State<PageHome> {
   setCarteras() async {
     try {
       carteraProvider.carteras =
-          await database.getCarteras(byOrder: _isCarterasByOrder);
+          await database.getCarteras(byOrder: prefProvider.isByOrderCarteras);
 
       for (var cartera in carteraProvider.carteras) {
         await database.createTableCartera(cartera).whenComplete(() async {
-          carteraProvider.fondos =
-              await database.getFondos(cartera, byOrder: _isFondosByOrder);
+          carteraProvider.fondos = await database.getFondos(cartera,
+              byOrder: prefProvider.isByOrderFondos);
           //carteraProvider.addFondos(cartera, carteraProvider.fondos);
           cartera.fondos = carteraProvider.fondos;
         });
@@ -127,8 +102,10 @@ class _PageHomeState extends State<PageHome> {
   syncExchange() async {
     Rate? exchangeApi = await ExchangeApi().latestRate();
     if (exchangeApi != null) {
-      if (_dateExchange < exchangeApi.date) {
-        setState(() => _dateExchange = exchangeApi.date);
+      if (prefProvider.dateExchange < exchangeApi.date) {
+        //setState(() => _dateExchange = exchangeApi.date);
+        prefProvider.rateExchange = exchangeApi.rate;
+        prefProvider.dateExchange = exchangeApi.date;
         await PreferencesService.saveDateExchange(
             keyDateExchange, exchangeApi.date);
         await PreferencesService.saveRateExchange(
@@ -140,6 +117,7 @@ class _PageHomeState extends State<PageHome> {
   @override
   void initState() {
     carteraProvider = context.read<CarteraProvider>();
+    prefProvider = context.read<PreferencesProvider>();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await getSharedPrefs();
       await setCarteras();
@@ -150,14 +128,17 @@ class _PageHomeState extends State<PageHome> {
   }
 
   _ordenarCarteras() async {
-    setState(() => _isCarterasByOrder = !_isCarterasByOrder);
+    prefProvider.isByOrderCarteras = !prefProvider.isByOrderCarteras;
     await setCarteras();
-    PreferencesService.saveBool(keyByOrderCarterasPref, _isCarterasByOrder);
+    PreferencesService.saveBool(
+        keyByOrderCarterasPref, prefProvider.isByOrderCarteras);
   }
 
   _viewCarteras() async {
-    setState(() => _isViewDetalleCarteras = !_isViewDetalleCarteras);
-    PreferencesService.saveBool(keyViewCarterasPref, _isViewDetalleCarteras);
+    setState(() => prefProvider.isViewDetalleCarteras =
+        !prefProvider.isViewDetalleCarteras);
+    PreferencesService.saveBool(
+        keyViewCarterasPref, prefProvider.isViewDetalleCarteras);
   }
 
   @override
@@ -173,11 +154,8 @@ class _PageHomeState extends State<PageHome> {
 
   @override
   Widget build(BuildContext context) {
-    //context.read<PreferencesProvider>().storage = _isStorageLogger;
-    Provider.of<PreferencesProvider>(context).storage = _isStorageLogger;
-
     return FutureBuilder(
-      future: database.getCarteras(byOrder: _isCarterasByOrder),
+      future: database.getCarteras(byOrder: prefProvider.isByOrderCarteras),
       builder: (BuildContext context, AsyncSnapshot<List<Cartera>> snapshot) {
         if (cargandoShare) {
           return const LoadingProgress(titulo: 'Cargando cartera...');
@@ -193,19 +171,12 @@ class _PageHomeState extends State<PageHome> {
                   appBar: AppBar(
                     title: const Text('Carteras'),
                     actions: [
-                      /*IconButton(
-                        icon: const Icon(Icons.currency_exchange),
-                        onPressed: () async {
-                          var exchangeApi = await ExchangeApi().latestRate();
-                          print(exchangeApi?.rate);
-                        },
-                      ),*/
                       IconButton(
                         icon: const Icon(Icons.refresh),
                         onPressed: () async => await _dialogUpdateAll(context),
                       ),
                       IconButton(
-                        icon: _isViewDetalleCarteras
+                        icon: prefProvider.isViewDetalleCarteras
                             ? const Icon(Icons.format_list_bulleted)
                             : const Icon(Icons.splitscreen),
                         onPressed: () => _viewCarteras(),
@@ -218,7 +189,8 @@ class _PageHomeState extends State<PageHome> {
                         ),
                         itemBuilder: (ctx) => [
                           buildMenuItem(Menu.ordenar, Icons.sort_by_alpha,
-                              divider: true, isOrder: _isCarterasByOrder),
+                              divider: true,
+                              isOrder: prefProvider.isByOrderCarteras),
                           buildMenuItem(Menu.exportar, Icons.save),
                           buildMenuItem(Menu.importar, Icons.file_download,
                               divider: true),
@@ -239,11 +211,6 @@ class _PageHomeState extends State<PageHome> {
                     ],
                   ),
                   drawer: const MyDrawer(),
-                  /*floatingActionButton: FloatingActionButton(
-                    backgroundColor: amber,
-                    child: const Icon(Icons.add, color: blue900),
-                    onPressed: () => _inputName(context),
-                  ),*/
                   floatingActionButton: SpeedDial(
                     icon: Icons.add,
                     foregroundColor: blue900,
@@ -321,7 +288,7 @@ class _PageHomeState extends State<PageHome> {
                             ),
                           );
                         }
-                        if (!_isViewDetalleCarteras) {
+                        if (!prefProvider.isViewDetalleCarteras) {
                           return ListView.builder(
                             //padding: const EdgeInsets.all(8),
                             itemCount: data.carteras.length,
@@ -368,14 +335,11 @@ class _PageHomeState extends State<PageHome> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return StatefulBuilder(
-          key: _dialogKey,
-          builder: (context, setState) {
-            return Loading(
-              titulo: 'ACTUALIZANDO FONDOS...',
-              subtitulo: _loadingText,
-            );
-          },
-        );
+            key: _dialogKey,
+            builder: (context, setState) {
+              return Loading(
+                  titulo: 'ACTUALIZANDO FONDOS...', subtitulo: _loadingText);
+            });
       },
     );
     List<Update> updateResultados = [];
@@ -758,7 +722,7 @@ class _PageHomeState extends State<PageHome> {
   }
 
   _deleteCartera(Cartera cartera) async {
-    if (_isConfirmDeleteCartera) {
+    if (prefProvider.isConfirmDeleteCartera) {
       var resp = await _dialogDeleteConfirm(context, cartera.name);
       if (resp == null || resp == false) {
         setState(() {});
