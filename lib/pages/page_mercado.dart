@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -115,8 +113,9 @@ class _MercadoState extends State<PageMercado> {
             ),
             actions: [
               TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cerrar')),
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cerrar'),
+              ),
             ],
           );
         });
@@ -467,11 +466,8 @@ class _MercadoState extends State<PageMercado> {
     if (_formKey.currentState!.validate()) {
       //Stats stats = Stats(valoresSelect);
       //var participaciones = stats.totalParticipaciones() ?? 0;
-
-      // NUEVA OPERACION
-      int tipoOp = _tipo ? 1 : 0;
       Valor newOp = Valor(
-          tipo: tipoOp,
+          tipo: _tipo ? 1 : 0,
           date: _date,
           participaciones: _participaciones,
           precio: _precio);
@@ -480,28 +476,9 @@ class _MercadoState extends State<PageMercado> {
 
       var valorDb =
           await database.getValorByDate(carteraSelect, fondoSelect, newOp);
-      double partPre = 0.0;
-      List<Valor> valoresPre = [];
-      if (valorDb != null) {
-        valoresPre =
-            valoresSelect.where((valor) => valor.date < valorDb.date).toList();
-        for (var valor in valoresPre) {
-          if (valor.tipo == 1) {
-            partPre += valor.participaciones ?? 0;
-          } else if (valor.tipo == 0) {
-            partPre -= valor.participaciones ?? 0;
-          }
-        }
-      }
-      log('PARTICIPACIONES PRE: $partPre');
-
       if (valorDb != null && valorDb.date == newOp.date && valorDb.tipo != -1) {
-        // OPERACIONES EN MISMA FECHA
-        log('Ya existe una operación en esa fecha');
-        // DIALOGO SOBREESCRIBIR / COMBINAR / CANCELAR
         bool? combinarOp = await _showDialogOp(valorDb);
         if (combinarOp == true) {
-          // COMBINAR
           double partValordb = valorDb.tipo == 0
               ? -valorDb.participaciones!
               : valorDb.participaciones!;
@@ -511,11 +488,10 @@ class _MercadoState extends State<PageMercado> {
           double partComb = partValordb + partNewValor;
           int tipoComb = partComb > 0 ? 1 : 0;
           partComb = partComb.abs();
-          // CHECK OP COMB
+
           if (newOp.tipo == 0) {
             minusPart = true;
             var partPrev = getPartPrev(valorDb);
-            log('PART PREVIAS: $partPrev');
             var partResto = partPrev + valorDb.participaciones!;
             if (partResto <= 0 || partComb > partResto || partComb == 0) {
               opCheck = false;
@@ -536,14 +512,10 @@ class _MercadoState extends State<PageMercado> {
               newOp.participaciones = null;
             }
           }
-          log('COMBINADO: TIPO: ${newOp.tipo}, PART: ${newOp.participaciones}');
-          log('CHECK: $opCheck, REDUCE: $minusPart');
         } else if (combinarOp == false) {
-          // SOBRESCRIBIR  // CHECK OP
           if (newOp.tipo == 0) {
             minusPart = true;
             var partPrev = getPartPrev(newOp);
-            log('PART PREVIAS: $partPrev');
             var partResto = partPrev; // - valorDb.participaciones!;
             if (partResto <= 0 || newOp.participaciones! > partResto) {
               opCheck = false;
@@ -556,19 +528,13 @@ class _MercadoState extends State<PageMercado> {
             }
             opCheck = true;
           }
-          log('SOBREESCRIBIR: TIPO: ${newOp.tipo}, PART: ${newOp.participaciones}');
-          log('CHECK: $opCheck, REDUCE: $minusPart');
         } else {
-          // CANCELAR
-          log('CANCELAR');
           return;
         }
       } else {
-        // NO OP EN MISMA FECHA // CHECK OP
         if (newOp.tipo == 0) {
           minusPart = true;
           var partPrev = getPartPrev(newOp);
-          log('PART PREVIAS: $partPrev');
           var partResto = partPrev; // - valorDb.participaciones!;
           if (partResto <= 0 || newOp.participaciones! > partResto) {
             opCheck = false;
@@ -587,53 +553,16 @@ class _MercadoState extends State<PageMercado> {
             color: Colors.red);
         return;
       }
-
       if (minusPart) {
         await database.deleteAllReembolsosPosteriores(
             carteraSelect, fondoSelect, newOp);
       }
+      // INSERT O UPDATE OP ?? (SET VALORES PARA UPDATE UI ??)
       await database.insertValor(carteraSelect, fondoSelect, newOp);
       carteraProvider.addValor(carteraSelect, fondoSelect, newOp);
       if (!mounted) return;
       ScaffoldMessenger.of(context).removeCurrentSnackBar();
       context.go(fondoPage);
-
-      // CHECK NEW OPERACION EN CASO DE TIPO 0
-      /*if (newOp.tipo == 0) {
-        var parResto = participaciones - newOp.participaciones!;
-        if (parResto <= 0) {
-          _showMsg(
-              msg: 'Operación no permitida: no se puede hacer un reembolso '
-                  'de participaciones no disponibles',
-              color: Colors.red);
-          return;
-        } else {
-          if (valorDb != null && valorDb.tipo != -1) {
-            log('DELETE OP DB');
-            if (valorDb.participaciones! < newOp.participaciones!) {
-              log('DIFERENCIA: ${valorDb.participaciones} - ${newOp.participaciones}');
-              await database.deleteAllOperacionesPosteriores(
-                  carteraSelect, fondoSelect, valorDb);
-              //carteraProvider.removeAllOperaciones(fondo);
-            }
-            await database.deleteOperacion(carteraSelect, fondoSelect, valorDb);
-            carteraProvider.removeOperacion(fondoSelect, valorDb);
-          }
-        }
-      }*/
-
-      /*if (newOp.participaciones == participaciones) {
-        newOp.tipo = -1;
-        newOp.participaciones = null;
-      }*/
-
-      /*// INSERT O UPDATE OP ?? (SET VALORES PARA UPDATE UI ??)
-      await database.insertValor(carteraSelect, fondoSelect, newOp);
-      carteraProvider.addValor(carteraSelect, fondoSelect, newOp);
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-      context.go(fondoPage);*/
     }
   }
 
