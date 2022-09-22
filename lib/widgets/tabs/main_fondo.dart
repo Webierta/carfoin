@@ -1,5 +1,10 @@
+import 'dart:io';
+
+import 'package:carfoin/models/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/cartera.dart';
@@ -7,11 +12,14 @@ import '../../models/cartera_provider.dart';
 import '../../models/preferences_provider.dart';
 import '../../router/routes_const.dart';
 import '../../services/database_helper.dart';
+import '../../services/doc_cnmv.dart';
 import '../../utils/fecha_util.dart';
 import '../../utils/number_util.dart';
+import '../../utils/pdf_visor.dart';
 import '../../utils/stats.dart';
 import '../../utils/styles.dart';
 import '../hoja_calendario.dart';
+import '../loading_progress.dart';
 
 class MainFondo extends StatefulWidget {
   const MainFondo({Key? key}) : super(key: key);
@@ -27,6 +35,7 @@ class _MainFondoState extends State<MainFondo> {
   late List<Valor> valoresSelect;
   late List<Valor> operacionesSelect;
 
+  bool openingPdf = false;
   //bool _isConfirmDelete = true;
   late Stats stats;
 
@@ -300,6 +309,22 @@ class _MainFondoState extends State<MainFondo> {
       return true;
     }
 
+    showDialogLoading(BuildContext context) async {
+      return await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return const SizedBox(
+              width: double.infinity,
+              height: double.infinity,
+              child: LoadingProgress(titulo: 'Cargando documento...'),
+            );
+          });
+    }
+
+    if (openingPdf) {
+      Future.delayed(Duration.zero, () => showDialogLoading(context));
+    }
     return ListView(
       shrinkWrap: true,
       padding: const EdgeInsets.all(8),
@@ -310,6 +335,9 @@ class _MainFondoState extends State<MainFondo> {
             child: Column(
               children: [
                 ListTile(
+                  //dense: true,
+                  visualDensity: const VisualDensity(vertical: -4),
+                  //contentPadding: const EdgeInsets.symmetric(vertical: 0),
                   //leading: const Icon(Icons.assessment, size: 32, color: blue),
                   title: Text(
                     fondoSelect.name,
@@ -321,6 +349,89 @@ class _MainFondoState extends State<MainFondo> {
                     fondoSelect.isin,
                     style: const TextStyle(fontSize: 16, color: blue900),
                   ),
+                ),
+                TextButton(
+                    onPressed: () async {
+                      var docCnmv = DocCnmv(isin: fondoSelect.isin);
+                      await docCnmv.getRating();
+                    },
+                    child: const Text('Get rating')),
+                Column(
+                  children: [
+                    const Text(
+                      'Rating Morningstar',
+                      style: TextStyle(fontSize: 10),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.star, color: Colors.greenAccent[400]),
+                        Icon(Icons.star, color: Colors.greenAccent[400]),
+                        Icon(Icons.star, color: Colors.greenAccent[400]),
+                        const Icon(Icons.star, color: Colors.grey),
+                        const Icon(Icons.star, color: Colors.grey),
+                      ],
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10.0),
+                  child: Row(children: [
+                    TextButton.icon(
+                      onPressed: () async {
+                        setState(() => openingPdf = true);
+                        var docCnmv = DocCnmv(isin: fondoSelect.isin);
+                        String? urlPdf = await docCnmv.getUrlFolleto();
+                        if (urlPdf != null) {
+                          String filename = 'folleto_${fondoSelect.isin}';
+                          await loadPdfFromNetwork(urlPdf, filename)
+                              .then((file) => openPdf(context, file, urlPdf))
+                              .whenComplete(
+                                  () => setState(() => openingPdf = false));
+                        } else {
+                          setState(() => openingPdf = false);
+                          Logger.log(
+                            dataLog: DataLog(
+                              msg: 'urlPdf is null',
+                              file: 'main_fondo.dart',
+                              clase: '_MainFondoState',
+                              funcion: 'build',
+                            ),
+                          );
+                        }
+                      },
+                      icon: Image.asset('assets/pdf.gif'),
+                      label: const Text('Folleto'),
+                    ),
+                    TextButton.icon(
+                      onPressed: () async {
+                        setState(() => openingPdf = true);
+                        var docCnmv = DocCnmv(isin: fondoSelect.isin);
+                        Informe? informe = await docCnmv.getUrlInforme();
+                        if (informe != null) {
+                          var name = informe.name;
+                          var urlPdf = informe.url;
+                          String filename = '${name}_${fondoSelect.isin}';
+                          await loadPdfFromNetwork(urlPdf, filename)
+                              .then((file) => openPdf(context, file, urlPdf))
+                              .whenComplete(
+                                  () => setState(() => openingPdf = false));
+                        } else {
+                          setState(() => openingPdf = false);
+                          Logger.log(
+                            dataLog: DataLog(
+                              msg: 'informe is null',
+                              file: 'main_fondo.dart',
+                              clase: '_MainFondoState',
+                              funcion: 'build',
+                            ),
+                          );
+                        }
+                      },
+                      icon: Image.asset('assets/pdf.gif'),
+                      label: const Text('Informe'),
+                    ),
+                  ]),
                 ),
                 valores.isEmpty
                     ? const Text(
@@ -666,6 +777,50 @@ class _MainFondoState extends State<MainFondo> {
           ),
       ],
     );
+  }
+
+  Future<File> loadPdfFromNetwork(String url, String filename) async {
+    final response = await http.get(Uri.parse(url));
+    final bytes = response.bodyBytes;
+    return _storeFile(url, bytes, filename);
+  }
+
+  Future<File> _storeFile(String url, List<int> bytes, String filename) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/$filename');
+    await file.writeAsBytes(bytes, flush: true);
+    return file;
+  }
+
+  _deleteFile(File file) async {
+    try {
+      await file.delete();
+    } catch (e, s) {
+      Logger.log(
+          dataLog: DataLog(
+        msg: 'Catch delete File',
+        file: 'main_fondo.dart',
+        clase: '_MainFondoState',
+        funcion: '_deleteFile',
+        error: e,
+        stackTrace: s,
+      ));
+    }
+  }
+
+  void openPdf(BuildContext context, File file, String url) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(
+            builder: (context) => PdfVisor(
+                  file: file,
+                  url: url,
+                  isin: fondoSelect.isin,
+                )))
+        .whenComplete(() {
+      _deleteFile(file);
+      setState(() => openingPdf = false);
+      Navigator.of(context).pop();
+    });
   }
 }
 

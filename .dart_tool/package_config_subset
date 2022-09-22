@@ -38,6 +38,10 @@ crypto
 2.14
 file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/crypto-3.0.2/
 file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/crypto-3.0.2/lib/
+csslib
+2.12
+file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/csslib-0.17.2/
+file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/csslib-0.17.2/lib/
 csv
 2.12
 file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/csv-5.0.1/
@@ -86,6 +90,10 @@ flutter_markdown
 2.12
 file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_markdown-0.6.10+2/
 file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_markdown-0.6.10+2/lib/
+flutter_pdfview
+2.17
+file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_pdfview-1.2.3/
+file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_pdfview-1.2.3/lib/
 flutter_plugin_android_lifecycle
 2.12
 file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_plugin_android_lifecycle-2.0.7/
@@ -98,6 +106,10 @@ go_router
 2.17
 file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/go_router-4.2.7/
 file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/go_router-4.2.7/lib/
+html
+2.12
+file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/html-0.15.0/
+file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/html-0.15.0/lib/
 http
 2.14
 file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/http-0.13.4/
