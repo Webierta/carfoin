@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../router/routes_const.dart';
 import '../utils/styles.dart';
+import '../widgets/custom_dialog.dart';
 import '../widgets/my_drawer.dart';
 
 const String btcAddress = '15ZpNzqbYFx9P7wg4U438JMwZr2q3W6fkS';
@@ -28,15 +29,21 @@ class PageSupport extends StatelessWidget {
           mode: LaunchMode.externalApplication)) throw 'Could not launch $url';
     }
 
-    showSnackBar() {
+    void showMsg({required String msg, Color? color}) {
+      CustomDialog customDialog = const CustomDialog();
+      customDialog.generateDialog(context: context, msg: msg, color: color);
+    }
+
+    /*showSnackBar() {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('BTC Address copied to Clipboard.'),
       ));
-    }
+    }*/
 
     clipboard() async {
       await Clipboard.setData(const ClipboardData(text: btcAddress));
-      showSnackBar();
+      //showSnackBar();
+      showMsg(msg: 'BTC Address copied to Clipboard');
     }
 
     return WillPopScope(
@@ -51,7 +58,7 @@ class PageSupport extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.home),
                 onPressed: () {
-                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  // ScaffoldMessenger.of(context).removeCurrentSnackBar();
                   //Navigator.of(context).pushNamed(RouteGenerator.homePage);
                   context.go(homePage);
                 },

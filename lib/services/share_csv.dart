@@ -1,9 +1,9 @@
-import 'dart:convert';
-import 'dart:io';
+import 'dart:convert' show utf8;
+import 'dart:io' show File, Directory;
 
-import 'package:csv/csv.dart';
+import 'package:csv/csv.dart' show ListToCsvConverter, CsvToListConverter;
 import 'package:file_picker/file_picker.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart' show getTemporaryDirectory;
 
 import '../models/cartera.dart';
 import '../models/logger.dart';
@@ -22,6 +22,7 @@ class ShareCsv {
         rowFondo.add(fondo.isin);
         rowFondo.add(fondo.name);
         rowFondo.add(fondo.divisa);
+        rowFondo.add(fondo.rating);
         rowsBd.add(rowFondo);
         if (fondo.valores != null && fondo.valores!.isNotEmpty) {
           for (var valor in fondo.valores!) {
@@ -137,6 +138,7 @@ class ShareCsv {
       //String? divisa;
       //if (fields[indexRowFondo].length > 2) {
       var divisa = fields[indexRowFondo][2];
+      var rating = fields[indexRowFondo][3]; // ?? 0
       List<Valor> valores = [];
       /*int dif;
       if (indexRowFondo == indexRowFondos.last) {
@@ -164,8 +166,12 @@ class ShareCsv {
           valores.add(newValor);
         }
       }
-      Fondo fondo =
-          Fondo(isin: isin, name: nameFondo, divisa: divisa, valores: valores);
+      Fondo fondo = Fondo(
+          isin: isin,
+          name: nameFondo,
+          divisa: divisa,
+          valores: valores,
+          rating: rating);
       fondos.add(fondo);
     }
     cartera.fondos = [...fondos];

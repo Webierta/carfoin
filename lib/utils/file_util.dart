@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:io' show File;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';

@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: const [Locale('es', 'ES')],
       debugShowCheckedModeBanner: false,
       title: 'Carfoin',
+      //scaffoldMessengerKey: scaffoldMessengerKey,
       theme: ThemeData(
         primaryColor: const Color(0xFF0D47A1),
         colorScheme: ColorScheme.fromSwatch()

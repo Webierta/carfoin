@@ -6,6 +6,7 @@ import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
 import '../services/api_service.dart';
 import '../utils/styles.dart';
+import '../widgets/custom_dialog.dart';
 
 class PageInputFondo extends StatefulWidget {
   const PageInputFondo({Key? key}) : super(key: key);
@@ -124,14 +125,18 @@ class _PageInputFondoState extends State<PageInputFondo> {
                                         setState(() => _buscando = false);
                                       } else {
                                         setState(() => _validIsin = false);
-                                        ScaffoldMessenger.of(context)
+                                        showMsg(
+                                          msg: 'Código ISIN no válido',
+                                          color: red900,
+                                        );
+                                        /*ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(
                                             content:
                                                 Text('Código ISIN no válido.'),
                                             backgroundColor: Colors.red,
                                           ),
-                                        );
+                                        );*/
                                       }
                                     },
                             ),
@@ -181,7 +186,7 @@ class _PageInputFondoState extends State<PageInputFondo> {
                     TextButton(
                         child: const Text('Cancelar'),
                         onPressed: () {
-                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                          // ScaffoldMessenger.of(context).removeCurrentSnackBar();
                           setState(() {
                             _validIsin = null;
                             _errorDataApi = null;
@@ -192,7 +197,7 @@ class _PageInputFondoState extends State<PageInputFondo> {
                         onPressed: () {
                           var fondo = Fondo(
                               name: locatedFond!.name, isin: locatedFond!.isin);
-                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                          // ScaffoldMessenger.of(context).removeCurrentSnackBar();
                           Navigator.pop(context, fondo);
                         }),
                   ],
@@ -259,5 +264,10 @@ class _PageInputFondoState extends State<PageInputFondo> {
       setState(() => _errorDataApi = true);
       return Fondo(name: 'Fondo no encontrado', isin: inputIsin);
     }
+  }
+
+  void showMsg({required String msg, Color? color}) {
+    CustomDialog customDialog = const CustomDialog();
+    customDialog.generateDialog(context: context, msg: msg, color: color);
   }
 }

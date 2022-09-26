@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:math' show sqrt, pow;
 
 import '../models/cartera.dart';
 import '../models/logger.dart';

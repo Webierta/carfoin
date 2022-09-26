@@ -1,12 +1,14 @@
+//import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
+import '../models/logger.dart';
 import '../models/preferences_provider.dart';
 import '../router/routes_const.dart';
 import '../services/api_service.dart';
@@ -19,6 +21,8 @@ import '../utils/file_util.dart';
 import '../utils/konstantes.dart';
 import '../utils/styles.dart';
 import '../utils/update_all.dart';
+import '../widgets/custom_dialog.dart';
+import '../widgets/expandable_fab.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
 import '../widgets/my_drawer.dart';
@@ -70,7 +74,6 @@ class _PageHomeState extends State<PageHome> {
     try {
       carteraProvider.carteras =
           await database.getCarteras(byOrder: prefProvider.isByOrderCarteras);
-
       for (var cartera in carteraProvider.carteras) {
         await database.createTableCartera(cartera).whenComplete(() async {
           carteraProvider.fondos = await database.getFondos(cartera,
@@ -152,6 +155,34 @@ class _PageHomeState extends State<PageHome> {
     Icon(Icons.delete_forever)
   ];
 
+  _sharedCartera(BuildContext context) async {
+    int index = 0;
+    if (carteraProvider.carteras.isNotEmpty) {
+      var carterasConIndex =
+          carteraProvider.carteras.where((item) => item.id != null).toList();
+      carterasConIndex.sort((a, b) => a.id!.compareTo(b.id!));
+      if (carterasConIndex.isNotEmpty) {
+        index = carterasConIndex.last.id!;
+      }
+    }
+    //await database.getNamesTables();
+    setState(() => cargandoShare = true);
+    await ShareCsv.loadCartera(index).then((Cartera? value) async {
+      if (value != null) {
+        await _loadCartera(value);
+      } else {
+        showMsg(msg: 'Proceso desestimado');
+      }
+    }).catchError((onError) {
+      showMsg(
+        msg: 'Error en el proceso de carga de la cartera compartida',
+        color: red900,
+      );
+    }).whenComplete(() {
+      setState(() => cargandoShare = false);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -211,61 +242,18 @@ class _PageHomeState extends State<PageHome> {
                     ],
                   ),
                   drawer: const MyDrawer(),
-                  floatingActionButton: SpeedDial(
+                  floatingActionButton: ExpandableFab(
                     icon: Icons.add,
-                    foregroundColor: blue900,
-                    backgroundColor: amber,
-                    spacing: 8,
-                    spaceBetweenChildren: 4,
-                    overlayColor: gris,
-                    overlayOpacity: 0.4,
                     children: [
-                      SpeedDialChild(
-                        child: const Icon(Icons.share),
-                        label: 'Archivada',
-                        backgroundColor: amber,
-                        foregroundColor: blue900,
-                        onTap: () async {
-                          // TODO: get last index cartera:
-                          // 1. by database
-                          // 2. by Provider (MEJOR)
-                          int index = 0;
-                          if (carteraProvider.carteras.isNotEmpty) {
-                            var carterasConIndex = carteraProvider.carteras
-                                .where((item) => item.id != null)
-                                .toList();
-                            carterasConIndex
-                                .sort((a, b) => a.id!.compareTo(b.id!));
-                            if (carterasConIndex.isNotEmpty) {
-                              index = carterasConIndex.last.id!;
-                            }
-                          }
-                          //await database.getNamesTables();
-                          setState(() => cargandoShare = true);
-                          await ShareCsv.loadCartera(index)
-                              .then((Cartera? value) async {
-                            if (value != null) {
-                              await _loadCartera(value);
-                            } else {
-                              _showMsg(msg: 'Proceso desestimado');
-                            }
-                          }).catchError((onError) {
-                            _showMsg(
-                              msg:
-                                  'Error en el proceso de carga de la cartera compartida',
-                              color: Colors.red,
-                            );
-                          }).whenComplete(() {
-                            setState(() => cargandoShare = false);
-                          });
-                        },
+                      ChildFab(
+                        onPressed: () => _sharedCartera(context),
+                        icon: const Icon(Icons.share),
+                        label: 'Compartida',
                       ),
-                      SpeedDialChild(
-                        child: const Icon(Icons.create),
+                      ChildFab(
+                        onPressed: () => _inputName(context),
+                        icon: const Icon(Icons.create),
                         label: 'Nueva',
-                        backgroundColor: amber,
-                        foregroundColor: blue900,
-                        onTap: () => _inputName(context),
                       ),
                     ],
                   ),
@@ -338,7 +326,9 @@ class _PageHomeState extends State<PageHome> {
             key: _dialogKey,
             builder: (context, setState) {
               return Loading(
-                  titulo: 'ACTUALIZANDO FONDOS...', subtitulo: _loadingText);
+                titulo: 'ACTUALIZANDO FONDOS...',
+                subtitulo: _loadingText,
+              );
             });
       },
     );
@@ -356,7 +346,7 @@ class _PageHomeState extends State<PageHome> {
     _pop();
     updateResultados.isNotEmpty
         ? await _showResultados(updateResultados)
-        : _showMsg(msg: 'Nada que actualizar');
+        : showMsg(msg: 'Nada que actualizar');
   }
 
   _setStateDialog(String newText) {
@@ -617,12 +607,25 @@ class _PageHomeState extends State<PageHome> {
         .contains(cartera.name);
 
     if (existe) {
-      _showMsg(msg: 'Ya existe una cartera con ese nombre.', color: Colors.red);
+      showMsg(msg: 'Ya existe una cartera con ese nombre', color: red900);
     } else {
-      await database.createTableCartera(cartera).whenComplete(() async {
-        await database.insertCartera(cartera);
-        //await setCarteras();
-      });
+      try {
+        await database.createTableCartera(cartera).whenComplete(() async {
+          await database.insertCartera(cartera);
+          //await setCarteras();
+        });
+      } catch (e, s) {
+        Logger.log(
+          dataLog: DataLog(
+            msg: 'Catch create table cartera + insert cartera',
+            file: 'page_home.dart',
+            clase: '_PageHomeState',
+            funcion: '_loadCartera',
+            error: e,
+            stackTrace: s,
+          ),
+        );
+      }
 
       if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
         for (var fondo in cartera.fondos!) {
@@ -635,7 +638,8 @@ class _PageHomeState extends State<PageHome> {
                     isin: fondo.isin,
                     name: fondo.name,
                     divisa: fondo.divisa,
-                    valores: fondo.valores));
+                    valores: fondo.valores,
+                    rating: fondo.rating));
             //await setCarteras();
             if (fondo.valores != null && fondo.valores!.isNotEmpty) {
               for (var valor in fondo.valores!) {
@@ -658,8 +662,7 @@ class _PageHomeState extends State<PageHome> {
       if (existe) {
         _controller.clear();
         _pop();
-        _showMsg(
-            msg: 'Ya existe una cartera con ese nombre.', color: Colors.red);
+        showMsg(msg: 'Ya existe una cartera con ese nombre', color: red900);
       } else if (cartera != null) {
         cartera.name = input;
         await database.updateCartera(cartera);
@@ -677,13 +680,14 @@ class _PageHomeState extends State<PageHome> {
   }
 
   _goCartera(BuildContext context, Cartera cartera) {
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    //ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    //scaffoldMessengerKey.currentState?.removeCurrentSnackBar();
     carteraProvider.carteraSelect = cartera;
     context.go(carteraPage);
   }
 
   _goFondo(BuildContext context, Cartera cartera, Fondo fondo) {
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    //ScaffoldMessenger.of(context).removeCurrentSnackBar();
     carteraProvider.carteraSelect = cartera;
     carteraProvider.fondoSelect = fondo;
     context.go(fondoPage);
@@ -763,14 +767,14 @@ class _PageHomeState extends State<PageHome> {
     }
   }
 
-  void _showMsg({required String msg, MaterialColor color = Colors.grey}) =>
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), backgroundColor: color),
-      );
+  void showMsg({required String msg, Color? color}) {
+    CustomDialog customDialog = const CustomDialog();
+    customDialog.generateDialog(context: context, msg: msg, color: color);
+  }
 
   void _pop() {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    //ScaffoldMessenger.of(context).removeCurrentSnackBar();
     Navigator.of(context).pop();
   }
 }

@@ -1,26 +1,29 @@
-import 'dart:io';
+import 'dart:io' show File;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:share_plus/share_plus.dart' show Share;
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
+import '../models/logger.dart';
 import '../models/preferences_provider.dart';
 import '../router/router_utils.dart';
 import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
+import '../services/doc_cnmv.dart';
 import '../services/preferences_service.dart';
 import '../services/share_csv.dart';
 import '../utils/fecha_util.dart';
 import '../utils/konstantes.dart';
 import '../utils/styles.dart';
 import '../utils/update_all.dart';
+import '../widgets/custom_dialog.dart';
 import '../widgets/data_cartera.dart';
+import '../widgets/expandable_fab.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
 
@@ -88,25 +91,14 @@ class _PageCarteraState extends State<PageCartera> {
         keyByOrderFondosPref, prefProvider.isByOrderFondos);
   }
 
-  SpeedDialChild _buildSpeedDialChild(BuildContext context,
-      {required IconData icono, required String label, required AppPage page}) {
-    return SpeedDialChild(
-      child: Icon(icono),
-      label: label,
-      backgroundColor: amber,
-      foregroundColor: blue900,
-      onTap: () async {
-        ScaffoldMessenger.of(context).removeCurrentSnackBar();
-        //final newFondo = await Navigator.of(context).pushNamed(page);
-        final newFondo = await Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => page.routeClass),
-        );
-        newFondo != null
-            ? _addFondo(newFondo as Fondo)
-            : _showMsg(msg: 'Sin cambios en la cartera.');
-      },
+  _searchFondo(BuildContext context, AppPage page) async {
+    final newFondo = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => page.routeClass),
     );
+    newFondo != null
+        ? _addFondo(newFondo as Fondo)
+        : _showMsg(msg: 'Sin cambios en la cartera.');
   }
 
   _onShare(Cartera cartera, File file) async {
@@ -138,7 +130,7 @@ class _PageCarteraState extends State<PageCartera> {
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () {
-                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                    // ScaffoldMessenger.of(context).removeCurrentSnackBar();
                     context.go(homePage);
                   },
                 ),
@@ -191,26 +183,18 @@ class _PageCarteraState extends State<PageCartera> {
                   ),
                 ],
               ),
-              floatingActionButton: SpeedDial(
+              floatingActionButton: ExpandableFab(
                 icon: Icons.addchart,
-                foregroundColor: blue900,
-                backgroundColor: amber,
-                spacing: 8,
-                spaceBetweenChildren: 4,
-                overlayColor: gris,
-                overlayOpacity: 0.4,
                 children: [
-                  _buildSpeedDialChild(
-                    context,
-                    icono: Icons.search,
+                  ChildFab(
+                    icon: const Icon(Icons.search),
                     label: 'Buscar online por ISIN',
-                    page: AppPage.inputFondo,
+                    onPressed: () => _searchFondo(context, AppPage.inputFondo),
                   ),
-                  _buildSpeedDialChild(
-                    context,
-                    icono: Icons.storage,
+                  ChildFab(
+                    icon: const Icon(Icons.storage),
                     label: 'Base de Datos local',
-                    page: AppPage.searchFondo,
+                    onPressed: () => _searchFondo(context, AppPage.searchFondo),
                   ),
                 ],
               ),
@@ -255,7 +239,7 @@ class _PageCarteraState extends State<PageCartera> {
   }
 
   _goFondo(BuildContext context, Fondo fondo) {
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    //ScaffoldMessenger.of(context).removeCurrentSnackBar();
     carteraProvider.fondoSelect = fondo;
     context.go(fondoPage);
   }
@@ -270,7 +254,9 @@ class _PageCarteraState extends State<PageCartera> {
             builder: (context, setState) {
               // return Dialog(child: Loading(...); ???
               return Loading(
-                  titulo: 'ACTUALIZANDO FONDOS...', subtitulo: _loadingText);
+                titulo: 'ACTUALIZANDO FONDOS...',
+                subtitulo: _loadingText,
+              );
             });
       },
     );
@@ -344,14 +330,13 @@ class _PageCarteraState extends State<PageCartera> {
     );
   }
 
-  _getDataApi(Fondo fondo) async {
+  Future<bool> _getDataApi(Fondo fondo) async {
     //await carfoin.createTableFondo(fondo);
     await database.createTableFondo(carteraSelect, fondo);
     final getDataApi = await apiService.getDataApi(fondo.isin);
     if (getDataApi != null) {
       /// TEST EPOCH HMS
       var date = FechaUtil.epochToEpochHms(getDataApi.epochSecs);
-
       var newValor = Valor(date: date, precio: getDataApi.price);
       fondo.divisa = getDataApi.market;
 
@@ -359,10 +344,24 @@ class _PageCarteraState extends State<PageCartera> {
       //await carfoin.updateFondoCartera(fondo);
       //await carfoin.insertValorFondo(fondo, newValor);
 
-      await database.updateFondo(carteraSelect, fondo);
-      await database.insertValor(carteraSelect, fondo, newValor);
-      await setFondos(carteraSelect);
-      return true;
+      try {
+        await database.updateFondo(carteraSelect, fondo);
+        await database.insertValor(carteraSelect, fondo, newValor);
+        await setFondos(carteraSelect);
+        return true;
+      } catch (e, s) {
+        Logger.log(
+          dataLog: DataLog(
+            msg: 'Catch updateFondo / insertValor database',
+            file: 'page_cartera.dart',
+            clase: '_PageCarteraState',
+            funcion: '_getDataApi',
+            error: e,
+            stackTrace: s,
+          ),
+        );
+        return false;
+      }
     } else {
       return false;
     }
@@ -381,7 +380,7 @@ class _PageCarteraState extends State<PageCartera> {
     _pop();
     update
         ? _showMsg(msg: 'Fondo actualizado')
-        : _showMsg(msg: 'Error al actualizar el fondo', color: Colors.red);
+        : _showMsg(msg: 'Error al actualizar el fondo', color: red900);
   }
 
   _addFondo(Fondo newFondo) async {
@@ -390,16 +389,41 @@ class _PageCarteraState extends State<PageCartera> {
     if (existe) {
       _showMsg(
         msg: 'El fondo con ISIN ${newFondo.isin} ya existe en esta cartera.',
-        color: Colors.red,
+        color: red900,
       );
     } else {
-      await database.insertFondo(carteraSelect, newFondo);
-      await setFondos(carteraSelect);
-      if (prefProvider.isAutoAudate) {
-        if (!mounted) return;
-        await _dialogAutoUpdate(context, newFondo);
+      var docCnmv = DocCnmv(isin: newFondo.isin);
+      int rating = await docCnmv.getRating();
+      newFondo.rating = rating;
+      /*if (rating > 0 && rating < 6) {
+        newFondo.rating = rating;
+      }*/
+      bool? insertOk;
+      try {
+        insertOk = await database.insertFondo(carteraSelect, newFondo);
+      } catch (e, s) {
+        Logger.log(
+          dataLog: DataLog(
+            msg: 'Catch insert new Fondo in database',
+            file: 'page_cartera.dart',
+            clase: '_PageCarteraState',
+            funcion: '_addFondo',
+            error: e,
+            stackTrace: s,
+          ),
+        );
+        //return;
+      }
+      if (insertOk == true) {
+        await setFondos(carteraSelect);
+        if (prefProvider.isAutoAudate) {
+          if (!mounted) return;
+          await _dialogAutoUpdate(context, newFondo);
+        } else {
+          _showMsg(msg: 'Fondo añadido');
+        }
       } else {
-        _showMsg(msg: 'Fondo añadido');
+        _showMsg(msg: 'Error al añaddir el Fondo', color: red900);
       }
     }
   }
@@ -489,14 +513,13 @@ class _PageCarteraState extends State<PageCartera> {
     }
   }
 
-  void _showMsg({required String msg, MaterialColor color = Colors.grey}) =>
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), backgroundColor: color),
-      );
+  void _showMsg({required String msg, Color? color}) {
+    CustomDialog customDialog = const CustomDialog();
+    customDialog.generateDialog(context: context, msg: msg, color: color);
+  }
 
   void _pop() {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
     Navigator.of(context).pop();
   }
 }

@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:math' show pow;
 
 class CashFlow {
   final double importe;

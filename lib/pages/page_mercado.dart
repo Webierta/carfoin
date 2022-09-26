@@ -11,6 +11,7 @@ import '../services/database_helper.dart';
 import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
 import '../utils/styles.dart';
+import '../widgets/custom_dialog.dart';
 import '../widgets/loading_progress.dart';
 
 class PageMercado extends StatefulWidget {
@@ -135,7 +136,7 @@ class _MercadoState extends State<PageMercado> {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
-                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                // ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 context.go(fondoPage);
               },
             ),
@@ -323,13 +324,18 @@ class _MercadoState extends State<PageMercado> {
                                 });
                               } else {
                                 if (!mounted) return;
-                                ScaffoldMessenger.of(context).showSnackBar(
+                                _showMsg(
+                                  msg:
+                                      'Dato no disponible. Introduce el precio manualmente',
+                                  color: red900,
+                                );
+                                /*ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text(
                                         'Dato no encontrado. Introduce el precio manualmente.'),
                                     backgroundColor: Colors.red,
                                   ),
-                                );
+                                );*/
                               }
                             },
                           ),
@@ -550,7 +556,7 @@ class _MercadoState extends State<PageMercado> {
         _showMsg(
             msg: 'No se puede hacer un reembolso de participaciones no '
                 'disponibles ni operaciones sin ninguna participación',
-            color: Colors.red);
+            color: red900);
         return;
       }
       if (minusPart) {
@@ -561,7 +567,7 @@ class _MercadoState extends State<PageMercado> {
       await database.insertValor(carteraSelect, fondoSelect, newOp);
       carteraProvider.addValor(carteraSelect, fondoSelect, newOp);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      // ScaffoldMessenger.of(context).removeCurrentSnackBar();
       context.go(fondoPage);
     }
   }
@@ -606,14 +612,14 @@ class _MercadoState extends State<PageMercado> {
     return null;
   }
 
-  void _showMsg({required String msg, MaterialColor color = Colors.grey}) =>
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), backgroundColor: color),
-      );
+  void _showMsg({required String msg, Color? color}) {
+    CustomDialog customDialog = const CustomDialog();
+    customDialog.generateDialog(context: context, msg: msg, color: color);
+  }
 
   void _pop() {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    //ScaffoldMessenger.of(context).removeCurrentSnackBar();
     Navigator.of(context).pop();
   }
 }

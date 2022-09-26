@@ -54,6 +54,7 @@ const Color amber = Color(0xFFFFC107);
 const Color gris = Color(0xFF9E9E9E);
 const Color green = Color(0xFF4CAF50);
 const Color red = Color(0xFFF44336);
+const Color red900 = Color(0xFFB71C1C);
 
 Color textRedGreen(num number) {
   return number < 0 ? const Color(0xFFF44336) : const Color(0xFF4CAF50);

@@ -1,12 +1,15 @@
-import 'dart:async';
-import 'dart:io';
+//import 'dart:async';
+import 'dart:io' show File, Directory;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart' show PDFView;
+import 'package:path_provider/path_provider.dart'
+    show getExternalStorageDirectory;
 import 'package:permission_handler/permission_handler.dart';
 
 import '../models/logger.dart';
+import '../widgets/custom_dialog.dart';
+import 'styles.dart';
 
 class PdfVisor extends StatefulWidget {
   final File file;
@@ -31,8 +34,9 @@ class _PdfVisorState extends State<PdfVisor> {
           IconButton(
             onPressed: () async {
               await saveFile(widget.url, title).then((value) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Archivo guardado en Doc_Carfoin')));
+                _showMsg(msg: 'Archivo guardado en Doc_Carfoin');
+                /*ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Archivo guardado en Doc_Carfoin')));*/
               }).onError((e, s) {
                 Logger.log(
                   dataLog: DataLog(
@@ -44,10 +48,11 @@ class _PdfVisorState extends State<PdfVisor> {
                     stackTrace: s,
                   ),
                 );
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                _showMsg(msg: 'Error al guardar el archivo', color: red900);
+                /*ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                   content: Text('Error al guardar el archivo'),
                   backgroundColor: Colors.red,
-                ));
+                ));*/
               });
             },
             icon: const Icon(Icons.download),
@@ -146,5 +151,10 @@ class _PdfVisorState extends State<PdfVisor> {
       }
     }
     return false;
+  }
+
+  void _showMsg({required String msg, Color? color}) {
+    CustomDialog customDialog = const CustomDialog();
+    customDialog.generateDialog(context: context, msg: msg, color: color);
   }
 }

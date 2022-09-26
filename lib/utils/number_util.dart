@@ -1,4 +1,4 @@
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' show NumberFormat;
 
 const String locEs = 'es';
 const double limitDown = 10000;

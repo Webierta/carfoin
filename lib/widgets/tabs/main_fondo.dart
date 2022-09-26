@@ -1,14 +1,15 @@
-import 'dart:io';
+import 'dart:io' show File;
 
-import 'package:carfoin/models/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart'
+    show getApplicationDocumentsDirectory;
 import 'package:provider/provider.dart';
 
 import '../../models/cartera.dart';
 import '../../models/cartera_provider.dart';
+import '../../models/logger.dart';
 import '../../models/preferences_provider.dart';
 import '../../router/routes_const.dart';
 import '../../services/database_helper.dart';
@@ -18,6 +19,7 @@ import '../../utils/number_util.dart';
 import '../../utils/pdf_visor.dart';
 import '../../utils/stats.dart';
 import '../../utils/styles.dart';
+import '../custom_dialog.dart';
 import '../hoja_calendario.dart';
 import '../loading_progress.dart';
 
@@ -322,6 +324,17 @@ class _MainFondoState extends State<MainFondo> {
           });
     }
 
+    List<Icon> getStarRating() {
+      List<Icon> estrellas = [];
+      int rating = fondoSelect.rating ?? 0;
+      for (var i = 1; i < 6; i++) {
+        var icon = Icon(Icons.star,
+            color: rating >= i ? Colors.greenAccent[400] : Colors.grey);
+        estrellas.add(icon);
+      }
+      return estrellas;
+    }
+
     if (openingPdf) {
       Future.delayed(Duration.zero, () => showDialogLoading(context));
     }
@@ -350,12 +363,6 @@ class _MainFondoState extends State<MainFondo> {
                     style: const TextStyle(fontSize: 16, color: blue900),
                   ),
                 ),
-                TextButton(
-                    onPressed: () async {
-                      var docCnmv = DocCnmv(isin: fondoSelect.isin);
-                      await docCnmv.getRating();
-                    },
-                    child: const Text('Get rating')),
                 Column(
                   children: [
                     const Text(
@@ -364,13 +371,7 @@ class _MainFondoState extends State<MainFondo> {
                     ),
                     Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.star, color: Colors.greenAccent[400]),
-                        Icon(Icons.star, color: Colors.greenAccent[400]),
-                        Icon(Icons.star, color: Colors.greenAccent[400]),
-                        const Icon(Icons.star, color: Colors.grey),
-                        const Icon(Icons.star, color: Colors.grey),
-                      ],
+                      children: getStarRating(),
                     ),
                   ],
                 ),
@@ -381,7 +382,12 @@ class _MainFondoState extends State<MainFondo> {
                       onPressed: () async {
                         setState(() => openingPdf = true);
                         var docCnmv = DocCnmv(isin: fondoSelect.isin);
-                        String? urlPdf = await docCnmv.getUrlFolleto();
+                        String? urlPdf =
+                            await docCnmv.getUrlFolleto().whenComplete(() {
+                          Future.delayed(Duration.zero, () {
+                            Navigator.of(context).pop();
+                          });
+                        });
                         if (urlPdf != null) {
                           String filename = 'folleto_${fondoSelect.isin}';
                           await loadPdfFromNetwork(urlPdf, filename)
@@ -390,6 +396,9 @@ class _MainFondoState extends State<MainFondo> {
                                   () => setState(() => openingPdf = false));
                         } else {
                           setState(() => openingPdf = false);
+                          _showMsg(msg: 'Archivo no disponible', color: red900);
+                          //if (mounted)
+                          //Navigator.of(context).pop();
                           Logger.log(
                             dataLog: DataLog(
                               msg: 'urlPdf is null',
@@ -398,6 +407,7 @@ class _MainFondoState extends State<MainFondo> {
                               funcion: 'build',
                             ),
                           );
+                          //if (!mounted) return;
                         }
                       },
                       icon: Image.asset('assets/pdf.gif'),
@@ -407,7 +417,12 @@ class _MainFondoState extends State<MainFondo> {
                       onPressed: () async {
                         setState(() => openingPdf = true);
                         var docCnmv = DocCnmv(isin: fondoSelect.isin);
-                        Informe? informe = await docCnmv.getUrlInforme();
+                        Informe? informe =
+                            await docCnmv.getUrlInforme().whenComplete(() {
+                          Future.delayed(Duration.zero, () {
+                            Navigator.of(context).pop();
+                          });
+                        });
                         if (informe != null) {
                           var name = informe.name;
                           var urlPdf = informe.url;
@@ -418,6 +433,9 @@ class _MainFondoState extends State<MainFondo> {
                                   () => setState(() => openingPdf = false));
                         } else {
                           setState(() => openingPdf = false);
+                          _showMsg(msg: 'Archivo no disponible', color: red900);
+                          //if (mounted)
+                          //Navigator.of(context).pop();
                           Logger.log(
                             dataLog: DataLog(
                               msg: 'informe is null',
@@ -426,6 +444,7 @@ class _MainFondoState extends State<MainFondo> {
                               funcion: 'build',
                             ),
                           );
+                          //if (!mounted) return;
                         }
                       },
                       icon: Image.asset('assets/pdf.gif'),
@@ -434,8 +453,11 @@ class _MainFondoState extends State<MainFondo> {
                   ]),
                 ),
                 valores.isEmpty
-                    ? const Text(
-                        'Sin datos. Descarga el último valor o un intervalo de valores históricos.')
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Text('Sin datos. Descarga el último valor o '
+                            'un intervalo de valores históricos.'),
+                      )
                     : Padding(
                         padding: const EdgeInsets.only(
                             left: 12, right: 12, bottom: 12),
@@ -593,8 +615,11 @@ class _MainFondoState extends State<MainFondo> {
                   ),
                 ),
                 operaciones.isEmpty
-                    ? const Text('Sin datos de operaciones.\n'
-                        'Ordena transacciones en el mercado para seguir la evolución de tu inversión.')
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: Text('Sin datos de operaciones.\n'
+                            'Ordena transacciones en el mercado para seguir la evolución de tu inversión.'),
+                      )
                     : Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Column(
@@ -819,8 +844,15 @@ class _MainFondoState extends State<MainFondo> {
         .whenComplete(() {
       _deleteFile(file);
       setState(() => openingPdf = false);
-      Navigator.of(context).pop();
+      /*Future.delayed(Duration.zero, () {
+        Navigator.of(context).pop();
+      });*/
     });
+  }
+
+  void _showMsg({required String msg, Color? color}) {
+    CustomDialog customDialog = const CustomDialog();
+    customDialog.generateDialog(context: context, msg: msg, color: color);
   }
 }
 

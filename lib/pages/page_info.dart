@@ -25,7 +25,7 @@ class PageInfo extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.home),
                 onPressed: () {
-                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  //ScaffoldMessenger.of(context).removeCurrentSnackBar();
                   //Navigator.of(context).pushNamed(RouteGenerator.homePage);
                   context.go(homePage);
                 },

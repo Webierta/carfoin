@@ -33,7 +33,7 @@ class PageAbout extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.home),
                 onPressed: () {
-                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  //ScaffoldMessenger.of(context).removeCurrentSnackBar();
                   context.go(homePage);
                 },
               ),

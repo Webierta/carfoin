@@ -1,5 +1,5 @@
-import 'package:html/dom.dart';
-import 'package:html/parser.dart';
+import 'package:html/dom.dart' show Document, Element;
+import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 
 import '../models/logger.dart';
@@ -194,7 +194,7 @@ class DocCnmv {
     }
   }
 
-  Future<int?> getRating() async {
+  Future<int> getRating() async {
     /*const String urlBase1 =
         'https://www.morningstar.es/es/screener/fund.aspx#?filtersSelectedValue=%7B%22term%22:%22';
     const String urlBase2 = '%22%7D&page=1&sortField=legalName&sortOrder=asc';
@@ -213,18 +213,21 @@ class DocCnmv {
               element.attributes['data-ng-if'] == 'obj.starRatingM255')
           .toList();*/
 
-      var elements = document
+      // List<Element?>?
+      List<List<Element?>?>? elements = document
           .getElementsByTagName('span')
-          .where((element) =>
-              element.attributes['data-mod-stars-highlighted'] == 'true')
-          .map((item) => item.getElementsByTagName('i'))
+          ?.where((Element? element) =>
+              element?.attributes['data-mod-stars-highlighted'] == 'true')
+          .map((Element? item) => item?.getElementsByTagName('i'))
           .toList();
-      if (elements.isNotEmpty) {
-        var i = elements.first.length;
-        if (i > 0 && i < 6) {
-          return i;
+      if (elements != null && elements.isNotEmpty) {
+        int? i = elements.first?.length;
+        if (i != null) {
+          if (i > 0 && i < 6) {
+            return i;
+          }
         }
-        return null;
+        return 0;
       } else {
         Logger.log(
           dataLog: DataLog(
@@ -234,7 +237,7 @@ class DocCnmv {
             funcion: 'getRating',
           ),
         );
-        return null;
+        return 0;
       }
     } else {
       Logger.log(
@@ -245,7 +248,7 @@ class DocCnmv {
           funcion: 'getRating',
         ),
       );
-      return null;
+      return 0;
     }
   }
 }

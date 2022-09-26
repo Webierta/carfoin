@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +11,8 @@ import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../utils/fecha_util.dart';
 import '../utils/styles.dart';
+import '../widgets/custom_dialog.dart';
+import '../widgets/expandable_fab.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
 import '../widgets/tabs/grafico_fondo.dart';
@@ -76,7 +77,7 @@ class _PageFondoState extends State<PageFondo>
     super.dispose();
   }
 
-  SpeedDialChild _buildSpeedDialChild(
+  /*SpeedDialChild _buildSpeedDialChild(
     BuildContext context, {
     required IconData icono,
     required String label,
@@ -88,11 +89,12 @@ class _PageFondoState extends State<PageFondo>
       backgroundColor: const Color(0xFFFFC107),
       foregroundColor: const Color(0xFF0D47A1),
       onTap: () async {
-        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+        //ScaffoldMessenger.of(context).removeCurrentSnackBar();
+        //key.currentState?.removeCurrentSnackBar();
         action(context);
       },
     );
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +114,8 @@ class _PageFondoState extends State<PageFondo>
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () {
-                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                    // ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                    //scaffoldMessengerKey.currentState?.removeCurrentSnackBar();
                     // TODO: set carteraOn antes de navigator??
                     context.go(carteraPage);
                   },
@@ -155,7 +158,7 @@ class _PageFondoState extends State<PageFondo>
                         context.go(mercadoPage);
                       } else if (item == MenuFondo.eliminar) {
                         if (carteraProvider.valores.isEmpty) {
-                          _showMsg(msg: 'Nada que eliminar');
+                          showMsg(msg: 'Nada que eliminar');
                         } else {
                           var resp = await _deleteConfirm(context);
                           if (resp == null || resp == false) {
@@ -184,6 +187,7 @@ class _PageFondoState extends State<PageFondo>
               bottomNavigationBar: BottomAppBar(
                 color: blue900,
                 shape: const CircularNotchedRectangle(),
+                clipBehavior: Clip.antiAlias,
                 notchMargin: 5,
                 child: FractionallySizedBox(
                   widthFactor: 0.7,
@@ -205,28 +209,26 @@ class _PageFondoState extends State<PageFondo>
               ),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.endDocked,
-              floatingActionButton: SpeedDial(
-                icon: Icons.refresh,
-                foregroundColor: blue900,
-                backgroundColor: amber,
-                spacing: 8,
-                spaceBetweenChildren: 4,
-                overlayColor: gris,
-                overlayOpacity: 0.4,
-                children: [
-                  _buildSpeedDialChild(
-                    context,
-                    icono: Icons.date_range,
-                    label: 'Descargar valores históricos',
-                    action: _getRangeApi,
-                  ),
-                  _buildSpeedDialChild(
-                    context,
-                    icono: Icons.update,
-                    label: 'Actualizar último valor',
-                    action: _getDataApi,
-                  ),
-                ],
+              floatingActionButton: FloatingActionButton(
+                heroTag: null,
+                onPressed: null,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                child: ExpandableFab(
+                  icon: Icons.refresh,
+                  children: [
+                    ChildFab(
+                      icon: const Icon(Icons.date_range),
+                      label: 'Valores Históricos',
+                      onPressed: () => _getRangeApi(context),
+                    ),
+                    ChildFab(
+                      icon: const Icon(Icons.update),
+                      label: 'Actualizar Valor',
+                      onPressed: () => _getDataApi(context),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -269,10 +271,10 @@ class _PageFondoState extends State<PageFondo>
       await database.updateOperacion(carteraSelect, fondoSelect, newValor);
       await setValores(carteraSelect, fondoSelect);
       _pop();
-      _showMsg(msg: 'Descarga de datos completada.');
+      showMsg(msg: 'Descarga de datos completada.');
     } else {
       _pop();
-      _showMsg(msg: 'Error en la descarga de datos.', color: Colors.red);
+      showMsg(msg: 'Error en la descarga de datos.', color: red900);
     }
   }
 
@@ -309,10 +311,10 @@ class _PageFondoState extends State<PageFondo>
         await setValores(carteraSelect, fondoSelect);
         // TODO set last valor (date y precio) desde VALORES cada vez en _updateValores
         _pop();
-        _showMsg(msg: 'Descarga de datos completada.');
+        showMsg(msg: 'Descarga de datos completada.');
       } else {
         _pop();
-        _showMsg(msg: 'Error en la descarga de datos.', color: Colors.red);
+        showMsg(msg: 'Error en la descarga de datos.', color: red900);
       }
     }
   }
@@ -356,8 +358,8 @@ class _PageFondoState extends State<PageFondo>
               ElevatedButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFFFFFFFF),
                   backgroundColor: red,
-                  primary: const Color(0xFFFFFFFF),
                 ),
                 child: const Text('ACEPTAR'),
               ),
@@ -366,15 +368,18 @@ class _PageFondoState extends State<PageFondo>
         });
   }
 
-  void _showMsg({required String msg, MaterialColor color = Colors.grey}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: color),
-    );
+  void showMsg({required String msg, Color? color}) {
+    CustomDialog customDialog = const CustomDialog();
+    customDialog.generateDialog(context: context, msg: msg, color: color);
   }
 
   void _pop() {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    //ScaffoldMessenger.of(context).removeCurrentSnackBar();
     Navigator.of(context).pop();
+
+    /*SchedulerBinding.instance.addPostFrameCallback((_) {
+      Navigator.of(context).pop();
+    });*/
   }
 }

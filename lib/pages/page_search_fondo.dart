@@ -1,7 +1,7 @@
-import 'dart:convert';
+import 'dart:convert' show json;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 import '../models/cartera.dart';
 import '../utils/styles.dart';

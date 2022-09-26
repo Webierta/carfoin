@@ -36,10 +36,7 @@ class ListTileLastOp extends StatelessWidget {
                         decorationColor: blue,
                         color: Colors.transparent,
                         shadows: [
-                          Shadow(
-                            offset: Offset(0, -4),
-                            color: Colors.black,
-                          )
+                          Shadow(offset: Offset(0, -4), color: Colors.black)
                         ],
                       ),
                     )),
@@ -47,10 +44,12 @@ class ListTileLastOp extends StatelessWidget {
                   children: [
                     const Icon(Icons.business_center, color: Colors.black54),
                     const SizedBox(width: 4),
-                    Text(lastOp.cartera.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Colors.black54)),
+                    Text(
+                      lastOp.cartera.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Colors.black54),
+                    ),
                   ],
                 ),
               ],

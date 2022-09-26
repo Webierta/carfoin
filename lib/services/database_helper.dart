@@ -1,4 +1,5 @@
-import 'dart:io';
+//import 'dart:async';
+import 'dart:io' show Directory;
 
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -9,7 +10,7 @@ import '../models/logger.dart';
 class DatabaseHelper {
   // DATABASE
   static const _databaseName = 'database.db';
-  static const _databaseVersion = 1;
+  static const _databaseVersion = 2;
   // TABLA CARFOIN DE CARTERAS
   static const table = 'carfoin';
   static const columnId = 'id';
@@ -18,6 +19,7 @@ class DatabaseHelper {
   static const columnIsin = 'isin';
   static const columnNameFondo = 'name';
   static const columnDivisa = 'divisa';
+  static const columnRating = 'rating';
   // TABLA _CARTERA.ID + FONDO.ISIN DE VALORES
   static const columnDate = 'date';
   static const columnPrecio = 'precio';
@@ -51,7 +53,20 @@ class DatabaseHelper {
           $columnNameCartera TEXT NOT NULL)
         ''');
       },
+      onUpgrade: _onUpgrade,
     );
+  }
+
+  //FutureOr<void> _onUpgrade(Database db, int oldVersion, int newVersion) {}
+  void _onUpgrade(Database db, int oldVersion, int newVersion) {
+    if (oldVersion < newVersion) {
+      print('UPGRADE DATABASE');
+      // you can execute drop table and create table
+      //db.execute("ALTER TABLE tb_name ADD COLUMN newCol TEXT;");
+      //var nameTable = '_${cartera.id}';
+      //db.execute("ALTER TABLE ");
+      db.close();
+    }
   }
 
   getDatabaseFolder() async {
@@ -190,7 +205,8 @@ class DatabaseHelper {
     CREATE TABLE IF NOT EXISTS $nameTable (
       $columnIsin TEXT PRIMARY KEY,
       $columnNameCartera TEXT NOT NULL,
-      $columnDivisa TEXT)
+      $columnDivisa TEXT,
+      $columnRating INTEGER)
     ''');
   }
 
@@ -202,10 +218,26 @@ class DatabaseHelper {
     await db.execute("DROP TABLE IF EXISTS $nameTable");
   }
 
-  Future<void> insertFondo(Cartera cartera, Fondo fondo) async {
+  Future<bool> insertFondo(Cartera cartera, Fondo fondo) async {
     Database db = await database;
     var nameTable = '_${cartera.id}';
-    await db.insert(nameTable, fondo.toDb());
+    try {
+      await db.insert(nameTable, fondo.toDb());
+      return true;
+    } catch (e, s) {
+      Logger.log(
+        dataLog: DataLog(
+          msg: 'Catch insert fondo',
+          file: 'database_helper.dart',
+          clase: 'DatabaseHelper',
+          funcion: 'insertFondo',
+          error: e,
+          stackTrace: s,
+        ),
+      );
+      return false;
+    }
+
     //await db.insert(nameTable, fondo.toDb(),
     //    conflictAlgorithm: ConflictAlgorithm.replace);
   }

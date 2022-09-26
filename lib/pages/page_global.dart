@@ -40,7 +40,7 @@ class _PageGlobalState extends State<PageGlobal> {
     }*/
 
     goFondo(BuildContext context, Cartera cartera, Fondo fondo) {
-      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      //ScaffoldMessenger.of(context).removeCurrentSnackBar();
       carteraProvider.carteraSelect = cartera;
       carteraProvider.fondoSelect = fondo;
       context.go(fondoPage);
@@ -59,7 +59,7 @@ class _PageGlobalState extends State<PageGlobal> {
               IconButton(
                 icon: const Icon(Icons.home),
                 onPressed: () {
-                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  //ScaffoldMessenger.of(context).removeCurrentSnackBar();
                   context.go(homePage);
                 },
               ),

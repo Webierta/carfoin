@@ -1,10 +1,10 @@
-import 'package:carfoin/models/logger.dart';
-import 'package:carfoin/models/preferences_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../models/logger.dart';
+import '../models/preferences_provider.dart';
 import '../router/routes_const.dart';
 import '../services/exchange_api.dart';
 import '../services/preferences_service.dart';
@@ -13,6 +13,7 @@ import '../utils/fecha_util.dart';
 import '../utils/konstantes.dart';
 import '../utils/number_util.dart';
 import '../utils/styles.dart';
+import '../widgets/custom_dialog.dart';
 import '../widgets/my_drawer.dart';
 
 enum ResultStatus { pendiente, nuevo, viejo, error }
@@ -68,7 +69,7 @@ class _PageSettingsState extends State<PageSettings> {
     } else if (result == ResultStatus.viejo) {
       _showMsg(msg: 'No se requiere actualización');
     } else if (result == ResultStatus.error) {
-      _showMsg(msg: 'Servicio no disponible', color: Colors.red);
+      _showMsg(msg: 'Servicio no disponible', color: red900);
     }
   }
 
@@ -87,7 +88,7 @@ class _PageSettingsState extends State<PageSettings> {
               IconButton(
                 icon: const Icon(Icons.home),
                 onPressed: () {
-                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  //ScaffoldMessenger.of(context).removeCurrentSnackBar();
                   context.go(homePage);
                 },
               ),
@@ -306,8 +307,9 @@ class _PageSettingsState extends State<PageSettings> {
                         _showMsg(msg: 'Memoria caché liberada');
                       } else {
                         _showMsg(
-                            msg: 'No ha sido posible liberar la memoria caché',
-                            color: Colors.red);
+                          msg: 'No ha sido posible liberar la memoria caché',
+                          color: red900,
+                        );
                       }
                     },
                   ),
@@ -377,7 +379,7 @@ class _PageSettingsState extends State<PageSettings> {
                       } else {
                         _showMsg(
                           msg: 'El archivo logfile.txt no existe o está vacío',
-                          color: Colors.red,
+                          color: red900,
                         );
                       }
                     },
@@ -399,10 +401,7 @@ class _PageSettingsState extends State<PageSettings> {
                       if (await const Logger().clear()) {
                         _showMsg(msg: 'Archivo de registro eliminado');
                       } else {
-                        _showMsg(
-                          msg: 'Archivo no encontrado',
-                          color: Colors.red,
-                        );
+                        _showMsg(msg: 'Archivo no encontrado', color: red900);
                       }
                     },
                   ),
@@ -415,11 +414,9 @@ class _PageSettingsState extends State<PageSettings> {
     );
   }
 
-  void _showMsg({required String msg, MaterialColor color = Colors.grey}) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: color),
-    );
+  void _showMsg({required String msg, Color? color}) {
+    CustomDialog customDialog = const CustomDialog();
+    customDialog.generateDialog(context: context, msg: msg, color: color);
   }
 }
 
