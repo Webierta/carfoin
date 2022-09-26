@@ -70,6 +70,16 @@ class _PageHomeState extends State<PageHome> {
     }
   }
 
+  /*checkVersionDb() async {
+    DatabaseHelper databaseTest = DatabaseHelper();
+    final String dbPath = await databaseTest.getDatabasePath();
+    if (!await databaseTest.isDatabase(dbPath)) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        context.go(errorPage);
+      });
+    }
+  }*/
+
   setCarteras() async {
     try {
       carteraProvider.carteras =
@@ -123,6 +133,7 @@ class _PageHomeState extends State<PageHome> {
     prefProvider = context.read<PreferencesProvider>();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await getSharedPrefs();
+      //await checkVersionDb();
       await setCarteras();
     });
     _controller = TextEditingController();
@@ -171,7 +182,10 @@ class _PageHomeState extends State<PageHome> {
       if (value != null) {
         await _loadCartera(value);
       } else {
-        showMsg(msg: 'Proceso desestimado');
+        showMsg(
+          msg: 'Interrupción del proceso de carga de la cartera compartida',
+          color: red900,
+        );
       }
     }).catchError((onError) {
       showMsg(
@@ -311,7 +325,7 @@ class _PageHomeState extends State<PageHome> {
             ),
           );
         } else {
-          return const LoadingProgress(titulo: 'Actualizando carteras...');
+          return const LoadingProgress(titulo: 'Cargando carteras...');
         }
       },
     );
@@ -334,10 +348,8 @@ class _PageHomeState extends State<PageHome> {
     );
     List<Update> updateResultados = [];
     if (carteraProvider.carteras.isNotEmpty) {
-      var updateAll = UpdateAll(
-        context: context,
-        setStateDialog: _setStateDialog,
-      );
+      var updateAll =
+          UpdateAll(context: context, setStateDialog: _setStateDialog);
       updateResultados = await updateAll.updateCarteras();
       if (updateResultados.isNotEmpty) {
         await setCarteras();
@@ -608,6 +620,7 @@ class _PageHomeState extends State<PageHome> {
 
     if (existe) {
       showMsg(msg: 'Ya existe una cartera con ese nombre', color: red900);
+      return;
     } else {
       try {
         await database.createTableCartera(cartera).whenComplete(() async {
@@ -615,6 +628,9 @@ class _PageHomeState extends State<PageHome> {
           //await setCarteras();
         });
       } catch (e, s) {
+        showMsg(
+            msg: 'Proceso interrumpido: Error en la carga del archivo',
+            color: red900);
         Logger.log(
           dataLog: DataLog(
             msg: 'Catch create table cartera + insert cartera',
@@ -625,32 +641,50 @@ class _PageHomeState extends State<PageHome> {
             stackTrace: s,
           ),
         );
+        return;
       }
 
-      if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
-        for (var fondo in cartera.fondos!) {
-          await database
-              .createTableFondo(cartera, fondo)
-              .whenComplete(() async {
-            await database.insertFondo(
-                cartera,
-                Fondo(
-                    isin: fondo.isin,
-                    name: fondo.name,
-                    divisa: fondo.divisa,
-                    valores: fondo.valores,
-                    rating: fondo.rating));
-            //await setCarteras();
-            if (fondo.valores != null && fondo.valores!.isNotEmpty) {
-              for (var valor in fondo.valores!) {
-                await database.insertValor(cartera, fondo, valor);
-                //await setCarteras();
+      try {
+        if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
+          for (var fondo in cartera.fondos!) {
+            await database
+                .createTableFondo(cartera, fondo)
+                .whenComplete(() async {
+              await database.insertFondo(
+                  cartera,
+                  Fondo(
+                      isin: fondo.isin,
+                      name: fondo.name,
+                      divisa: fondo.divisa,
+                      valores: fondo.valores,
+                      rating: fondo.rating));
+              //await setCarteras();
+              if (fondo.valores != null && fondo.valores!.isNotEmpty) {
+                for (var valor in fondo.valores!) {
+                  await database.insertValor(cartera, fondo, valor);
+                  //await setCarteras();
+                }
               }
-            }
-          });
+            });
+          }
         }
+        await setCarteras();
+      } catch (e, s) {
+        showMsg(
+            msg: 'Proceso interrumpido: Error en la carga del archivo',
+            color: red900);
+        Logger.log(
+          dataLog: DataLog(
+            msg: 'Catch create table fondo + insert fondo',
+            file: 'page_home.dart',
+            clase: '_PageHomeState',
+            funcion: '_loadCartera',
+            error: e,
+            stackTrace: s,
+          ),
+        );
+        return;
       }
-      await setCarteras();
     }
   }
 

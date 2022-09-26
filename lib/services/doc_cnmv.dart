@@ -231,7 +231,7 @@ class DocCnmv {
       } else {
         Logger.log(
           dataLog: DataLog(
-            msg: 'elements is empty',
+            msg: 'elements is empty: return rating 0',
             file: 'doc_cnmv.dart',
             clase: 'DocCnmv',
             funcion: 'getRating',

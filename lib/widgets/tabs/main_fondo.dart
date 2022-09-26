@@ -382,14 +382,15 @@ class _MainFondoState extends State<MainFondo> {
                       onPressed: () async {
                         setState(() => openingPdf = true);
                         var docCnmv = DocCnmv(isin: fondoSelect.isin);
-                        String? urlPdf =
+                        /*String? urlPdf =
                             await docCnmv.getUrlFolleto().whenComplete(() {
                           Future.delayed(Duration.zero, () {
                             Navigator.of(context).pop();
                           });
-                        });
+                        });*/
+                        String? urlPdf = await docCnmv.getUrlFolleto();
                         if (urlPdf != null) {
-                          String filename = 'folleto_${fondoSelect.isin}';
+                          String filename = 'folleto_${fondoSelect.isin}.pdf';
                           await loadPdfFromNetwork(urlPdf, filename)
                               .then((file) => openPdf(context, file, urlPdf))
                               .whenComplete(
@@ -409,6 +410,7 @@ class _MainFondoState extends State<MainFondo> {
                           );
                           //if (!mounted) return;
                         }
+                        //setState(() => openingPdf = false);
                       },
                       icon: Image.asset('assets/pdf.gif'),
                       label: const Text('Folleto'),
@@ -417,16 +419,17 @@ class _MainFondoState extends State<MainFondo> {
                       onPressed: () async {
                         setState(() => openingPdf = true);
                         var docCnmv = DocCnmv(isin: fondoSelect.isin);
-                        Informe? informe =
+                        /*Informe? informe =
                             await docCnmv.getUrlInforme().whenComplete(() {
                           Future.delayed(Duration.zero, () {
                             Navigator.of(context).pop();
                           });
-                        });
+                        });*/
+                        Informe? informe = await docCnmv.getUrlInforme();
                         if (informe != null) {
                           var name = informe.name;
                           var urlPdf = informe.url;
-                          String filename = '${name}_${fondoSelect.isin}';
+                          String filename = '${name}_${fondoSelect.isin}.pdf';
                           await loadPdfFromNetwork(urlPdf, filename)
                               .then((file) => openPdf(context, file, urlPdf))
                               .whenComplete(
@@ -844,9 +847,9 @@ class _MainFondoState extends State<MainFondo> {
         .whenComplete(() {
       _deleteFile(file);
       setState(() => openingPdf = false);
-      /*Future.delayed(Duration.zero, () {
+      Future.delayed(Duration.zero, () {
         Navigator.of(context).pop();
-      });*/
+      });
     });
   }
 

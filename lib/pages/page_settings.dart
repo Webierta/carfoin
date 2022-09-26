@@ -254,8 +254,8 @@ class _PageSettingsState extends State<PageSettings> {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 leading: const Icon(Icons.refresh, color: blue900),
                 title: const Text('Actualizar último valor al añadir Fondo'),
-                subtitle:
-                    const Text('Recomendado para obtener la divisa del fondo'),
+                subtitle: const Text(
+                    'Recomendado para obtener la divisa y el rating del fondo'),
                 trailing: Switch(
                   value: prefProvider.isAutoAudate,
                   onChanged: (value) {

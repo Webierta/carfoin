@@ -101,12 +101,32 @@ class _ExpandableFabState extends State<ExpandableFab>
           curve: const Interval(0.25, 1.0, curve: Curves.easeInOut),
           duration: const Duration(milliseconds: 250),
           child: FloatingActionButton(
-            //heroTag: 'Open Fab',
+            heroTag: 'Open Fab',
+            //heroTag: null,
             onPressed: toggle,
             foregroundColor: blue900,
             backgroundColor: amber,
             child: Icon(widget.icon),
           ),
+          /*child: SizedBox(
+            width: 56.0,
+            height: 56.0,
+            child: Center(
+              child: Material(
+                shape: const CircleBorder(),
+                color: amber,
+                clipBehavior: Clip.antiAlias,
+                elevation: 4.0,
+                child: InkWell(
+                  onTap: toggle,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(widget.icon, color: blue900),
+                  ),
+                ),
+              ),
+            ),
+          ),*/
         ),
       ),
     );
@@ -156,6 +176,16 @@ class _ExpandableFabState extends State<ExpandableFab>
                   style: const TextStyle(color: Colors.white),
                 ),
               ),
+              /*FloatingActionButton(
+                heroTag: widget.children[i].label,
+                onPressed: () {
+                  toggle();
+                  widget.children[i].onPressed();
+                },
+                foregroundColor: blue900,
+                backgroundColor: amber,
+                child: widget.children[i].icon,
+              ),*/
               Material(
                 shape: const CircleBorder(),
                 clipBehavior: Clip.antiAlias,

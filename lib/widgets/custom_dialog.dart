@@ -24,7 +24,7 @@ class CustomDialog {
         return Align(
           alignment: Alignment.bottomCenter,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 30),
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 60),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.end,

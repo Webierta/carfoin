@@ -94,7 +94,7 @@ class _MercadoState extends State<PageMercado> {
             content: ListBody(
               children: const [
                 Text('Todas las operaciones de suscripción y reembolso son '
-                    'simulaciones con intención de ser comparadas con '
+                    'simulaciones para ser comparadas con '
                     'transacciones reales, ficticias o potenciales.'),
                 SizedBox(height: 8),
                 Text('Cuando se realiza una operación en una fecha en la que '

@@ -119,71 +119,85 @@ class ShareCsv {
     return fields;
   }
 
-  static Cartera _listToCartera(List<List<dynamic>> fields, int lastIndex) {
+  static Cartera? _listToCartera(List<List<dynamic>> fields, int lastIndex) {
     Cartera cartera = Cartera(id: lastIndex + 1, name: fields[0].first);
     List<Fondo> fondos = [];
-
-    List<int> indexRowFondos = [];
-    for (int i = 1; i < fields.length; i++) {
-      var row = fields[i];
-      if (row[0].runtimeType == String) {
-        indexRowFondos.add(i);
+    try {
+      List<int> indexRowFondos = [];
+      for (int i = 1; i < fields.length; i++) {
+        var row = fields[i];
+        if (row[0].runtimeType == String) {
+          indexRowFondos.add(i);
+        }
       }
-    }
-
-    for (int i = 0; i < indexRowFondos.length; i++) {
-      int indexRowFondo = indexRowFondos[i];
-      var isin = fields[indexRowFondo][0];
-      var nameFondo = fields[indexRowFondo][1];
-      //String? divisa;
-      //if (fields[indexRowFondo].length > 2) {
-      var divisa = fields[indexRowFondo][2];
-      var rating = fields[indexRowFondo][3]; // ?? 0
-      List<Valor> valores = [];
-      /*int dif;
+      for (int i = 0; i < indexRowFondos.length; i++) {
+        int indexRowFondo = indexRowFondos[i];
+        var isin = fields[indexRowFondo][0];
+        var nameFondo = fields[indexRowFondo][1];
+        //String? divisa;
+        //if (fields[indexRowFondo].length > 2) {
+        var divisa = fields[indexRowFondo][2];
+        var rating = fields[indexRowFondo][3]; // ?? 0
+        List<Valor> valores = [];
+        /*int dif;
       if (indexRowFondo == indexRowFondos.last) {
         dif = fields.length - indexRowFondo;
       } else {
         dif = indexRowFondos[i + 1] - indexRowFondo;
       }*/
-      // indexRowFondo + 1 <= indexRowFondos.length ?
-      // i == indexRowFondos.length - 1 ?
-      int dif = indexRowFondo == indexRowFondos.last
-          ? fields.length - indexRowFondo
-          : indexRowFondos[i + 1] - indexRowFondo;
-      if (dif > 1) {
-        for (int j = indexRowFondo + 1; j < indexRowFondo + dif; j++) {
-          var rowValor = fields[j];
-          var date = rowValor[0];
-          var precio = rowValor[1];
-          var tipo = rowValor[2];
-          var participaciones = rowValor[3];
-          var newValor = Valor(
-              date: date,
-              precio: precio,
-              tipo: tipo,
-              participaciones: participaciones);
-          valores.add(newValor);
+        // indexRowFondo + 1 <= indexRowFondos.length ?
+        // i == indexRowFondos.length - 1 ?
+        int dif = indexRowFondo == indexRowFondos.last
+            ? fields.length - indexRowFondo
+            : indexRowFondos[i + 1] - indexRowFondo;
+        if (dif > 1) {
+          for (int j = indexRowFondo + 1; j < indexRowFondo + dif; j++) {
+            var rowValor = fields[j];
+            var date = rowValor[0];
+            var precio = rowValor[1];
+            var tipo = rowValor[2];
+            var participaciones = rowValor[3];
+            var newValor = Valor(
+                date: date,
+                precio: precio,
+                tipo: tipo,
+                participaciones: participaciones);
+            valores.add(newValor);
+          }
         }
+        Fondo fondo = Fondo(
+            isin: isin,
+            name: nameFondo,
+            divisa: divisa,
+            valores: valores,
+            rating: rating);
+        fondos.add(fondo);
       }
-      Fondo fondo = Fondo(
-          isin: isin,
-          name: nameFondo,
-          divisa: divisa,
-          valores: valores,
-          rating: rating);
-      fondos.add(fondo);
+      cartera.fondos = [...fondos];
+      return cartera;
+    } catch (e, s) {
+      Logger.log(
+        dataLog: DataLog(
+          msg: 'Catch Load Cartera Shared',
+          file: 'share_csv.dart',
+          clase: 'ShareCsv',
+          funcion: '_listToCartera',
+          error: e,
+          stackTrace: s,
+        ),
+      );
+      return null;
     }
-    cartera.fondos = [...fondos];
-    return cartera;
   }
 
   static Future<Cartera?> loadCartera(int lastIndex) async {
     File? file = await _selectFile();
     if (file != null) {
       List<List> fields = await _csvToList(file);
-      return _listToCartera(fields, lastIndex);
-      //return dbCartera;
+      Cartera? dbCartera = _listToCartera(fields, lastIndex);
+      if (dbCartera != null) {
+        return dbCartera;
+      }
     }
     return null;
   }

@@ -21,17 +21,17 @@ class PageError extends StatelessWidget {
               const Spacer(),
               const Center(
                 child: Text(
-                  'ERROR: ARCHIVO CORRUPTO',
+                  'ERROR: ARCHIVO NO VÁLIDO',
                   style: TextStyle(fontSize: 18, color: Colors.red),
                 ),
               ),
               const SizedBox(height: 20),
-              const Text('El archivo de la base de datos está dañado y será eliminado. '
+              const Text(
+                  'El archivo de la Base de Datos no es válido y será eliminado. '
                   'Todos los datos de las carteras, fondos, valores y operaciones se perderán.'),
               const SizedBox(height: 20),
-              const Text(
-                  'Una posible causa de este error es que no se reconoce un archivo importado '
-                  '(porque ha sido manipulado o creado con otra aplicación).'),
+              const Text('Posibles causas de este error son una base de datos '
+                  'con una versión no compatible, o que no se reconoce un archivo importado.'),
               const SizedBox(height: 20),
               const Text('La aplicación se reiniciará.'),
               const Spacer(),

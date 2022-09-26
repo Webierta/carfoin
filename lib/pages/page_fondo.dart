@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +11,7 @@ import '../router/router_utils.dart';
 import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
+import '../services/doc_cnmv.dart';
 import '../utils/fecha_util.dart';
 import '../utils/styles.dart';
 import '../widgets/custom_dialog.dart';
@@ -95,6 +98,10 @@ class _PageFondoState extends State<PageFondo>
       },
     );
   }*/
+
+  test() {
+    log('test');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -186,9 +193,9 @@ class _PageFondoState extends State<PageFondo>
               ),
               bottomNavigationBar: BottomAppBar(
                 color: blue900,
-                shape: const CircularNotchedRectangle(),
+                //shape: const CircularNotchedRectangle(),
                 clipBehavior: Clip.antiAlias,
-                notchMargin: 5,
+                //notchMargin: 5,
                 child: FractionallySizedBox(
                   widthFactor: 0.7,
                   alignment: FractionalOffset.bottomLeft,
@@ -209,9 +216,29 @@ class _PageFondoState extends State<PageFondo>
               ),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.endDocked,
-              floatingActionButton: FloatingActionButton(
+              floatingActionButton: Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: ExpandableFab(
+                  icon: Icons.refresh,
+                  children: [
+                    ChildFab(
+                      icon: const Icon(Icons.date_range),
+                      label: 'Valores Históricos',
+                      onPressed: () => _getRangeApi(context),
+                    ),
+                    ChildFab(
+                      icon: const Icon(Icons.update),
+                      label: 'Actualizar Valor',
+                      onPressed: () => _getDataApi(context),
+                    ),
+                  ],
+                ),
+              ),
+
+              /*floatingActionButton: FloatingActionButton(
                 heroTag: null,
-                onPressed: null,
+                //onPressed: null,
+                onPressed: () {},
                 backgroundColor: Colors.transparent,
                 elevation: 0,
                 child: ExpandableFab(
@@ -229,7 +256,7 @@ class _PageFondoState extends State<PageFondo>
                     ),
                   ],
                 ),
-              ),
+              ),*/
             ),
           ),
         );
@@ -247,8 +274,31 @@ class _PageFondoState extends State<PageFondo>
     );
   }
 
+  _updateRating() async {
+    updatingRating() async {
+      var docCnmv = DocCnmv(isin: fondoSelect.isin);
+      int rating = await docCnmv.getRating();
+      fondoSelect.rating = rating;
+    }
+
+    if (valoresSelect.isNotEmpty) {
+      var lastEpoch = valoresSelect.first.date;
+      var lastDate = FechaUtil.epochToDate(lastEpoch);
+      DateTime now = DateTime.now();
+      int difDays = now.difference(lastDate).inDays;
+      if (difDays > 30) {
+        await updatingRating();
+      }
+    } else {
+      await updatingRating();
+    }
+  }
+
   void _getDataApi(BuildContext context) async {
     _dialogProgress(context);
+
+    await _updateRating();
+
     final getDataApi = await apiService.getDataApi(fondoSelect.isin);
     if (getDataApi != null) {
       /// TEST EPOCH HMS
@@ -256,6 +306,9 @@ class _PageFondoState extends State<PageFondo>
 
       var newValor = Valor(date: date, precio: getDataApi.price);
       fondoSelect.divisa = getDataApi.market;
+
+      //fondoSelect.rating = 2;
+
       //TODO: POSIBLE ERROR SI CHOCA CON VALOR INTRODUCIDO DESDE MERCADO CON FECHA ANTERIOR
       //TODO check newvalor repetido por date ??
       //TODO: ESTE INSERT DESORDENA LOS FONDOS (pone al final el actualizado)

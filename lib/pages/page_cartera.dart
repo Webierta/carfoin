@@ -48,6 +48,8 @@ class _PageCarteraState extends State<PageCartera> {
   final GlobalKey _dialogKey = GlobalKey();
   String _loadingText = '';
 
+  bool addingFondo = false;
+
   setFondos(Cartera cartera) async {
     try {
       carteraProvider.fondos = await database.getFondos(cartera,
@@ -93,9 +95,7 @@ class _PageCarteraState extends State<PageCartera> {
 
   _searchFondo(BuildContext context, AppPage page) async {
     final newFondo = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => page.routeClass),
-    );
+        context, MaterialPageRoute(builder: (context) => page.routeClass));
     newFondo != null
         ? _addFondo(newFondo as Fondo)
         : _showMsg(msg: 'Sin cambios en la cartera.');
@@ -112,12 +112,13 @@ class _PageCarteraState extends State<PageCartera> {
 
   @override
   Widget build(BuildContext context) {
+    if (addingFondo) return const LoadingProgress(titulo: 'Añadiendo fondo...');
     return FutureBuilder(
       future: database.getFondos(carteraSelect,
           byOrder: prefProvider.isByOrderFondos),
       builder: (BuildContext context, AsyncSnapshot<List<Fondo>> snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return const LoadingProgress(titulo: 'Actualizando fondos...');
+          return const LoadingProgress(titulo: 'Cargando fondos...');
         }
         return WillPopScope(
           onWillPop: () async => false,
@@ -130,7 +131,6 @@ class _PageCarteraState extends State<PageCartera> {
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () {
-                    // ScaffoldMessenger.of(context).removeCurrentSnackBar();
                     context.go(homePage);
                   },
                 ),
@@ -373,7 +373,7 @@ class _PageCarteraState extends State<PageCartera> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return const Loading(
-            titulo: 'FONDO AÑADIDO', subtitulo: 'Cargando último valor...');
+            titulo: 'Fondo añadido', subtitulo: 'Cargando último valor...');
       },
     );
     var update = await _getDataApi(newFondo);
@@ -392,12 +392,15 @@ class _PageCarteraState extends State<PageCartera> {
         color: red900,
       );
     } else {
-      var docCnmv = DocCnmv(isin: newFondo.isin);
-      int rating = await docCnmv.getRating();
-      newFondo.rating = rating;
-      /*if (rating > 0 && rating < 6) {
+      setState(() => addingFondo = true);
+      if (prefProvider.isAutoAudate) {
+        var docCnmv = DocCnmv(isin: newFondo.isin);
+        int rating = await docCnmv.getRating();
         newFondo.rating = rating;
-      }*/
+        /*if (rating > 0 && rating < 6) {
+        newFondo.rating = rating;
+        }*/
+      }
       bool? insertOk;
       try {
         insertOk = await database.insertFondo(carteraSelect, newFondo);
@@ -413,6 +416,8 @@ class _PageCarteraState extends State<PageCartera> {
           ),
         );
         //return;
+      } finally {
+        setState(() => addingFondo = false);
       }
       if (insertOk == true) {
         await setFondos(carteraSelect);
