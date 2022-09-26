@@ -1,1 +1,19 @@
-<p>Application for managing multiple Investment Fund Portfolios. It allows you to easily create personalized Portfolios and follow their evolution. Operate quickly with the Funds to consult, update and archive their net asset values.</p><p>It allows simulated subscription and redemption operations to follow the evolution of the capital invested and its profitability. It also presents a global view of the portfolio and allows you to back up and share portfolios with other users.</p><p>Functions:</p><ul><li>It allows you to create multiple personalized Investment Fund Portfolios and follow their evolution.</li><li>Verify the ISIN code of the Funds with the check digit.</li><li>Update via internet the last price or a time interval and archive the net asset values obtained.</li><li>It presents the data through tables and graphs and calculates some statistical indices.</li><li>It allows simulating subscription and redemption operations to follow the evolution of the capital invested and its profitability (TWR and MWR).</li><li>Summary and graphical view of the global position of the portfolio.</li><li>Obtains the price of the Dollar to compare portfolios with different currencies.</li><li>Backs up the main portfolio file (SQLite3 database).</li><li>Allows you to share wallets with other users of the App.</li><li>More features coming soon...</li></ul>
+Application for managing multiple Investment Fund Portfolios. It allows you to easily create personalized Portfolios and follow their evolution. Operate quickly with the Funds to consult, update and archive their net asset values.
+
+It allows simulated subscription and redemption operations to follow the evolution of the capital invested and its profitability. It also presents a global view of the portfolio and allows you to back up and share portfolios with other users.
+
+Main features:
+
+* It allows you to create multiple personalized Investment Fund Portfolios and follow their evolution.
+* Verify the ISIN code of the Funds with the check digit.
+* Update via internet the last price or a time interval and archive the net asset values obtained.
+* It presents the data through tables and graphs and calculates some statistical indices.
+* It allows simulating subscription and redemption operations to follow the evolution of the capital invested and its profitability (TWR and MWR).
+* Summary and graphical view of the global position of the portfolio.
+* Obtains the price of the Dollar to compare portfolios with different currencies.
+* View and download fund documents: brochure and latest periodic report (pdf format).
+* Shows the Morningstar Rating (updated every month).
+* Backs up the main portfolio file (SQLite3 database).
+* Allows you to share wallets with other users of the App.
+
+More features coming soon...

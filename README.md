@@ -8,7 +8,7 @@ Aplicación para la gestión de múltiples Carteras de Fondos de Inversión. Per
 
 Permite operaciones simuladas de suscripción y reembolso para seguir la evolución del capital invertido y su rentabilidad. También presenta una visión global del portafolio y permite hacer copias de seguridad y compartir carteras con otros usuarios.
 
-## Funciones:
+## Funciones principales:
 
 * Permite crear múltiples Carteras personalizadas de Fondos de Inversión y seguir su evolución.</li><li>Verifica el código ISIN de los Fondos con el dígito de control.
 * Actualiza vía internet la última cotización o un intervalo de tiempo y archiva los valores liquidativos obtenidos.
@@ -16,6 +16,8 @@ Permite operaciones simuladas de suscripción y reembolso para seguir la evoluci
 * Permite simular operaciones de suscripción y reembolso para seguir la evolución del capital invertido y su rentabilidad (TWR y MWR).
 * Vista resumida y gráfica de la posición global del portafolio.
 * Obtiene la cotización del Dólar para comparar carteras con distintas divisas.
+* Visualiza y descarga documentos de los fondos: folleto y último infome periódico (formato pdf).
+* Muestra el Rating de Morningstar (actualizado cada mes).
 * Hace copias de seguridad del archivo principal del portafolio (base de datos SQLite3).
 * Permite compartir carteras con otros usuarios de la App.
 * Próximamente más funciones...
