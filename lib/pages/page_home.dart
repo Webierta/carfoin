@@ -1,5 +1,3 @@
-//import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
@@ -70,16 +68,6 @@ class _PageHomeState extends State<PageHome> {
     }
   }
 
-  /*checkVersionDb() async {
-    DatabaseHelper databaseTest = DatabaseHelper();
-    final String dbPath = await databaseTest.getDatabasePath();
-    if (!await databaseTest.isDatabase(dbPath)) {
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        context.go(errorPage);
-      });
-    }
-  }*/
-
   setCarteras() async {
     try {
       carteraProvider.carteras =
@@ -133,7 +121,6 @@ class _PageHomeState extends State<PageHome> {
     prefProvider = context.read<PreferencesProvider>();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await getSharedPrefs();
-      //await checkVersionDb();
       await setCarteras();
     });
     _controller = TextEditingController();
@@ -282,9 +269,7 @@ class _PageHomeState extends State<PageHome> {
                               child: Text(
                                 'Empieza creando una cartera',
                                 style: TextStyle(
-                                  color: Color(0xFFFFFFFF),
-                                  fontSize: 22,
-                                ),
+                                    color: Color(0xFFFFFFFF), fontSize: 22),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -451,9 +436,8 @@ class _PageHomeState extends State<PageHome> {
         }
       } else if (status == Status.error) {
         line1 = 'Error en el proceso de exportación.';
-        line2 =
-            'Intenta guardar la copia de seguridad en el almacenamiento interno '
-            '(dependiendo de la versión de Android de tu dispositivo puede '
+        line2 = 'Intenta guardar la copia de seguridad en el almacenamiento '
+            'interno (dependiendo de la versión de Android de tu dispositivo puede '
             'que la App no tenga permiso para escribir en la tarjeta SD).';
       } else if (status == Status.abortado) {
         line1 = 'Proceso abortado';
@@ -468,9 +452,7 @@ class _PageHomeState extends State<PageHome> {
           return AlertDialog(
             title: const Text('Resultado'),
             content: SingleChildScrollView(
-              child: ListBody(
-                children: [Text(line1), Text(line2)],
-              ),
+              child: ListBody(children: [Text(line1), Text(line2)]),
             ),
             actions: [
               TextButton(
@@ -492,7 +474,6 @@ class _PageHomeState extends State<PageHome> {
     String nombreDb = _controller.value.text.trim();
     nombreDb = '$nombreDb.db';
     _controller.clear();
-
     var resultExport = await FileUtil.exportar(nombreDb);
     await _showResult(
       isImport: false,
@@ -511,9 +492,8 @@ class _PageHomeState extends State<PageHome> {
             content: SingleChildScrollView(
               child: ListBody(
                 children: const [
-                  Text(
-                      'La nueva base de datos sobreescribirá los datos actuales, '
-                      'que se perderán y no podrán ser recuperados.'),
+                  Text('La nueva base de datos sobreescribirá los datos '
+                      'actuales, que se perderán y no podrán ser recuperados.'),
                   SizedBox(height: 10),
                   Text('Se recomienda exportar una copia de seguridad antes de '
                       'importar una nueva base de datos.'),
@@ -632,15 +612,13 @@ class _PageHomeState extends State<PageHome> {
             msg: 'Proceso interrumpido: Error en la carga del archivo',
             color: red900);
         Logger.log(
-          dataLog: DataLog(
-            msg: 'Catch create table cartera + insert cartera',
-            file: 'page_home.dart',
-            clase: '_PageHomeState',
-            funcion: '_loadCartera',
-            error: e,
-            stackTrace: s,
-          ),
-        );
+            dataLog: DataLog(
+                msg: 'Catch create table cartera + insert cartera',
+                file: 'page_home.dart',
+                clase: '_PageHomeState',
+                funcion: '_loadCartera',
+                error: e,
+                stackTrace: s));
         return;
       }
 
@@ -674,15 +652,13 @@ class _PageHomeState extends State<PageHome> {
             msg: 'Proceso interrumpido: Error en la carga del archivo',
             color: red900);
         Logger.log(
-          dataLog: DataLog(
-            msg: 'Catch create table fondo + insert fondo',
-            file: 'page_home.dart',
-            clase: '_PageHomeState',
-            funcion: '_loadCartera',
-            error: e,
-            stackTrace: s,
-          ),
-        );
+            dataLog: DataLog(
+                msg: 'Catch create table fondo + insert fondo',
+                file: 'page_home.dart',
+                clase: '_PageHomeState',
+                funcion: '_loadCartera',
+                error: e,
+                stackTrace: s));
         return;
       }
     }
@@ -714,14 +690,11 @@ class _PageHomeState extends State<PageHome> {
   }
 
   _goCartera(BuildContext context, Cartera cartera) {
-    //ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    //scaffoldMessengerKey.currentState?.removeCurrentSnackBar();
     carteraProvider.carteraSelect = cartera;
     context.go(carteraPage);
   }
 
   _goFondo(BuildContext context, Cartera cartera, Fondo fondo) {
-    //ScaffoldMessenger.of(context).removeCurrentSnackBar();
     carteraProvider.carteraSelect = cartera;
     carteraProvider.fondoSelect = fondo;
     context.go(fondoPage);
@@ -808,7 +781,6 @@ class _PageHomeState extends State<PageHome> {
 
   void _pop() {
     if (!mounted) return;
-    //ScaffoldMessenger.of(context).removeCurrentSnackBar();
     Navigator.of(context).pop();
   }
 }

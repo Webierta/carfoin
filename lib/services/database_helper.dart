@@ -1,4 +1,3 @@
-//import 'dart:async';
 import 'dart:io' show Directory;
 
 import 'package:path/path.dart';
@@ -75,23 +74,18 @@ class DatabaseHelper {
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < newVersion) {
       db.close();
-      print('UPGRADE DATABASE');
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Check Version Database',
-          file: 'database_helper.dart',
-          clase: 'DatabaseHelper',
-          funcion: '_initDb',
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Check Version Database',
+              file: 'database_helper.dart',
+              clase: 'DatabaseHelper',
+              funcion: '_initDb'));
       final String dbPath = await getDatabasePath();
       deleteDatabase(dbPath);
-
       // you can execute drop table and create table
       //db.execute("ALTER TABLE tb_name ADD COLUMN newCol TEXT;");
       //var nameTable = '_${cartera.id}';
       //db.execute("ALTER TABLE ");
-
     }
   }
 
@@ -114,15 +108,13 @@ class DatabaseHelper {
       await deleteDatabase(path);
     } catch (e, s) {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Catch Delete Database',
-          file: 'database_helper.dart',
-          clase: 'DatabaseHelper',
-          funcion: 'deleteDatabase',
-          error: e,
-          stackTrace: s,
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Catch Delete Database',
+              file: 'database_helper.dart',
+              clase: 'DatabaseHelper',
+              funcion: 'deleteDatabase',
+              error: e,
+              stackTrace: s));
     }
   }
 
@@ -269,15 +261,13 @@ class DatabaseHelper {
       return true;
     } catch (e, s) {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Catch insert fondo',
-          file: 'database_helper.dart',
-          clase: 'DatabaseHelper',
-          funcion: 'insertFondo',
-          error: e,
-          stackTrace: s,
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Catch insert fondo',
+              file: 'database_helper.dart',
+              clase: 'DatabaseHelper',
+              funcion: 'insertFondo',
+              error: e,
+              stackTrace: s));
       return false;
     }
 
@@ -312,15 +302,13 @@ class DatabaseHelper {
           .delete(nameTable, where: '$columnIsin = ?', whereArgs: [fondo.isin]);
     } catch (e, s) {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Catch Delete Table Fondo',
-          file: 'database_helper.dart',
-          clase: 'DatabaseHelper',
-          funcion: 'deleteFondo',
-          error: e,
-          stackTrace: s,
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Catch Delete Table Fondo',
+              file: 'database_helper.dart',
+              clase: 'DatabaseHelper',
+              funcion: 'deleteFondo',
+              error: e,
+              stackTrace: s));
     }
   }
 
@@ -341,15 +329,13 @@ class DatabaseHelper {
           } catch (e, s) {
             // continue;
             Logger.log(
-              dataLog: DataLog(
-                msg: 'Catch Delete Fondo',
-                file: 'database_helper.dart',
-                clase: 'DatabaseHelper',
-                funcion: 'deleteAllFondos',
-                error: e,
-                stackTrace: s,
-              ),
-            );
+                dataLog: DataLog(
+                    msg: 'Catch Delete Fondo',
+                    file: 'database_helper.dart',
+                    clase: 'DatabaseHelper',
+                    funcion: 'deleteAllFondos',
+                    error: e,
+                    stackTrace: s));
             //continue;
           }
         }
@@ -361,15 +347,13 @@ class DatabaseHelper {
       await db.delete(nameTable);
     } catch (e, s) {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Catch Delete Table Cartera',
-          file: 'database_helper.dart',
-          clase: 'DatabaseHelper',
-          funcion: 'deleteAllFondos',
-          error: e,
-          stackTrace: s,
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Catch Delete Table Cartera',
+              file: 'database_helper.dart',
+              clase: 'DatabaseHelper',
+              funcion: 'deleteAllFondos',
+              error: e,
+              stackTrace: s));
     }
   }
 
@@ -488,15 +472,13 @@ class DatabaseHelper {
           .delete(nameTable, where: '$columnDate = ?', whereArgs: [valor.date]);
     } catch (e, s) {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Catch Delete Valor',
-          file: 'database_helper.dart',
-          clase: 'DatabaseHelper',
-          funcion: 'deleteValor',
-          error: e,
-          stackTrace: s,
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Catch Delete Valor',
+              file: 'database_helper.dart',
+              clase: 'DatabaseHelper',
+              funcion: 'deleteValor',
+              error: e,
+              stackTrace: s));
     }
   }
 
@@ -507,15 +489,13 @@ class DatabaseHelper {
       await db.delete(nameTable, where: '$columnDate = ?', whereArgs: [date]);
     } catch (e, s) {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Catch Delete Valor',
-          file: 'database_helper.dart',
-          clase: 'DatabaseHelper',
-          funcion: 'deleteValorByDate',
-          error: e,
-          stackTrace: s,
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Catch Delete Valor',
+              file: 'database_helper.dart',
+              clase: 'DatabaseHelper',
+              funcion: 'deleteValorByDate',
+              error: e,
+              stackTrace: s));
     }
   }
 
@@ -526,15 +506,13 @@ class DatabaseHelper {
       await db.delete(nameTable);
     } catch (e, s) {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Catch Delete All Valores',
-          file: 'database_helper.dart',
-          clase: 'DatabaseHelper',
-          funcion: 'deleteAllValores',
-          error: e,
-          stackTrace: s,
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Catch Delete All Valores',
+              file: 'database_helper.dart',
+              clase: 'DatabaseHelper',
+              funcion: 'deleteAllValores',
+              error: e,
+              stackTrace: s));
     }
   }
 
@@ -547,15 +525,13 @@ class DatabaseHelper {
           where: '$columnTipoOperacion IN (?)', whereArgs: [-1]);
     } catch (e, s) {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Catch Delete Valor where operación -1',
-          file: 'database_helper.dart',
-          clase: 'DatabaseHelper',
-          funcion: 'deleteOnlyValores',
-          error: e,
-          stackTrace: s,
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Catch Delete Valor where operación -1',
+              file: 'database_helper.dart',
+              clase: 'DatabaseHelper',
+              funcion: 'deleteOnlyValores',
+              error: e,
+              stackTrace: s));
     }
   }
 
@@ -577,15 +553,13 @@ class DatabaseHelper {
           where: '$columnTipoOperacion IN (?, ?)', whereArgs: [0, 1]);
     } catch (e, s) {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Catch Delete All Operaciones',
-          file: 'database_helper.dart',
-          clase: 'DatabaseHelper',
-          funcion: 'deleteAllOperaciones',
-          error: e,
-          stackTrace: s,
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Catch Delete All Operaciones',
+              file: 'database_helper.dart',
+              clase: 'DatabaseHelper',
+              funcion: 'deleteAllOperaciones',
+              error: e,
+              stackTrace: s));
     }
   }
 

@@ -44,8 +44,8 @@ class _GraficoFondoState extends State<GraficoFondo> {
     double precioMin = 0;
     String? fechaMax;
     String? fechaMin;
-    int epochMax = 0; // int? nullable
-    int epochMin = 0;
+    //int epochMax = 0; // int? nullable
+    //int epochMin = 0;
     int timestamp = 0;
     if (precios.length > 1) {
       precioMedio = precios.reduce((a, b) => a + b) / precios.length;
@@ -55,8 +55,8 @@ class _GraficoFondoState extends State<GraficoFondo> {
       // fechaMin = _epochFormat(fechas[precios.indexOf(precioMin)]);
       fechaMax = FechaUtil.epochToString(fechas[precios.indexOf(precioMax)]);
       fechaMin = FechaUtil.epochToString(fechas[precios.indexOf(precioMin)]);
-      epochMax = fechas[precios.indexOf(precioMax)];
-      epochMin = fechas[precios.indexOf(precioMin)];
+      //epochMax = fechas[precios.indexOf(precioMax)];
+      //epochMin = fechas[precios.indexOf(precioMin)];
       timestamp = FechaUtil.epochToDate(fechas.last)
           .difference(FechaUtil.epochToDate(fechas.first))
           .inDays;
@@ -207,9 +207,6 @@ class _GraficoFondoState extends State<GraficoFondo> {
               /*if (epoch.toInt() % 25 != 0) {
                 return const Text('');
               }*/
-              //return Text(DateFormat.MMMd().format(dateTime));
-              //return Text(DateFormat.yMMM('es').format(dateTime));
-              //return Text(FechaUtil.dateToString(date: dateTime, formato: 'yMMM'));
               return Text(
                   FechaUtil.dateToString(date: dateTime, formato: 'MM/yy'));
             },

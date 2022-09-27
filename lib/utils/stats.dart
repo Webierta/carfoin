@@ -351,15 +351,13 @@ class Stats {
         mwr = CalculationWrapper.xirr(cashFlows);
       } catch (e, s) {
         Logger.log(
-          dataLog: DataLog(
-            msg: 'Catch Calculation Wrapper Xirr CashFlows',
-            file: 'stats.dart',
-            clase: 'Stats',
-            funcion: 'mwr',
-            error: e,
-            stackTrace: s,
-          ),
-        );
+            dataLog: DataLog(
+                msg: 'Catch Calculation Wrapper Xirr CashFlows',
+                file: 'stats.dart',
+                clase: 'Stats',
+                funcion: 'mwr',
+                error: e,
+                stackTrace: s));
         mwr = null;
       }
     }

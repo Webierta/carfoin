@@ -28,32 +28,30 @@ class ListTileCapital extends StatelessWidget {
           const Icon(Icons.euro, color: blue900),
           const SizedBox(width: 10),
           Expanded(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${NumberUtil.decimalFixed(capital, long: false)} €',
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: const TextStyle(fontSize: 16),
-              ),
-              Text(
-                '${NumberUtil.decimalFixed(inversion, long: false)} €',
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: const TextStyle(color: Colors.black54),
-              ),
-            ],
-          )),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${NumberUtil.decimalFixed(capital, long: false)} €',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: const TextStyle(fontSize: 16),
+                ),
+                Text(
+                  '${NumberUtil.decimalFixed(inversion, long: false)} €',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: const TextStyle(color: Colors.black54),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(width: 10),
           Text(
             '${NumberUtil.decimalFixed(balance, long: false, limit: 100000)} €',
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
-            style: TextStyle(
-              fontSize: 16,
-              color: textRedGreen(balance),
-            ),
+            style: TextStyle(fontSize: 16, color: textRedGreen(balance)),
           ),
         ],
       ),

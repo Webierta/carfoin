@@ -55,15 +55,13 @@ class ShareCsv {
       file.writeAsString(csv);
     } catch (e, s) {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Catch Storage File',
-          file: 'share_csv.dart',
-          clase: 'ShareCsv',
-          funcion: '_storageFile',
-          error: e,
-          stackTrace: s,
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Catch Storage File',
+              file: 'share_csv.dart',
+              clase: 'ShareCsv',
+              funcion: '_storageFile',
+              error: e,
+              stackTrace: s));
     }
     return file;
 
@@ -140,11 +138,11 @@ class ShareCsv {
         var rating = fields[indexRowFondo][3]; // ?? 0
         List<Valor> valores = [];
         /*int dif;
-      if (indexRowFondo == indexRowFondos.last) {
+        if (indexRowFondo == indexRowFondos.last) {
         dif = fields.length - indexRowFondo;
-      } else {
+        } else {
         dif = indexRowFondos[i + 1] - indexRowFondo;
-      }*/
+        }*/
         // indexRowFondo + 1 <= indexRowFondos.length ?
         // i == indexRowFondos.length - 1 ?
         int dif = indexRowFondo == indexRowFondos.last
@@ -177,15 +175,13 @@ class ShareCsv {
       return cartera;
     } catch (e, s) {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Catch Load Cartera Shared',
-          file: 'share_csv.dart',
-          clase: 'ShareCsv',
-          funcion: '_listToCartera',
-          error: e,
-          stackTrace: s,
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Catch Load Cartera Shared',
+              file: 'share_csv.dart',
+              clase: 'ShareCsv',
+              funcion: '_listToCartera',
+              error: e,
+              stackTrace: s));
       return null;
     }
   }

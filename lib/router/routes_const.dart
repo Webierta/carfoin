@@ -16,4 +16,3 @@ const String globalPage = '/global';
 const String searchFondoSub = 'searchFondo';
 const String inputFondoSub = 'inputFondo';
 const String inputRangeSub = 'inputRange';
-//const String infoBalanceSub = 'infoBalance';

@@ -15,7 +15,6 @@ class DataPie {
   final String nameCartera;
   final double data;
   final Color color;
-
   const DataPie(
       {required this.nameCartera, required this.data, required this.color});
 }
@@ -25,7 +24,6 @@ class PieChartGlobal extends StatelessWidget {
   final CriterioPie criterioPie;
   final StatsGlobal statsGlobal;
   final double rateExchange;
-
   const PieChartGlobal(
       {Key? key,
       required this.carteras,
@@ -79,11 +77,9 @@ class PieChartGlobal extends StatelessWidget {
     if (criterioPie != CriterioPie.Fondos && statsGlobal.inversionGlobal == 0) {
       return const PieChartNull();
     }
-
     if (criterioPie == CriterioPie.Balance && statsGlobal.inversionGlobal > 0) {
       return BarChartBalance(carteras: carteras, rateExchange: rateExchange);
     }
-
     final List<DataPie> dataPies = [];
 
     for (var cartera in carteras) {

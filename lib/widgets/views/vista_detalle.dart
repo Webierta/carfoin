@@ -11,7 +11,6 @@ class VistaDetalle extends StatelessWidget {
   final Function goCartera;
   final Function inputName;
   final Function goFondo;
-
   const VistaDetalle({
     Key? key,
     required this.cartera,

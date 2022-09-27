@@ -33,7 +33,6 @@ class _MainFondoState extends State<MainFondo> {
   late List<Valor> operacionesSelect;
 
   bool openingPdf = false;
-  //bool _isConfirmDelete = true;
   late Stats stats;
 
   /*getSharedPrefs() async {

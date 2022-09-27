@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'dart:convert' show json;
 
 DataApi dataApiFromJson(String str) => DataApi.fromJson(json.decode(str));
 

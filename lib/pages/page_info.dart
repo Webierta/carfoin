@@ -24,24 +24,9 @@ class PageInfo extends StatelessWidget {
             actions: [
               IconButton(
                 icon: const Icon(Icons.home),
-                onPressed: () {
-                  //ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                  //Navigator.of(context).pushNamed(RouteGenerator.homePage);
-                  context.go(homePage);
-                },
+                onPressed: () => context.go(homePage),
               ),
             ],
-            /* leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => Navigator.of(context).pop(),
-            ),*/
-
-            /*actions: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => Navigator.of(context).pop(),
-              )
-            ],*/
           ),
           drawer: const MyDrawer(),
           body: Padding(
@@ -54,38 +39,6 @@ class PageInfo extends StatelessWidget {
                 p: const TextStyle(fontSize: 18),
               ),
             ),
-            /*child: ListView(
-              children: [
-                */ /*Center(
-                  child: Stack(
-                    children: <Widget>[
-                      Text(
-                        titulo,
-                        style: TextStyle(
-                          fontSize: 40,
-                          foreground: Paint()
-                            ..style = PaintingStyle.stroke
-                            ..strokeWidth = 6
-                            ..color = Colors.blue[700]!,
-                        ),
-                      ),
-                      Text(
-                        titulo,
-                        style: TextStyle(fontSize: 40, color: Colors.grey[300]),
-                      ),
-                    ],
-                  ),
-                ),*/ /*
-                Container(
-                  child: Markdown(
-                    data: mdstring,
-                    */ /*styleSheet: MarkdownStyleSheet(
-                      h1: TextStyle(color: Colors.blue, fontSize: 40),
-                    ),*/ /*
-                  ),
-                ),
-              ],
-            ),*/
           ),
         ),
       ),

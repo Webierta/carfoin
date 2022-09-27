@@ -42,31 +42,6 @@ class VistaCompacta extends StatelessWidget {
           ),
         ),
       ),
-      /*child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: InputChip(
-            labelPadding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            avatar: CircleAvatar(
-              backgroundColor: const Color(0xFFFFC107),
-              child: Text(
-                cartera.name[0],
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Color(0xFF0D47A1),
-                ),
-              ),
-            ),
-            backgroundColor: const Color(0xFFBBDEFB),
-            label: Text(cartera.name),
-            labelStyle: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-              color: Color(0xFF2196F3),
-            ),
-            onPressed: () => goCartera(context, cartera)),
-      ),*/
     );
   }
 }

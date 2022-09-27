@@ -29,25 +29,23 @@ class ListTileDestacado extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 InkWell(
-                    onTap: () =>
-                        goFondo(context, destacado.cartera, destacado.fondo),
-                    child: Text(
-                      destacado.fondo.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        decoration: TextDecoration.underline,
-                        decorationColor: blue,
-                        color: Colors.transparent,
-                        shadows: [
-                          Shadow(
-                            offset: Offset(0, -4),
-                            color: Colors.black,
-                          )
-                        ],
-                      ),
-                    )),
+                  onTap: () =>
+                      goFondo(context, destacado.cartera, destacado.fondo),
+                  child: Text(
+                    destacado.fondo.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      decoration: TextDecoration.underline,
+                      decorationColor: blue,
+                      color: Colors.transparent,
+                      shadows: [
+                        Shadow(offset: Offset(0, -4), color: Colors.black)
+                      ],
+                    ),
+                  ),
+                ),
                 Row(
                   children: [
                     const Icon(Icons.business_center, color: Colors.black54),

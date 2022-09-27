@@ -50,15 +50,6 @@ class StepperBalance extends StatelessWidget {
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              /*Container(
-                padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: gris,
-                ),
-                child: const Icon(Icons.first_page, color: Color(0xFFFFFFFF)),
-              ),*/
-              //const Icon(Icons.first_page, color: gris),
               const Expanded(
                 child:
                     Divider(thickness: 1, indent: 0, endIndent: 4, color: gris),
@@ -80,13 +71,6 @@ class StepperBalance extends StatelessWidget {
                 child:
                     Divider(thickness: 1, indent: 4, endIndent: 4, color: gris),
               ),
-              //const Icon(Icons.last_page, color: gris),
-              /*Container(
-                padding: const EdgeInsets.all(4),
-                decoration:
-                    const BoxDecoration(shape: BoxShape.circle, color: gris),
-                child: const Icon(Icons.last_page, color: Color(0xFFFFFFFF)),
-              ),*/
             ],
           ),
           Transform.translate(

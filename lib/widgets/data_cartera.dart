@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../models/cartera.dart';
-import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
 import '../utils/stats.dart';
 import '../utils/styles.dart';
@@ -23,47 +22,47 @@ class DataCartera extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Valor>? valores = fondo.valores;
     Stats? stats;
-    double? _inversion;
-    double? _resultado;
-    double? _balance;
-    double? _tae;
-    String lastDate = '';
-    int dia = 0;
-    String mesYear = '';
+    double? inversion;
+    double? resultado;
+    double? balance;
+    double? tae;
+    //String lastDate = '';
+    //int dia = 0;
+    //String mesYear = '';
     String lastPrecio = '';
 
     double? diferencia;
 
     String divisa = fondo.divisa ?? '';
     String symbolDivisa = ' ';
-    IconData icon = Icons.payments_outlined;
+    //IconData icon = Icons.payments_outlined;
     if (divisa == 'EUR') {
-      icon = Icons.euro;
+      //icon = Icons.euro;
       symbolDivisa = '€';
     } else if (divisa == 'USD') {
-      icon = Icons.attach_money;
+      //icon = Icons.attach_money;
       symbolDivisa = '\$';
     }
 
     if (valores != null && valores.isNotEmpty) {
-      int lastEpoch = valores.first.date;
-      lastDate = FechaUtil.epochToString(lastEpoch);
-      dia = FechaUtil.epochToDate(lastEpoch).day;
+      //int lastEpoch = valores.first.date;
+      //lastDate = FechaUtil.epochToString(lastEpoch);
+      //dia = FechaUtil.epochToDate(lastEpoch).day;
       //mes = FechaUtil.epochToDate(lastEpoch).month;
       //ano = FechaUtil.epochToDate(lastEpoch).year;
-      mesYear = FechaUtil.epochToString(lastEpoch, formato: 'MMM yy');
+      //mesYear = FechaUtil.epochToString(lastEpoch, formato: 'MMM yy');
       //lastPrecio = NumberFormat.decimalPattern('es').format(valores.first.precio);
       lastPrecio = NumberUtil.decimalFixed(valores.first.precio, long: false);
       if (valores.length > 1) {
         diferencia = valores.first.precio - valores[1].precio;
       }
       stats = Stats(valores);
-      _inversion = stats.inversion();
-      _resultado = stats.resultado();
-      _balance = stats.balance();
+      inversion = stats.inversion();
+      resultado = stats.resultado();
+      balance = stats.balance();
       double? twr = stats.twr();
       if (twr != null) {
-        _tae = stats.anualizar(twr);
+        tae = stats.anualizar(twr);
       }
     }
     return Dismissible(
@@ -72,8 +71,6 @@ class DataCartera extends StatelessWidget {
       background: bgDismissible,
       onDismissed: (_) async => await removeFondo(fondo),
       child: Card(
-        //padding: const EdgeInsets.all(12),
-        //decoration: boxDeco,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -173,22 +170,22 @@ class DataCartera extends StatelessWidget {
                     ),
                   ),
                 ),
-              if (_inversion != null &&
-                  _resultado != null &&
-                  _balance != null &&
-                  _tae != null &&
+              if (inversion != null &&
+                  resultado != null &&
+                  balance != null &&
+                  tae != null &&
                   valores != null &&
                   valores.isNotEmpty)
                 StepperBalance(
-                  input: _inversion,
-                  output: _resultado,
-                  balance: _balance,
+                  input: inversion,
+                  output: resultado,
+                  balance: balance,
                   divisa: symbolDivisa,
                   firstDate: valores.reversed.first.date,
                   lastDate: valores.reversed.last.date,
                   //tae: _tae,
                 ),
-              if (_tae != null)
+              if (tae != null)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(10, 10, 20, 0),
                   child: Row(
@@ -197,14 +194,14 @@ class DataCartera extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          NumberUtil.percentCompact(_tae),
+                          NumberUtil.percentCompact(tae),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.right,
                           style: TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.w300,
-                            color: textRedGreen(_tae),
+                            color: textRedGreen(tae),
                           ),
                         ),
                       ),

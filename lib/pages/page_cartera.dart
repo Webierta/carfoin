@@ -34,10 +34,6 @@ class PageCartera extends StatefulWidget {
 }
 
 class _PageCarteraState extends State<PageCartera> {
-  /*bool _isFondosByOrder = true;
-  bool _isAutoUpdate = true;
-  bool _isConfirmDeleteFondo = true;*/
-
   late ApiService apiService;
   DatabaseHelper database = DatabaseHelper();
 
@@ -130,9 +126,7 @@ class _PageCarteraState extends State<PageCartera> {
                 backgroundColor: Colors.transparent,
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    context.go(homePage);
-                  },
+                  onPressed: () => context.go(homePage),
                 ),
                 title: Row(
                   children: [
@@ -209,9 +203,7 @@ class _PageCarteraState extends State<PageCartera> {
                           child: Text(
                             'Añade fondos a esta cartera',
                             style: TextStyle(
-                              color: Color(0xFFFFFFFF),
-                              fontSize: 22,
-                            ),
+                                color: Color(0xFFFFFFFF), fontSize: 22),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -239,7 +231,6 @@ class _PageCarteraState extends State<PageCartera> {
   }
 
   _goFondo(BuildContext context, Fondo fondo) {
-    //ScaffoldMessenger.of(context).removeCurrentSnackBar();
     carteraProvider.fondoSelect = fondo;
     context.go(fondoPage);
   }
@@ -351,15 +342,13 @@ class _PageCarteraState extends State<PageCartera> {
         return true;
       } catch (e, s) {
         Logger.log(
-          dataLog: DataLog(
-            msg: 'Catch updateFondo / insertValor database',
-            file: 'page_cartera.dart',
-            clase: '_PageCarteraState',
-            funcion: '_getDataApi',
-            error: e,
-            stackTrace: s,
-          ),
-        );
+            dataLog: DataLog(
+                msg: 'Catch updateFondo / insertValor database',
+                file: 'page_cartera.dart',
+                clase: '_PageCarteraState',
+                funcion: '_getDataApi',
+                error: e,
+                stackTrace: s));
         return false;
       }
     } else {
@@ -406,15 +395,13 @@ class _PageCarteraState extends State<PageCartera> {
         insertOk = await database.insertFondo(carteraSelect, newFondo);
       } catch (e, s) {
         Logger.log(
-          dataLog: DataLog(
-            msg: 'Catch insert new Fondo in database',
-            file: 'page_cartera.dart',
-            clase: '_PageCarteraState',
-            funcion: '_addFondo',
-            error: e,
-            stackTrace: s,
-          ),
-        );
+            dataLog: DataLog(
+                msg: 'Catch insert new Fondo in database',
+                file: 'page_cartera.dart',
+                clase: '_PageCarteraState',
+                funcion: '_addFondo',
+                error: e,
+                stackTrace: s));
         //return;
       } finally {
         setState(() => addingFondo = false);

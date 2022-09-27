@@ -45,15 +45,13 @@ class FileUtil {
         return Resultado(Status.ok);
       } catch (e, s) {
         Logger.log(
-          dataLog: DataLog(
-            msg: 'Catch Read and Write File',
-            file: 'file_util.dart',
-            clase: 'FileUtil',
-            funcion: 'importar',
-            error: e,
-            stackTrace: s,
-          ),
-        );
+            dataLog: DataLog(
+                msg: 'Catch Read and Write File',
+                file: 'file_util.dart',
+                clase: 'FileUtil',
+                funcion: 'importar',
+                error: e,
+                stackTrace: s));
 
         // TODO: DIALOGO ERROR: RECUPERAR BD ??
         //await deleteDatabase(dbPath);
@@ -97,15 +95,13 @@ class FileUtil {
         return Resultado(Status.ok, msg: filePath);
       } catch (e, s) {
         Logger.log(
-          dataLog: DataLog(
-            msg: 'Catch Write File',
-            file: 'file_util.dart',
-            clase: 'FileUtil',
-            funcion: 'exportar',
-            error: e,
-            stackTrace: s,
-          ),
-        );
+            dataLog: DataLog(
+                msg: 'Catch Write File',
+                file: 'file_util.dart',
+                clase: 'FileUtil',
+                funcion: 'exportar',
+                error: e,
+                stackTrace: s));
 
         return Resultado(Status.error, msg: e.toString());
       }

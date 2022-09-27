@@ -10,7 +10,6 @@ import '../../utils/styles.dart';
 
 class TablaFondo extends StatefulWidget {
   const TablaFondo({Key? key}) : super(key: key);
-
   @override
   State<TablaFondo> createState() => _TablaFondoState();
 }
@@ -48,7 +47,7 @@ class _TablaFondoState extends State<TablaFondo> {
   Widget build(BuildContext context) {
     final valores = context.watch<CarteraProvider>().valores;
 
-    _changeSort() {
+    changeSort() {
       if (!_isSortDesc) {
         valores.sort((a, b) => b.date.compareTo(a.date));
       } else {
@@ -57,7 +56,7 @@ class _TablaFondoState extends State<TablaFondo> {
       setState(() => _isSortDesc = !_isSortDesc);
     }
 
-    Text _diferencia(Valor valor) {
+    Text diferencia(Valor valor) {
       int index = _isSortDesc ? 1 : -1;
       bool condition = _isSortDesc
           ? valores.length > (valores.indexOf(valor) + 1)
@@ -75,8 +74,8 @@ class _TablaFondoState extends State<TablaFondo> {
       return const Text('');
     }
 
-    Widget _getId(int? tipo, int index) {
-      _getTxt() {
+    Widget getId(int? tipo, int index) {
+      getTxt() {
         return Text(
           _isSortDesc ? '${valores.length - index}' : '${index + 1}',
           textAlign: TextAlign.center,
@@ -86,10 +85,10 @@ class _TablaFondoState extends State<TablaFondo> {
       if (tipo == 1 || tipo == 0) {
         return CircleAvatar(
           backgroundColor: tipo == 1 ? green : red,
-          child: _getTxt(),
+          child: getTxt(),
         );
       }
-      return _getTxt();
+      return getTxt();
     }
 
     return valores.isEmpty
@@ -106,7 +105,7 @@ class _TablaFondoState extends State<TablaFondo> {
                           flex: 1,
                           child: IconButton(
                             icon: const Icon(Icons.swap_vert),
-                            onPressed: () => _changeSort(),
+                            onPressed: () => changeSort(),
                           )),
                       const Expanded(
                           flex: 3,
@@ -176,7 +175,7 @@ class _TablaFondoState extends State<TablaFondo> {
                               children: [
                                 Expanded(
                                   flex: 1,
-                                  child: _getId(valores[index].tipo, index),
+                                  child: getId(valores[index].tipo, index),
                                 ),
                                 Expanded(
                                     flex: 3,
@@ -198,7 +197,7 @@ class _TablaFondoState extends State<TablaFondo> {
                                     )),
                                 Expanded(
                                   flex: 2,
-                                  child: _diferencia(valores[index]),
+                                  child: diferencia(valores[index]),
                                 ),
                                 /*Expanded(
                                   flex: 1,

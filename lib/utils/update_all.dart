@@ -12,7 +12,6 @@ class Update {
   final String nameCartera;
   final String nameFondo;
   final bool isUpdate;
-
   Update(
       {required this.nameCartera,
       required this.nameFondo,

@@ -26,9 +26,8 @@ class PageError extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                  'El archivo de la Base de Datos no es válido y será eliminado. '
-                  'Todos los datos de las carteras, fondos, valores y operaciones se perderán.'),
+              const Text('El archivo de la Base de Datos no es válido y será '
+                  'eliminado. Todos los datos de las carteras, fondos, valores y operaciones se perderán.'),
               const SizedBox(height: 20),
               const Text('Posibles causas de este error son una base de datos '
                   'con una versión no compatible, o que no se reconoce un archivo importado.'),

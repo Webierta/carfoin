@@ -50,10 +50,6 @@ class _PageSettingsState extends State<PageSettings> {
         result = ResultStatus.viejo;
       } else {
         result = ResultStatus.nuevo;
-        /*setState(() {
-          _dateExchange = exchangeApi.date;
-          _rateExchange = exchangeApi.rate;
-        });*/
         prefProvider.dateExchange = exchangeApi.date;
         prefProvider.rateExchange = exchangeApi.rate;
         await PreferencesService.saveDateExchange(
@@ -87,10 +83,7 @@ class _PageSettingsState extends State<PageSettings> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.home),
-                onPressed: () {
-                  //ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                  context.go(homePage);
-                },
+                onPressed: () => context.go(homePage),
               ),
             ],
           ),
@@ -126,9 +119,7 @@ class _PageSettingsState extends State<PageSettings> {
                               FechaUtil.epochToString(
                                   prefProvider.dateExchange),
                               style: const TextStyle(
-                                fontSize: 10,
-                                color: Colors.black,
-                              ),
+                                  fontSize: 10, color: Colors.black),
                             ),
                             FittedBox(
                               fit: BoxFit.fill,
@@ -274,9 +265,9 @@ class _PageSettingsState extends State<PageSettings> {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 leading: const Icon(Icons.delete_forever, color: blue900),
                 title: const Text('Confirmar antes de eliminar'),
-                subtitle: const Text(
-                    'Eliminar operaciones de suscripción siempre requiere confirmación '
-                    'y conlleva la eliminación de todas las operaciones posteriores'),
+                subtitle: const Text('Eliminar operaciones de suscripción '
+                    'siempre requiere confirmación y conlleva la eliminación de '
+                    'todas las operaciones posteriores'),
                 trailing: Switch(
                   value: prefProvider.isConfirmDelete,
                   onChanged: (value) {
@@ -369,12 +360,11 @@ class _PageSettingsState extends State<PageSettings> {
                         if (!await launchUrl(Uri.parse(url),
                             mode: LaunchMode.externalApplication)) {
                           Logger.log(
-                            dataLog: DataLog(
-                                msg: 'Could not launch $url',
-                                file: 'page_settings',
-                                clase: '_PageSettingsState',
-                                funcion: 'build'),
-                          );
+                              dataLog: DataLog(
+                                  msg: 'Could not launch $url',
+                                  file: 'page_settings',
+                                  clase: '_PageSettingsState',
+                                  funcion: 'build'));
                         }
                       } else {
                         _showMsg(
@@ -470,20 +460,12 @@ class FullScreenModal extends ModalRoute {
   @override
   Widget buildTransitions(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation, Widget child) {
-    // add fade animation
     return FadeTransition(
       opacity: animation,
-      // add slide animation
       child: SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(0, -1),
-          end: Offset.zero,
-        ).animate(animation),
-        // add scale animation
-        child: ScaleTransition(
-          scale: animation,
-          child: child,
-        ),
+        position: Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero)
+            .animate(animation),
+        child: ScaleTransition(scale: animation, child: child),
       ),
     );
   }

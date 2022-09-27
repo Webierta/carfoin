@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
@@ -80,29 +78,6 @@ class _PageFondoState extends State<PageFondo>
     super.dispose();
   }
 
-  /*SpeedDialChild _buildSpeedDialChild(
-    BuildContext context, {
-    required IconData icono,
-    required String label,
-    required Function action,
-  }) {
-    return SpeedDialChild(
-      child: Icon(icono),
-      label: label,
-      backgroundColor: const Color(0xFFFFC107),
-      foregroundColor: const Color(0xFF0D47A1),
-      onTap: () async {
-        //ScaffoldMessenger.of(context).removeCurrentSnackBar();
-        //key.currentState?.removeCurrentSnackBar();
-        action(context);
-      },
-    );
-  }*/
-
-  test() {
-    log('test');
-  }
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -121,8 +96,6 @@ class _PageFondoState extends State<PageFondo>
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () {
-                    // ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                    //scaffoldMessengerKey.currentState?.removeCurrentSnackBar();
                     // TODO: set carteraOn antes de navigator??
                     context.go(carteraPage);
                   },
@@ -234,29 +207,6 @@ class _PageFondoState extends State<PageFondo>
                   ],
                 ),
               ),
-
-              /*floatingActionButton: FloatingActionButton(
-                heroTag: null,
-                //onPressed: null,
-                onPressed: () {},
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                child: ExpandableFab(
-                  icon: Icons.refresh,
-                  children: [
-                    ChildFab(
-                      icon: const Icon(Icons.date_range),
-                      label: 'Valores Históricos',
-                      onPressed: () => _getRangeApi(context),
-                    ),
-                    ChildFab(
-                      icon: const Icon(Icons.update),
-                      label: 'Actualizar Valor',
-                      onPressed: () => _getDataApi(context),
-                    ),
-                  ],
-                ),
-              ),*/
             ),
           ),
         );
@@ -306,8 +256,6 @@ class _PageFondoState extends State<PageFondo>
 
       var newValor = Valor(date: date, precio: getDataApi.price);
       fondoSelect.divisa = getDataApi.market;
-
-      //fondoSelect.rating = 2;
 
       //TODO: POSIBLE ERROR SI CHOCA CON VALOR INTRODUCIDO DESDE MERCADO CON FECHA ANTERIOR
       //TODO check newvalor repetido por date ??
@@ -428,9 +376,7 @@ class _PageFondoState extends State<PageFondo>
 
   void _pop() {
     if (!mounted) return;
-    //ScaffoldMessenger.of(context).removeCurrentSnackBar();
     Navigator.of(context).pop();
-
     /*SchedulerBinding.instance.addPostFrameCallback((_) {
       Navigator.of(context).pop();
     });*/

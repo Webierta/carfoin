@@ -13,9 +13,6 @@ class PageAbout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /*void _launchUrl(url) async {
-      if (!await launchUrl(url)) throw 'Could not launch $url';
-    }*/
     void launchweb(url) async {
       if (!await launchUrl(Uri.parse(url),
           mode: LaunchMode.externalApplication)) throw 'Could not launch $url';
@@ -32,10 +29,7 @@ class PageAbout extends StatelessWidget {
             actions: [
               IconButton(
                 icon: const Icon(Icons.home),
-                onPressed: () {
-                  //ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                  context.go(homePage);
-                },
+                onPressed: () => context.go(homePage),
               ),
             ],
           ),
@@ -45,7 +39,6 @@ class PageAbout extends StatelessWidget {
             child: Markdown(
               onTapLink: (String text, String? url, String title) {
                 if (text != 'donación') {
-                  //_launchUrl(Uri.parse(url!));
                   launchweb(url!);
                 } else {
                   context.go(supportPage);
@@ -91,6 +84,8 @@ Por tanto, esta aplicación requiere conexión a internet para recabar la inform
 
 Además, la aplicación obtiene la cotización del Dólar a través de Frankfurter, una API de código abierto para tipos de cambio de divisas publicados por el Banco Central Europeo. Los datos se actualizan todos los días laborables en torno a las 16:00 CET. Esto se utiliza para combinar importes en euros de carteras con distintas divisas (si la cartera no tiene moneda definida se presupone en euros).
 
+Por último, la app accede a los documentos de los Fondos desde el Portal de la Comisión Nacional de Mercado de Valores (CNMV). 
+
 Los únicos permisos que requiere esta App son:
 
 * Acceso a internet (básicamente para buscar fondos y actualizar sus valores; también para actualizar la cotización del dólar).
@@ -98,7 +93,7 @@ Los únicos permisos que requiere esta App son:
 
 Esta aplicación usa una base de datos SQLite. Normalmente Android la cerrará cuando finalice la aplicación, pero si desea asegurarse de liberar recursos y cerrar la base de datos, cierre la aplicación desde la opción <<Salir>>.
 
-Además, si ha compartido alguna Cartera, un archivo con extensión cfi (nombre-cartera.cfi) ha quedado almacenado en el directorio temporal de la aplicación. Puede eliminarlo limpiando la caché de la aplicación desde los Ajustes de su dispositivo.
+Además, si ha compartido alguna Cartera, un archivo con extensión cfi (nombre-cartera.cfi) ha quedado almacenado en el directorio temporal de la aplicación. Puede eliminarlo limpiando la caché desde los Ajustes de la aplicación.
 
 ---
 

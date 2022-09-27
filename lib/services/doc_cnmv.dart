@@ -23,28 +23,24 @@ class DocCnmv {
       response = await http.Client().get(Uri.parse(url));
     } catch (e, s) {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Catch response CNMV',
-          file: 'doc_cnmv.dart',
-          clase: 'DocCnmv',
-          funcion: '_getDoc',
-          error: e,
-          stackTrace: s,
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Catch response CNMV',
+              file: 'doc_cnmv.dart',
+              clase: 'DocCnmv',
+              funcion: '_getDoc',
+              error: e,
+              stackTrace: s));
       return null;
     }
     if (response.statusCode == 200) {
       return parse(response.body);
     } else {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Response status code != 200',
-          file: 'doc_cnmv.dart',
-          clase: 'DocCnmv',
-          funcion: '_getDoc',
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Response status code != 200',
+              file: 'doc_cnmv.dart',
+              clase: 'DocCnmv',
+              funcion: '_getDoc'));
       return null;
     }
   }
@@ -74,24 +70,20 @@ class DocCnmv {
         return urlPdf;
       } else {
         Logger.log(
-          dataLog: DataLog(
-            msg: 'href is null',
-            file: 'doc_cnmv.dart',
-            clase: 'DocCnmv',
-            funcion: 'getUrlFolleto',
-          ),
-        );
+            dataLog: DataLog(
+                msg: 'href is null',
+                file: 'doc_cnmv.dart',
+                clase: 'DocCnmv',
+                funcion: 'getUrlFolleto'));
         return null;
       }
     } else {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'document is null',
-          file: 'doc_cnmv.dart',
-          clase: 'DocCnmv',
-          funcion: 'getUrlFolleto',
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'document is null',
+              file: 'doc_cnmv.dart',
+              clase: 'DocCnmv',
+              funcion: 'getUrlFolleto'));
 
       return null;
     }
@@ -150,46 +142,38 @@ class DocCnmv {
             return Informe(name: informeTime, url: urlPdf);
           } else {
             Logger.log(
-              dataLog: DataLog(
-                msg: 'href or ejercicio or periodo == null',
-                file: 'doc_cnmv.dart',
-                clase: 'DocCnmv',
-                funcion: 'getUrlInforme',
-              ),
-            );
+                dataLog: DataLog(
+                    msg: 'href or ejercicio or periodo == null',
+                    file: 'doc_cnmv.dart',
+                    clase: 'DocCnmv',
+                    funcion: 'getUrlInforme'));
             return null;
           }
         } else {
           Logger.log(
-            dataLog: DataLog(
-              msg: 'docInformes is null',
-              file: 'doc_cnmv.dart',
-              clase: 'DocCnmv',
-              funcion: 'getUrlInforme',
-            ),
-          );
+              dataLog: DataLog(
+                  msg: 'docInformes is null',
+                  file: 'doc_cnmv.dart',
+                  clase: 'DocCnmv',
+                  funcion: 'getUrlInforme'));
           return null;
         }
       } else {
         Logger.log(
-          dataLog: DataLog(
-            msg: 'hrefInfoPeriodica is null',
-            file: 'doc_cnmv.dart',
-            clase: 'DocCnmv',
-            funcion: 'getUrlInforme',
-          ),
-        );
+            dataLog: DataLog(
+                msg: 'hrefInfoPeriodica is null',
+                file: 'doc_cnmv.dart',
+                clase: 'DocCnmv',
+                funcion: 'getUrlInforme'));
         return null;
       }
     } else {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'document is null',
-          file: 'doc_cnmv.dart',
-          clase: 'DocCnmv',
-          funcion: 'getUrlInforme',
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'document is null',
+              file: 'doc_cnmv.dart',
+              clase: 'DocCnmv',
+              funcion: 'getUrlInforme'));
       return null;
     }
   }
@@ -213,14 +197,13 @@ class DocCnmv {
               element.attributes['data-ng-if'] == 'obj.starRatingM255')
           .toList();*/
 
-      // List<Element?>?
       List<List<Element?>?>? elements = document
           .getElementsByTagName('span')
-          ?.where((Element? element) =>
+          .where((Element? element) =>
               element?.attributes['data-mod-stars-highlighted'] == 'true')
           .map((Element? item) => item?.getElementsByTagName('i'))
           .toList();
-      if (elements != null && elements.isNotEmpty) {
+      if (elements.isNotEmpty) {
         int? i = elements.first?.length;
         if (i != null) {
           if (i > 0 && i < 6) {
@@ -230,24 +213,20 @@ class DocCnmv {
         return 0;
       } else {
         Logger.log(
-          dataLog: DataLog(
-            msg: 'elements is empty: return rating 0',
-            file: 'doc_cnmv.dart',
-            clase: 'DocCnmv',
-            funcion: 'getRating',
-          ),
-        );
+            dataLog: DataLog(
+                msg: 'elements is empty: return rating 0',
+                file: 'doc_cnmv.dart',
+                clase: 'DocCnmv',
+                funcion: 'getRating'));
         return 0;
       }
     } else {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'document is null',
-          file: 'doc_cnmv.dart',
-          clase: 'DocCnmv',
-          funcion: 'getRating',
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'document is null',
+              file: 'doc_cnmv.dart',
+              clase: 'DocCnmv',
+              funcion: 'getRating'));
       return 0;
     }
   }

@@ -96,7 +96,6 @@ class BarChartBalance extends StatelessWidget {
                 return BarTooltipItem(
                   '${NumberUtil.currency(balance)} €',
                   TextStyle(color: textRedGreen(balance)),
-                  //TextStyle(color: balance < 0 ? Colors.red : Colors.green),
                 );
               },
             ),

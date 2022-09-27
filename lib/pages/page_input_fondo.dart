@@ -129,14 +129,6 @@ class _PageInputFondoState extends State<PageInputFondo> {
                                           msg: 'Código ISIN no válido',
                                           color: red900,
                                         );
-                                        /*ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content:
-                                                Text('Código ISIN no válido.'),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );*/
                                       }
                                     },
                             ),
@@ -186,7 +178,6 @@ class _PageInputFondoState extends State<PageInputFondo> {
                     TextButton(
                         child: const Text('Cancelar'),
                         onPressed: () {
-                          // ScaffoldMessenger.of(context).removeCurrentSnackBar();
                           setState(() {
                             _validIsin = null;
                             _errorDataApi = null;
@@ -196,8 +187,9 @@ class _PageInputFondoState extends State<PageInputFondo> {
                         child: const Text('Aceptar'),
                         onPressed: () {
                           var fondo = Fondo(
-                              name: locatedFond!.name, isin: locatedFond!.isin);
-                          // ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                            name: locatedFond!.name,
+                            isin: locatedFond!.isin,
+                          );
                           Navigator.pop(context, fondo);
                         }),
                   ],

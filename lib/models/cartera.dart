@@ -46,20 +46,6 @@ class Fondo {
   Map<String, Object?> toDb() {
     return {'isin': isin, 'name': name, 'divisa': divisa, 'rating': rating};
   }
-
-  /*double? precioMinimo;
-  double? precioMaximo;
-  double? precioMedio;
-  int? dateMinimo;
-  int? dateMaximo;
-  double? volatilidad;
-
-  double? totalParticipaciones;
-  double? inversion;
-  double? resultado;
-  double? balance;
-  double? rentabilidad;
-  double? tae;*/
 }
 
 class Valor {

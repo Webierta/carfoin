@@ -8,7 +8,6 @@ import '../utils/fecha_util.dart';
 class Rate {
   final int date;
   final double rate;
-
   const Rate({required this.date, required this.rate});
 }
 
@@ -35,15 +34,13 @@ class ExchangeApi {
       }
     } catch (e, s) {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Catch Response Frankfurter API',
-          file: 'exchange_api.dart',
-          clase: 'ExchangeApi',
-          funcion: 'latestRate',
-          error: e,
-          stackTrace: s,
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Catch Response Frankfurter API',
+              file: 'exchange_api.dart',
+              clase: 'ExchangeApi',
+              funcion: 'latestRate',
+              error: e,
+              stackTrace: s));
     }
     return lastRate;
   }

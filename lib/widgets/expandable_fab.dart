@@ -102,7 +102,6 @@ class _ExpandableFabState extends State<ExpandableFab>
           duration: const Duration(milliseconds: 250),
           child: FloatingActionButton(
             heroTag: 'Open Fab',
-            //heroTag: null,
             onPressed: toggle,
             foregroundColor: blue900,
             backgroundColor: amber,

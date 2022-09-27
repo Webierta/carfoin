@@ -135,10 +135,7 @@ class _MercadoState extends State<PageMercado> {
           appBar: AppBar(
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                // ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                context.go(fondoPage);
-              },
+              onPressed: () => context.go(fondoPage),
             ),
             title: const Text('MERCADO'),
             actions: [
@@ -329,13 +326,6 @@ class _MercadoState extends State<PageMercado> {
                                       'Dato no disponible. Introduce el precio manualmente',
                                   color: red900,
                                 );
-                                /*ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                        'Dato no encontrado. Introduce el precio manualmente.'),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );*/
                               }
                             },
                           ),
@@ -567,7 +557,6 @@ class _MercadoState extends State<PageMercado> {
       await database.insertValor(carteraSelect, fondoSelect, newOp);
       carteraProvider.addValor(carteraSelect, fondoSelect, newOp);
       if (!mounted) return;
-      // ScaffoldMessenger.of(context).removeCurrentSnackBar();
       context.go(fondoPage);
     }
   }
@@ -619,7 +608,6 @@ class _MercadoState extends State<PageMercado> {
 
   void _pop() {
     if (!mounted) return;
-    //ScaffoldMessenger.of(context).removeCurrentSnackBar();
     Navigator.of(context).pop();
   }
 }

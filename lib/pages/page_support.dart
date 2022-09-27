@@ -1,4 +1,4 @@
-import 'package:flutter/gestures.dart';
+import 'package:flutter/gestures.dart' show TapGestureRecognizer;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -19,11 +19,6 @@ class PageSupport extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const String btcAddress = '15ZpNzqbYFx9P7wg4U438JMwZr2q3W6fkS';
-    const String urlPayPal =
-        'https://www.paypal.com/donate?hosted_button_id=986PSAHLH6N4L';
-    const String urlGitHub = 'https://github.com/Webierta/carfoin/issues';
-
     void launchweb(url) async {
       if (!await launchUrl(Uri.parse(url),
           mode: LaunchMode.externalApplication)) throw 'Could not launch $url';
@@ -34,15 +29,8 @@ class PageSupport extends StatelessWidget {
       customDialog.generateDialog(context: context, msg: msg, color: color);
     }
 
-    /*showSnackBar() {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('BTC Address copied to Clipboard.'),
-      ));
-    }*/
-
     clipboard() async {
       await Clipboard.setData(const ClipboardData(text: btcAddress));
-      //showSnackBar();
       showMsg(msg: 'BTC Address copied to Clipboard');
     }
 
@@ -57,11 +45,7 @@ class PageSupport extends StatelessWidget {
             actions: [
               IconButton(
                 icon: const Icon(Icons.home),
-                onPressed: () {
-                  // ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                  //Navigator.of(context).pushNamed(RouteGenerator.homePage);
-                  context.go(homePage);
-                },
+                onPressed: () => context.go(homePage),
               ),
             ],
           ),
@@ -71,15 +55,11 @@ class PageSupport extends StatelessWidget {
                 const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 40),
             child: Column(
               children: [
-                //const Head(),
-                //const Icon(Icons.coffee, size: 60, color: Color(0xFF1565C0)),
-                //const Divider(),
-                //const SizedBox(height: 10.0),
                 const Align(
                   alignment: Alignment.topLeft,
                   child: Text(
-                    'CARFOIN es Software libre y de Código Abierto. Por favor considera colaborar '
-                    'para mantener activo el desarrollo de esta App.',
+                    'CARFOIN es Software libre y de Código Abierto. '
+                    'Por favor considera colaborar para mantener activo el desarrollo de esta App.',
                     style: TextStyle(fontSize: 18),
                   ),
                 ),

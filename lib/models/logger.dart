@@ -1,6 +1,6 @@
-import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
+import 'dart:convert' show utf8;
+import 'dart:developer' show log;
+import 'dart:io' show File, FileMode;
 
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -54,7 +54,6 @@ class Logger {
   Logger.log({required DataLog dataLog}) {
     String name = dataLog.getName();
     log(dataLog.msg, name: name, error: dataLog.error);
-
     getStorage().then((value) {
       if (value) _write(dataLog.toString());
     });
@@ -105,7 +104,6 @@ class Logger {
     final file = await localFile;
     try {
       if (await file.exists()) {
-        //return await file.readAsString();
         return await file.readAsString(encoding: utf8);
       } else {
         return 'No se ha registrado ningún error';

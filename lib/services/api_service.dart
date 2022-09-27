@@ -1,5 +1,3 @@
-//import 'dart:async';
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
@@ -31,15 +29,13 @@ class ApiService {
       }
     } catch (e, s) {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Catch Response Funds API',
-          file: 'api_service.dart',
-          clase: 'ApiService',
-          funcion: 'getDataApi',
-          error: e,
-          stackTrace: s,
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Catch Response Funds API',
+              file: 'api_service.dart',
+              clase: 'ApiService',
+              funcion: 'getDataApi',
+              error: e,
+              stackTrace: s));
     }
     /*on TimeoutException {
       //status = Status.tiempoExcedido;
@@ -69,27 +65,24 @@ class ApiService {
       if (response.body.contains('Access denied') ||
           response.statusCode != 200) {
         Logger.log(
-          dataLog: DataLog(
-              msg:
-                  'Funds Api Access denied, Status Code: ${response.statusCode}',
-              file: 'api_service.dart',
-              clase: 'ApiService',
-              funcion: 'getDataApiRange'),
-        );
+            dataLog: DataLog(
+                msg:
+                    'Funds Api Access denied, Status Code: ${response.statusCode}',
+                file: 'api_service.dart',
+                clase: 'ApiService',
+                funcion: 'getDataApiRange'));
       } else if (response.statusCode == 200) {
         return dataApiRangeFromJson(response.body);
       }
     } catch (e, s) {
       Logger.log(
-        dataLog: DataLog(
-          msg: 'Catch Response Funds API',
-          file: 'api_service.dart',
-          clase: 'ApiService',
-          funcion: 'getDataApiRange',
-          error: e,
-          stackTrace: s,
-        ),
-      );
+          dataLog: DataLog(
+              msg: 'Catch Response Funds API',
+              file: 'api_service.dart',
+              clase: 'ApiService',
+              funcion: 'getDataApiRange',
+              error: e,
+              stackTrace: s));
     }
     /*on TimeoutException {
       //status = Status.tiempoExcedido;
