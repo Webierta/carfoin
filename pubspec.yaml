@@ -49,7 +49,8 @@ dependencies:
   # permission_handler: ^10.0.0
   path_provider: ^2.0.11
   html: ^0.15.0
-  flutter_pdfview: ^1.2.3
+  # flutter_pdfview: ^1.2.3
+  syncfusion_flutter_pdfviewer: ^20.2.50-beta
 
 dev_dependencies:
   flutter_test:

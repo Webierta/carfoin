@@ -1,10 +1,5 @@
-import 'dart:io' show File;
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart'
-    show getApplicationDocumentsDirectory;
 import 'package:provider/provider.dart';
 
 import '../../models/cartera.dart';
@@ -16,7 +11,7 @@ import '../../services/database_helper.dart';
 import '../../services/doc_cnmv.dart';
 import '../../utils/fecha_util.dart';
 import '../../utils/number_util.dart';
-import '../../utils/pdf_visor.dart';
+import '../../utils/pdf_viewer.dart';
 import '../../utils/stats.dart';
 import '../../utils/styles.dart';
 import '../custom_dialog.dart';
@@ -382,35 +377,23 @@ class _MainFondoState extends State<MainFondo> {
                       onPressed: () async {
                         setState(() => openingPdf = true);
                         var docCnmv = DocCnmv(isin: fondoSelect.isin);
-                        /*String? urlPdf =
-                            await docCnmv.getUrlFolleto().whenComplete(() {
-                          Future.delayed(Duration.zero, () {
-                            Navigator.of(context).pop();
-                          });
-                        });*/
                         String? urlPdf = await docCnmv.getUrlFolleto();
                         if (urlPdf != null) {
                           String filename = 'folleto_${fondoSelect.isin}.pdf';
-                          await loadPdfFromNetwork(urlPdf, filename)
-                              .then((file) => openPdf(context, file, urlPdf))
-                              .whenComplete(
-                                  () => setState(() => openingPdf = false));
+                          if (!mounted) return;
+                          await openPdfViewer(context, filename, urlPdf);
                         } else {
                           setState(() => openingPdf = false);
+                          if (!mounted) return;
+                          Navigator.of(context).pop();
                           _showMsg(msg: 'Archivo no disponible', color: red900);
-                          //if (mounted)
-                          //Navigator.of(context).pop();
                           Logger.log(
-                            dataLog: DataLog(
-                              msg: 'urlPdf is null',
-                              file: 'main_fondo.dart',
-                              clase: '_MainFondoState',
-                              funcion: 'build',
-                            ),
-                          );
-                          //if (!mounted) return;
+                              dataLog: DataLog(
+                                  msg: 'urlPdf is null',
+                                  file: 'main_fondo.dart',
+                                  clase: '_MainFondoState',
+                                  funcion: 'build'));
                         }
-                        //setState(() => openingPdf = false);
                       },
                       icon: Image.asset('assets/pdf.gif'),
                       label: const Text('Folleto'),
@@ -419,35 +402,24 @@ class _MainFondoState extends State<MainFondo> {
                       onPressed: () async {
                         setState(() => openingPdf = true);
                         var docCnmv = DocCnmv(isin: fondoSelect.isin);
-                        /*Informe? informe =
-                            await docCnmv.getUrlInforme().whenComplete(() {
-                          Future.delayed(Duration.zero, () {
-                            Navigator.of(context).pop();
-                          });
-                        });*/
                         Informe? informe = await docCnmv.getUrlInforme();
                         if (informe != null) {
                           var name = informe.name;
                           var urlPdf = informe.url;
                           String filename = '${name}_${fondoSelect.isin}.pdf';
-                          await loadPdfFromNetwork(urlPdf, filename)
-                              .then((file) => openPdf(context, file, urlPdf))
-                              .whenComplete(
-                                  () => setState(() => openingPdf = false));
+                          if (!mounted) return;
+                          await openPdfViewer(context, filename, urlPdf);
                         } else {
                           setState(() => openingPdf = false);
+                          if (!mounted) return;
+                          Navigator.of(context).pop();
                           _showMsg(msg: 'Archivo no disponible', color: red900);
-                          //if (mounted)
-                          //Navigator.of(context).pop();
                           Logger.log(
-                            dataLog: DataLog(
-                              msg: 'informe is null',
-                              file: 'main_fondo.dart',
-                              clase: '_MainFondoState',
-                              funcion: 'build',
-                            ),
-                          );
-                          //if (!mounted) return;
+                              dataLog: DataLog(
+                                  msg: 'informe is null',
+                                  file: 'main_fondo.dart',
+                                  clase: '_MainFondoState',
+                                  funcion: 'build'));
                         }
                       },
                       icon: Image.asset('assets/pdf.gif'),
@@ -621,7 +593,8 @@ class _MainFondoState extends State<MainFondo> {
                     ? const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 12),
                         child: Text('Sin datos de operaciones.\n'
-                            'Ordena transacciones en el mercado para seguir la evolución de tu inversión.'),
+                            'Ordena transacciones en el mercado para seguir la '
+                            'evolución de tu inversión.'),
                       )
                     : Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -727,16 +700,12 @@ class _MainFondoState extends State<MainFondo> {
                             Row(
                               children: const [
                                 Expanded(
-                                    child: Divider(
-                                  endIndent: 10,
-                                  thickness: 1,
-                                )),
+                                  child: Divider(endIndent: 10, thickness: 1),
+                                ),
                                 Text('RENTABILIDAD'),
                                 Expanded(
-                                    child: Divider(
-                                  indent: 10,
-                                  thickness: 1,
-                                )),
+                                  child: Divider(indent: 10, thickness: 1),
+                                ),
                               ],
                             ),
                           if (rentabilidad != null) const SizedBox(height: 10),
@@ -766,11 +735,12 @@ class _MainFondoState extends State<MainFondo> {
                             Row(
                               children: const [
                                 Expanded(
-                                    child:
-                                        Divider(endIndent: 10, thickness: 1)),
+                                  child: Divider(endIndent: 10, thickness: 1),
+                                ),
                                 Text('RENTABILIDAD ANUAL'),
                                 Expanded(
-                                    child: Divider(indent: 10, thickness: 1)),
+                                  child: Divider(indent: 10, thickness: 1),
+                                ),
                               ],
                             ),
                           if (rentAnual != null) const SizedBox(height: 10),
@@ -785,7 +755,6 @@ class _MainFondoState extends State<MainFondo> {
                             RowBalance(
                               label: 'TWR (TAE)',
                               data: NumberUtil.percentCompact(tae),
-                              //data: NumberUtil.percentCompact(_tae),
                               color: textRedGreen(tae),
                             ),
                           if (mwr != null) const SizedBox(height: 10),
@@ -807,49 +776,16 @@ class _MainFondoState extends State<MainFondo> {
     );
   }
 
-  Future<File> loadPdfFromNetwork(String url, String filename) async {
-    final response = await http.get(Uri.parse(url));
-    final bytes = response.bodyBytes;
-    return _storeFile(url, bytes, filename);
-  }
-
-  Future<File> _storeFile(String url, List<int> bytes, String filename) async {
-    final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/$filename');
-    await file.writeAsBytes(bytes, flush: true);
-    return file;
-  }
-
-  _deleteFile(File file) async {
-    try {
-      await file.delete();
-    } catch (e, s) {
-      Logger.log(
-          dataLog: DataLog(
-        msg: 'Catch delete File',
-        file: 'main_fondo.dart',
-        clase: '_MainFondoState',
-        funcion: '_deleteFile',
-        error: e,
-        stackTrace: s,
-      ));
-    }
-  }
-
-  void openPdf(BuildContext context, File file, String url) {
-    Navigator.of(context)
+  openPdfViewer(BuildContext context, String fileName, String url) async {
+    await Navigator.of(context)
         .push(MaterialPageRoute(
-            builder: (context) => PdfVisor(
-                  file: file,
+            builder: (context) => PdfViewer(
+                  fileName: fileName,
                   url: url,
-                  isin: fondoSelect.isin,
                 )))
         .whenComplete(() {
-      _deleteFile(file);
       setState(() => openingPdf = false);
-      Future.delayed(Duration.zero, () {
-        Navigator.of(context).pop();
-      });
+      Navigator.of(context).pop();
     });
   }
 
@@ -873,7 +809,6 @@ class RowBalance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      //mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: const TextStyle(fontSize: 16)),
         const SizedBox(width: 10),
