@@ -7,16 +7,12 @@ class ListTileCapital extends StatelessWidget {
   final double inversion;
   final double capital;
   final double balance;
-  //final String divisa;
-  //final IconData icon;
-  const ListTileCapital({
-    Key? key,
-    required this.inversion,
-    required this.capital,
-    required this.balance,
-    //required this.divisa,
-    //required this.icon
-  }) : super(key: key);
+  const ListTileCapital(
+      {Key? key,
+      required this.inversion,
+      required this.capital,
+      required this.balance})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -149,16 +149,11 @@ class _PageInputRangeState extends State<PageInputRange> {
         );
       },
       initialDateRange: DateTimeRange(
-        //start: DateTime.now().subtract(const Duration(days: 5)),
-        //end: DateTime.now(),
         start: _initDateRange.start,
         end: _initDateRange.end,
       ),
       firstDate: DateTime(1997, 1, 1),
       lastDate: DateTime.now(),
-      //currentDate: DateTime.now(),
-      //initialEntryMode: DatePickerEntryMode.inputOnly,
-      //initialEntryMode = DatePickerEntryMode.calendarOnly,
       initialEntryMode: mode,
       locale: const Locale('es'),
       fieldStartLabelText: 'Desde',
@@ -173,7 +168,6 @@ class _PageInputRangeState extends State<PageInputRange> {
       errorInvalidRangeText: 'Período no válido.',
     );
 
-    /// TEST EPOCH HMS
     if (newRange != null) {
       DateTime start = FechaUtil.dateToDateHms(newRange.start);
       DateTime end = FechaUtil.dateToDateHms(newRange.end);

@@ -1,7 +1,7 @@
 import 'dart:io' show File;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart' show Share;
@@ -19,10 +19,13 @@ import '../services/preferences_service.dart';
 import '../services/share_csv.dart';
 import '../utils/fecha_util.dart';
 import '../utils/konstantes.dart';
+import '../utils/status_api_service.dart';
 import '../utils/styles.dart';
 import '../utils/update_all.dart';
-import '../widgets/custom_dialog.dart';
 import '../widgets/data_cartera.dart';
+import '../widgets/dialogs/confirm_dialog.dart';
+import '../widgets/dialogs/custom_messenger.dart';
+import '../widgets/dialogs/info_dialog.dart';
 import '../widgets/expandable_fab.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
@@ -50,8 +53,6 @@ class _PageCarteraState extends State<PageCartera> {
     try {
       carteraProvider.fondos = await database.getFondos(cartera,
           byOrder: prefProvider.isByOrderFondos);
-      //carteraProvider.addFondos(cartera, carteraProvider.fondos);
-      /// ????
       carteraSelect.fondos = carteraProvider.fondos;
       for (var fondo in carteraProvider.fondos) {
         await database.createTableFondo(cartera, fondo).whenComplete(() async {
@@ -93,7 +94,7 @@ class _PageCarteraState extends State<PageCartera> {
     final newFondo = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => page.routeClass));
     newFondo != null
-        ? _addFondo(newFondo as Fondo)
+        ? _addFondo(newFondo as Fondo, page)
         : _showMsg(msg: 'Sin cambios en la cartera.');
   }
 
@@ -235,6 +236,21 @@ class _PageCarteraState extends State<PageCartera> {
     context.go(fondoPage);
   }
 
+  List<ListTile> _buildChildrenContent(List<Update> updates) {
+    List<ListTile> contentWidgets = [];
+    for (var update in updates) {
+      contentWidgets.add(ListTile(
+        dense: true,
+        title: Text(update.nameFondo),
+        //subtitle: Text(update.nameCartera),
+        trailing: update.isUpdate
+            ? const Icon(Icons.check_box, color: green)
+            : const Icon(Icons.disabled_by_default, color: red),
+      ));
+    }
+    return contentWidgets;
+  }
+
   _dialogUpdateAll(BuildContext context) async {
     showDialog(
       context: context,
@@ -243,7 +259,6 @@ class _PageCarteraState extends State<PageCartera> {
         return StatefulBuilder(
             key: _dialogKey,
             builder: (context, setState) {
-              // return Dialog(child: Loading(...); ???
               return Loading(
                 titulo: 'ACTUALIZANDO FONDOS...',
                 subtitulo: _loadingText,
@@ -251,7 +266,6 @@ class _PageCarteraState extends State<PageCartera> {
             });
       },
     );
-
     List<Update> updateResultados = [];
     if (carteraSelect.fondos != null && carteraSelect.fondos!.isNotEmpty) {
       var updateAll =
@@ -263,9 +277,16 @@ class _PageCarteraState extends State<PageCartera> {
       }
     }
     _pop();
-    updateResultados.isNotEmpty
-        ? await _showResultados(updateResultados)
-        : _showMsg(msg: 'Nada que actualizar');
+    if (updateResultados.isNotEmpty) {
+      List<ListTile> contentWidgets = _buildChildrenContent(updateResultados);
+      await InfoDialog(
+        context: context,
+        title: 'Resultado',
+        content: Column(children: contentWidgets),
+      ).generateDialog();
+    } else {
+      _showMsg(msg: 'Nada que actualizar');
+    }
   }
 
   _setStateDialog(String newText) {
@@ -276,81 +297,34 @@ class _PageCarteraState extends State<PageCartera> {
     }
   }
 
-  _showResultados(List<Update> updates) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        Icon getIconUpdate(bool isUpdate) {
-          if (isUpdate) {
-            return const Icon(Icons.check_box, color: green);
-          }
-          return const Icon(Icons.disabled_by_default, color: red);
-        }
-
-        return WillPopScope(
-          onWillPop: () async => false,
-          child: AlertDialog(
-            insetPadding: const EdgeInsets.all(10),
-            title: const Text('Resultado'),
-            actions: [
-              TextButton(
-                child: const Text('Cerrar'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-            content: SingleChildScrollView(
-              child: SizedBox(
-                width: double.maxFinite,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    for (var update in updates)
-                      ListTile(
-                        dense: true,
-                        title: Text(update.nameFondo),
-                        trailing: getIconUpdate(update.isUpdate),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+  Future<bool> _insertFondoDb(Fondo fondo) async {
+    try {
+      await database.updateFondo(carteraSelect, fondo);
+      await database.insertValor(carteraSelect, fondo, fondo.valores!.first);
+      await setFondos(carteraSelect);
+      return true;
+    } catch (e, s) {
+      Logger.log(
+          dataLog: DataLog(
+              msg: 'Catch updateFondo / insertValor database',
+              file: 'page_cartera.dart',
+              clase: '_PageCarteraState',
+              funcion: '_insertFondoDb',
+              error: e,
+              stackTrace: s));
+      return false;
+    }
   }
 
   Future<bool> _getDataApi(Fondo fondo) async {
-    //await carfoin.createTableFondo(fondo);
     await database.createTableFondo(carteraSelect, fondo);
     final getDataApi = await apiService.getDataApi(fondo.isin);
     if (getDataApi != null) {
-      /// TEST EPOCH HMS
       var date = FechaUtil.epochToEpochHms(getDataApi.epochSecs);
       var newValor = Valor(date: date, precio: getDataApi.price);
       fondo.divisa = getDataApi.market;
-
-      ///await carfoin.insertFondoCartera(fondo);
-      //await carfoin.updateFondoCartera(fondo);
-      //await carfoin.insertValorFondo(fondo, newValor);
-
-      try {
-        await database.updateFondo(carteraSelect, fondo);
-        await database.insertValor(carteraSelect, fondo, newValor);
-        await setFondos(carteraSelect);
-        return true;
-      } catch (e, s) {
-        Logger.log(
-            dataLog: DataLog(
-                msg: 'Catch updateFondo / insertValor database',
-                file: 'page_cartera.dart',
-                clase: '_PageCarteraState',
-                funcion: '_getDataApi',
-                error: e,
-                stackTrace: s));
-        return false;
-      }
+      fondo.valores = [newValor];
+      return _insertFondoDb(fondo);
     } else {
       return false;
     }
@@ -362,17 +336,28 @@ class _PageCarteraState extends State<PageCartera> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return const Loading(
-            titulo: 'Fondo añadido', subtitulo: 'Cargando último valor...');
+          titulo: 'Fondo añadido',
+          subtitulo: 'Cargando último valor...',
+        );
       },
     );
-    var update = await _getDataApi(newFondo);
+    bool update = await _getDataApi(newFondo);
     _pop();
-    update
-        ? _showMsg(msg: 'Fondo actualizado')
-        : _showMsg(msg: 'Error al actualizar el fondo', color: red900);
+    if (update) {
+      _showMsg(msg: 'Fondo actualizado');
+    } else {
+      if (apiService.status == StatusApiService.okHttp) {
+        _showMsg(msg: 'Error al escribir en la base de datos', color: red900);
+      } else {
+        String msg = apiService.status.msg == ''
+            ? 'Fondo no actualizado: Error en la descarga de datos'
+            : apiService.status.msg;
+        _showMsg(msg: msg, color: red900);
+      }
+    }
   }
 
-  _addFondo(Fondo newFondo) async {
+  _addFondo(Fondo newFondo, AppPage page) async {
     var existe = [for (var fondo in carteraProvider.fondos) fondo.isin]
         .contains(newFondo.isin);
     if (existe) {
@@ -386,9 +371,6 @@ class _PageCarteraState extends State<PageCartera> {
         var docCnmv = DocCnmv(isin: newFondo.isin);
         int rating = await docCnmv.getRating();
         newFondo.rating = rating;
-        /*if (rating > 0 && rating < 6) {
-        newFondo.rating = rating;
-        }*/
       }
       bool? insertOk;
       try {
@@ -402,7 +384,6 @@ class _PageCarteraState extends State<PageCartera> {
                 funcion: '_addFondo',
                 error: e,
                 stackTrace: s));
-        //return;
       } finally {
         setState(() => addingFondo = false);
       }
@@ -410,62 +391,44 @@ class _PageCarteraState extends State<PageCartera> {
         await setFondos(carteraSelect);
         if (prefProvider.isAutoAudate) {
           if (!mounted) return;
-          await _dialogAutoUpdate(context, newFondo);
+          if (page == AppPage.searchFondo) {
+            await _dialogAutoUpdate(context, newFondo);
+          } else {
+            if (newFondo.valores != null &&
+                newFondo.valores!.isNotEmpty &&
+                newFondo.divisa != null) {
+              bool insertFondo = await _insertFondoDb(newFondo);
+              insertFondo
+                  ? _showMsg(msg: 'Fondo añadido')
+                  : _showMsg(msg: 'Error al añadir el Fondo', color: red900);
+            } else {
+              await _dialogAutoUpdate(context, newFondo);
+            }
+          }
         } else {
           _showMsg(msg: 'Fondo añadido');
         }
       } else {
-        _showMsg(msg: 'Error al añaddir el Fondo', color: red900);
+        _showMsg(msg: 'Error al añadir el Fondo', color: red900);
       }
     }
-  }
-
-  _dialogDeleteConfirm(BuildContext context, [String? fondoName]) async {
-    return showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext ctx) {
-          String title = fondoName == null
-              ? 'Eliminar todos los fondos'
-              : 'Eliminar $fondoName';
-          String content = fondoName == null
-              ? '¿Eliminar todos los fondos en la cartera ${carteraSelect.name}?'
-              : '¿Eliminar el fondo $fondoName y todos sus valores?';
-          return AlertDialog(
-            title: Text(title),
-            content: Text(content),
-            actions: [
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('CANCELAR'),
-              ),
-              ElevatedButton(
-                style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFFFFFFFF),
-                  backgroundColor: red,
-                ),
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('ACEPTAR'),
-              ),
-            ],
-          );
-        });
   }
 
   _removeFondo(Fondo fondo) async {
     eliminarFondo() async {
       await database.deleteAllValores(carteraSelect, fondo);
       await database.deleteFondo(carteraSelect, fondo);
-
-      // PRUEBA ??
       await database.dropTableFondo(carteraSelect, fondo);
-
       carteraProvider.removeFondo(carteraSelect, fondo);
       await setFondos(carteraSelect);
     }
 
     if (prefProvider.isConfirmDeleteFondo) {
-      var resp = await _dialogDeleteConfirm(context, fondo.name);
+      bool? resp = await ConfirmDialog(
+        context: context,
+        title: 'Eliminar Fondo',
+        content: '¿Eliminar el fondo ${fondo.name} y todos sus valores?',
+      ).generateDialog();
       if (resp == null || resp == false) {
         setState(() {});
       } else {
@@ -478,25 +441,24 @@ class _PageCarteraState extends State<PageCartera> {
 
   void _deleteAllConfirm(BuildContext context) async {
     removeAllFondos() async {
-      //carteraSelect.fondos
       for (var fondo in carteraProvider.fondos) {
         await database.deleteAllValores(carteraSelect, fondo);
       }
       await database.deleteAllFondos(carteraSelect);
-
-      // PRUEBA
       await database.dropAllTablesFondos(carteraSelect);
-
       carteraProvider.removeAllFondos(carteraSelect);
-
-      /// ???
       await setFondos(carteraSelect);
     }
 
     if (carteraProvider.fondos.isEmpty) {
       _showMsg(msg: 'Nada que eliminar');
     } else {
-      var resp = await _dialogDeleteConfirm(context);
+      bool? resp = await ConfirmDialog(
+        context: context,
+        title: 'Eliminar fondos',
+        content:
+            '¿Eliminar todos los fondos y sus valores en la cartera ${carteraSelect.name}?',
+      ).generateDialog();
       if (resp == null || resp == false) {
         setState(() {});
       } else {
@@ -505,10 +467,9 @@ class _PageCarteraState extends State<PageCartera> {
     }
   }
 
-  void _showMsg({required String msg, Color? color}) {
-    CustomDialog customDialog = const CustomDialog();
-    customDialog.generateDialog(context: context, msg: msg, color: color);
-  }
+  void _showMsg({required String msg, Color? color}) =>
+      CustomMessenger(context: context, msg: msg, color: color)
+          .generateDialog();
 
   void _pop() {
     if (!mounted) return;

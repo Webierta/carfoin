@@ -32,7 +32,6 @@ Container bgDismissible = Container(
   //alignment: Alignment.centerRight,
   alignment: AlignmentDirectional.centerEnd,
   child: const Padding(
-    //padding: EdgeInsets.all(10.0),
     padding: EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
     child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
   ),

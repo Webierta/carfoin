@@ -25,10 +25,8 @@ class ExchangeApi {
         final decoded = jsonDecode(response.body);
         final dateDecoded = decoded['date'];
         final ratesMap = (decoded['rates'] as Map).cast<String, double>();
-        //lastRate = ratesMap.values.first.toDouble();
         var lastRateEUR = ratesMap['EUR'] as double;
         var dateTime = DateTime.parse(dateDecoded);
-        //dateTime = FechaUtil.dateToDateHms(dateTime);
         var date = FechaUtil.dateToEpoch(dateTime);
         lastRate = Rate(date: date, rate: lastRateEUR);
       }

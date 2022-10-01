@@ -27,20 +27,13 @@ class FileUtil {
     final String dbPath = await database.getDatabasePath();
     PlatformFile archivo = result.files.first;
 
-    // TODO: ESTUDIAR POSIBILIDAD DE RECUPERAR BD ORIGINAL: EXPORTAR AUTO??
-    //var dbFile = File(dbPath);
-    //var dbBackup = await dbFile.readAsBytes();
-
     if (archivo.extension == 'db' &&
         archivo.path != null &&
         await database.isDatabase(archivo.path!)) {
       try {
         File file = File(archivo.path!);
         final dbAsBytes = await file.readAsBytes();
-        //final dbDir = await getDatabasesPath();
-        //final String dbPath = join(dbDir, 'database.db');
         await deleteDatabase(dbPath);
-        //await database.deleteDatabase(dbPath);
         await File(dbPath).writeAsBytes(dbAsBytes);
         return Resultado(Status.ok);
       } catch (e, s) {
@@ -52,14 +45,6 @@ class FileUtil {
                 funcion: 'importar',
                 error: e,
                 stackTrace: s));
-
-        // TODO: DIALOGO ERROR: RECUPERAR BD ??
-        //await deleteDatabase(dbPath);
-        //await database.deleteDatabase(dbPath);
-        //await File(dbPath).writeAsBytes(dbBackup);
-        // TODO: RECUPERAR BD AUTOGUARDADA ??
-        //await deleteDatabase(dbPath);
-        // AÑADIR msg: e ??
         return Resultado(Status.error);
       }
     } else {
@@ -102,7 +87,6 @@ class FileUtil {
                 funcion: 'exportar',
                 error: e,
                 stackTrace: s));
-
         return Resultado(Status.error, msg: e.toString());
       }
     } else {

@@ -56,7 +56,6 @@ class StatsGlobal {
                 lastOps
                     .add(LastOp(cartera: cartera, fondo: fondo, valor: lastOp));
                 if (operaciones.length > 1) {
-                  //var lastOp2 = operaciones[operaciones.length - 2];
                   var lastOp2 = operaciones[1];
                   lastOps.add(
                       LastOp(cartera: cartera, fondo: fondo, valor: lastOp2));

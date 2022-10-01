@@ -2,16 +2,15 @@ import 'dart:async' show Timer;
 
 import 'package:flutter/material.dart';
 
-import '../utils/styles.dart';
+import '../../utils/styles.dart';
 
-class CustomDialog {
-  const CustomDialog();
+class CustomMessenger {
+  final BuildContext context;
+  final String msg;
+  final Color? color;
+  const CustomMessenger({required this.context, required this.msg, this.color});
 
-  generateDialog({
-    required BuildContext context,
-    required String msg,
-    Color? color,
-  }) {
+  generateDialog() {
     Timer? timer;
     return showDialog<void>(
       context: context,

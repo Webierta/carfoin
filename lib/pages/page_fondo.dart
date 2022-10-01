@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
+import '../models/preferences_provider.dart';
 import '../router/router_utils.dart';
 import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../services/doc_cnmv.dart';
 import '../utils/fecha_util.dart';
+import '../utils/status_api_service.dart';
 import '../utils/styles.dart';
-import '../widgets/custom_dialog.dart';
+import '../widgets/dialogs/confirm_dialog.dart';
+import '../widgets/dialogs/custom_messenger.dart';
 import '../widgets/expandable_fab.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
@@ -36,7 +39,7 @@ class _PageFondoState extends State<PageFondo>
   late List<Valor> operacionesSelect;
   late ApiService apiService;
   late TabController _tabController;
-  bool _deleteOp = false;
+  late PreferencesProvider prefProvider;
 
   setValores(Cartera cartera, Fondo fondo) async {
     try {
@@ -60,7 +63,7 @@ class _PageFondoState extends State<PageFondo>
     carteraProvider = context.read<CarteraProvider>();
     carteraSelect = carteraProvider.carteraSelect;
     fondoSelect = carteraProvider.fondoSelect;
-
+    prefProvider = context.read<PreferencesProvider>();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       database
           .createTableFondo(carteraSelect, fondoSelect)
@@ -95,10 +98,8 @@ class _PageFondoState extends State<PageFondo>
               appBar: AppBar(
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    // TODO: set carteraOn antes de navigator??
-                    context.go(carteraPage);
-                  },
+                  // TODO: set carteraOn antes de navigator??
+                  onPressed: () => context.go(carteraPage),
                 ),
                 title: ListTile(
                   title: Text(
@@ -123,6 +124,10 @@ class _PageFondoState extends State<PageFondo>
                   ),
                 ),
                 actions: [
+                  IconButton(
+                    onPressed: () => context.go(homePage),
+                    icon: const Icon(Icons.home),
+                  ),
                   PopupMenuButton(
                     color: blue,
                     offset: Offset(0.0, AppBar().preferredSize.height),
@@ -140,11 +145,24 @@ class _PageFondoState extends State<PageFondo>
                         if (carteraProvider.valores.isEmpty) {
                           showMsg(msg: 'Nada que eliminar');
                         } else {
-                          var resp = await _deleteConfirm(context);
-                          if (resp == null || resp == false) {
-                            setState(() {});
-                          } else {
-                            if (_deleteOp) {
+                          String content = '';
+                          if (prefProvider.isDeleteOperaciones == true &&
+                              carteraProvider.operaciones.isNotEmpty) {
+                            content = '¿Eliminar todos los valores del fondo y '
+                                'las operaciones asociadas? (puedes cambiarlo desde Ajustes)';
+                          } else if (prefProvider.isDeleteOperaciones ==
+                                  false &&
+                              carteraProvider.operaciones.isNotEmpty) {
+                            content = '¿Eliminar todos los valores del fondo '
+                                'manteniendo las operaciones asociadas? (puedes cambiarlo desde Ajustes)';
+                          }
+                          bool? resp = await ConfirmDialog(
+                            context: context,
+                            title: 'Eliminar Valores',
+                            content: content,
+                          ).generateDialog();
+                          if (resp == true) {
+                            if (prefProvider.isDeleteOperaciones == true) {
                               await database.deleteAllValores(
                                   carteraSelect, fondoSelect);
                             } else {
@@ -228,7 +246,9 @@ class _PageFondoState extends State<PageFondo>
     updatingRating() async {
       var docCnmv = DocCnmv(isin: fondoSelect.isin);
       int rating = await docCnmv.getRating();
-      fondoSelect.rating = rating;
+      if (rating != 0) {
+        fondoSelect.rating = rating;
+      }
     }
 
     if (valoresSelect.isNotEmpty) {
@@ -251,31 +271,24 @@ class _PageFondoState extends State<PageFondo>
 
     final getDataApi = await apiService.getDataApi(fondoSelect.isin);
     if (getDataApi != null) {
-      /// TEST EPOCH HMS
       var date = FechaUtil.epochToEpochHms(getDataApi.epochSecs);
-
       var newValor = Valor(date: date, precio: getDataApi.price);
       fondoSelect.divisa = getDataApi.market;
-
-      //TODO: POSIBLE ERROR SI CHOCA CON VALOR INTRODUCIDO DESDE MERCADO CON FECHA ANTERIOR
-      //TODO check newvalor repetido por date ??
-      //TODO: ESTE INSERT DESORDENA LOS FONDOS (pone al final el actualizado)
-
-      // TODO: si existe update si no existe insert
-
-      ///?
-      //await database.insertFondo(carteraSelect, fondoSelect);
-      //await database.insertValor(carteraSelect, fondoSelect, newValor);
-      // NUEVO EN PRUEBA
       await database.updateFondo(carteraSelect, fondoSelect);
-      // END PRUEBA
       await database.updateOperacion(carteraSelect, fondoSelect, newValor);
       await setValores(carteraSelect, fondoSelect);
       _pop();
       showMsg(msg: 'Descarga de datos completada.');
     } else {
       _pop();
-      showMsg(msg: 'Error en la descarga de datos.', color: red900);
+      if (apiService.status == StatusApiService.okHttp) {
+        showMsg(msg: 'Error al escribir en la base de datos', color: red900);
+      } else {
+        String msg = apiService.status.msg == ''
+            ? 'Fondo no actualizado: Error en la descarga de datos'
+            : apiService.status.msg;
+        showMsg(msg: msg, color: red900);
+      }
     }
   }
 
@@ -306,11 +319,9 @@ class _PageFondoState extends State<PageFondo>
           newListValores.add(Valor(date: date, precio: dataApi.price));
         }
         for (var valor in newListValores) {
-          //await database.insertValor(carteraSelect, fondoSelect, valor);
           await database.updateOperacion(carteraSelect, fondoSelect, valor);
         }
         await setValores(carteraSelect, fondoSelect);
-        // TODO set last valor (date y precio) desde VALORES cada vez en _updateValores
         _pop();
         showMsg(msg: 'Descarga de datos completada.');
       } else {
@@ -320,65 +331,12 @@ class _PageFondoState extends State<PageFondo>
     }
   }
 
-  _deleteConfirm(BuildContext context) async {
-    //var fondoOn = context.read<CarfoinProvider>().getFondo!;
-    // TODO: necesario getValores si se usa provider watch ??
-    //await carfoin.getValoresFondo(fondoOn);
-    return showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext ctx) {
-          return AlertDialog(
-            title: const Text('Eliminar Valores'),
-            content: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                        'Esto eliminará todos los valores almacenados del fondo.'),
-                    const SizedBox(height: 10),
-                    if (carteraProvider.operaciones.isNotEmpty)
-                      CheckboxListTile(
-                        title: const Text('Eliminar operaciones'),
-                        value: _deleteOp,
-                        onChanged: (bool? newValue) {
-                          setState(() => _deleteOp = newValue!);
-                        },
-                        controlAffinity: ListTileControlAffinity.leading,
-                      ),
-                  ],
-                );
-              },
-            ),
-            actions: [
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('CANCELAR'),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFFFFFFFF),
-                  backgroundColor: red,
-                ),
-                child: const Text('ACEPTAR'),
-              ),
-            ],
-          );
-        });
-  }
-
-  void showMsg({required String msg, Color? color}) {
-    CustomDialog customDialog = const CustomDialog();
-    customDialog.generateDialog(context: context, msg: msg, color: color);
-  }
+  void showMsg({required String msg, Color? color}) =>
+      CustomMessenger(context: context, msg: msg, color: color)
+          .generateDialog();
 
   void _pop() {
     if (!mounted) return;
     Navigator.of(context).pop();
-    /*SchedulerBinding.instance.addPostFrameCallback((_) {
-      Navigator.of(context).pop();
-    });*/
   }
 }

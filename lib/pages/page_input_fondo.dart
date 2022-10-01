@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show FilteringTextInputFormatter;
 import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
 import '../services/api_service.dart';
+import '../utils/fecha_util.dart';
 import '../utils/styles.dart';
-import '../widgets/custom_dialog.dart';
+import '../widgets/dialogs/custom_messenger.dart';
 
 class PageInputFondo extends StatefulWidget {
   const PageInputFondo({Key? key}) : super(key: key);
@@ -54,9 +55,6 @@ class _PageInputFondoState extends State<PageInputFondo> {
                 child: Column(
                   children: [
                     ListTile(
-                      //leading: const Icon(Icons.business_center),
-                      //title: Text(carteraOn.name),
-                      //subtitle: const Text('Introduce el ISIN del nuevo Fondo'),
                       leading:
                           const Icon(Icons.add_chart, size: 32, color: blue),
                       title: const Text('Introduce el ISIN del nuevo Fondo'),
@@ -91,7 +89,6 @@ class _PageInputFondoState extends State<PageInputFondo> {
                         decoration: const InputDecoration(
                           hintText: 'ISIN',
                           border: OutlineInputBorder(),
-                          //errorText: _emptyIsin ? 'ISIN requerido.' : null,
                         ),
                       ),
                       subtitle: Padding(
@@ -187,9 +184,10 @@ class _PageInputFondoState extends State<PageInputFondo> {
                         child: const Text('Aceptar'),
                         onPressed: () {
                           var fondo = Fondo(
-                            name: locatedFond!.name,
-                            isin: locatedFond!.isin,
-                          );
+                              name: locatedFond!.name,
+                              isin: locatedFond!.isin,
+                              divisa: locatedFond!.divisa,
+                              valores: locatedFond!.valores);
                           Navigator.pop(context, fondo);
                         }),
                   ],
@@ -251,15 +249,20 @@ class _PageInputFondoState extends State<PageInputFondo> {
     final getDataApi = await apiService.getDataApi(inputIsin);
     if (getDataApi != null) {
       setState(() => _errorDataApi = false);
-      return Fondo(name: getDataApi.name, isin: inputIsin);
+      var date = FechaUtil.epochToEpochHms(getDataApi.epochSecs);
+      var newValor = Valor(date: date, precio: getDataApi.price);
+      return Fondo(
+          name: getDataApi.name,
+          isin: inputIsin,
+          divisa: getDataApi.market,
+          valores: [newValor]);
     } else {
       setState(() => _errorDataApi = true);
       return Fondo(name: 'Fondo no encontrado', isin: inputIsin);
     }
   }
 
-  void showMsg({required String msg, Color? color}) {
-    CustomDialog customDialog = const CustomDialog();
-    customDialog.generateDialog(context: context, msg: msg, color: color);
-  }
+  void showMsg({required String msg, Color? color}) =>
+      CustomMessenger(context: context, msg: msg, color: color)
+          .generateDialog();
 }

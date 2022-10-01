@@ -115,7 +115,6 @@ class DataCartera extends StatelessWidget {
                           Expanded(
                             child: ListTile(
                               dense: true,
-                              //contentPadding: const EdgeInsets.all(0),
                               contentPadding:
                                   const EdgeInsets.fromLTRB(0, 0, 8, 0),
                               //minLeadingWidth: 0,
@@ -183,7 +182,6 @@ class DataCartera extends StatelessWidget {
                   divisa: symbolDivisa,
                   firstDate: valores.reversed.first.date,
                   lastDate: valores.reversed.last.date,
-                  //tae: _tae,
                 ),
               if (tae != null)
                 Padding(

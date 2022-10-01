@@ -89,15 +89,12 @@ class Logger {
         if (await file.exists()) {
           file.copy('/storage/emulated/0/Download/logfile.txt');
           return true;
-        } else {
-          return false;
         }
       } catch (e) {
         return false;
       }
-    } else {
-      return false;
     }
+    return false;
   }
 
   Future<String> read() async {

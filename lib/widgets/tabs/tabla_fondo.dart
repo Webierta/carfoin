@@ -27,7 +27,6 @@ class _TablaFondoState extends State<TablaFondo> {
     carteraProvider.valores = await database.getValores(cartera, fondo);
     fondo.valores = carteraProvider.valores;
     valoresSelect = carteraProvider.valores;
-
     carteraProvider.operaciones = await database.getOperaciones(cartera, fondo);
     operacionesSelect = carteraProvider.operaciones;
   }
@@ -65,7 +64,6 @@ class _TablaFondoState extends State<TablaFondo> {
       if (condition) {
         var dif = valor.precio - valores[valores.indexOf(valor) + index].precio;
         return Text(
-          //dif.toStringAsFixed(2),
           NumberUtil.decimalFixed(dif, long: false),
           textAlign: TextAlign.center,
           style: TextStyle(color: textRedGreen(dif)),
@@ -128,10 +126,6 @@ class _TablaFondoState extends State<TablaFondo> {
                             textAlign: TextAlign.center,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           )),
-                      /*const Expanded(
-                        flex: 1,
-                        child: Text(''),
-                      ),*/
                     ],
                   ),
                 ),
@@ -180,7 +174,6 @@ class _TablaFondoState extends State<TablaFondo> {
                                 Expanded(
                                     flex: 3,
                                     child: Text(
-                                      //_epochFormat(valoresCopy[index].date),
                                       FechaUtil.epochToString(
                                           valores[index].date),
                                       textAlign: TextAlign.center,
@@ -188,7 +181,6 @@ class _TablaFondoState extends State<TablaFondo> {
                                 Expanded(
                                     flex: 3,
                                     child: Text(
-                                      //'${valores[index].precio}',
                                       NumberUtil.decimalFixed(
                                           valores[index].precio,
                                           long: false),

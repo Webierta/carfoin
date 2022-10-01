@@ -6,9 +6,6 @@ class Cartera {
     fondos ??= [];
   }
 
-  //List<Fondo> fondos;
-  //Cartera({this.id, required this.name, this.fondos = []});
-
   Cartera.fromMap(Map<String, dynamic> map)
       : id = map['id'],
         name = map['name'],

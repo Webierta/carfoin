@@ -33,11 +33,6 @@ class _PageGlobalState extends State<PageGlobal> {
     _statsGlobal = StatsGlobal(rateExchange: prefProvider.rateExchange);
     _statsGlobal.calcular(carteras);
 
-    /*goCartera(BuildContext context, Cartera cartera) {
-      carteraProvider.carteraSelect = cartera;
-      context.go(carteraPage);
-    }*/
-
     goFondo(BuildContext context, Cartera cartera, Fondo fondo) {
       carteraProvider.carteraSelect = cartera;
       carteraProvider.fondoSelect = fondo;
@@ -75,7 +70,6 @@ class _PageGlobalState extends State<PageGlobal> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   child: ListView(
-                    //padding: EdgeInsets.fromLTRB(0, 30, 0, 30),
                     children: [
                       const Text('PORTAFOLIO', textAlign: TextAlign.start),
                       Wrap(

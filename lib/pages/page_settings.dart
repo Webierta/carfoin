@@ -13,7 +13,8 @@ import '../utils/fecha_util.dart';
 import '../utils/konstantes.dart';
 import '../utils/number_util.dart';
 import '../utils/styles.dart';
-import '../widgets/custom_dialog.dart';
+import '../widgets/dialogs/custom_messenger.dart';
+import '../widgets/dialogs/full_screen_modal.dart';
 import '../widgets/my_drawer.dart';
 
 enum ResultStatus { pendiente, nuevo, viejo, error }
@@ -110,10 +111,17 @@ class _PageSettingsState extends State<PageSettings> {
                         },
                         style: OutlinedButton.styleFrom(
                           backgroundColor: Colors.white,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
                           side: const BorderSide(color: blue, width: 2),
+                          elevation: 4,
+                          padding: const EdgeInsets.symmetric(horizontal: 0),
+                          shadowColor: Colors.grey,
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               FechaUtil.epochToString(
@@ -122,14 +130,12 @@ class _PageSettingsState extends State<PageSettings> {
                                   fontSize: 10, color: Colors.black),
                             ),
                             FittedBox(
-                              fit: BoxFit.fill,
-                              child: Text(
-                                NumberUtil.decimalFixed(
-                                    prefProvider.rateExchange,
-                                    decimals: 3),
-                                //style: const TextStyle(fontSize: 16),
-                              ),
-                            ),
+                                fit: BoxFit.fill,
+                                child: Text(
+                                  NumberUtil.decimalFixed(
+                                      prefProvider.rateExchange,
+                                      decimals: 3),
+                                )),
                           ],
                         ),
                       ),
@@ -267,12 +273,27 @@ class _PageSettingsState extends State<PageSettings> {
                 title: const Text('Confirmar antes de eliminar'),
                 subtitle: const Text('Eliminar operaciones de suscripción '
                     'siempre requiere confirmación y conlleva la eliminación de '
-                    'todas las operaciones posteriores'),
+                    'todos los reembolsos posteriores'),
                 trailing: Switch(
                   value: prefProvider.isConfirmDelete,
                   onChanged: (value) {
                     setState(() => prefProvider.isConfirmDelete = value);
                     PreferencesService.saveBool(keyConfirmDeletePref, value);
+                  },
+                ),
+              ),
+              ListTile(
+                dense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                leading: const Icon(Icons.remove_shopping_cart, color: blue900),
+                title: const Text('Eliminar operaciones asociadas'),
+                subtitle: const Text('Cuando se eliminan valores en bloque, '
+                    'eliminar también sus operaciones asociadas'),
+                trailing: Switch(
+                  value: prefProvider.isDeleteOperaciones,
+                  onChanged: (value) {
+                    setState(() => prefProvider.isDeleteOperaciones = value);
+                    PreferencesService.saveBool(keyDeleteOperaciones, value);
                   },
                 ),
               ),
@@ -289,8 +310,10 @@ class _PageSettingsState extends State<PageSettings> {
                 subtitle: const Text('Pulsa para eliminar archivos de carteras '
                     'compartidas almacenadas en caché'),
                 trailing: CircleAvatar(
+                  backgroundColor: blue,
                   child: IconButton(
-                    icon: const Icon(Icons.cleaning_services),
+                    icon: const Icon(Icons.cleaning_services,
+                        color: Colors.white),
                     onPressed: () async {
                       //await DefaultCacheManager().emptyCache();
                       var clearCache = await ShareCsv.clearCache();
@@ -314,7 +337,6 @@ class _PageSettingsState extends State<PageSettings> {
                 subtitle: const Text(
                     'Registra posibles errores en un archicvo de texto. '
                     'No almacena ninguna información personal ni envía ningún dato'),
-                // TODO: Switch storage true or false
                 trailing: Switch(
                   value: prefProvider.isStorageLogger,
                   onChanged: (value) {
@@ -330,12 +352,16 @@ class _PageSettingsState extends State<PageSettings> {
                 title: const Text('Abrir Registro de errores'),
                 subtitle: const Text('Pulsa para ver el contenido del archivo'),
                 trailing: CircleAvatar(
+                  backgroundColor: blue,
                   child: IconButton(
-                    icon: const Icon(Icons.find_in_page),
+                    icon: const Icon(Icons.find_in_page, color: Colors.white),
                     onPressed: () async {
                       await const Logger().read().then((value) {
-                        Navigator.of(context)
-                            .push(FullScreenModal(data: value));
+                        var data = Text(value,
+                            style: const TextStyle(
+                                color: Colors.red, fontSize: 14));
+                        Navigator.of(context).push(
+                            FullScreenModal(title: 'logfile.txt', data: data));
                       });
                     },
                   ),
@@ -350,8 +376,12 @@ class _PageSettingsState extends State<PageSettings> {
                     'Copia el archivo logfile.txt en la carpeta de Descargas y '
                     'abre el sitio web donde adjuntar el archivo copiado'),
                 trailing: CircleAvatar(
+                  backgroundColor: blue,
                   child: IconButton(
-                    icon: const Icon(Icons.file_present),
+                    icon: const Icon(
+                      Icons.file_present,
+                      color: Colors.white,
+                    ),
                     onPressed: () async {
                       bool copy = await const Logger().copy();
                       if (copy == true) {
@@ -385,8 +415,9 @@ class _PageSettingsState extends State<PageSettings> {
                     'Pulsa para eliminar el archivo logfile.txt del directorio '
                     'de la app (permanece en la carpeta Descargas si se ha enviado)'),
                 trailing: CircleAvatar(
+                  backgroundColor: blue,
                   child: IconButton(
-                    icon: const Icon(Icons.restore_page),
+                    icon: const Icon(Icons.restore_page, color: Colors.white),
                     onPressed: () async {
                       if (await const Logger().clear()) {
                         _showMsg(msg: 'Archivo de registro eliminado');
@@ -404,69 +435,7 @@ class _PageSettingsState extends State<PageSettings> {
     );
   }
 
-  void _showMsg({required String msg, Color? color}) {
-    CustomDialog customDialog = const CustomDialog();
-    customDialog.generateDialog(context: context, msg: msg, color: color);
-  }
-}
-
-class FullScreenModal extends ModalRoute {
-  final String data;
-  FullScreenModal({required this.data});
-
-  @override
-  Duration get transitionDuration => const Duration(milliseconds: 500);
-
-  @override
-  bool get opaque => false;
-
-  @override
-  bool get barrierDismissible => false;
-
-  @override
-  Color get barrierColor => Colors.black.withOpacity(0.8);
-
-  @override
-  String? get barrierLabel => null;
-
-  @override
-  bool get maintainState => true;
-
-  @override
-  Widget buildPage(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation) {
-    return Material(
-      type: MaterialType.transparency,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: blue900,
-          foregroundColor: Colors.white,
-          title: const Text('logfile.txt'),
-        ),
-        body: ListView(
-          padding: const EdgeInsets.all(10),
-          children: [
-            Text(
-              data,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget buildTransitions(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation, Widget child) {
-    return FadeTransition(
-      opacity: animation,
-      child: SlideTransition(
-        position: Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero)
-            .animate(animation),
-        child: ScaleTransition(scale: animation, child: child),
-      ),
-    );
-  }
+  void _showMsg({required String msg, Color? color}) =>
+      CustomMessenger(context: context, msg: msg, color: color)
+          .generateDialog();
 }

@@ -245,7 +245,6 @@ class VistaDetalle extends StatelessWidget {
                         ),
                 ),
               ),
-              //if (isTrueDivisaEur()) const SizedBox(height: 10),
               if (isTrueDivisaEur())
                 StepperBalance(
                   input: inversionCarteraEur,
@@ -255,7 +254,6 @@ class VistaDetalle extends StatelessWidget {
                   firstDate: firstDate,
                   lastDate: lastDate,
                 ),
-              //if (isTrueDivisaUsd()) const SizedBox(height: 10),
               if (isTrueDivisaUsd())
                 StepperBalance(
                   input: inversionCarteraUsd,
@@ -265,7 +263,6 @@ class VistaDetalle extends StatelessWidget {
                   firstDate: firstDate,
                   lastDate: lastDate,
                 ),
-              //if (isTrueDivisaOtra()) const SizedBox(height: 10),
               if (isTrueDivisaOtra())
                 StepperBalance(
                   input: inversionCarteraOtra,

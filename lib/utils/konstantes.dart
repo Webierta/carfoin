@@ -8,6 +8,7 @@ const String keyByOrderFondosPref = 'isByOrderFondos';
 const String keyConfirmDeleteFondoPref = 'isConfirmDeleteFondo';
 const String keyAutoUpdatePref = 'isAutoAudate';
 const String keyConfirmDeletePref = 'isConfirmDelete';
+const String keyDeleteOperaciones = 'isDeleteOperaciones';
 
 const String keyAutoExchangePref = 'isAutoExchange';
 

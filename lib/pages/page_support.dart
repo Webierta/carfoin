@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../router/routes_const.dart';
 import '../utils/styles.dart';
-import '../widgets/custom_dialog.dart';
+import '../widgets/dialogs/custom_messenger.dart';
 import '../widgets/my_drawer.dart';
 
 const String btcAddress = '15ZpNzqbYFx9P7wg4U438JMwZr2q3W6fkS';
@@ -24,10 +24,9 @@ class PageSupport extends StatelessWidget {
           mode: LaunchMode.externalApplication)) throw 'Could not launch $url';
     }
 
-    void showMsg({required String msg, Color? color}) {
-      CustomDialog customDialog = const CustomDialog();
-      customDialog.generateDialog(context: context, msg: msg, color: color);
-    }
+    void showMsg({required String msg, Color? color}) =>
+        CustomMessenger(context: context, msg: msg, color: color)
+            .generateDialog();
 
     clipboard() async {
       await Clipboard.setData(const ClipboardData(text: btcAddress));

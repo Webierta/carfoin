@@ -64,28 +64,6 @@ class ShareCsv {
               stackTrace: s));
     }
     return file;
-
-    /*String filePath = '';
-    String nameFile = '${nameCartera.trim()}.cfi'; // csv
-    if (await Permission.storage.request().isGranted) {
-      try {
-        String? selectedDirectory =
-            await FilePicker.platform.getDirectoryPath();
-        if (selectedDirectory == null) throw Exception();
-        filePath = '$selectedDirectory/$nameFile';
-        if (filePath.isEmpty) throw Exception();
-        File file = File(filePath);
-        file.writeAsString(csv);
-        return file;
-      } catch (e) {
-        return null;
-      }
-    } else {
-      Map<Permission, PermissionStatus> statuses = await [
-        Permission.storage,
-      ].request();
-    }
-    return null;*/
   }
 
   static Future<File?> shareCartera(Cartera cartera) async {
@@ -103,7 +81,6 @@ class ShareCsv {
       if (archivo.extension == 'cfi' && archivo.path != null) {
         file = File(archivo.path!);
       }
-      // TODO: else: archivo no valido
     }
     return file;
   }
@@ -132,19 +109,9 @@ class ShareCsv {
         int indexRowFondo = indexRowFondos[i];
         var isin = fields[indexRowFondo][0];
         var nameFondo = fields[indexRowFondo][1];
-        //String? divisa;
-        //if (fields[indexRowFondo].length > 2) {
         var divisa = fields[indexRowFondo][2];
         var rating = fields[indexRowFondo][3]; // ?? 0
         List<Valor> valores = [];
-        /*int dif;
-        if (indexRowFondo == indexRowFondos.last) {
-        dif = fields.length - indexRowFondo;
-        } else {
-        dif = indexRowFondos[i + 1] - indexRowFondo;
-        }*/
-        // indexRowFondo + 1 <= indexRowFondos.length ?
-        // i == indexRowFondos.length - 1 ?
         int dif = indexRowFondo == indexRowFondos.last
             ? fields.length - indexRowFondo
             : indexRowFondos[i + 1] - indexRowFondo;
@@ -199,18 +166,15 @@ class ShareCsv {
   }
 
   static Future<bool> clearCache() async {
-    //var appDir = (await getTemporaryDirectory()).path;
-    //Directory(appDir).delete(recursive: true);
     try {
       final cacheDir = await getTemporaryDirectory();
       if (cacheDir.existsSync()) {
         cacheDir.deleteSync(recursive: true);
         return true;
       }
-      return false;
     } catch (e) {
       Logger.log(dataLog: DataLog(msg: 'Catch clear cache'));
-      return false;
     }
+    return false;
   }
 }

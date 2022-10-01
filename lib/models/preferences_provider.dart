@@ -52,6 +52,13 @@ class PreferencesProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  bool? _isDeleteOperaciones;
+  bool get isDeleteOperaciones => _isDeleteOperaciones ?? true;
+  set isDeleteOperaciones(bool value) {
+    _isDeleteOperaciones = value;
+    notifyListeners();
+  }
+
   bool? _isAutoAudate;
   bool get isAutoAudate => _isAutoAudate ?? true;
   set isAutoAudate(bool value) {

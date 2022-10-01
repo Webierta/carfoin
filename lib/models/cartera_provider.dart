@@ -200,7 +200,6 @@ class CarteraProvider with ChangeNotifier {
             if (indexDate == -1) {
               _carteras[index].fondos![indexIsin].valores!.add(valor);
               sortValores(fondo);
-              //calculaIndices(fondo);
               notifyListeners();
             }
           }
@@ -230,7 +229,6 @@ class CarteraProvider with ChangeNotifier {
             if (indexDate != -1) {
               _carteras[index].fondos![indexIsin].valores![indexDate] = valor;
               sortValores(fondo);
-              //calculaIndices(fondo);
               notifyListeners();
             }
           }
@@ -266,34 +264,28 @@ class CarteraProvider with ChangeNotifier {
 
   void removeValor(Fondo fondo, Valor valor) {
     //fondo.valores!.remove(valor);
-    //calculaIndices(fondo);
     _valores.remove(valor);
-    //calculaIndices(fondo);
     notifyListeners();
   }
 
   void removeValorByDate(Fondo fondo, Valor valor) {
     fondo.valores!.removeWhere((v) => v.date == valor.date);
-    //calculaIndices(fondo);
     notifyListeners();
   }
 
   void removeOperacion(Fondo fondo, Valor valor) {
     _operaciones.remove(valor);
-    //calculaIndices(fondo);
     notifyListeners();
   }
 
   void removeAllValores(Fondo fondo) {
     //fondo.valores!.clear();
     _valores.clear();
-    //calculaIndices(fondo);
     notifyListeners();
   }
 
   void removeAllOperaciones(Fondo fondo) {
     _operaciones.clear();
-    //calculaIndices(fondo);
     notifyListeners();
   }
 }

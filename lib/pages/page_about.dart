@@ -105,7 +105,9 @@ No puede garantizarse que el contenido ofrecido esté libre de errores, ya sean 
 
 El acceso, navegación y uso de los servicios webs de *Financial Times* (FT) derivados del uso de la API están sujetos a sus Términos y condiciones y puede implicar la aceptación de su Política de Privacidad y uso Cookies. En concreto, FT advierte que *All content on FT.com is for your general information and use only and is not intended to address your particular requirements. In particular, the content does not constitute any form of advice, recommendation, representation, endorsement or arrangement by FT and is not intended to be relied upon by users in making (or refraining from making) any specific investment or other decisions. Any information that you receive via FT.com is at best delayed intraday data and not "real time". Share price information may be rounded up/down and therefore not entirely accurate. FT is not responsible for any use of content by you outside its scope as stated in the FT Terms & Conditions*.
 
-Frankfurter website doesn't track you. Its content is licensed CC BY NC SA 4.0. 
+Frankfurter website doesn't track you. Its content is licensed CC BY NC SA 4.0.
+
+Flutter PDF Viewer library under the Syncfusion Community License Program.
 
 ---
 

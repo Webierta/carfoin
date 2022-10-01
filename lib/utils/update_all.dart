@@ -47,7 +47,6 @@ class UpdateAll {
   Future<List<Update>> updateCarteras() async {
     ApiService apiService = ApiService();
     DatabaseHelper database = DatabaseHelper();
-
     setStateDialog('Conectando...');
     List<Update> updates = [];
     final List<Cartera> carteras = context.read<CarteraProvider>().carteras;
@@ -55,27 +54,18 @@ class UpdateAll {
       for (var cartera in carteras) {
         List<Fondo>? fondos = cartera.fondos;
         if (fondos != null && fondos.isNotEmpty) {
-          //Future<List<Update>> upFondo = updateFondos(cartera, fondos);
-          //updates.add(updateFondos(cartera, fondos));
-
           for (var fondo in fondos) {
             setStateDialog('${fondo.name}\n${cartera.name}');
-
-            /// ???? CREATE TABLE FONDO ??
             await database.createTableFondo(cartera, fondo);
             final getDataApi = await apiService.getDataApi(fondo.isin);
             if (getDataApi != null) {
-              /// TEST EPOCH HMS
               var date = FechaUtil.epochToEpochHms(getDataApi.epochSecs);
-
               var newValor = Valor(date: date, precio: getDataApi.price);
               fondo.divisa = getDataApi.market;
-
               int rating = await _updateRating(fondo);
               if (rating != 0) {
                 fondo.rating = rating;
               }
-
               await database.updateFondo(cartera, fondo);
               await database.updateOperacion(cartera, fondo, newValor);
               updates.add(Update(
@@ -89,10 +79,8 @@ class UpdateAll {
                   isUpdate: false));
             }
           }
-          //await setFondos(cartera);
         }
       }
-      //await setCarteras();
     }
     return updates;
   }
@@ -105,22 +93,16 @@ class UpdateAll {
     if (fondos.isNotEmpty) {
       for (var fondo in fondos) {
         setStateDialog(fondo.name);
-
-        /// ???? CREATE TABLE FONDO ??
         await database.createTableFondo(cartera, fondo);
         final getDataApi = await apiService.getDataApi(fondo.isin);
         if (getDataApi != null) {
-          /// TEST EPOCH HMS
           var date = FechaUtil.epochToEpochHms(getDataApi.epochSecs);
-
           var newValor = Valor(date: date, precio: getDataApi.price);
           fondo.divisa = getDataApi.market;
-
           int rating = await _updateRating(fondo);
           if (rating != 0) {
             fondo.rating = rating;
           }
-
           await database.updateFondo(cartera, fondo);
           await database.updateOperacion(cartera, fondo, newValor);
           updates.add(Update(
@@ -134,7 +116,6 @@ class UpdateAll {
               isUpdate: false));
         }
       }
-      //await setFondos(cartera);
     }
     return updates;
   }

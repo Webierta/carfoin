@@ -12,7 +12,7 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart'
         PdfDocumentLoadFailedDetails;
 
 import '../models/logger.dart';
-import '../widgets/custom_dialog.dart';
+import '../widgets/dialogs/custom_messenger.dart';
 import 'styles.dart';
 
 class PdfViewer extends StatefulWidget {
@@ -27,8 +27,7 @@ class PdfViewer extends StatefulWidget {
 
 class _PdfViewerState extends State<PdfViewer> {
   final GlobalKey<SfPdfViewerState> _pdfViewerKey = GlobalKey();
-  //PdfDocument?
-  List<int> docPdf = [];
+  List<int> pdfBytes = [];
 
   void showErrorDialog(BuildContext context, String error, String description) {
     showDialog<dynamic>(
@@ -50,11 +49,6 @@ class _PdfViewerState extends State<PdfViewer> {
   Future<bool> saveFile() async {
     try {
       if (await _requestPermission(Permission.storage)) {
-        //Directory? directory = await getExternalStorageDirectory();
-        //Directory? folderCarfoin = Directory('${directory!.path}/Doc_Carfoin');
-        /*Directory? folderCarfoin = await getExternalStorageDirectory()
-            .then((value) => Directory('${value!.path}/Doc_Carfoin'))
-            .onError((e, s) => throw Exception());*/
         Directory? directory = await getExternalStorageDirectory();
         String newPath = '';
         List<String> paths = directory!.path.split('/');
@@ -70,17 +64,18 @@ class _PdfViewerState extends State<PdfViewer> {
         if (newPath.isNotEmpty) {
           folderCarfoin = Directory('$newPath/Doc_Carfoin');
         }
-        if (folderCarfoin == null) {
+        if (folderCarfoin == null || pdfBytes.isEmpty) {
           throw Exception();
         }
-
         if (!await folderCarfoin.exists()) {
           await folderCarfoin.create(recursive: true);
         }
-        if (await folderCarfoin.exists() && docPdf.isNotEmpty) {
+        if (await folderCarfoin.exists() && pdfBytes.isNotEmpty) {
           try {
             await File('${folderCarfoin.path}/${widget.fileName}')
-                .writeAsBytes(docPdf);
+                .writeAsBytes(pdfBytes)
+                .then((value) => true)
+                .onError((e, s) => throw Exception());
           } catch (e, s) {
             Logger.log(
                 dataLog: DataLog(
@@ -90,8 +85,9 @@ class _PdfViewerState extends State<PdfViewer> {
                     funcion: 'saveFile',
                     error: e,
                     stackTrace: s));
-            return false;
           }
+        } else {
+          throw Exception();
         }
       } else {
         Logger.log(
@@ -100,7 +96,6 @@ class _PdfViewerState extends State<PdfViewer> {
                 file: 'pdf_viewer.dart',
                 clase: '_PdfViewerState',
                 funcion: 'saveFile'));
-        return false;
       }
     } catch (e, s) {
       Logger.log(
@@ -111,9 +106,8 @@ class _PdfViewerState extends State<PdfViewer> {
               funcion: 'saveFile',
               error: e,
               stackTrace: s));
-      return false;
     }
-    return true;
+    return false;
   }
 
   Future<bool> _requestPermission(Permission permission) async {
@@ -160,7 +154,7 @@ class _PdfViewerState extends State<PdfViewer> {
         key: _pdfViewerKey,
         onDocumentLoaded: (PdfDocumentLoadedDetails details) async {
           //PdfDocument pdf = details.document;
-          docPdf = await details.document.save();
+          pdfBytes = await details.document.save();
         },
         onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {
           showErrorDialog(context, details.error, details.description);
@@ -169,8 +163,7 @@ class _PdfViewerState extends State<PdfViewer> {
     );
   }
 
-  void _showMsg({required String msg, Color? color}) {
-    CustomDialog customDialog = const CustomDialog();
-    customDialog.generateDialog(context: context, msg: msg, color: color);
-  }
+  void _showMsg({required String msg, Color? color}) =>
+      CustomMessenger(context: context, msg: msg, color: color)
+          .generateDialog();
 }

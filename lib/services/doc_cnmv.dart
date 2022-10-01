@@ -75,7 +75,6 @@ class DocCnmv {
                 file: 'doc_cnmv.dart',
                 clase: 'DocCnmv',
                 funcion: 'getUrlFolleto'));
-        return null;
       }
     } else {
       Logger.log(
@@ -84,9 +83,8 @@ class DocCnmv {
               file: 'doc_cnmv.dart',
               clase: 'DocCnmv',
               funcion: 'getUrlFolleto'));
-
-      return null;
     }
+    return null;
   }
 
   Future<Informe?> getUrlInforme() async {
@@ -190,13 +188,6 @@ class DocCnmv {
 
     Document? document = await _getDoc(url);
     if (document != null) {
-      /*List<Element?> div = document
-          //.getElementsByTagName('div')
-          .getElementsByClassName('ec-table__ratingstar ng-scope')
-          .where((element) =>
-              element.attributes['data-ng-if'] == 'obj.starRatingM255')
-          .toList();*/
-
       List<List<Element?>?>? elements = document
           .getElementsByTagName('span')
           .where((Element? element) =>
@@ -210,7 +201,6 @@ class DocCnmv {
             return i;
           }
         }
-        return 0;
       } else {
         Logger.log(
             dataLog: DataLog(
@@ -218,7 +208,6 @@ class DocCnmv {
                 file: 'doc_cnmv.dart',
                 clase: 'DocCnmv',
                 funcion: 'getRating'));
-        return 0;
       }
     } else {
       Logger.log(
@@ -227,7 +216,7 @@ class DocCnmv {
               file: 'doc_cnmv.dart',
               clase: 'DocCnmv',
               funcion: 'getRating'));
-      return 0;
     }
+    return 0;
   }
 }

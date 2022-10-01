@@ -15,7 +15,6 @@ class PageError extends StatelessWidget {
         body: Padding(
           padding: const EdgeInsets.all(22.0),
           child: Column(
-            //mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Spacer(),

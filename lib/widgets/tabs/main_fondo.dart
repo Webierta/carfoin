@@ -14,7 +14,8 @@ import '../../utils/number_util.dart';
 import '../../utils/pdf_viewer.dart';
 import '../../utils/stats.dart';
 import '../../utils/styles.dart';
-import '../custom_dialog.dart';
+import '../dialogs/confirm_dialog.dart';
+import '../dialogs/custom_messenger.dart';
 import '../hoja_calendario.dart';
 import '../loading_progress.dart';
 
@@ -35,24 +36,12 @@ class _MainFondoState extends State<MainFondo> {
   bool openingPdf = false;
   late Stats stats;
 
-  /*getSharedPrefs() async {
-    await PreferencesService.getBool(keyConfirmDeletePref).then((value) {
-      setState(() => _isConfirmDelete = value);
-    });
-  }*/
-
   setValores(Cartera cartera, Fondo fondo) async {
     carteraProvider.valores = await database.getValores(cartera, fondo);
     fondo.valores = carteraProvider.valores;
-    //fondoSelect.valores = carteraProvider.valores;
     valoresSelect = carteraProvider.valores;
     carteraProvider.operaciones = await database.getOperaciones(cartera, fondo);
     operacionesSelect = carteraProvider.operaciones;
-    //carteraProvider.addValores(carteraSelect, fondoSelect, valoresSelect);
-    //carteraProvider.calculaStats(fondo);
-    //carteraProvider.calculaInversion(fondo);
-    //carteraProvider.calculaResultado(fondo);
-    //stats = Stats(valoresSelect);
   }
 
   @override
@@ -61,7 +50,6 @@ class _MainFondoState extends State<MainFondo> {
     carteraSelect = carteraProvider.carteraSelect;
     fondoSelect = carteraProvider.fondoSelect;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      //await getSharedPrefs();
       await setValores(carteraSelect, fondoSelect);
     });
     super.initState();
@@ -70,15 +58,10 @@ class _MainFondoState extends State<MainFondo> {
   @override
   Widget build(BuildContext context) {
     PreferencesProvider prefProvider = context.read<PreferencesProvider>();
-    //final carteraProvider = context.read<CarteraProvider>();
-    //final carteraSelect = carteraProvider.carteraSelect;
-    //final fondoSelect = carteraProvider.fondoSelect;
     final List<Valor> valores = context.watch<CarteraProvider>().valores;
     final List<Valor> operaciones =
         context.watch<CarteraProvider>().operaciones;
-
     stats = Stats(valores);
-    //carteraProvider.addValores(carteraSelect, fondoSelect, valores);
 
     double? getDiferencia() {
       if (valores.length > 1) {
@@ -87,35 +70,6 @@ class _MainFondoState extends State<MainFondo> {
         return last - prev;
       }
       return null;
-    }
-
-    confirmDeleteOperacion(BuildContext context, Valor op) async {
-      String aviso = op.tipo == 1
-          ? 'Esta acción elimina esta operación y los reembolsos posteriores '
-              'pero mantiene los valores liquidativos de las fechas afectadas.'
-          : 'Esta acción elimina esta operación manteniendo su valor liquidativo.';
-      return showDialog(
-          context: context,
-          builder: (BuildContext ctx) {
-            return AlertDialog(
-              title: const Text('Eliminar Operación'),
-              content: Text(aviso),
-              actions: [
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('CANCELAR'),
-                ),
-                ElevatedButton(
-                  style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFFFFFFFF),
-                    backgroundColor: red,
-                  ),
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('ACEPTAR'),
-                ),
-              ],
-            );
-          });
     }
 
     deleteOperacion(Valor op) async {
@@ -148,9 +102,6 @@ class _MainFondoState extends State<MainFondo> {
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
-                /*NumberFormat.decimalPattern('es').format(op.tipo == 1
-                    ? op.participaciones
-                    : (op.participaciones ?? 0) * -1),*/
                 op.tipo == 1
                     ? NumberUtil.decimal(op.participaciones ?? 0, long: false)
                     : NumberUtil.decimal((op.participaciones ?? 0) * -1,
@@ -170,20 +121,21 @@ class _MainFondoState extends State<MainFondo> {
             )),
             DataCell(IconButton(
               onPressed: () async {
-                if (prefProvider.isConfirmDelete) {
-                  var resp = await confirmDeleteOperacion(context, op);
-                  if (resp) {
+                if (prefProvider.isConfirmDelete || op.tipo == 1) {
+                  String content = op.tipo == 1
+                      ? 'Esta acción elimina esta operación y los reembolsos posteriores '
+                          'pero mantiene los valores liquidativos de las fechas afectadas.'
+                      : 'Esta acción elimina esta operación manteniendo su valor liquidativo.';
+                  bool? resp = await ConfirmDialog(
+                    context: context,
+                    title: 'Eliminar Operación',
+                    content: content,
+                  ).generateDialog();
+                  if (resp == true) {
                     deleteOperacion(op);
                   }
                 } else {
-                  if (op.tipo == 1) {
-                    var resp = await confirmDeleteOperacion(context, op);
-                    if (resp) {
-                      deleteOperacion(op);
-                    }
-                  } else {
-                    deleteOperacion(op);
-                  }
+                  deleteOperacion(op);
                 }
               },
               icon: const Icon(Icons.delete_forever),
@@ -788,10 +740,9 @@ class _MainFondoState extends State<MainFondo> {
     });
   }
 
-  void _showMsg({required String msg, Color? color}) {
-    CustomDialog customDialog = const CustomDialog();
-    customDialog.generateDialog(context: context, msg: msg, color: color);
-  }
+  void _showMsg({required String msg, Color? color}) =>
+      CustomMessenger(context: context, msg: msg, color: color)
+          .generateDialog();
 }
 
 class RowBalance extends StatelessWidget {

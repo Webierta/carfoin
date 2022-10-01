@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show FilteringTextInputFormatter;
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -11,7 +11,9 @@ import '../services/database_helper.dart';
 import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
 import '../utils/styles.dart';
-import '../widgets/custom_dialog.dart';
+import '../widgets/dialogs/confirm_dialog.dart';
+import '../widgets/dialogs/custom_messenger.dart';
+import '../widgets/dialogs/full_screen_modal.dart';
 import '../widgets/loading_progress.dart';
 
 class PageMercado extends StatefulWidget {
@@ -39,14 +41,11 @@ class _MercadoState extends State<PageMercado> {
 
   DateTime now = DateTime.now();
   int _date = 0;
-  //int _date = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-
   double _participaciones = 0;
   double _precio = 0;
 
   @override
   void initState() {
-    /// TEST EPOCH HMS
     _date = FechaUtil.dateToEpoch(now);
     _date = FechaUtil.epochToEpochHms(_date);
 
@@ -82,50 +81,29 @@ class _MercadoState extends State<PageMercado> {
     super.dispose();
   }
 
-  Future<void> _dialogMercado(BuildContext context) async {
-    return await showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            insetPadding: const EdgeInsets.symmetric(horizontal: 0),
-            scrollable: true,
-            title: const Text('Operaciones'),
-            content: ListBody(
-              children: const [
-                Text('Todas las operaciones de suscripción y reembolso son '
-                    'simulaciones para ser comparadas con '
-                    'transacciones reales, ficticias o potenciales.'),
-                SizedBox(height: 8),
-                Text('Cuando se realiza una operación en una fecha en la que '
-                    'existe otra, la app consulta si se quiere sobrescribir '
-                    'la primera o combinar ambas (una forma de añadir distintas '
-                    'operaciones en una misma fecha).'),
-                SizedBox(height: 8),
-                Text('El resultado de combinar dos operaciones será una '
-                    'nueva transacción: por ejemplo, combinar un aporte inicial de '
-                    '20 part. con un reembolso de 30, resulta un reembolso de 10.'),
-                SizedBox(height: 8),
-                Text('Ten en cuenta que tanto añadir un reembolso como '
-                    'eliminar un aporte (o reducir su número de part.) entre '
-                    'operaciones, conlleva eliminar todos los reembolsos posteriores, '
-                    'si los hubiera (para evitar potenciales descuadres).'),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cerrar'),
-              ),
-            ],
-          );
-        });
+  _dialogMercado(BuildContext context) async {
+    const String txt =
+        'Todas las operaciones de suscripción y reembolso son simulaciones para '
+        'ser comparadas con transacciones reales, ficticias o potenciales.\n\n'
+        'Cuando se realiza una operación en una fecha en la que existe otra, '
+        'la app consulta si se quiere sobrescribir la primera o combinar ambas '
+        '(una forma de añadir distintas operaciones en una misma fecha).\n\n'
+        'El resultado de combinar dos operaciones será una nueva transacción: '
+        'por ejemplo, combinar un aporte inicial de 20 part. con un reembolso '
+        'de 30, resulta un reembolso de 10.\n\n'
+        'Ten en cuenta que tanto añadir un reembolso como eliminar un aporte '
+        '(o reducir su número de part.) entre operaciones, conlleva eliminar '
+        'todos los reembolsos posteriores, si los hubiera (para evitar potenciales descuadres).';
+    const data = Padding(
+      padding: EdgeInsets.all(8.0),
+      child: Text(txt, style: TextStyle(fontSize: 16)),
+    );
+    await Navigator.of(context)
+        .push(FullScreenModal(title: 'Operaciones', data: data));
   }
 
   @override
   Widget build(BuildContext context) {
-    //var carteraSelect = context.read<CarteraProvider>().carteraSelect;
-    //var fondoSelect = context.read<CarteraProvider>().fondoSelect;
     return WillPopScope(
       onWillPop: () async => false,
       child: Container(
@@ -244,16 +222,10 @@ class _MercadoState extends State<PageMercado> {
                             setState(() {
                               // TODO: CONTROL OTRAS TIME ZONE PARA NO REPETIR DATE ??
                               // o epoch +/- 1 day ??
-
-                              ///DateTime timeZone = fecha.add(const Duration(hours: 2));
-                              ///_date = timeZone.millisecondsSinceEpoch ~/ 1000;
-
-                              /// TEST EPOCH HMS
-                              //DateTime fechaHMS = DateTime(fecha.year, fecha.month, fecha.day, 0, 0, 0, 0, 0);
-                              //_date = fecha.millisecondsSinceEpoch ~/ 1000;
+                              //DateTime timeZone = fecha.add(const Duration(hours: 2));
+                              //_date = timeZone.millisecondsSinceEpoch ~/ 1000;
                               _date = FechaUtil.dateToEpoch(fecha);
                               _date = FechaUtil.epochToEpochHms(_date);
-
                               _dateController.text =
                                   FechaUtil.dateToString(date: fecha);
                             });
@@ -307,13 +279,9 @@ class _MercadoState extends State<PageMercado> {
                           suffixIcon: IconButton(
                             icon: const Icon(Icons.download, color: blue),
                             onPressed: () async {
-                              //Loading(context).openDialog(title: 'Obteniendo valor liquidativo...');
-                              //const LoadingProgress(titulo: 'Obteniendo valor liquidativo...');
-                              ///var precioApi = await _getPrecioApi(context, fondoOn);
                               var precioApi =
                                   await _dialogProgress(context, fondoSelect);
                               if (!mounted) return;
-                              //Loading(context).closeDialog();
                               if (precioApi != null) {
                                 setState(() {
                                   _precio = precioApi;
@@ -403,47 +371,6 @@ class _MercadoState extends State<PageMercado> {
     );
   }
 
-  _showDialogOp(Valor valorDb) async {
-    String tipoOp = valorDb.tipo == 1 ? 'una suscripción' : 'un reembolso';
-    return await showDialog<bool?>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          insetPadding: const EdgeInsets.symmetric(horizontal: 0),
-          scrollable: true,
-          actionsAlignment: MainAxisAlignment.spaceBetween,
-          title: const Text('Operación previa'),
-          content: ListBody(
-            children: [
-              Text('En esa fecha ya existe una operación: '
-                  '$tipoOp de ${valorDb.participaciones} participaciones.'),
-              const SizedBox(height: 8),
-              const Text('Puedes sobrescribirla o combinar ambas '
-                  'transacciones en una nueva operación.'),
-              const SizedBox(height: 8),
-              const Text('Si el resultado es un reembolso o una reducción de '
-                  'participaciones se eliminarán los reembolsos posteriores, si existen.'),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-                onPressed: () => Navigator.pop(context, null),
-                child: const Text('Cancelar')),
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Sobreescribir'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Combinar'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   double getPartPrev(Valor valor) {
     double partPre = 0.0;
     List<Valor> valoresPre = [];
@@ -460,8 +387,6 @@ class _MercadoState extends State<PageMercado> {
 
   _submit(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      //Stats stats = Stats(valoresSelect);
-      //var participaciones = stats.totalParticipaciones() ?? 0;
       Valor newOp = Valor(
           tipo: _tipo ? 1 : 0,
           date: _date,
@@ -473,7 +398,20 @@ class _MercadoState extends State<PageMercado> {
       var valorDb =
           await database.getValorByDate(carteraSelect, fondoSelect, newOp);
       if (valorDb != null && valorDb.date == newOp.date && valorDb.tipo != -1) {
-        bool? combinarOp = await _showDialogOp(valorDb);
+        String tipoOp = valorDb.tipo == 1 ? 'una suscripción' : 'un reembolso';
+        String content = 'En esa fecha ya existe una operación: '
+            '$tipoOp de ${valorDb.participaciones} participaciones.\n\n'
+            'Puedes sobrescribirla o combinar ambas transacciones en una nueva operación.\n\n'
+            'Si el resultado es un reembolso o una reducción de participaciones, '
+            'se eliminarán los reembolsos posteriores, si existen.\n\n'
+            '¿Combinar ambas operaciones?';
+        bool? combinarOp = await ConfirmDialog(
+          context: context,
+          title: '¡Operación concurrente!',
+          content: content,
+          falseButton: 'Sobreescribir',
+        ).generateDialog();
+
         if (combinarOp == true) {
           double partValordb = valorDb.tipo == 0
               ? -valorDb.participaciones!
@@ -571,8 +509,6 @@ class _MercadoState extends State<PageMercado> {
       lastDate: DateTime.now(),
     );
     if (picked != null) {
-      /// TEST EPOCH HMS
-      //return  = DateTime(picked.year, picked.month, picked.day, 0, 0, 0, 0, 0);
       return FechaUtil.dateToDateHms(picked);
     }
     return picked;
@@ -601,10 +537,9 @@ class _MercadoState extends State<PageMercado> {
     return null;
   }
 
-  void _showMsg({required String msg, Color? color}) {
-    CustomDialog customDialog = const CustomDialog();
-    customDialog.generateDialog(context: context, msg: msg, color: color);
-  }
+  void _showMsg({required String msg, Color? color}) =>
+      CustomMessenger(context: context, msg: msg, color: color)
+          .generateDialog();
 
   void _pop() {
     if (!mounted) return;

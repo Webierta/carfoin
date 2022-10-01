@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'models/cartera_provider.dart';
 import 'models/preferences_provider.dart';
 import 'router/app_router.dart';
+import 'utils/styles.dart';
 
 Future main() async {
   Provider.debugCheckInvalidValueType = null;
@@ -41,6 +43,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Carfoin',
       theme: ThemeData(
+        useMaterial3: true,
         primaryColor: const Color(0xFF0D47A1),
         colorScheme: ColorScheme.fromSwatch()
             .copyWith(secondary: const Color(0xFFFFC107)),
@@ -49,6 +52,10 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.transparent,
           elevation: 0,
           foregroundColor: Color(0xFF0D47A1),
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: blue900,
+            statusBarIconBrightness: Brightness.light,
+          ),
         ),
         cardTheme: CardTheme(
           color: const Color.fromRGBO(255, 255, 255, 0.5),

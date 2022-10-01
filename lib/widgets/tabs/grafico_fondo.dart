@@ -121,7 +121,6 @@ class _GraficoFondoState extends State<GraficoFondo> {
                 getDotPainter(index),
           ),
           belowBarData: BarAreaData(show: true, color: const Color(0x802196F3)),
-          // Colors.blue.withOpacity(0.5)),
         ),
       ],
       minY: precioMin.floor().toDouble(),
@@ -137,7 +136,6 @@ class _GraficoFondoState extends State<GraficoFondo> {
               var epoch = touchedSpot.x.toInt();
               DateTime dateTime =
                   DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
-              //var fecha = DateFormat('d/MM/yy').format(dateTime);
               var fecha = FechaUtil.dateToString(date: dateTime);
               final textStyle = TextStyle(
                 color: touchedSpot.bar.gradient?.colors[0] ??
@@ -235,7 +233,6 @@ class _GraficoFondoState extends State<GraficoFondo> {
               alignment: Alignment.topRight,
               labelResolver: (line) =>
                   'Media: ${NumberUtil.decimalFixed(precioMedio)}',
-              //'Media: ${precioMedio.toStringAsFixed(2)}',
             ),
           ),
           HorizontalLine(
@@ -254,7 +251,6 @@ class _GraficoFondoState extends State<GraficoFondo> {
               alignment: Alignment.topRight,
               labelResolver: (line) =>
                   'Máx: ${NumberUtil.decimalFixed(precioMax)} - ${fechaMax ?? ''}',
-              //'Máx: ${precioMax.toStringAsFixed(2)} - ${fechaMax ?? ''}',
             ),
           ),
           HorizontalLine(
@@ -273,7 +269,6 @@ class _GraficoFondoState extends State<GraficoFondo> {
               alignment: Alignment.topRight,
               labelResolver: (line) =>
                   'Mín: ${NumberUtil.decimalFixed(precioMin)} - ${fechaMin ?? ''}',
-              //'Mín: ${precioMin.toStringAsFixed(2)} - ${fechaMin ?? ''}',
             ),
           ),
         ],

@@ -25,9 +25,6 @@ class DatabaseHelper {
   static const columnTipoOperacion = 'tipo';
   static const columnParticipaciones = 'participaciones';
 
-  // TODO: CAPTURA DE EXCEPCIONES EN TODAS LAS LLAMADAS A DB
-  // SI EXCEPCIÓN (archivo corrupto): ELIMINAR BD Y REINICIAR
-
   Future<Database>? _database;
 
   get database async {
@@ -41,21 +38,6 @@ class DatabaseHelper {
       await Directory(dbFolder).create(recursive: true);
     }
     final String dbPath = join(dbFolder, _databaseName);
-    //final String dbPath = await getDatabasePath();
-
-    /*bool checkVersion = await isDatabase(dbPath);
-    if (checkVersion == false) {
-      Logger.log(
-        dataLog: DataLog(
-          msg: 'Check Version Database',
-          file: 'database_helper.dart',
-          clase: 'DatabaseHelper',
-          funcion: '_initDb',
-        ),
-      );
-      deleteDatabase(dbPath);
-    }*/
-
     return await openDatabase(
       dbPath,
       version: _databaseVersion,
@@ -70,7 +52,6 @@ class DatabaseHelper {
     );
   }
 
-  //FutureOr<void> _onUpgrade(Database db, int oldVersion, int newVersion) {}
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < newVersion) {
       db.close();
@@ -82,10 +63,6 @@ class DatabaseHelper {
               funcion: '_initDb'));
       final String dbPath = await getDatabasePath();
       deleteDatabase(dbPath);
-      // you can execute drop table and create table
-      //db.execute("ALTER TABLE tb_name ADD COLUMN newCol TEXT;");
-      //var nameTable = '_${cartera.id}';
-      //db.execute("ALTER TABLE ");
     }
   }
 
@@ -270,7 +247,6 @@ class DatabaseHelper {
               stackTrace: s));
       return false;
     }
-
     //await db.insert(nameTable, fondo.toDb(),
     //    conflictAlgorithm: ConflictAlgorithm.replace);
   }
