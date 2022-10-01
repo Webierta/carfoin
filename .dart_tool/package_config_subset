@@ -234,6 +234,10 @@ restart_app
 2.17
 file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/restart_app-1.1.0+1/
 file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/restart_app-1.1.0+1/lib/
+sentry
+2.12
+file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/sentry-6.11.1/
+file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/sentry-6.11.1/lib/
 share_plus
 2.12
 file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/share_plus-4.1.0/

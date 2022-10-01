@@ -1,7 +1,9 @@
+import 'dart:io' show File;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:sentry/sentry_io.dart';
 
 import '../models/logger.dart';
 import '../models/preferences_provider.dart';
@@ -350,7 +352,8 @@ class _PageSettingsState extends State<PageSettings> {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 leading: const Icon(Icons.description, color: blue900),
                 title: const Text('Abrir Registro de errores'),
-                subtitle: const Text('Pulsa para ver el contenido del archivo'),
+                subtitle: const Text(
+                    'Pulsa para ver el contenido del archivo logfile.txt'),
                 trailing: CircleAvatar(
                   backgroundColor: blue,
                   child: IconButton(
@@ -372,37 +375,13 @@ class _PageSettingsState extends State<PageSettings> {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 leading: const Icon(Icons.send, color: blue900),
                 title: const Text('Enviar Registro de errores'),
-                subtitle: const Text(
-                    'Copia el archivo logfile.txt en la carpeta de Descargas y '
-                    'abre el sitio web donde adjuntar el archivo copiado'),
+                subtitle: const Text('Pulsa para reportar el archivo '
+                    'logfile.txt al sistema de incidencias de la aplicación'),
                 trailing: CircleAvatar(
                   backgroundColor: blue,
                   child: IconButton(
-                    icon: const Icon(
-                      Icons.file_present,
-                      color: Colors.white,
-                    ),
-                    onPressed: () async {
-                      bool copy = await const Logger().copy();
-                      if (copy == true) {
-                        const String url =
-                            'https://www.dropbox.com/request/TmdVW7RFPTyP5NQdhLmz';
-                        if (!await launchUrl(Uri.parse(url),
-                            mode: LaunchMode.externalApplication)) {
-                          Logger.log(
-                              dataLog: DataLog(
-                                  msg: 'Could not launch $url',
-                                  file: 'page_settings',
-                                  clase: '_PageSettingsState',
-                                  funcion: 'build'));
-                        }
-                      } else {
-                        _showMsg(
-                          msg: 'El archivo logfile.txt no existe o está vacío',
-                          color: red900,
-                        );
-                      }
-                    },
+                    icon: const Icon(Icons.file_present, color: Colors.white),
+                    onPressed: () async => await _reportFileLogs(),
                   ),
                 ),
               ),
@@ -410,17 +389,16 @@ class _PageSettingsState extends State<PageSettings> {
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 leading: const Icon(Icons.delete, color: blue900),
-                title: const Text('Eliminar Archivo de Registro'),
-                subtitle: const Text(
-                    'Pulsa para eliminar el archivo logfile.txt del directorio '
-                    'de la app (permanece en la carpeta Descargas si se ha enviado)'),
+                title: const Text('Eliminar Errores registrados'),
+                subtitle:
+                    const Text('Pulsa para eliminar el archivo logfile.txt'),
                 trailing: CircleAvatar(
                   backgroundColor: blue,
                   child: IconButton(
                     icon: const Icon(Icons.restore_page, color: Colors.white),
                     onPressed: () async {
                       if (await const Logger().clear()) {
-                        _showMsg(msg: 'Archivo de registro eliminado');
+                        _showMsg(msg: 'Archivo eliminado');
                       } else {
                         _showMsg(msg: 'Archivo no encontrado', color: red900);
                       }
@@ -433,6 +411,50 @@ class _PageSettingsState extends State<PageSettings> {
         ),
       ),
     );
+  }
+
+  Future<bool> _checkEnviado() async {
+    String textFile = await const Logger().read();
+    if (textFile.isNotEmpty && textFile[textFile.length - 1] == '*') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  _reportFileLogs() async {
+    File file = await const Logger().localFile;
+    if (!await file.exists()) {
+      _showMsg(msg: 'Sin registro de errores', color: red900);
+      return;
+    }
+    if (await _checkEnviado()) {
+      _showMsg(
+        msg: 'El registro de errores ya ha sido reportado',
+        color: red900,
+      );
+      return;
+    }
+    int epochLog = FechaUtil.dateToEpoch(DateTime.now());
+    try {
+      await Sentry.captureMessage('$epochLog', withScope: (scope) {
+        scope.transaction = 'Carfoin $kVersion';
+        scope.addAttachment(IoSentryAttachment.fromFile(file));
+      }).then((value) {
+        _showMsg(msg: 'Gracias por ayudar a mejorar la App');
+        const Logger().write('\n*');
+      });
+    } catch (e, s) {
+      Logger.log(
+          dataLog: DataLog(
+              msg: 'Catch Sentry Capture Message',
+              file: 'page_settings',
+              clase: '_PageSettingsState',
+              funcion: '_reportFileLogs',
+              error: e,
+              stackTrace: s));
+      _showMsg(msg: 'Error al reportar el registro de errores', color: red900);
+    }
   }
 
   void _showMsg({required String msg, Color? color}) =>

@@ -51,6 +51,7 @@ dependencies:
   html: ^0.15.0
   # flutter_pdfview: ^1.2.3
   syncfusion_flutter_pdfviewer: ^20.2.50-beta
+  sentry: ^6.11.1
 
 dev_dependencies:
   flutter_test:

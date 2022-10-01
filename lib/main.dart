@@ -3,16 +3,30 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:sentry/sentry.dart';
 
 import 'models/cartera_provider.dart';
 import 'models/preferences_provider.dart';
 import 'router/app_router.dart';
 import 'utils/styles.dart';
 
+const String _dsn =
+    'https://9388fe715b9e4ce0bf7b41fd3e040eb7@o4503907179233280.ingest.sentry.io/4503907197517824';
+
 Future main() async {
   Provider.debugCheckInvalidValueType = null;
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
+
+  await Sentry.init(
+    (options) {
+      options.dsn = _dsn;
+      options.tracesSampleRate = 1.0;
+      options.maxAttachmentSize = 5 * 1024 * 1024;
+    },
+    appRunner: () => runApp,
+  );
+
   runApp(
     MultiProvider(
       providers: [

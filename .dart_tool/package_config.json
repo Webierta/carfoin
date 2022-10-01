@@ -374,6 +374,12 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "sentry",
+      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/sentry-6.11.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "share_plus",
       "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/share_plus-4.1.0",
       "packageUri": "lib/",
@@ -656,7 +662,7 @@
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2022-09-27T18:01:09.885820Z",
+  "generated": "2022-10-01T07:50:44.804315Z",
   "generator": "pub",
   "generatorVersion": "2.18.1"
 }
