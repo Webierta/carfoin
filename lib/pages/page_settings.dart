@@ -435,14 +435,28 @@ class _PageSettingsState extends State<PageSettings> {
       );
       return;
     }
+
+    const String dsn =
+        'https://9388fe715b9e4ce0bf7b41fd3e040eb7@o4503907179233280.ingest.sentry.io/4503907197517824';
     int epochLog = FechaUtil.dateToEpoch(DateTime.now());
+    await Sentry.init(
+      (options) {
+        options.dsn = dsn;
+        options.tracesSampleRate = 1.0;
+        options.maxAttachmentSize = 5 * 1024 * 1024;
+      },
+    );
     try {
       await Sentry.captureMessage('$epochLog', withScope: (scope) {
         scope.transaction = 'Carfoin $kVersion';
         scope.addAttachment(IoSentryAttachment.fromFile(file));
-      }).then((value) {
+      }).then((value) async {
         _showMsg(msg: 'Gracias por ayudar a mejorar la App');
         const Logger().write('\n*');
+      }).onError((error, stackTrace) {
+        throw Exception;
+      }).whenComplete(() async {
+        await Sentry.close();
       });
     } catch (e, s) {
       Logger.log(

@@ -1,3 +1,4 @@
+import 'package:carfoin/widgets/flutter_expandable_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:go_router/go_router.dart';
@@ -16,7 +17,6 @@ import '../utils/status_api_service.dart';
 import '../utils/styles.dart';
 import '../widgets/dialogs/confirm_dialog.dart';
 import '../widgets/dialogs/custom_messenger.dart';
-import '../widgets/expandable_fab.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
 import '../widgets/tabs/grafico_fondo.dart';
@@ -95,6 +95,7 @@ class _PageFondoState extends State<PageFondo>
             decoration: scaffoldGradient,
             child: Scaffold(
               backgroundColor: Colors.transparent,
+              //backgroundColor: Color(0x80000000),
               appBar: AppBar(
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
@@ -207,23 +208,21 @@ class _PageFondoState extends State<PageFondo>
               ),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.endDocked,
-              floatingActionButton: Padding(
-                padding: const EdgeInsets.only(bottom: 20),
-                child: ExpandableFab(
-                  icon: Icons.refresh,
-                  children: [
-                    ChildFab(
-                      icon: const Icon(Icons.date_range),
-                      label: 'Valores Históricos',
-                      onPressed: () => _getRangeApi(context),
-                    ),
-                    ChildFab(
-                      icon: const Icon(Icons.update),
-                      label: 'Actualizar Valor',
-                      onPressed: () => _getDataApi(context),
-                    ),
-                  ],
-                ),
+              floatingActionButton: ExpandableFab(
+                isEndDocked: true,
+                children: [
+                  ChildFab(
+                    icon: const Icon(Icons.date_range),
+                    label: 'Valores Históricos',
+                    onPressed: () => _getRangeApi(context),
+                  ),
+                  ChildFab(
+                    icon: const Icon(Icons.update),
+                    label: 'Actualizar Valor',
+                    onPressed: () => _getDataApi(context),
+                  ),
+                ],
+                child: const Icon(Icons.refresh),
               ),
             ),
           ),

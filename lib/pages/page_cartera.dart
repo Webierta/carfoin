@@ -1,5 +1,6 @@
 import 'dart:io' show File;
 
+import 'package:carfoin/widgets/flutter_expandable_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:go_router/go_router.dart';
@@ -26,7 +27,6 @@ import '../widgets/data_cartera.dart';
 import '../widgets/dialogs/confirm_dialog.dart';
 import '../widgets/dialogs/custom_messenger.dart';
 import '../widgets/dialogs/info_dialog.dart';
-import '../widgets/expandable_fab.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
 
@@ -178,8 +178,8 @@ class _PageCarteraState extends State<PageCartera> {
                   ),
                 ],
               ),
+              floatingActionButtonLocation: ExpandableFab.location,
               floatingActionButton: ExpandableFab(
-                icon: Icons.addchart,
                 children: [
                   ChildFab(
                     icon: const Icon(Icons.search),
@@ -192,6 +192,7 @@ class _PageCarteraState extends State<PageCartera> {
                     onPressed: () => _searchFondo(context, AppPage.searchFondo),
                   ),
                 ],
+                child: const Icon(Icons.addchart),
               ),
               body: Padding(
                 padding: const EdgeInsets.all(8),

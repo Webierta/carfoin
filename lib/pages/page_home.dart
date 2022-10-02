@@ -1,3 +1,4 @@
+import 'package:carfoin/widgets/flutter_expandable_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:go_router/go_router.dart';
@@ -23,7 +24,6 @@ import '../widgets/dialogs/confirm_dialog.dart';
 import '../widgets/dialogs/custom_messenger.dart';
 import '../widgets/dialogs/info_dialog.dart';
 import '../widgets/dialogs/input_name_dialog.dart';
-import '../widgets/expandable_fab.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
 import '../widgets/my_drawer.dart';
@@ -189,6 +189,7 @@ class _PageHomeState extends State<PageHome> {
         if (snapshot.connectionState != ConnectionState.done) {
           return const LoadingProgress(titulo: 'Cargando carteras...');
         }
+
         return WillPopScope(
           onWillPop: () async => false,
           child: Center(
@@ -239,8 +240,8 @@ class _PageHomeState extends State<PageHome> {
                   ],
                 ),
                 drawer: const MyDrawer(),
+                floatingActionButtonLocation: ExpandableFab.location,
                 floatingActionButton: ExpandableFab(
-                  icon: Icons.add,
                   children: [
                     ChildFab(
                       onPressed: () => _sharedCartera(context),
@@ -253,6 +254,7 @@ class _PageHomeState extends State<PageHome> {
                       label: 'Nueva',
                     ),
                   ],
+                  child: const Icon(Icons.add),
                 ),
                 body: Padding(
                   padding: const EdgeInsets.all(8),
@@ -562,8 +564,8 @@ class _PageHomeState extends State<PageHome> {
   }
 
   _eliminar(Cartera cartera) async {
-    await database.deleteAllFondos(cartera);
-    await database.deleteCartera(cartera);
+    //await database.deleteAllFondos(cartera);
+    //await database.deleteCartera(cartera);
 
     await database.dropAllTablesFondos(cartera);
     await database.dropTableCartera(cartera);
