@@ -165,16 +165,14 @@ class ShareCsv {
     return null;
   }
 
-  static Future<bool> clearCache() async {
+  static Future<void> clearCache() async {
     try {
       final cacheDir = await getTemporaryDirectory();
       if (cacheDir.existsSync()) {
         cacheDir.deleteSync(recursive: true);
-        return true;
       }
     } catch (e) {
       Logger.log(dataLog: DataLog(msg: 'Catch clear cache'));
     }
-    return false;
   }
 }

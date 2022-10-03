@@ -17,30 +17,32 @@ class ConfirmDialog {
       barrierDismissible: false,
       context: context,
       builder: (context) {
-        return SingleChildScrollView(
-          child: AlertDialog(
-            //scrollable: ,
-            title: Text(title),
-            content: content != '' ? Text(content) : null,
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, null),
-                child: const Text('Cancelar'),
-              ),
-              if (falseButton != null)
+        return SafeArea(
+          child: SingleChildScrollView(
+            child: AlertDialog(
+              //scrollable: ,
+              title: Text(title),
+              content: content != '' ? Text(content) : null,
+              actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: Text(falseButton!),
+                  onPressed: () => Navigator.pop(context, null),
+                  child: const Text('Cancelar'),
                 ),
-              TextButton(
-                /*style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFFFFFFFF),
-                  backgroundColor: red,
-                ),*/
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Aceptar'),
-              ),
-            ],
+                if (falseButton != null)
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text(falseButton!),
+                  ),
+                TextButton(
+                  /*style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFFFFFFFF),
+                    backgroundColor: red,
+                  ),*/
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Aceptar'),
+                ),
+              ],
+            ),
           ),
         );
       },

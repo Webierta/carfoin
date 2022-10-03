@@ -56,6 +56,47 @@ class FileUtil {
     }
   }
 
+  static Future<bool> _requestPermission(Permission permission) async {
+    if (await permission.isGranted) {
+      return true;
+    } else {
+      var result = await permission.request();
+      if (result == PermissionStatus.granted) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static Future<Resultado> savePdf(String filename, List<int> pdfBytes) async {
+    //String filePath = '';
+    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+    if (selectedDirectory == null) {
+      return Resultado(Status.abortado, msg: 'Destino no seleccionado');
+    }
+    //filePath = '$selectedDirectory/$filename';
+    File file = File('$selectedDirectory/$filename');
+
+    if (await _requestPermission(Permission.storage)) {
+      try {
+        await file.writeAsBytes(pdfBytes);
+        return Resultado(Status.ok, msg: file.path);
+      } catch (e, s) {
+        Logger.log(
+            dataLog: DataLog(
+                msg: 'Catch Write Pdf',
+                file: 'file_util.dart',
+                clase: 'FileUtil',
+                funcion: 'savePdf',
+                error: e,
+                stackTrace: s));
+        return Resultado(Status.error, msg: e.toString());
+      }
+    } else {
+      return Resultado(Status.abortado, msg: 'Permiso denegado');
+    }
+  }
+
   static Future<Resultado> exportar(String nombreDb) async {
     DatabaseHelper database = DatabaseHelper();
     final String dbPath = await database.getDatabasePath();
@@ -70,11 +111,7 @@ class FileUtil {
     filePath = '$selectedDirectory/$nombreDb';
     File file = File(filePath);
 
-    var permiso = await Permission.storage.status;
-    if (!permiso.isGranted) {
-      permiso = await Permission.storage.request();
-    }
-    if (permiso.isGranted) {
+    if (await _requestPermission(Permission.storage)) {
       try {
         await file.writeAsBytes(dbAsBytes);
         return Resultado(Status.ok, msg: filePath);

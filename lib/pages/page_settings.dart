@@ -10,7 +10,6 @@ import '../models/preferences_provider.dart';
 import '../router/routes_const.dart';
 import '../services/exchange_api.dart';
 import '../services/preferences_service.dart';
-import '../services/share_csv.dart';
 import '../utils/fecha_util.dart';
 import '../utils/konstantes.dart';
 import '../utils/number_util.dart';
@@ -304,7 +303,7 @@ class _PageSettingsState extends State<PageSettings> {
                 padding: EdgeInsets.only(left: 20),
                 child: Text('MANTENIMIENTO'),
               ),
-              ListTile(
+              /*ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 leading: const Icon(Icons.memory, color: blue900),
@@ -330,7 +329,7 @@ class _PageSettingsState extends State<PageSettings> {
                     },
                   ),
                 ),
-              ),
+              ),*/
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),

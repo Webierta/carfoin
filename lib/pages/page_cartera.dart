@@ -101,9 +101,25 @@ class _PageCarteraState extends State<PageCartera> {
   _onShare(Cartera cartera, File file) async {
     final box = context.findRenderObject() as RenderBox?;
     if (file.path.isNotEmpty) {
-      await Share.shareFiles([file.path],
-          text: cartera.name,
-          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+      await Share.shareFiles(
+        [file.path],
+        text: cartera.name,
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+      ).whenComplete(() async {
+        try {
+          //await file.delete();
+          await ShareCsv.clearCache();
+        } catch (e, s) {
+          Logger.log(
+              dataLog: DataLog(
+                  msg: 'Catch clear cache',
+                  file: 'page_cartera.dart',
+                  clase: '_PageCarteraState',
+                  funcion: '_onShare',
+                  error: e,
+                  stackTrace: s));
+        }
+      });
     }
   }
 

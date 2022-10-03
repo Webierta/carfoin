@@ -507,43 +507,43 @@
     },
     {
       "name": "syncfusion_flutter_core",
-      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/syncfusion_flutter_core-20.2.50",
+      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/syncfusion_flutter_core-20.3.47",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
       "name": "syncfusion_flutter_pdf",
-      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/syncfusion_flutter_pdf-20.2.50",
+      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/syncfusion_flutter_pdf-20.3.47",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
       "name": "syncfusion_flutter_pdfviewer",
-      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/syncfusion_flutter_pdfviewer-20.2.50-beta",
+      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/syncfusion_flutter_pdfviewer-20.3.47",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
       "name": "syncfusion_pdfviewer_macos",
-      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/syncfusion_pdfviewer_macos-20.2.50-beta",
+      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/syncfusion_pdfviewer_macos-20.3.47",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
       "name": "syncfusion_pdfviewer_platform_interface",
-      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/syncfusion_pdfviewer_platform_interface-20.2.50-beta",
+      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/syncfusion_pdfviewer_platform_interface-20.3.47",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
       "name": "syncfusion_pdfviewer_web",
-      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/syncfusion_pdfviewer_web-20.2.50-beta",
+      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/syncfusion_pdfviewer_web-20.3.47",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
       "name": "syncfusion_pdfviewer_windows",
-      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/syncfusion_pdfviewer_windows-20.2.50-beta",
+      "rootUri": "file:///home/jcv/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/syncfusion_pdfviewer_windows-20.3.47",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -662,7 +662,7 @@
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2022-10-02T15:13:36.508590Z",
+  "generated": "2022-10-03T10:51:43.036691Z",
   "generator": "pub",
   "generatorVersion": "2.18.1"
 }

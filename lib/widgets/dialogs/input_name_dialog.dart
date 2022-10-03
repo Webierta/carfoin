@@ -65,46 +65,48 @@ class _InputNameDialogState extends State<InputNameDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return StatefulBuilder(
-      builder: (BuildContext context, StateSetter setState) {
-        return ValueListenableBuilder(
-          valueListenable: _controller,
-          builder: (context, TextEditingValue value, __) {
-            return SingleChildScrollView(
-              child: AlertDialog(
-                alignment: Alignment.topCenter,
-                insetPadding: const EdgeInsets.only(top: 40),
-                //scrollable: true,
-                title: Text(widget.title),
-                content: TextField(
-                  controller: _controller,
-                  decoration: InputDecoration(
-                    hintText: 'Nombre',
-                    errorMaxLines: 4,
-                    errorText: _errorText,
-                    labelText: widget.label,
+    return SafeArea(
+      child: StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return ValueListenableBuilder(
+            valueListenable: _controller,
+            builder: (context, TextEditingValue value, __) {
+              return SingleChildScrollView(
+                child: AlertDialog(
+                  alignment: Alignment.topCenter,
+                  insetPadding: const EdgeInsets.only(top: 40),
+                  //scrollable: true,
+                  title: Text(widget.title),
+                  content: TextField(
+                    controller: _controller,
+                    decoration: InputDecoration(
+                      hintText: 'Nombre',
+                      errorMaxLines: 4,
+                      errorText: _errorText,
+                      labelText: widget.label,
+                    ),
                   ),
+                  actions: [
+                    OutlinedButton(
+                      onPressed: () => Navigator.pop(context, null),
+                      child: const Text('CANCELAR'),
+                    ),
+                    ElevatedButton(
+                      onPressed: _errorText == null
+                          ? () {
+                              String input = _controller.value.text.trim();
+                              Navigator.pop(context, input);
+                            }
+                          : null,
+                      child: const Text('ACEPTAR'),
+                    ),
+                  ],
                 ),
-                actions: [
-                  OutlinedButton(
-                    onPressed: () => Navigator.pop(context, null),
-                    child: const Text('CANCELAR'),
-                  ),
-                  ElevatedButton(
-                    onPressed: _errorText == null
-                        ? () {
-                            String input = _controller.value.text.trim();
-                            Navigator.pop(context, input);
-                          }
-                        : null,
-                    child: const Text('ACEPTAR'),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

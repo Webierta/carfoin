@@ -8,9 +8,10 @@ class InfoDialog {
   const InfoDialog(
       {required this.context, required this.title, required this.content});
 
-  generateDialog() {
-    return showDialog<bool>(
+  generateDialog() async {
+    await showDialog<void>(
       barrierDismissible: false,
+      useSafeArea: true,
       context: context,
       builder: (context) {
         return WillPopScope(

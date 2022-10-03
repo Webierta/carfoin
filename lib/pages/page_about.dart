@@ -93,8 +93,6 @@ Los únicos permisos que requiere esta App son:
 
 Esta aplicación usa una base de datos SQLite. Normalmente Android la cerrará cuando finalice la aplicación, pero si desea asegurarse de liberar recursos y cerrar la base de datos, cierre la aplicación desde la opción <<Salir>>.
 
-Además, si ha compartido alguna Cartera, un archivo con extensión cfi (nombre-cartera.cfi) ha quedado almacenado en el directorio temporal de la aplicación. Puede eliminarlo limpiando la caché desde los Ajustes de la aplicación.
-
 ---
 
 ## Garantía, Seguridad y Privacidad
