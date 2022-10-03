@@ -23,12 +23,13 @@ import '../utils/konstantes.dart';
 import '../utils/status_api_service.dart';
 import '../utils/styles.dart';
 import '../utils/update_all.dart';
-import '../widgets/data_cartera.dart';
 import '../widgets/dialogs/confirm_dialog.dart';
 import '../widgets/dialogs/custom_messenger.dart';
 import '../widgets/dialogs/info_dialog.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
+import '../widgets/views/vista_compacta_fondos.dart';
+import '../widgets/views/vista_detalle_fondos.dart';
 
 class PageCartera extends StatefulWidget {
   const PageCartera({Key? key}) : super(key: key);
@@ -88,6 +89,13 @@ class _PageCarteraState extends State<PageCartera> {
     await setFondos(carteraSelect);
     PreferencesService.saveBool(
         keyByOrderFondosPref, prefProvider.isByOrderFondos);
+  }
+
+  _viewFondos() async {
+    setState(() =>
+        prefProvider.isViewDetalleFondos = !prefProvider.isViewDetalleFondos);
+    PreferencesService.saveBool(
+        keyViewFondosPref, prefProvider.isViewDetalleFondos);
   }
 
   _searchFondo(BuildContext context, AppPage page) async {
@@ -163,6 +171,12 @@ class _PageCarteraState extends State<PageCartera> {
                     icon: const Icon(Icons.refresh),
                     onPressed: () async => await _dialogUpdateAll(context),
                   ),
+                  IconButton(
+                    icon: prefProvider.isViewDetalleFondos
+                        ? const Icon(Icons.format_list_bulleted)
+                        : const Icon(Icons.splitscreen),
+                    onPressed: () => _viewFondos(),
+                  ),
                   PopupMenuButton(
                     color: blue,
                     offset: Offset(0.0, AppBar().preferredSize.height),
@@ -227,12 +241,27 @@ class _PageCarteraState extends State<PageCartera> {
                         ),
                       );
                     }
+                    if (!prefProvider.isViewDetalleFondos) {
+                      return ListView.builder(
+                        itemCount: data.fondos.length,
+                        itemBuilder: (context, index) {
+                          Fondo fondo = data.fondos[index];
+                          return VistaCompactaFondos(
+                            fondo: fondo,
+                            updateFondo: _updateFondo,
+                            removeFondo: _removeFondo,
+                            goFondo: _goFondo,
+                          );
+                        },
+                      );
+                    }
                     return ListView.builder(
                       itemCount: data.fondos.length,
                       itemBuilder: (context, index) {
                         Fondo fondo = data.fondos[index];
-                        return DataCartera(
+                        return VistaDetalleFondos(
                           fondo: fondo,
+                          updateFondo: _updateFondo,
                           removeFondo: _removeFondo,
                           goFondo: _goFondo,
                         );
@@ -344,6 +373,33 @@ class _PageCarteraState extends State<PageCartera> {
       return _insertFondoDb(fondo);
     } else {
       return false;
+    }
+  }
+
+  _updateFondo(Fondo fondo) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Loading(
+          titulo: fondo.name,
+          subtitulo: 'Actualizando valor...',
+        );
+      },
+    );
+    bool update = await _getDataApi(fondo);
+    _pop();
+    if (update) {
+      _showMsg(msg: 'Fondo actualizado');
+    } else {
+      if (apiService.status == StatusApiService.okHttp) {
+        _showMsg(msg: 'Error al escribir en la base de datos', color: red900);
+      } else {
+        String msg = apiService.status.msg == ''
+            ? 'Fondo no actualizado: Error en la descarga de datos'
+            : apiService.status.msg;
+        _showMsg(msg: msg, color: red900);
+      }
     }
   }
 

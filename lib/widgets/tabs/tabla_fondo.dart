@@ -7,6 +7,7 @@ import '../../services/database_helper.dart';
 import '../../utils/fecha_util.dart';
 import '../../utils/number_util.dart';
 import '../../utils/styles.dart';
+import '../background_dismissible.dart';
 
 class TablaFondo extends StatefulWidget {
   const TablaFondo({Key? key}) : super(key: key);
@@ -141,7 +142,13 @@ class _TablaFondoState extends State<TablaFondo> {
                       return Dismissible(
                           key: UniqueKey(),
                           direction: DismissDirection.endToStart,
-                          background: bgDismissible,
+                          background: const BackgroundDismissible(
+                            slide: Slide.left,
+                            label: 'Eliminar',
+                            icon: Icons.highlight_remove,
+                            marginVertical: 0.0,
+                          ),
+                          //background: bgDismissible,
                           /*background: Container(
                             color: Colors.red,
                             margin: const EdgeInsets.symmetric(horizontal: 15),

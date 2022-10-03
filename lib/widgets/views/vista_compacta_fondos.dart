@@ -1,47 +1,46 @@
-import 'package:carfoin/widgets/background_dismissible.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/cartera.dart';
 import '../../utils/styles.dart';
+import '../background_dismissible.dart';
 
-class VistaCompacta extends StatelessWidget {
-  final Cartera cartera;
-  final Function delete;
-  final Function rename;
-  final Function goCartera;
-  const VistaCompacta(
+class VistaCompactaFondos extends StatelessWidget {
+  final Fondo fondo;
+  final Function updateFondo;
+  final Function removeFondo;
+  final Function goFondo;
+  const VistaCompactaFondos(
       {Key? key,
-      required this.cartera,
-      required this.delete,
-      required this.rename,
-      required this.goCartera})
+      required this.fondo,
+      required this.updateFondo,
+      required this.removeFondo,
+      required this.goFondo})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Dismissible(
       key: UniqueKey(),
-      //key: Key(cartera.name),
       background: const BackgroundDismissible(
         slide: Slide.right,
-        label: 'Renombrar',
-        icon: Icons.edit,
+        label: 'Actualizar',
+        icon: Icons.refresh,
       ),
       secondaryBackground: const BackgroundDismissible(
         slide: Slide.left,
         label: 'Eliminar',
         icon: Icons.delete,
       ),
-      onDismissed: (direction) {
+      onDismissed: (direction) async {
         if (direction == DismissDirection.endToStart) {
-          delete(cartera);
+          await removeFondo(fondo);
         } else {
-          rename(context, cartera: cartera);
+          await updateFondo(fondo);
         }
       },
       child: Card(
         child: ListTile(
-          onTap: () => goCartera(context, cartera),
+          onTap: () => goFondo(context, fondo),
           enabled: true,
           leading: CircleAvatar(
             radius: 22,
@@ -49,7 +48,7 @@ class VistaCompacta extends StatelessWidget {
             child: CircleAvatar(
               backgroundColor: amber,
               child: Text(
-                cartera.name[0],
+                fondo.name[0],
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 22,
@@ -58,7 +57,7 @@ class VistaCompacta extends StatelessWidget {
               ),
             ),
           ),
-          title: Text(cartera.name, style: styleTitleCompact),
+          title: Text(fondo.name, style: styleTitleCompact),
         ),
       ),
     );

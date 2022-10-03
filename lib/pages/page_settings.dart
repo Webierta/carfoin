@@ -229,6 +229,20 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                leading: const Icon(Icons.view_stream, color: blue900),
+                title: const Text('Modo presentación: detalle'),
+                subtitle: const Text('En caso contrario, vista compacta'),
+                trailing: Switch(
+                  value: prefProvider.isViewDetalleFondos,
+                  onChanged: (value) {
+                    setState(() => prefProvider.isViewDetalleFondos = value);
+                    PreferencesService.saveBool(keyViewCarterasPref, value);
+                  },
+                ),
+              ),
+              ListTile(
+                dense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 leading: const Icon(Icons.delete_forever, color: blue900),
                 title: const Text('Confirmar antes de eliminar'),
                 subtitle: const Text('Eliminar todos los fondos de una cartera '

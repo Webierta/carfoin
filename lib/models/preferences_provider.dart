@@ -45,6 +45,13 @@ class PreferencesProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  bool? _isViewDetalleFondos;
+  bool get isViewDetalleFondos => _isViewDetalleFondos ?? true;
+  set isViewDetalleFondos(bool value) {
+    _isViewDetalleFondos = value;
+    notifyListeners();
+  }
+
   bool? _isConfirmDeleteFondo;
   bool get isConfirmDeleteFondo => _isConfirmDeleteFondo ?? true;
   set isConfirmDeleteFondo(bool value) {

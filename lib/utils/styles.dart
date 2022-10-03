@@ -26,21 +26,24 @@ BoxDecoration boxDecoBlue = BoxDecoration(
   borderRadius: BorderRadius.circular(12),
 );
 
-Container bgDismissible = Container(
-  color: const Color(0xFFF44336),
-  margin: const EdgeInsets.symmetric(horizontal: 15),
-  //alignment: Alignment.centerRight,
-  alignment: AlignmentDirectional.centerEnd,
-  child: const Padding(
-    padding: EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
-    child: Icon(Icons.delete, color: Color(0xFFFFFFFF)),
-  ),
-);
-
 const TextStyle styleTitle = TextStyle(
   fontWeight: FontWeight.w400,
   fontSize: 18,
   color: Color(0xFF2196F3),
+);
+
+const TextStyle styleTitleCompact = TextStyle(
+  fontWeight: FontWeight.w400,
+  fontSize: 20,
+  color: Color(0xFF2196F3),
+);
+
+TextStyle labelGrafico = TextStyle(
+  fontWeight: FontWeight.bold,
+  background: Paint()
+    ..color = const Color(0xFFFFFFFF)
+    ..strokeWidth = 17
+    ..style = PaintingStyle.stroke,
 );
 
 /* PALETA DE COLORES */

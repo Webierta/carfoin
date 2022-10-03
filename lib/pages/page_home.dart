@@ -281,8 +281,9 @@ class _PageHomeState extends State<PageHome> {
                           itemBuilder: (context, index) {
                             Cartera cartera = data.carteras[index];
                             return VistaCompacta(
-                              delete: _deleteCartera,
                               cartera: cartera,
+                              delete: _deleteCartera,
+                              rename: _inputName,
                               goCartera: _goCartera,
                             );
                           },
@@ -450,6 +451,8 @@ class _PageHomeState extends State<PageHome> {
         .push(RouterInputName(title: title).builder());
     if (input != null) {
       _submit(cartera, input);
+    } else {
+      setState(() {});
     }
   }
 

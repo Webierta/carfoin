@@ -1,3 +1,4 @@
+import 'package:carfoin/utils/styles.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -223,13 +224,14 @@ class _GraficoFondoState extends State<GraficoFondo> {
             dashArray: [2, 2],
             label: HorizontalLineLabel(
               show: true,
-              style: TextStyle(
+              /*style: TextStyle(
                 //backgroundColor: Colors.black,
                 background: Paint()
                   ..color = const Color(0xFF000000)
                   ..strokeWidth = 13
                   ..style = PaintingStyle.stroke,
-              ),
+              ),*/
+              style: labelGrafico,
               alignment: Alignment.topRight,
               labelResolver: (line) =>
                   'Media: ${NumberUtil.decimalFixed(precioMedio)}',
@@ -242,12 +244,13 @@ class _GraficoFondoState extends State<GraficoFondo> {
             dashArray: [2, 2],
             label: HorizontalLineLabel(
               show: true,
-              style: TextStyle(
+              style: labelGrafico,
+              /*style: TextStyle(
                 background: Paint()
                   ..color = const Color(0xFF000000)
                   ..strokeWidth = 13
                   ..style = PaintingStyle.stroke,
-              ),
+              ),*/
               alignment: Alignment.topRight,
               labelResolver: (line) =>
                   'Máx: ${NumberUtil.decimalFixed(precioMax)} - ${fechaMax ?? ''}',
@@ -260,12 +263,13 @@ class _GraficoFondoState extends State<GraficoFondo> {
             dashArray: [2, 2],
             label: HorizontalLineLabel(
               show: true,
-              style: TextStyle(
+              style: labelGrafico,
+              /*style: TextStyle(
                 background: Paint()
                   ..color = const Color(0xFF000000)
                   ..strokeWidth = 13
                   ..style = PaintingStyle.stroke,
-              ),
+              ),*/
               alignment: Alignment.topRight,
               labelResolver: (line) =>
                   'Mín: ${NumberUtil.decimalFixed(precioMin)} - ${fechaMin ?? ''}',

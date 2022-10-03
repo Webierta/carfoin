@@ -134,147 +134,142 @@ class VistaDetalle extends StatelessWidget {
       return false;
     }
 
-    return Dismissible(
-      key: UniqueKey(),
-      direction: DismissDirection.endToStart,
-      background: bgDismissible,
-      onDismissed: (_) => delete(cartera),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            children: [
-              ListTile(
-                minLeadingWidth: 0,
-                horizontalTitleGap: 10,
-                leading: CircleAvatar(
-                  radius: 22,
-                  backgroundColor: const Color(0xFFFFFFFF),
-                  child: CircleAvatar(
-                    backgroundColor: amber,
-                    child: IconButton(
-                      onPressed: () => goCartera(context, cartera),
-                      icon: const Icon(Icons.business_center, color: blue900),
-                    ),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          children: [
+            ListTile(
+              minLeadingWidth: 0,
+              horizontalTitleGap: 10,
+              leading: CircleAvatar(
+                radius: 22,
+                backgroundColor: const Color(0xFFFFFFFF),
+                child: CircleAvatar(
+                  backgroundColor: amber,
+                  child: IconButton(
+                    onPressed: () => goCartera(context, cartera),
+                    icon: const Icon(Icons.business_center, color: blue900),
                   ),
                 ),
-                title: Text(
-                  cartera.name,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: styleTitle,
+              ),
+              title: Text(
+                cartera.name,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: styleTitle,
+              ),
+              trailing: PopupMenuButton(
+                color: blue,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
                 ),
-                trailing: PopupMenuButton(
-                  color: blue,
-                  icon: const Icon(Icons.more_vert, color: blue),
-                  itemBuilder: (context) => const [
-                    PopupMenuItem(
-                      value: 1,
-                      child: ListTile(
-                        leading: Icon(Icons.edit, color: Color(0xFFFFFFFF)),
-                        title: Text(
-                          'Renombrar',
-                          style: TextStyle(color: Color(0xFFFFFFFF)),
-                        ),
+                icon: const Icon(Icons.more_vert, color: blue),
+                itemBuilder: (context) => const [
+                  PopupMenuItem(
+                    value: 1,
+                    child: ListTile(
+                      leading: Icon(Icons.edit, color: Color(0xFFFFFFFF)),
+                      title: Text(
+                        'Renombrar',
+                        style: TextStyle(color: Color(0xFFFFFFFF)),
                       ),
                     ),
-                    PopupMenuItem(
-                      value: 2,
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.delete_forever,
-                          color: Color(0xFFFFFFFF),
-                        ),
-                        title: Text(
-                          'Eliminar',
-                          style: TextStyle(color: Color(0xFFFFFFFF)),
-                        ),
+                  ),
+                  PopupMenuItem(
+                    value: 2,
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.delete_forever,
+                        color: Color(0xFFFFFFFF),
                       ),
-                    )
-                  ],
-                  onSelected: (value) {
-                    if (value == 1) {
-                      inputName(context, cartera: cartera);
-                    } else if (value == 2) {
-                      delete(cartera);
-                    }
-                  },
-                ),
+                      title: Text(
+                        'Eliminar',
+                        style: TextStyle(color: Color(0xFFFFFFFF)),
+                      ),
+                    ),
+                  )
+                ],
+                onSelected: (value) {
+                  if (value == 1) {
+                    inputName(context, cartera: cartera);
+                  } else if (value == 2) {
+                    delete(cartera);
+                  }
+                },
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                child: Container(
-                  padding: const EdgeInsets.only(right: 12),
-                  decoration: boxDecoBlue,
-                  child: fondos.isNotEmpty
-                      ? Theme(
-                          data: Theme.of(context)
-                              .copyWith(dividerColor: Colors.transparent),
-                          child: ExpansionTile(
-                            childrenPadding:
-                                const EdgeInsets.only(bottom: 5, left: 20),
-                            expandedCrossAxisAlignment:
-                                CrossAxisAlignment.start,
-                            expandedAlignment: Alignment.topLeft,
-                            maintainState: true,
-                            iconColor: blue,
-                            collapsedIconColor: blue,
-                            tilePadding: const EdgeInsets.all(0.0),
-                            backgroundColor: blue100,
-                            title: ChipFondo(lengthFondos: fondos.length),
-                            children: [
-                              for (var fondo in fondos)
-                                TextButton(
-                                  onPressed: () =>
-                                      goFondo(context, cartera, fondo),
-                                  child: Text(
-                                    fondo.name,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: const TextStyle(
-                                        decoration: TextDecoration.underline),
-                                  ),
-                                )
-                            ],
-                          ),
-                        )
-                      : const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 6),
-                          child: ChipFondo(lengthFondos: null),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Container(
+                padding: const EdgeInsets.only(right: 12),
+                decoration: boxDecoBlue,
+                child: fondos.isNotEmpty
+                    ? Theme(
+                        data: Theme.of(context)
+                            .copyWith(dividerColor: Colors.transparent),
+                        child: ExpansionTile(
+                          childrenPadding:
+                              const EdgeInsets.only(bottom: 5, left: 20),
+                          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                          expandedAlignment: Alignment.topLeft,
+                          maintainState: true,
+                          iconColor: blue,
+                          collapsedIconColor: blue,
+                          tilePadding: const EdgeInsets.all(0.0),
+                          backgroundColor: blue100,
+                          title: ChipFondo(lengthFondos: fondos.length),
+                          children: [
+                            for (var fondo in fondos)
+                              TextButton(
+                                onPressed: () =>
+                                    goFondo(context, cartera, fondo),
+                                child: Text(
+                                  fondo.name,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                      decoration: TextDecoration.underline),
+                                ),
+                              )
+                          ],
                         ),
-                ),
+                      )
+                    : const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 6),
+                        child: ChipFondo(lengthFondos: null),
+                      ),
               ),
-              if (isTrueDivisaEur())
-                StepperBalance(
-                  input: inversionCarteraEur,
-                  output: capitalCarteraEur,
-                  balance: rendimientoCarteraEur,
-                  divisa: '€',
-                  firstDate: firstDate,
-                  lastDate: lastDate,
-                ),
-              if (isTrueDivisaUsd())
-                StepperBalance(
-                  input: inversionCarteraUsd,
-                  output: capitalCarteraUsd,
-                  balance: rendimientoCarteraUsd,
-                  divisa: '\$',
-                  firstDate: firstDate,
-                  lastDate: lastDate,
-                ),
-              if (isTrueDivisaOtra())
-                StepperBalance(
-                  input: inversionCarteraOtra,
-                  output: capitalCarteraOtra,
-                  balance: rendimientoCarteraOtra,
-                  divisa: '',
-                  firstDate: firstDate,
-                  lastDate: lastDate,
-                ),
-              const SizedBox(height: 10),
-            ],
-          ),
+            ),
+            if (isTrueDivisaEur())
+              StepperBalance(
+                input: inversionCarteraEur,
+                output: capitalCarteraEur,
+                balance: rendimientoCarteraEur,
+                divisa: '€',
+                firstDate: firstDate,
+                lastDate: lastDate,
+              ),
+            if (isTrueDivisaUsd())
+              StepperBalance(
+                input: inversionCarteraUsd,
+                output: capitalCarteraUsd,
+                balance: rendimientoCarteraUsd,
+                divisa: '\$',
+                firstDate: firstDate,
+                lastDate: lastDate,
+              ),
+            if (isTrueDivisaOtra())
+              StepperBalance(
+                input: inversionCarteraOtra,
+                output: capitalCarteraOtra,
+                balance: rendimientoCarteraOtra,
+                divisa: '',
+                firstDate: firstDate,
+                lastDate: lastDate,
+              ),
+            const SizedBox(height: 10),
+          ],
         ),
       ),
     );

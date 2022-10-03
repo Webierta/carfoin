@@ -5,6 +5,7 @@ const String keyByOrderCarterasPref = 'isByOrderCarteras';
 const String keyViewCarterasPref = 'isViewDetalleCarteras';
 const String keyConfirmDeleteCarteraPref = 'isConfirmDeleteCartera';
 const String keyByOrderFondosPref = 'isByOrderFondos';
+const String keyViewFondosPref = 'isViewDetalleFondos';
 const String keyConfirmDeleteFondoPref = 'isConfirmDeleteFondo';
 const String keyAutoUpdatePref = 'isAutoAudate';
 const String keyConfirmDeletePref = 'isConfirmDelete';
