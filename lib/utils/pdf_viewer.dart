@@ -55,7 +55,7 @@ class _PdfViewerState extends State<PdfViewer> {
                 await saveFile();
               }
             },
-            icon: const Icon(Icons.download),
+            icon: const Icon(Icons.download, color: blue900),
           )
         ],
       ),

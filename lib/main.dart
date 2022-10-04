@@ -44,21 +44,39 @@ class MyApp extends StatelessWidget {
       title: 'Carfoin',
       theme: ThemeData(
         useMaterial3: true,
-        primaryColor: const Color(0xFF0D47A1),
-        colorScheme: ColorScheme.fromSwatch()
-            .copyWith(secondary: const Color(0xFFFFC107)),
+        primaryColor: blue,
+        /*colorScheme: ColorScheme.fromSwatch()
+            .copyWith(secondary: const Color(0xFFFFC107)),*/
+        colorScheme: const ColorScheme(
+          primary: blue,
+          secondary: amber,
+          surface: grisOp,
+          background: Colors.transparent,
+          error: red900,
+          onPrimary: Colors.white,
+          onSecondary: blue900,
+          onSurface: blue900,
+          onBackground: blue900,
+          onError: Colors.white,
+          brightness: Brightness.light,
+        ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          foregroundColor: Color(0xFF0D47A1),
+          iconTheme: IconThemeData(color: blue900),
+          //actionsIconTheme: IconThemeData(color: Colors.red),
+          foregroundColor: blue900,
+          //titleTextStyle: TextStyle(color: blue900),
           systemOverlayStyle: SystemUiOverlayStyle(
             statusBarColor: blue900,
             statusBarIconBrightness: Brightness.light,
           ),
         ),
+        //iconTheme: const IconThemeData(color: Colors.red),
         cardTheme: CardTheme(
-          color: const Color.fromRGBO(255, 255, 255, 0.5),
+          //color: const Color.fromRGBO(255, 255, 255, 0.5),
+          color: grisOp,
           elevation: 0.0,
           shape: RoundedRectangleBorder(
             side: BorderSide(color: Theme.of(context).colorScheme.outline),

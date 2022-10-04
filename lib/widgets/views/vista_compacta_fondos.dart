@@ -57,7 +57,8 @@ class VistaCompactaFondos extends StatelessWidget {
               ),
             ),
           ),
-          title: Text(fondo.name, style: styleTitleCompact),
+          title: Text(fondo.name, style: styleTitle),
+          trailing: const Icon(Icons.swipe, color: blue100),
         ),
       ),
     );

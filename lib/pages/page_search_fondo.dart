@@ -63,7 +63,7 @@ class _PageSearchFondoState extends State<PageSearchFondo> {
                 textCapitalization: TextCapitalization.characters,
                 decoration: const InputDecoration(
                   labelText: 'Busca por ISIN o por nombre',
-                  suffixIcon: Icon(Icons.search),
+                  suffixIcon: Icon(Icons.search, color: blue900),
                 ),
               ),
               const SizedBox(height: 20),

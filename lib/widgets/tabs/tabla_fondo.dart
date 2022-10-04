@@ -92,129 +92,126 @@ class _TablaFondoState extends State<TablaFondo> {
 
     return valores.isEmpty
         ? const Center(child: Text('Sin datos'))
-        : Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Column(
-              children: [
-                Container(
-                  color: amber,
-                  child: Row(
-                    children: [
-                      Expanded(
-                          flex: 1,
-                          child: IconButton(
-                            icon: const Icon(Icons.swap_vert),
-                            onPressed: () => changeSort(),
-                          )),
-                      const Expanded(
-                          flex: 3,
-                          child: Text(
-                            'FECHA',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                      const Expanded(
-                          flex: 3,
-                          child: Text(
-                            'PRECIO',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                      const Expanded(
-                          flex: 2,
-                          child: Text(
-                            '+/-',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                    ],
-                  ),
+        : Column(
+            children: [
+              Container(
+                color: amber,
+                child: Row(
+                  children: [
+                    Expanded(
+                        flex: 1,
+                        child: IconButton(
+                          icon: const Icon(Icons.swap_vert),
+                          onPressed: () => changeSort(),
+                        )),
+                    const Expanded(
+                        flex: 3,
+                        child: Text(
+                          'FECHA',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                    const Expanded(
+                        flex: 3,
+                        child: Text(
+                          'PRECIO',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                    const Expanded(
+                        flex: 2,
+                        child: Text(
+                          '+/-',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                  ],
                 ),
-                Expanded(
-                  child: ListView.separated(
-                    padding: const EdgeInsets.only(top: 10),
-                    separatorBuilder: (context, index) => const Divider(
-                        color: gris, height: 4, indent: 10, endIndent: 10),
-                    shrinkWrap: true,
-                    physics: const ClampingScrollPhysics(),
-                    itemCount: valores.length,
-                    itemBuilder: (context, index) {
-                      return Dismissible(
-                          key: UniqueKey(),
-                          direction: DismissDirection.endToStart,
-                          background: const BackgroundDismissible(
-                            slide: Slide.left,
-                            label: 'Eliminar',
-                            icon: Icons.highlight_remove,
-                            marginVertical: 0.0,
+              ),
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.only(top: 10),
+                  separatorBuilder: (context, index) => const Divider(
+                      color: gris, height: 4, indent: 10, endIndent: 10),
+                  shrinkWrap: true,
+                  physics: const ClampingScrollPhysics(),
+                  itemCount: valores.length,
+                  itemBuilder: (context, index) {
+                    return Dismissible(
+                        key: UniqueKey(),
+                        direction: DismissDirection.endToStart,
+                        background: const BackgroundDismissible(
+                          slide: Slide.left,
+                          label: 'Eliminar',
+                          icon: Icons.highlight_remove,
+                          marginVertical: 0.0,
+                        ),
+                        //background: bgDismissible,
+                        /*background: Container(
+                        color: Colors.red,
+                        margin: const EdgeInsets.symmetric(horizontal: 15),
+                        //alignment: Alignment.centerRight,
+                        alignment: AlignmentDirectional.centerEnd,
+                        child: const Padding(
+                          padding: EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
+                          child: Icon(Icons.delete, color: Colors.white),
+                        ),
+                      ),*/
+                        onDismissed: (_) async {
+                          //var carfoin = context.read<CarfoinProvider>();
+                          //await carfoin.eliminarValor(valoresOn[index].date);
+                          //await carfoin.updateValores();
+                          //final carteraProvider = context.read<CarteraProvider>();
+                          /// TODO...
+                          await database.deleteValor(
+                              carteraSelect, fondoSelect, valores[index]);
+                          await setValores(carteraSelect, fondoSelect);
+                          //PageFondo page = PageFondo().eliminarValor() ;
+                        },
+                        child: SizedBox(
+                          height: 30,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: getId(valores[index].tipo, index),
+                              ),
+                              Expanded(
+                                  flex: 3,
+                                  child: Text(
+                                    FechaUtil.epochToString(
+                                        valores[index].date),
+                                    textAlign: TextAlign.center,
+                                  )),
+                              Expanded(
+                                  flex: 3,
+                                  child: Text(
+                                    NumberUtil.decimalFixed(
+                                        valores[index].precio,
+                                        long: false),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 16),
+                                  )),
+                              Expanded(
+                                flex: 2,
+                                child: diferencia(valores[index]),
+                              ),
+                              /*Expanded(
+                              flex: 1,
+                              child: IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  print('EDITAR');
+                                },
+                              ),
+                            )*/
+                            ],
                           ),
-                          //background: bgDismissible,
-                          /*background: Container(
-                            color: Colors.red,
-                            margin: const EdgeInsets.symmetric(horizontal: 15),
-                            //alignment: Alignment.centerRight,
-                            alignment: AlignmentDirectional.centerEnd,
-                            child: const Padding(
-                              padding: EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
-                              child: Icon(Icons.delete, color: Colors.white),
-                            ),
-                          ),*/
-                          onDismissed: (_) async {
-                            //var carfoin = context.read<CarfoinProvider>();
-                            //await carfoin.eliminarValor(valoresOn[index].date);
-                            //await carfoin.updateValores();
-                            //final carteraProvider = context.read<CarteraProvider>();
-                            /// TODO...
-                            await database.deleteValor(
-                                carteraSelect, fondoSelect, valores[index]);
-                            await setValores(carteraSelect, fondoSelect);
-                            //PageFondo page = PageFondo().eliminarValor() ;
-                          },
-                          child: SizedBox(
-                            height: 30,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: getId(valores[index].tipo, index),
-                                ),
-                                Expanded(
-                                    flex: 3,
-                                    child: Text(
-                                      FechaUtil.epochToString(
-                                          valores[index].date),
-                                      textAlign: TextAlign.center,
-                                    )),
-                                Expanded(
-                                    flex: 3,
-                                    child: Text(
-                                      NumberUtil.decimalFixed(
-                                          valores[index].precio,
-                                          long: false),
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(fontSize: 16),
-                                    )),
-                                Expanded(
-                                  flex: 2,
-                                  child: diferencia(valores[index]),
-                                ),
-                                /*Expanded(
-                                  flex: 1,
-                                  child: IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () {
-                                      print('EDITAR');
-                                    },
-                                  ),
-                                )*/
-                              ],
-                            ),
-                          ));
-                    },
-                  ),
+                        ));
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           );
   }
 }

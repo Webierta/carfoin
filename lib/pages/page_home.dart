@@ -197,6 +197,7 @@ class _PageHomeState extends State<PageHome> {
               decoration: scaffoldGradient,
               child: Scaffold(
                 backgroundColor: Colors.transparent,
+                drawer: const MyDrawer(),
                 appBar: AppBar(
                   title: const Text('Carteras'),
                   actions: [
@@ -211,6 +212,7 @@ class _PageHomeState extends State<PageHome> {
                       onPressed: () => _viewCarteras(),
                     ),
                     PopupMenuButton(
+                      icon: const Icon(Icons.more_vert),
                       color: blue,
                       offset: Offset(0.0, AppBar().preferredSize.height),
                       shape: const RoundedRectangleBorder(
@@ -239,7 +241,6 @@ class _PageHomeState extends State<PageHome> {
                     ),
                   ],
                 ),
-                drawer: const MyDrawer(),
                 floatingActionButtonLocation: ExpandableFab.location,
                 floatingActionButton: ExpandableFab(
                   children: [
@@ -257,7 +258,7 @@ class _PageHomeState extends State<PageHome> {
                   child: const Icon(Icons.add),
                 ),
                 body: Padding(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
                   child: Consumer<CarteraProvider>(
                     builder: (context, data, child) {
                       if (data.carteras.isEmpty) {

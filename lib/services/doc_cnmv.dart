@@ -24,7 +24,7 @@ class DocCnmv {
     } catch (e, s) {
       Logger.log(
           dataLog: DataLog(
-              msg: 'Catch response CNMV',
+              msg: 'Catch response CNMV: $isin',
               file: 'doc_cnmv.dart',
               clase: 'DocCnmv',
               funcion: '_getDoc',
@@ -37,7 +37,7 @@ class DocCnmv {
     } else {
       Logger.log(
           dataLog: DataLog(
-              msg: 'Response status code != 200',
+              msg: 'Response status code != 200: $isin',
               file: 'doc_cnmv.dart',
               clase: 'DocCnmv',
               funcion: '_getDoc'));
@@ -71,7 +71,7 @@ class DocCnmv {
       } else {
         Logger.log(
             dataLog: DataLog(
-                msg: 'href is null',
+                msg: 'href is null: $isin',
                 file: 'doc_cnmv.dart',
                 clase: 'DocCnmv',
                 funcion: 'getUrlFolleto'));
@@ -79,7 +79,7 @@ class DocCnmv {
     } else {
       Logger.log(
           dataLog: DataLog(
-              msg: 'document is null',
+              msg: 'document is null: $isin',
               file: 'doc_cnmv.dart',
               clase: 'DocCnmv',
               funcion: 'getUrlFolleto'));
@@ -141,7 +141,7 @@ class DocCnmv {
           } else {
             Logger.log(
                 dataLog: DataLog(
-                    msg: 'href or ejercicio or periodo == null',
+                    msg: 'href or ejercicio or periodo == null: $isin',
                     file: 'doc_cnmv.dart',
                     clase: 'DocCnmv',
                     funcion: 'getUrlInforme'));
@@ -150,7 +150,7 @@ class DocCnmv {
         } else {
           Logger.log(
               dataLog: DataLog(
-                  msg: 'docInformes is null',
+                  msg: 'docInformes is null: $isin',
                   file: 'doc_cnmv.dart',
                   clase: 'DocCnmv',
                   funcion: 'getUrlInforme'));
@@ -159,7 +159,7 @@ class DocCnmv {
       } else {
         Logger.log(
             dataLog: DataLog(
-                msg: 'hrefInfoPeriodica is null',
+                msg: 'hrefInfoPeriodica is null: $isin',
                 file: 'doc_cnmv.dart',
                 clase: 'DocCnmv',
                 funcion: 'getUrlInforme'));
@@ -168,7 +168,7 @@ class DocCnmv {
     } else {
       Logger.log(
           dataLog: DataLog(
-              msg: 'document is null',
+              msg: 'document is null: $isin',
               file: 'doc_cnmv.dart',
               clase: 'DocCnmv',
               funcion: 'getUrlInforme'));

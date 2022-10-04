@@ -59,6 +59,7 @@ class VistaCompacta extends StatelessWidget {
             ),
           ),
           title: Text(cartera.name, style: styleTitleCompact),
+          trailing: const Icon(Icons.swipe, color: blue100),
         ),
       ),
     );

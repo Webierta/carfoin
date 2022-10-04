@@ -130,6 +130,7 @@ class _PageFondoState extends State<PageFondo>
                     icon: const Icon(Icons.home),
                   ),
                   PopupMenuButton(
+                    icon: const Icon(Icons.more_vert),
                     color: blue,
                     offset: Offset(0.0, AppBar().preferredSize.height),
                     shape: const RoundedRectangleBorder(

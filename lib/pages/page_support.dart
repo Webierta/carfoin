@@ -39,6 +39,7 @@ class PageSupport extends StatelessWidget {
         decoration: scaffoldGradient,
         child: Scaffold(
           backgroundColor: Colors.transparent,
+          drawer: const MyDrawer(),
           appBar: AppBar(
             title: const Text('Buy Me a Coffee'),
             actions: [
@@ -48,7 +49,6 @@ class PageSupport extends StatelessWidget {
               ),
             ],
           ),
-          drawer: const MyDrawer(),
           body: SingleChildScrollView(
             padding:
                 const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 40),

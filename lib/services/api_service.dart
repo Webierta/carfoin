@@ -31,7 +31,7 @@ class ApiService {
         status = StatusApiService.errorHttp;
         Logger.log(
             dataLog: DataLog(
-                msg: 'Status Code: ${response.statusCode}',
+                msg: 'Status Code: ${response.statusCode} $isin',
                 file: 'api_service.dart',
                 clase: 'ApiService',
                 funcion: 'getDataApi'));

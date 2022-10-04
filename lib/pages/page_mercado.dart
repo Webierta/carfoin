@@ -125,12 +125,16 @@ class _MercadoState extends State<PageMercado> {
           ),
           body: ListView(
             shrinkWrap: true,
-            padding: const EdgeInsets.all(10),
+            //padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
             children: [
               ListTile(
                 title: Align(
                   alignment: Alignment.center,
-                  child: Text(fondoSelect.name),
+                  child: Text(
+                    fondoSelect.name,
+                    style: const TextStyle(color: blue900),
+                  ),
                 ),
                 subtitle: Align(
                   alignment: Alignment.center,
@@ -138,10 +142,12 @@ class _MercadoState extends State<PageMercado> {
                     padding: const EdgeInsets.only(left: 10, right: 20),
                     backgroundColor: blue100,
                     avatar: const Icon(Icons.business_center, color: blue900),
+                    //iconTheme: const IconThemeData(color: blue900),
                     label: Text(
                       carteraSelect.name,
                       style: const TextStyle(color: blue900),
                     ),
+                    //labelStyle: const TextStyle(color: blue900),
                   ),
                 ),
               ),

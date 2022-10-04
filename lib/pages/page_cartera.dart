@@ -178,6 +178,7 @@ class _PageCarteraState extends State<PageCartera> {
                     onPressed: () => _viewFondos(),
                   ),
                   PopupMenuButton(
+                    icon: const Icon(Icons.more_vert),
                     color: blue,
                     offset: Offset(0.0, AppBar().preferredSize.height),
                     shape: const RoundedRectangleBorder(
@@ -225,7 +226,7 @@ class _PageCarteraState extends State<PageCartera> {
                 child: const Icon(Icons.addchart),
               ),
               body: Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
                 child: Consumer<CarteraProvider>(
                   builder: (context, data, child) {
                     if (data.fondos.isEmpty) {
@@ -392,6 +393,7 @@ class _PageCarteraState extends State<PageCartera> {
     if (update) {
       _showMsg(msg: 'Fondo actualizado');
     } else {
+      setState(() {});
       if (apiService.status == StatusApiService.okHttp) {
         _showMsg(msg: 'Error al escribir en la base de datos', color: red900);
       } else {

@@ -19,6 +19,7 @@ class PageInfo extends StatelessWidget {
         decoration: scaffoldGradient,
         child: Scaffold(
           backgroundColor: Colors.transparent,
+          drawer: const MyDrawer(),
           appBar: AppBar(
             title: const Text('INFO'),
             actions: [
@@ -28,7 +29,6 @@ class PageInfo extends StatelessWidget {
               ),
             ],
           ),
-          drawer: const MyDrawer(),
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Markdown(

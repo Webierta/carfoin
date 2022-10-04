@@ -286,7 +286,7 @@ class _MainFondoState extends State<MainFondo> {
     }
     return ListView(
       shrinkWrap: true,
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
       children: [
         Card(
           child: Padding(
