@@ -11,6 +11,7 @@ class VistaDetalle extends StatelessWidget {
   final Function goCartera;
   final Function inputName;
   final Function goFondo;
+
   const VistaDetalle({
     Key? key,
     required this.cartera,
@@ -108,27 +109,21 @@ class VistaDetalle extends StatelessWidget {
     }
 
     bool isTrueDivisaEur() {
-      if (isTrueInversionCarteraEur &&
-          isTrueCapitalCarteraEur &&
-          isTrueRendCarteraEur) {
+      if (isTrueInversionCarteraEur && isTrueCapitalCarteraEur && isTrueRendCarteraEur) {
         return true;
       }
       return false;
     }
 
     bool isTrueDivisaUsd() {
-      if (isTrueInversionCarteraUsd &&
-          isTrueCapitalCarteraUsd &&
-          isTrueRendCarteraUsd) {
+      if (isTrueInversionCarteraUsd && isTrueCapitalCarteraUsd && isTrueRendCarteraUsd) {
         return true;
       }
       return false;
     }
 
     bool isTrueDivisaOtra() {
-      if (isTrueInversionCarteraOtra &&
-          isTrueCapitalCarteraOtra &&
-          isTrueRendCarteraOtra) {
+      if (isTrueInversionCarteraOtra && isTrueCapitalCarteraOtra && isTrueRendCarteraOtra) {
         return true;
       }
       return false;
@@ -200,17 +195,16 @@ class VistaDetalle extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              //padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
               child: Container(
                 padding: const EdgeInsets.only(right: 12),
                 decoration: boxDecoBlue,
                 child: fondos.isNotEmpty
                     ? Theme(
-                        data: Theme.of(context)
-                            .copyWith(dividerColor: Colors.transparent),
+                        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                         child: ExpansionTile(
-                          childrenPadding:
-                              const EdgeInsets.only(bottom: 5, left: 20),
+                          childrenPadding: const EdgeInsets.only(bottom: 5, left: 20),
                           expandedCrossAxisAlignment: CrossAxisAlignment.start,
                           expandedAlignment: Alignment.topLeft,
                           maintainState: true,
@@ -222,14 +216,12 @@ class VistaDetalle extends StatelessWidget {
                           children: [
                             for (var fondo in fondos)
                               TextButton(
-                                onPressed: () =>
-                                    goFondo(context, cartera, fondo),
+                                onPressed: () => goFondo(context, cartera, fondo),
                                 child: Text(
                                   fondo.name,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
-                                  style: const TextStyle(
-                                      decoration: TextDecoration.underline),
+                                  style: const TextStyle(decoration: TextDecoration.underline),
                                 ),
                               )
                           ],
@@ -268,7 +260,7 @@ class VistaDetalle extends StatelessWidget {
                 firstDate: firstDate,
                 lastDate: lastDate,
               ),
-            const SizedBox(height: 10),
+            //const SizedBox(height: 10),
           ],
         ),
       ),
@@ -278,6 +270,7 @@ class VistaDetalle extends StatelessWidget {
 
 class ChipFondo extends StatelessWidget {
   final int? lengthFondos;
+
   const ChipFondo({Key? key, this.lengthFondos}) : super(key: key);
 
   @override

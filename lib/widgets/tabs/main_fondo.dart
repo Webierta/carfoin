@@ -311,7 +311,7 @@ class _MainFondoState extends State<MainFondo> {
                   ),
                   subtitle: Text(
                     fondoSelect.isin,
-                    style: const TextStyle(fontSize: 16, color: blue900),
+                    style: const TextStyle(fontSize: 14, color: blue900),
                   ),
                 ),
                 Column(

@@ -137,7 +137,7 @@ class VistaDetalleFondos extends StatelessWidget {
             ),
             if (valores != null && valores.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
+                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   decoration: boxDecoBlue,
