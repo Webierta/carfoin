@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/styles.dart';
+
 class RouterInputName {
   final String title;
   final String? label;
@@ -87,9 +89,12 @@ class _InputNameDialogState extends State<InputNameDialog> {
                     ),
                   ),
                   actions: [
-                    OutlinedButton(
+                    ElevatedButton(
                       onPressed: () => Navigator.pop(context, null),
-                      child: const Text('CANCELAR'),
+                      child: const Text(
+                        'Cancelar',
+                        style: TextStyle(color: blue900),
+                      ),
                     ),
                     ElevatedButton(
                       onPressed: _errorText == null
@@ -98,7 +103,10 @@ class _InputNameDialogState extends State<InputNameDialog> {
                               Navigator.pop(context, input);
                             }
                           : null,
-                      child: const Text('ACEPTAR'),
+                      child: const Text(
+                        'Aceptar',
+                        style: TextStyle(color: blue900),
+                      ),
                     ),
                   ],
                 ),

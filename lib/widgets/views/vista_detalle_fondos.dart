@@ -12,6 +12,7 @@ class VistaDetalleFondos extends StatelessWidget {
   final Function updateFondo;
   final Function removeFondo;
   final Function goFondo;
+
   const VistaDetalleFondos({
     Key? key,
     required this.fondo,
@@ -88,11 +89,11 @@ class VistaDetalleFondos extends StatelessWidget {
                 fondo.name,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,
-                style: styleTitle,
+                style: styleTitle16,
               ),
               subtitle: Text(
                 fondo.isin,
-                style: const TextStyle(fontSize: 16, color: blue900),
+                style: const TextStyle(fontSize: 14, color: blue900),
               ),
               trailing: PopupMenuButton(
                 color: blue,
@@ -151,8 +152,7 @@ class VistaDetalleFondos extends StatelessWidget {
                         Expanded(
                           child: ListTile(
                             dense: true,
-                            contentPadding:
-                                const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                            contentPadding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
                             //minLeadingWidth: 0,
                             horizontalTitleGap: 0,
                             title: Row(

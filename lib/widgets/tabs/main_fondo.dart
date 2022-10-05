@@ -21,6 +21,7 @@ import '../loading_progress.dart';
 
 class MainFondo extends StatefulWidget {
   const MainFondo({Key? key}) : super(key: key);
+
   @override
   State<MainFondo> createState() => _MainFondoState();
 }
@@ -34,7 +35,17 @@ class _MainFondoState extends State<MainFondo> {
   late List<Valor> operacionesSelect;
 
   bool openingPdf = false;
-  late Stats stats;
+
+  Stats stats = const Stats([]); //late Stats stats;
+  double? inversion;
+  double? resultado;
+  double? rendimiento;
+  double? rentabilidad;
+  double? rentAnual;
+  double? twr;
+  double? tae;
+  double? mwr;
+  double? mwrAcum;
 
   setValores(Cartera cartera, Fondo fondo) async {
     carteraProvider.valores = await database.getValores(cartera, fondo);
@@ -42,6 +53,29 @@ class _MainFondoState extends State<MainFondo> {
     valoresSelect = carteraProvider.valores;
     carteraProvider.operaciones = await database.getOperaciones(cartera, fondo);
     operacionesSelect = carteraProvider.operaciones;
+
+    stats = Stats(valoresSelect);
+    if (operacionesSelect.isNotEmpty) {
+      calculateStats();
+    }
+  }
+
+  calculateStats() {
+    inversion = stats.inversion();
+    resultado = stats.resultado();
+    rendimiento = stats.balance();
+    rentabilidad = stats.rentabilidad();
+    if (rentabilidad != null) {
+      rentAnual = stats.anualizar(rentabilidad!);
+    }
+    twr = stats.twr();
+    if (twr != null) {
+      tae = stats.anualizar(twr!);
+    }
+    mwr = stats.mwr();
+    if (mwr != null) {
+      mwrAcum = stats.mwrAcum(mwr!);
+    }
   }
 
   @override
@@ -59,9 +93,11 @@ class _MainFondoState extends State<MainFondo> {
   Widget build(BuildContext context) {
     PreferencesProvider prefProvider = context.read<PreferencesProvider>();
     final List<Valor> valores = context.watch<CarteraProvider>().valores;
-    final List<Valor> operaciones =
-        context.watch<CarteraProvider>().operaciones;
-    stats = Stats(valores);
+    final List<Valor> operaciones = context.watch<CarteraProvider>().operaciones;
+    /*stats = Stats(valores);
+    if (operaciones.isNotEmpty) {
+      calculateStats();
+    }*/
 
     double? getDiferencia() {
       if (valores.length > 1) {
@@ -89,23 +125,22 @@ class _MainFondoState extends State<MainFondo> {
     }
 
     List<DataRow> createRows() {
-      if (operaciones.isEmpty || valores.isEmpty) return <DataRow>[];
+      if (operaciones.isEmpty || valores.isEmpty) {
+        return <DataRow>[];
+      }
       return [
         for (var op in operaciones)
-          // TODO: HACER AQUI CÁLCULOS
           DataRow(cells: [
             DataCell(Align(
               alignment: Alignment.centerRight,
-              child:
-                  Text(FechaUtil.epochToString(op.date, formato: 'dd/MM/yy')),
+              child: Text(FechaUtil.epochToString(op.date, formato: 'dd/MM/yy')),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
                 op.tipo == 1
                     ? NumberUtil.decimal(op.participaciones ?? 0, long: false)
-                    : NumberUtil.decimal((op.participaciones ?? 0) * -1,
-                        long: false),
+                    : NumberUtil.decimal((op.participaciones ?? 0) * -1, long: false),
                 style: TextStyle(color: op.tipo == 1 ? green : red),
               ),
             )),
@@ -115,9 +150,8 @@ class _MainFondoState extends State<MainFondo> {
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
-              child: Text(NumberUtil.decimalFixed(
-                  (op.participaciones ?? 0) * op.precio,
-                  long: false)),
+              child:
+                  Text(NumberUtil.decimalFixed((op.participaciones ?? 0) * op.precio, long: false)),
             )),
             DataCell(IconButton(
               onPressed: () async {
@@ -147,29 +181,24 @@ class _MainFondoState extends State<MainFondo> {
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
-                FechaUtil.epochToString(valores.first.date,
-                    formato: 'dd/MM/yy'),
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                FechaUtil.epochToString(valores.first.date, formato: 'dd/MM/yy'),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
               ),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
                 stats.totalParticipaciones() != null
-                    ? NumberUtil.decimalFixed(stats.totalParticipaciones()!,
-                        long: false)
+                    ? NumberUtil.decimalFixed(stats.totalParticipaciones()!, long: false)
                     : '',
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
               ),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
                 NumberUtil.decimal(valores.first.precio),
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
               ),
             )),
             DataCell(Align(
@@ -178,8 +207,7 @@ class _MainFondoState extends State<MainFondo> {
                 stats.resultado() != null
                     ? NumberUtil.decimalFixed(stats.resultado()!, long: false)
                     : '',
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
               ),
             )),
             const DataCell(Text('')),
@@ -210,33 +238,6 @@ class _MainFondoState extends State<MainFondo> {
         return FechaUtil.epochToString(precio, formato: 'dd/MM/yy');
       }
       return '';
-    }
-
-    double? inversion;
-    double? resultado;
-    double? rendimiento;
-    double? rentabilidad;
-    double? rentAnual;
-    double? twr;
-    double? tae;
-    double? mwr;
-    double? mwrAcum;
-    if (operaciones.isNotEmpty) {
-      inversion = stats.inversion();
-      resultado = stats.resultado();
-      rendimiento = stats.balance();
-      rentabilidad = stats.rentabilidad();
-      if (rentabilidad != null) {
-        rentAnual = stats.anualizar(rentabilidad);
-      }
-      twr = stats.twr();
-      if (twr != null) {
-        tae = stats.anualizar(twr);
-      }
-      mwr = stats.mwr();
-      if (mwr != null) {
-        mwrAcum = stats.mwrAcum(mwr);
-      }
     }
 
     bool allStatsIsNull() {
@@ -274,8 +275,7 @@ class _MainFondoState extends State<MainFondo> {
       List<Icon> estrellas = [];
       int rating = fondoSelect.rating ?? 0;
       for (var i = 1; i < 6; i++) {
-        var icon = Icon(Icons.star,
-            color: rating >= i ? Colors.greenAccent[400] : Colors.grey);
+        var icon = Icon(Icons.star, color: rating >= i ? Colors.greenAccent[400] : Colors.grey);
         estrellas.add(icon);
       }
       return estrellas;
@@ -284,6 +284,11 @@ class _MainFondoState extends State<MainFondo> {
     if (openingPdf) {
       Future.delayed(Duration.zero, () => showDialogLoading(context));
     }
+
+    /*if (operaciones.isNotEmpty && allStatsIsNull()) {
+      return const Center(child: CircularProgressIndicator());
+    }*/
+
     return ListView(
       shrinkWrap: true,
       padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
@@ -385,8 +390,7 @@ class _MainFondoState extends State<MainFondo> {
                             'un intervalo de valores históricos.'),
                       )
                     : Padding(
-                        padding: const EdgeInsets.only(
-                            left: 12, right: 12, bottom: 12),
+                        padding: const EdgeInsets.only(left: 12, right: 12),
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: boxDecoBlue,
@@ -398,16 +402,13 @@ class _MainFondoState extends State<MainFondo> {
                                     DiaCalendario(epoch: valores.first.date),
                                     const Spacer(),
                                     Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Row(
                                           children: [
                                             Text(
-                                              NumberUtil.decimalFixed(
-                                                  valores.first.precio,
+                                              NumberUtil.decimalFixed(valores.first.precio,
                                                   long: false),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
@@ -425,48 +426,38 @@ class _MainFondoState extends State<MainFondo> {
                                           Row(
                                             children: [
                                               Text(
-                                                NumberUtil.compactFixed(
-                                                    getDiferencia()!),
+                                                NumberUtil.compactFixed(getDiferencia()!),
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.w400,
-                                                    color: textRedGreen(
-                                                        getDiferencia()!)),
+                                                    color: textRedGreen(getDiferencia()!)),
                                               ),
                                               const SizedBox(width: 4),
-                                              const Icon(Icons.iso,
-                                                  color: blue),
+                                              const Icon(Icons.iso, color: blue),
                                             ],
                                           ),
                                       ],
                                     ),
-                                    if (fondoSelect.divisa == 'EUR' ||
-                                        fondoSelect.divisa == 'USD')
+                                    if (fondoSelect.divisa == 'EUR' || fondoSelect.divisa == 'USD')
                                       Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 10),
+                                        padding: const EdgeInsets.only(left: 10),
                                         child: Text(
-                                          fondoSelect.divisa == 'EUR'
-                                              ? '€'
-                                              : '\$',
+                                          fondoSelect.divisa == 'EUR' ? '€' : '\$',
                                           textScaleFactor: 2.5,
-                                          style:
-                                              const TextStyle(color: blue200),
+                                          style: const TextStyle(color: blue200),
                                         ),
                                       ),
                                   ],
                                 ),
                               ),
-                              if (valores.isNotEmpty)
-                                const SizedBox(height: 10),
+                              if (valores.isNotEmpty) const SizedBox(height: 10),
                               if (valores.length > 1)
                                 Row(
                                   children: [
                                     Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                             'Mínimo  \t\t (${fechaPrecio(stats.datePrecioMinimo())})'),
@@ -478,21 +469,16 @@ class _MainFondoState extends State<MainFondo> {
                                     ),
                                     const Spacer(),
                                     Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
+                                      crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
-                                        Text(NumberUtil.decimal(
-                                            stats.precioMinimo() ?? 0)),
-                                        Text(NumberUtil.decimal(
-                                            stats.precioMaximo() ?? 0)),
+                                        Text(NumberUtil.decimal(stats.precioMinimo() ?? 0)),
+                                        Text(NumberUtil.decimal(stats.precioMaximo() ?? 0)),
                                         Text(stats.precioMedio() != null
-                                            ? NumberUtil.decimalFixed(
-                                                stats.precioMedio()!,
+                                            ? NumberUtil.decimalFixed(stats.precioMedio()!,
                                                 long: false)
                                             : ''),
                                         Text(stats.volatilidad() != null
-                                            ? NumberUtil.decimalFixed(
-                                                stats.volatilidad()!,
+                                            ? NumberUtil.decimalFixed(stats.volatilidad()!,
                                                 long: false)
                                             : ''),
                                       ],
@@ -507,7 +493,7 @@ class _MainFondoState extends State<MainFondo> {
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        //const SizedBox(height: 10),
         Card(
           child: Padding(
             padding: const EdgeInsets.all(8),
@@ -516,8 +502,7 @@ class _MainFondoState extends State<MainFondo> {
                 ListTile(
                   //contentPadding: const EdgeInsets.all(12),
                   minLeadingWidth: 0,
-                  leading:
-                      const Icon(Icons.compare_arrows, size: 32, color: blue),
+                  leading: const Icon(Icons.compare_arrows, size: 32, color: blue900),
                   title: const FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
@@ -525,7 +510,7 @@ class _MainFondoState extends State<MainFondo> {
                       'OPERACIONES',
                       //overflow: TextOverflow.ellipsis,
                       //maxLines: 1,
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(fontSize: 18, color: blue900),
                     ),
                   ),
                   trailing: CircleAvatar(
@@ -562,20 +547,19 @@ class _MainFondoState extends State<MainFondo> {
                                 columnSpacing: 20,
                                 dataRowHeight: 70,
                                 //horizontalMargin: 10,
-                                headingRowColor: MaterialStateColor.resolveWith(
-                                    (states) => Colors.blue),
+                                headingRowColor:
+                                    MaterialStateColor.resolveWith((states) => Colors.blue),
                                 headingTextStyle: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
-                                dataTextStyle: const TextStyle(
-                                    fontSize: 18, color: Colors.black),
+                                dataTextStyle: const TextStyle(fontSize: 18, color: Colors.black),
                                 columns: createColumns(),
                                 rows: createRows(),
                               ),
                             ),
-                            const SizedBox(height: 10),
+                            //const SizedBox(height: 10),
                           ],
                         ),
                       ),
@@ -583,7 +567,7 @@ class _MainFondoState extends State<MainFondo> {
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        //const SizedBox(height: 10),
         if (operaciones.isNotEmpty)
           Card(
             child: Padding(
@@ -592,11 +576,10 @@ class _MainFondoState extends State<MainFondo> {
                 children: [
                   ListTile(
                     minLeadingWidth: 0,
-                    leading: const Icon(Icons.balance,
-                        size: 32, color: blue), // Icons.balance
+                    leading: const Icon(Icons.balance, size: 32, color: blue900), // Icons.balance
                     title: const Text(
                       'BALANCE',
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(fontSize: 18, color: blue900),
                     ),
                     trailing: CircleAvatar(
                       radius: 22,
@@ -618,36 +601,28 @@ class _MainFondoState extends State<MainFondo> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          if (allStatsIsNull())
-                            const Text('Error en los cálculos'),
+                          if (allStatsIsNull()) const Text('Error en los cálculos'),
                           if (inversion != null)
                             RowBalance(
                               label: 'Inversión',
-                              data: NumberUtil.decimalFixed(inversion,
-                                  long: false),
+                              data: NumberUtil.decimalFixed(inversion!, long: false),
                             ),
                           if (resultado != null) const SizedBox(height: 10),
                           if (resultado != null)
                             RowBalance(
                               label: 'Resultado',
-                              data: NumberUtil.decimalFixed(resultado,
-                                  long: false),
+                              data: NumberUtil.decimalFixed(resultado!, long: false),
                             ),
                           if (rendimiento != null) const SizedBox(height: 10),
                           if (rendimiento != null)
                             RowBalance(
                               label: 'Rendimiento',
-                              data: NumberUtil.decimalFixed(rendimiento,
-                                  long: false),
-                              color: textRedGreen(rendimiento),
+                              data: NumberUtil.decimalFixed(rendimiento!, long: false),
+                              color: textRedGreen(rendimiento!),
                             ),
-                          if (rentabilidad != null ||
-                              twr != null ||
-                              mwrAcum != null)
+                          if (rentabilidad != null || twr != null || mwrAcum != null)
                             const SizedBox(height: 10),
-                          if (rentabilidad != null ||
-                              twr != null ||
-                              mwrAcum != null)
+                          if (rentabilidad != null || twr != null || mwrAcum != null)
                             Row(
                               children: const [
                                 Expanded(
@@ -663,22 +638,22 @@ class _MainFondoState extends State<MainFondo> {
                           if (rentabilidad != null)
                             RowBalance(
                               label: 'Simple',
-                              data: NumberUtil.percentCompact(rentabilidad),
-                              color: textRedGreen(rentabilidad),
+                              data: NumberUtil.percentCompact(rentabilidad!),
+                              color: textRedGreen(rentabilidad!),
                             ),
                           if (twr != null) const SizedBox(height: 10),
                           if (twr != null)
                             RowBalance(
                               label: 'TWR',
-                              data: NumberUtil.percentCompact(twr),
-                              color: textRedGreen(twr),
+                              data: NumberUtil.percentCompact(twr!),
+                              color: textRedGreen(twr!),
                             ),
                           if (mwr != null) const SizedBox(height: 10),
                           if (mwrAcum != null)
                             RowBalance(
                               label: 'MWR Acum.',
-                              data: NumberUtil.percentCompact(mwrAcum),
-                              color: textRedGreen(mwrAcum),
+                              data: NumberUtil.percentCompact(mwrAcum!),
+                              color: textRedGreen(mwrAcum!),
                             ),
                           if (rentAnual != null || tae != null || mwr != null)
                             const SizedBox(height: 10),
@@ -698,22 +673,22 @@ class _MainFondoState extends State<MainFondo> {
                           if (rentAnual != null)
                             RowBalance(
                               label: 'Simple Anual',
-                              data: NumberUtil.percentCompact(rentAnual),
-                              color: textRedGreen(rentAnual),
+                              data: NumberUtil.percentCompact(rentAnual!),
+                              color: textRedGreen(rentAnual!),
                             ),
                           if (tae != null) const SizedBox(height: 10),
                           if (tae != null)
                             RowBalance(
                               label: 'TWR (TAE)',
-                              data: NumberUtil.percentCompact(tae),
-                              color: textRedGreen(tae),
+                              data: NumberUtil.percentCompact(tae!),
+                              color: textRedGreen(tae!),
                             ),
                           if (mwr != null) const SizedBox(height: 10),
                           if (mwr != null)
                             RowBalance(
                               label: 'MWR',
-                              data: NumberUtil.percentCompact(mwr),
-                              color: textRedGreen(mwr),
+                              data: NumberUtil.percentCompact(mwr!),
+                              color: textRedGreen(mwr!),
                             ),
                         ],
                       ),
@@ -741,14 +716,14 @@ class _MainFondoState extends State<MainFondo> {
   }
 
   void _showMsg({required String msg, Color? color}) =>
-      CustomMessenger(context: context, msg: msg, color: color)
-          .generateDialog();
+      CustomMessenger(context: context, msg: msg, color: color).generateDialog();
 }
 
 class RowBalance extends StatelessWidget {
   final String label;
   final String data;
   final Color color;
+
   const RowBalance({
     Key? key,
     required this.label,

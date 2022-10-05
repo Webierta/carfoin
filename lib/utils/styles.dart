@@ -5,12 +5,7 @@ const BoxDecoration scaffoldGradient = BoxDecoration(
     begin: Alignment.topRight,
     end: Alignment.bottomLeft,
     stops: [0.2, 0.5, 0.8, 0.7],
-    colors: [
-      Color(0xFFE3F2FD),
-      Color(0xFFBBDEFB),
-      Color(0xFF90CAF9),
-      Color(0xFF64B5F6)
-    ],
+    colors: [Color(0xFFE3F2FD), Color(0xFFBBDEFB), Color(0xFF90CAF9), Color(0xFF64B5F6)],
   ),
 );
 
@@ -18,6 +13,12 @@ BoxDecoration boxDecoBlue = BoxDecoration(
   color: const Color(0xFFBBDEFB),
   border: Border.all(color: const Color(0xFFFFFFFF), width: 1),
   borderRadius: BorderRadius.circular(12),
+);
+
+const TextStyle styleTitle16 = TextStyle(
+  fontWeight: FontWeight.w400,
+  fontSize: 16,
+  color: blue,
 );
 
 const TextStyle styleTitle = TextStyle(
@@ -45,6 +46,7 @@ TextStyle labelGrafico = TextStyle(
 const Color blue = Color(0xFF2196F3);
 const Color blue100 = Color(0xFFBBDEFB);
 const Color blue200 = Color(0xFF90CAF9);
+const Color blueAccent = Colors.blueAccent;
 const Color blue900 = Color(0xFF0D47A1);
 const Color amber = Color(0xFFFFC107);
 const Color gris = Color(0xFF9E9E9E);

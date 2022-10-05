@@ -22,106 +22,120 @@ class _PageInputRangeState extends State<PageInputRange> {
   @override
   Widget build(BuildContext context) {
     final fondoSelect = context.read<CarteraProvider>().fondoSelect;
+    final carteraSelect = context.read<CarteraProvider>().carteraSelect;
     return Container(
       decoration: scaffoldGradient,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(title: const Text('Descarga histórico')),
         body: ListView(
-          padding: const EdgeInsets.all(12),
+          //padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
           children: [
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ListTile(
-                        leading:
-                            const Icon(Icons.assessment, size: 32, color: blue),
-                        title: Text(fondoSelect.name),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.assessment,
+                          size: 32, color: blue900),
+                      title: Text(
+                        fondoSelect.name,
+                        style: const TextStyle(color: blue900),
                       ),
-                      const SizedBox(height: 10),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 18),
-                        child: Text('Selecciona un intervalo de fechas:'),
+                      subtitle: Align(
+                        alignment: Alignment.centerLeft,
+                        child: InputChip(
+                          onPressed: () {},
+                          avatar:
+                              const Icon(Icons.business_center, color: blue900),
+                          backgroundColor: blue100,
+                          label: Text(
+                            carteraSelect.name,
+                            style: const TextStyle(color: blue900),
+                          ),
+                        ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(12.0),
-                          title: InkWell(
-                            onTap: () async {
+                    ),
+                    const SizedBox(height: 10),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 18),
+                      child: Text('Selecciona un intervalo de fechas:'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(12.0),
+                        title: InkWell(
+                          onTap: () async {
+                            var newRange = await _datePicker(
+                                context, DatePickerEntryMode.inputOnly);
+                            if (newRange != null) {
+                              setState(() => _dateRange = newRange);
+                            }
+                          },
+                          child: InputDecorator(
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Fechas',
+                            ),
+                            child: FittedBox(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '${DateFormat('dd/MM/yyyy').format(_dateRange?.start ?? _initDateRange.start)} - '
+                                    '${DateFormat('dd/MM/yyyy').format(_dateRange?.end ?? _initDateRange.end)}',
+                                  ),
+                                  const Icon(Icons.arrow_drop_down,
+                                      color: blue),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        trailing: CircleAvatar(
+                          backgroundColor: amber,
+                          child: IconButton(
+                            icon: const Icon(Icons.date_range, color: blue900),
+                            onPressed: () async {
                               var newRange = await _datePicker(
-                                  context, DatePickerEntryMode.inputOnly);
+                                  context, DatePickerEntryMode.calendarOnly);
                               if (newRange != null) {
                                 setState(() => _dateRange = newRange);
                               }
                             },
-                            child: InputDecorator(
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: 'Fechas',
-                              ),
-                              child: FittedBox(
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      '${DateFormat('dd/MM/yyyy').format(_dateRange?.start ?? _initDateRange.start)} - '
-                                      '${DateFormat('dd/MM/yyyy').format(_dateRange?.end ?? _initDateRange.end)}',
-                                    ),
-                                    const Icon(Icons.arrow_drop_down,
-                                        color: blue),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          trailing: CircleAvatar(
-                            backgroundColor: amber,
-                            child: IconButton(
-                              icon:
-                                  const Icon(Icons.date_range, color: blue900),
-                              onPressed: () async {
-                                var newRange = await _datePicker(
-                                    context, DatePickerEntryMode.calendarOnly);
-                                if (newRange != null) {
-                                  setState(() => _dateRange = newRange);
-                                }
-                              },
-                            ),
                           ),
                         ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            child: const Text('CANCELAR'),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
-                          TextButton(
-                            child: const Text('ACEPTAR'),
-                            onPressed: () {
-                              if (_dateRange != null) {
-                                var range = DateTimeRange(
-                                    start: _dateRange!.start,
-                                    end: _dateRange!.end);
-                                Navigator.pop(context, range);
-                              } else {
-                                var range = _initDateRange;
-                                Navigator.pop(context, range);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          child: const Text('CANCELAR'),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                        TextButton(
+                          child: const Text('ACEPTAR'),
+                          onPressed: () {
+                            if (_dateRange != null) {
+                              var range = DateTimeRange(
+                                  start: _dateRange!.start,
+                                  end: _dateRange!.end);
+                              Navigator.pop(context, range);
+                            } else {
+                              var range = _initDateRange;
+                              Navigator.pop(context, range);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),

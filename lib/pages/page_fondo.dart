@@ -81,6 +81,13 @@ class _PageFondoState extends State<PageFondo>
     super.dispose();
   }
 
+  goBack(BuildContext context) {
+    //await Future.delayed(const Duration(seconds: 1));
+    //if (!context.mounted) return;
+    //if (!mounted) return;
+    context.go(carteraPage);
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -100,9 +107,16 @@ class _PageFondoState extends State<PageFondo>
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
                   // TODO: set carteraOn antes de navigator??
-                  onPressed: () => context.go(carteraPage),
+                  onPressed: () {
+                    goBack(context);
+                    //await Future.delayed(const Duration(seconds: 1));
+                    //if (!context.mounted) return;
+                    //if (!mounted) return;
+                    //context.go(carteraPage);
+                  },
                 ),
                 title: ListTile(
+                  dense: true,
                   title: Text(
                     fondoSelect.name,
                     overflow: TextOverflow.ellipsis,

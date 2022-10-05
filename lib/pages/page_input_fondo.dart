@@ -47,7 +47,8 @@ class _PageInputFondoState extends State<PageInputFondo> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(title: const Text('Añadir Fondo')),
         body: ListView(
-          padding: const EdgeInsets.all(12),
+          //padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
           children: [
             Card(
               child: Padding(
@@ -56,12 +57,15 @@ class _PageInputFondoState extends State<PageInputFondo> {
                   children: [
                     ListTile(
                       leading:
-                          const Icon(Icons.add_chart, size: 32, color: blue),
-                      title: const Text('Introduce el ISIN del nuevo Fondo'),
+                          const Icon(Icons.add_chart, size: 32, color: blue900),
+                      title: const Text(
+                        'Introduce el ISIN del nuevo Fondo',
+                        style: TextStyle(color: blue900),
+                      ),
                       subtitle: Align(
                         alignment: Alignment.centerLeft,
-                        child: Chip(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: InputChip(
+                          onPressed: () {},
                           avatar:
                               const Icon(Icons.business_center, color: blue900),
                           backgroundColor: blue100,
@@ -97,16 +101,22 @@ class _PageInputFondoState extends State<PageInputFondo> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             ElevatedButton.icon(
-                              icon: const Icon(Icons.security),
-                              label: const Text('Validar'),
+                              icon: const Icon(Icons.security, color: blue900),
+                              label: const Text(
+                                'Validar',
+                                style: TextStyle(color: blue900),
+                              ),
                               onPressed: _controller.text.isNotEmpty
                                   ? () => setState(() => _validIsin =
                                       _checkIsin(_controller.value.text))
                                   : null,
                             ),
                             ElevatedButton.icon(
-                              icon: const Icon(Icons.search),
-                              label: const Text('Buscar'),
+                              icon: const Icon(Icons.search, color: blue900),
+                              label: const Text(
+                                'Buscar',
+                                style: TextStyle(color: blue900),
+                              ),
                               onPressed: _controller.text.isEmpty
                                   ? null
                                   : () async {

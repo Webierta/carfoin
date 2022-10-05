@@ -45,12 +45,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         primaryColor: blue,
-        /*colorScheme: ColorScheme.fromSwatch()
-            .copyWith(secondary: const Color(0xFFFFC107)),*/
         colorScheme: const ColorScheme(
           primary: blue,
           secondary: amber,
-          surface: grisOp,
+          surface: blue200,
           background: Colors.transparent,
           error: red900,
           onPrimary: Colors.white,

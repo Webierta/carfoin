@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart' show Share;
+import 'package:share_plus/share_plus.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
@@ -107,16 +107,18 @@ class _PageCarteraState extends State<PageCartera> {
   }
 
   _onShare(Cartera cartera, File file) async {
-    final box = context.findRenderObject() as RenderBox?;
+    //final box = context.findRenderObject() as RenderBox?;
     if (file.path.isNotEmpty) {
       await Share.shareFiles(
         [file.path],
         text: cartera.name,
-        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
-      ).whenComplete(() async {
+        //sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+      );
+      /*.whenComplete(() async {
         try {
+          print('HASTA AQUÍ');
           //await file.delete();
-          await ShareCsv.clearCache();
+          //await ShareCsv.clearCache();
         } catch (e, s) {
           Logger.log(
               dataLog: DataLog(
@@ -127,7 +129,12 @@ class _PageCarteraState extends State<PageCartera> {
                   error: e,
                   stackTrace: s));
         }
-      });
+      });*/
+    } else {
+      _showMsg(
+        msg: 'Error generando archivo para compartir cartera',
+        color: red900,
+      );
     }
   }
 
@@ -153,7 +160,8 @@ class _PageCarteraState extends State<PageCartera> {
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () => context.go(homePage),
                 ),
-                title: Row(
+                title: Text(carteraSelect.name),
+                /*title: Row(
                   children: [
                     const Icon(Icons.business_center),
                     const SizedBox(width: 10),
@@ -165,7 +173,7 @@ class _PageCarteraState extends State<PageCartera> {
                       ),
                     ),
                   ],
-                ),
+                ),*/
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.refresh),
@@ -184,7 +192,7 @@ class _PageCarteraState extends State<PageCartera> {
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(8.0)),
                     ),
-                    itemBuilder: (ctx) => [
+                    itemBuilder: (context) => [
                       buildMenuItem(
                         MenuCartera.ordenar,
                         Icons.sort_by_alpha,
@@ -197,10 +205,17 @@ class _PageCarteraState extends State<PageCartera> {
                       if (item == MenuCartera.ordenar) {
                         _ordenarFondos();
                       } else if (item == MenuCartera.compartir) {
-                        var shareCartera =
+                        File? fileCartera =
                             await ShareCsv.shareCartera(carteraSelect);
-                        if (shareCartera != null) {
-                          _onShare(carteraSelect, shareCartera);
+                        if (fileCartera != null) {
+                          //if (!mounted) return;
+                          await _onShare(carteraSelect, fileCartera);
+                        } else {
+                          _showMsg(
+                            msg:
+                                'Error generando archivo para compartir cartera',
+                            color: red900,
+                          );
                         }
                       } else if (item == MenuCartera.eliminar) {
                         _deleteAllConfirm(context);

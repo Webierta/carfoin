@@ -204,7 +204,7 @@ class DocCnmv {
       } else {
         Logger.log(
             dataLog: DataLog(
-                msg: 'elements is empty: return rating 0',
+                msg: 'elements is empty: return rating 0: $isin',
                 file: 'doc_cnmv.dart',
                 clase: 'DocCnmv',
                 funcion: 'getRating'));
@@ -212,7 +212,7 @@ class DocCnmv {
     } else {
       Logger.log(
           dataLog: DataLog(
-              msg: 'document is null',
+              msg: 'document is null: $isin',
               file: 'doc_cnmv.dart',
               clase: 'DocCnmv',
               funcion: 'getRating'));

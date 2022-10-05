@@ -52,7 +52,7 @@ class ShareCsv {
       String nameFile = '${nameCartera.trim()}.cfi'; // csv
       String filePath = '$tempPath/$nameFile';
       file = File(filePath);
-      file.writeAsString(csv);
+      await file.writeAsString(csv);
     } catch (e, s) {
       Logger.log(
           dataLog: DataLog(
@@ -68,9 +68,17 @@ class ShareCsv {
 
   static Future<File?> shareCartera(Cartera cartera) async {
     List<List<dynamic>> dataList = _carteraToList(cartera);
-    String csv = _listToCsv(dataList);
-    var file = await _storageFile(csv, cartera.name);
-    return file;
+    if (dataList.isNotEmpty) {
+      String csv = _listToCsv(dataList);
+      var file = await _storageFile(csv, cartera.name);
+      if (file != null && await file.exists()) {
+        return file;
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
   }
 
   static Future<File?> _selectFile() async {
@@ -165,14 +173,16 @@ class ShareCsv {
     return null;
   }
 
-  static Future<void> clearCache() async {
+  static Future<bool> clearCache() async {
     try {
       final cacheDir = await getTemporaryDirectory();
       if (cacheDir.existsSync()) {
         cacheDir.deleteSync(recursive: true);
       }
+      return true;
     } catch (e) {
       Logger.log(dataLog: DataLog(msg: 'Catch clear cache'));
+      return false;
     }
   }
 }

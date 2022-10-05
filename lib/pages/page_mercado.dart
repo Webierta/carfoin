@@ -123,44 +123,40 @@ class _MercadoState extends State<PageMercado> {
               ),
             ],
           ),
-          body: ListView(
-            shrinkWrap: true,
-            //padding: const EdgeInsets.all(10),
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-            children: [
-              ListTile(
-                title: Align(
-                  alignment: Alignment.center,
+          body: Center(
+            child: ListView(
+              shrinkWrap: true,
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+              children: [
+                Center(
                   child: Text(
                     fondoSelect.name,
                     style: const TextStyle(color: blue900),
                   ),
                 ),
-                subtitle: Align(
-                  alignment: Alignment.center,
-                  child: Chip(
-                    padding: const EdgeInsets.only(left: 10, right: 20),
-                    backgroundColor: blue100,
+                Center(
+                  child: InputChip(
+                    label: Text(carteraSelect.name),
+                    labelStyle: const TextStyle(color: blue900),
                     avatar: const Icon(Icons.business_center, color: blue900),
                     //iconTheme: const IconThemeData(color: blue900),
-                    label: Text(
-                      carteraSelect.name,
-                      style: const TextStyle(color: blue900),
-                    ),
-                    //labelStyle: const TextStyle(color: blue900),
+                    backgroundColor: blue100,
+                    onPressed: () {},
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              FractionallySizedBox(
-                widthFactor: 0.6,
-                child: Center(
-                  child: FittedBox(
-                    child: ToggleButtons(
+                const SizedBox(height: 10),
+                FractionallySizedBox(
+                  widthFactor: 0.6,
+                  alignment: Alignment.center,
+                  child: LayoutBuilder(builder: (context, constraints) {
+                    return ToggleButtons(
+                      renderBorder: false,
+                      constraints: BoxConstraints.expand(
+                          width: constraints.maxWidth / 2),
                       isSelected: _isSelected,
                       color: gris,
-                      selectedColor: blue,
-                      fillColor: blue100,
+                      selectedColor: blue100,
+                      fillColor: blue900,
                       borderColor: gris,
                       selectedBorderColor: blue,
                       borderRadius: const BorderRadius.all(Radius.circular(4)),
@@ -173,204 +169,197 @@ class _MercadoState extends State<PageMercado> {
                         _resetControllers();
                       },
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'SUSCRIBIR',
+                        Text('SUSCRIBIR',
                             style: TextStyle(
-                              fontWeight:
-                                  _tipo ? FontWeight.bold : FontWeight.w300,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'REEMBOLSAR',
+                                fontWeight:
+                                    _tipo ? FontWeight.bold : FontWeight.w300)),
+                        Text('REEMBOLSAR',
                             style: TextStyle(
-                              fontWeight:
-                                  !_tipo ? FontWeight.bold : FontWeight.w300,
-                            ),
-                          ),
-                        ),
+                                fontWeight: !_tipo
+                                    ? FontWeight.bold
+                                    : FontWeight.w300)),
                       ],
-                    ),
-                  ),
+                    );
+                  }),
                 ),
-              ),
-              const SizedBox(height: 30),
-              Form(
-                key: _formKey,
-                onChanged: () => setState(
-                    () => _isValido = _formKey.currentState?.validate()),
-                child: Column(
-                  children: [
-                    FractionallySizedBox(
-                      widthFactor: 0.6,
-                      child: TextFormField(
-                        textAlign: TextAlign.end,
-                        decoration: const InputDecoration(
-                          errorStyle: TextStyle(height: 0),
-                          labelText: 'Fecha',
-                          suffixIcon: Icon(Icons.calendar_today),
-                          border: OutlineInputBorder(),
-                        ),
-                        controller: _dateController,
-                        validator: (value) {
-                          return (value == null || value.isEmpty)
-                              ? 'Campo requerido'
-                              : null;
-                        },
-                        readOnly: true,
-                        onTap: () async {
-                          var fecha = await _selectDate(context);
-                          if (fecha != null) {
-                            setState(() {
-                              // TODO: CONTROL OTRAS TIME ZONE PARA NO REPETIR DATE ??
-                              // o epoch +/- 1 day ??
-                              //DateTime timeZone = fecha.add(const Duration(hours: 2));
-                              //_date = timeZone.millisecondsSinceEpoch ~/ 1000;
-                              _date = FechaUtil.dateToEpoch(fecha);
-                              _date = FechaUtil.epochToEpochHms(_date);
-                              _dateController.text =
-                                  FechaUtil.dateToString(date: fecha);
-                            });
-                          }
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    FractionallySizedBox(
-                      widthFactor: 0.6,
-                      child: TextFormField(
-                        textAlign: TextAlign.end,
-                        decoration: InputDecoration(
-                          errorStyle: const TextStyle(fontSize: 0, height: 0),
-                          labelText: 'Participaciones',
-                          suffixIcon: Icon(_tipo
-                              ? Icons.add_shopping_cart
-                              : Icons.currency_exchange),
-                          border: const OutlineInputBorder(),
-                        ),
-                        controller: _partController,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'(^\-?\d*\.?\d*)'))
-                        ],
-                        keyboardType: TextInputType.number,
-                        validator: (inputPart) {
-                          if (inputPart == null ||
-                              inputPart.isEmpty ||
-                              double.tryParse(inputPart) == null ||
-                              double.tryParse(inputPart)! <= 0.0) {
-                            return 'Número de participaciones no válido.';
-                          }
-                          return null;
-                        },
-                        onTap: () => _partController.clear(),
-                        onChanged: (value) {
-                          setState(() =>
-                              _participaciones = double.tryParse(value) ?? 0);
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    FractionallySizedBox(
-                      widthFactor: 0.6,
-                      child: TextFormField(
-                        textAlign: TextAlign.end,
-                        decoration: InputDecoration(
-                          errorStyle: const TextStyle(fontSize: 0, height: 0),
-                          labelText: 'Precio',
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.download, color: blue),
-                            onPressed: () async {
-                              var precioApi =
-                                  await _dialogProgress(context, fondoSelect);
-                              if (!mounted) return;
-                              if (precioApi != null) {
-                                setState(() {
-                                  _precio = precioApi;
-                                  _precioController.text = precioApi.toString();
-                                });
-                              } else {
-                                if (!mounted) return;
-                                _showMsg(
-                                  msg:
-                                      'Dato no disponible. Introduce el precio manualmente',
-                                  color: red900,
-                                );
-                              }
-                            },
+                const SizedBox(height: 20),
+                Form(
+                  key: _formKey,
+                  onChanged: () => setState(
+                      () => _isValido = _formKey.currentState?.validate()),
+                  child: Column(
+                    children: [
+                      FractionallySizedBox(
+                        widthFactor: 0.6,
+                        child: TextFormField(
+                          textAlign: TextAlign.end,
+                          decoration: const InputDecoration(
+                            errorStyle: TextStyle(height: 0),
+                            labelText: 'Fecha',
+                            suffixIcon: Icon(Icons.calendar_today),
+                            border: OutlineInputBorder(),
                           ),
-                          border: const OutlineInputBorder(),
+                          controller: _dateController,
+                          validator: (value) {
+                            return (value == null || value.isEmpty)
+                                ? 'Campo requerido'
+                                : null;
+                          },
+                          readOnly: true,
+                          onTap: () async {
+                            var fecha = await _selectDate(context);
+                            if (fecha != null) {
+                              setState(() {
+                                // TODO: CONTROL OTRAS TIME ZONE PARA NO REPETIR DATE ??
+                                // o epoch +/- 1 day ??
+                                //DateTime timeZone = fecha.add(const Duration(hours: 2));
+                                //_date = timeZone.millisecondsSinceEpoch ~/ 1000;
+                                _date = FechaUtil.dateToEpoch(fecha);
+                                _date = FechaUtil.epochToEpochHms(_date);
+                                _dateController.text =
+                                    FechaUtil.dateToString(date: fecha);
+                              });
+                            }
+                          },
                         ),
-                        controller: _precioController,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'(^\-?\d*\.?\d*)'))
-                        ],
-                        keyboardType: TextInputType.number,
-                        validator: (inputPrecio) {
-                          if (inputPrecio == null ||
-                              inputPrecio.isEmpty ||
-                              double.tryParse(inputPrecio) == null ||
-                              double.tryParse(inputPrecio)! <= 0) {
-                            return 'Precio no válido.';
-                          }
-                          return null;
-                        },
-                        onTap: () {
-                          if (_precioController.text == '0.0') {
-                            _precioController.clear();
-                          }
-                        },
-                        onChanged: (value) => setState(
-                            () => _precio = double.tryParse(value) ?? 0),
                       ),
-                    ),
-                    const SizedBox(height: 30),
-                    FractionallySizedBox(
-                      widthFactor: 0.6,
-                      child: InputDecorator(
-                        decoration: const InputDecoration(
-                          labelText: 'Importe',
-                          border: OutlineInputBorder(),
-                          fillColor: Color(0xFFD5D5D5),
-                          filled: true,
+                      const SizedBox(height: 20),
+                      FractionallySizedBox(
+                        widthFactor: 0.6,
+                        child: TextFormField(
+                          textAlign: TextAlign.end,
+                          decoration: InputDecoration(
+                            errorStyle: const TextStyle(fontSize: 0, height: 0),
+                            labelText: 'Participaciones',
+                            suffixIcon: Icon(_tipo
+                                ? Icons.add_shopping_cart
+                                : Icons.currency_exchange),
+                            border: const OutlineInputBorder(),
+                          ),
+                          controller: _partController,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'(^\-?\d*\.?\d*)'))
+                          ],
+                          keyboardType: TextInputType.number,
+                          validator: (inputPart) {
+                            if (inputPart == null ||
+                                inputPart.isEmpty ||
+                                double.tryParse(inputPart) == null ||
+                                double.tryParse(inputPart)! <= 0.0) {
+                              return 'Número de participaciones no válido.';
+                            }
+                            return null;
+                          },
+                          onTap: () => _partController.clear(),
+                          onChanged: (value) {
+                            setState(() =>
+                                _participaciones = double.tryParse(value) ?? 0);
+                          },
                         ),
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              _isValido == true
-                                  ? NumberUtil.currency(
-                                      _participaciones * _precio)
-                                  : '0.0',
-                              maxLines: 1,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                      ),
+                      const SizedBox(height: 10),
+                      FractionallySizedBox(
+                        widthFactor: 0.6,
+                        child: TextFormField(
+                          textAlign: TextAlign.end,
+                          decoration: InputDecoration(
+                            errorStyle: const TextStyle(fontSize: 0, height: 0),
+                            labelText: 'Precio',
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.download, color: blue),
+                              onPressed: () async {
+                                var precioApi =
+                                    await _dialogProgress(context, fondoSelect);
+                                if (!mounted) return;
+                                if (precioApi != null) {
+                                  setState(() {
+                                    _precio = precioApi;
+                                    _precioController.text =
+                                        precioApi.toString();
+                                  });
+                                } else {
+                                  if (!mounted) return;
+                                  _showMsg(
+                                    msg:
+                                        'Dato no disponible. Introduce el precio manualmente',
+                                    color: red900,
+                                  );
+                                }
+                              },
+                            ),
+                            border: const OutlineInputBorder(),
+                          ),
+                          controller: _precioController,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'(^\-?\d*\.?\d*)'))
+                          ],
+                          keyboardType: TextInputType.number,
+                          validator: (inputPrecio) {
+                            if (inputPrecio == null ||
+                                inputPrecio.isEmpty ||
+                                double.tryParse(inputPrecio) == null ||
+                                double.tryParse(inputPrecio)! <= 0) {
+                              return 'Precio no válido.';
+                            }
+                            return null;
+                          },
+                          onTap: () {
+                            if (_precioController.text == '0.0') {
+                              _precioController.clear();
+                            }
+                          },
+                          onChanged: (value) => setState(
+                              () => _precio = double.tryParse(value) ?? 0),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      FractionallySizedBox(
+                        widthFactor: 0.6,
+                        child: InputDecorator(
+                          decoration: const InputDecoration(
+                            labelText: 'Importe',
+                            border: OutlineInputBorder(),
+                            fillColor: Color(0xFFD5D5D5),
+                            filled: true,
+                          ),
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                _isValido == true
+                                    ? NumberUtil.currency(
+                                        _participaciones * _precio)
+                                    : '0.0',
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    FractionallySizedBox(
-                      widthFactor: 0.6,
-                      child: ElevatedButton(
-                        onPressed:
-                            _isValido == true ? () => _submit(context) : null,
-                        child: const Text('ORDENAR'),
+                      const SizedBox(height: 10),
+                      FractionallySizedBox(
+                        widthFactor: 0.6,
+                        child: ElevatedButton(
+                          onPressed:
+                              _isValido == true ? () => _submit(context) : null,
+                          child: const Text(
+                            'ORDENAR',
+                            style: TextStyle(color: blue900),
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -75,23 +75,19 @@ class _PageGlobalState extends State<PageGlobal> {
                       Wrap(
                         alignment: WrapAlignment.spaceBetween,
                         children: [
-                          Chip(
+                          InputChip(
+                            onPressed: () {},
                             backgroundColor: blue100,
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            avatar: const Icon(
-                              Icons.business_center,
-                              color: blue900,
-                            ),
+                            avatar: const Icon(Icons.business_center,
+                                color: blue900),
                             label: Text('${carteras.length} Carteras'),
                             labelStyle: const TextStyle(fontSize: 16),
                           ),
-                          Chip(
+                          InputChip(
+                            onPressed: () {},
                             backgroundColor: blue100,
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            avatar: const Icon(
-                              Icons.assessment,
-                              color: blue900,
-                            ),
+                            avatar:
+                                const Icon(Icons.assessment, color: blue900),
                             label: Text('${_statsGlobal.nFondos} Fondos'),
                             labelStyle: const TextStyle(fontSize: 16),
                           ),

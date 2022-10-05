@@ -568,8 +568,8 @@ class _PageHomeState extends State<PageHome> {
   }
 
   _eliminar(Cartera cartera) async {
-    //await database.deleteAllFondos(cartera);
-    //await database.deleteCartera(cartera);
+    await database.deleteAllFondos(cartera);
+    await database.deleteCartera(cartera);
 
     await database.dropAllTablesFondos(cartera);
     await database.dropTableCartera(cartera);
