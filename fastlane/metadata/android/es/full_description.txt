@@ -2,6 +2,8 @@ Aplicación para la gestión de múltiples Carteras de Fondos de Inversión. Per
 
 Permite operaciones simuladas de suscripción y reembolso para seguir la evolución del capital invertido y su rentabilidad. También presenta una visión global del portafolio y permite hacer copias de seguridad y compartir carteras con otros usuarios.
 
+Aviso: Actualmente esta aplicación está solo en español. Otros idiomas podrán ser incluídos en futuras versiones.
+
 Funciones principales:
 
 * Permite crear múltiples Carteras personalizadas de Fondos de Inversión y seguir su evolución.

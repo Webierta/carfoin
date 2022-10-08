@@ -2,6 +2,8 @@ Application for managing multiple Investment Fund Portfolios. It allows you to e
 
 It allows simulated subscription and redemption operations to follow the evolution of the capital invested and its profitability. It also presents a global view of the portfolio and allows you to back up and share portfolios with other users.
 
+Notice: Currently this application is in Spanish only. Other languages might be included with some future release.
+
 Main features:
 
 * It allows you to create multiple personalized Investment Fund Portfolios and follow their evolution.
