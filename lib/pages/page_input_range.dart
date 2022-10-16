@@ -3,8 +3,9 @@ import 'package:intl/intl.dart' show DateFormat;
 import 'package:provider/provider.dart';
 
 import '../models/cartera_provider.dart';
+import '../themes/styles_theme.dart';
+import '../themes/theme_provider.dart';
 import '../utils/fecha_util.dart';
-import '../utils/styles.dart';
 
 class PageInputRange extends StatefulWidget {
   const PageInputRange({Key? key}) : super(key: key);
@@ -21,12 +22,12 @@ class _PageInputRangeState extends State<PageInputRange> {
 
   @override
   Widget build(BuildContext context) {
+    final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
     final fondoSelect = context.read<CarteraProvider>().fondoSelect;
     final carteraSelect = context.read<CarteraProvider>().carteraSelect;
     return Container(
-      decoration: scaffoldGradient,
+      decoration: darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
       child: Scaffold(
-        backgroundColor: Colors.transparent,
         appBar: AppBar(title: const Text('Descarga histórico')),
         body: ListView(
           //padding: const EdgeInsets.all(12),
@@ -39,23 +40,16 @@ class _PageInputRangeState extends State<PageInputRange> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.assessment,
-                          size: 32, color: blue900),
+                      leading: const Icon(Icons.assessment, size: 32),
                       title: Text(
                         fondoSelect.name,
-                        style: const TextStyle(color: blue900),
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
                       subtitle: Align(
                         alignment: Alignment.centerLeft,
-                        child: InputChip(
-                          onPressed: () {},
-                          avatar:
-                              const Icon(Icons.business_center, color: blue900),
-                          backgroundColor: blue100,
-                          label: Text(
-                            carteraSelect.name,
-                            style: const TextStyle(color: blue900),
-                          ),
+                        child: Chip(
+                          avatar: const Icon(Icons.business_center),
+                          label: Text(carteraSelect.name),
                         ),
                       ),
                     ),
@@ -71,7 +65,7 @@ class _PageInputRangeState extends State<PageInputRange> {
                         title: InkWell(
                           onTap: () async {
                             var newRange = await _datePicker(
-                                context, DatePickerEntryMode.inputOnly);
+                                context, DatePickerEntryMode.inputOnly, darkTheme);
                             if (newRange != null) {
                               setState(() => _dateRange = newRange);
                             }
@@ -83,27 +77,25 @@ class _PageInputRangeState extends State<PageInputRange> {
                             ),
                             child: FittedBox(
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     '${DateFormat('dd/MM/yyyy').format(_dateRange?.start ?? _initDateRange.start)} - '
                                     '${DateFormat('dd/MM/yyyy').format(_dateRange?.end ?? _initDateRange.end)}',
                                   ),
-                                  const Icon(Icons.arrow_drop_down,
-                                      color: blue),
+                                  const Icon(Icons.arrow_drop_down, color: AppColor.light),
                                 ],
                               ),
                             ),
                           ),
                         ),
                         trailing: CircleAvatar(
-                          backgroundColor: amber,
+                          backgroundColor: AppColor.ambar,
                           child: IconButton(
-                            icon: const Icon(Icons.date_range, color: blue900),
+                            icon: const Icon(Icons.date_range, color: AppColor.light900),
                             onPressed: () async {
                               var newRange = await _datePicker(
-                                  context, DatePickerEntryMode.calendarOnly);
+                                  context, DatePickerEntryMode.calendarOnly, darkTheme);
                               if (newRange != null) {
                                 setState(() => _dateRange = newRange);
                               }
@@ -123,9 +115,8 @@ class _PageInputRangeState extends State<PageInputRange> {
                           child: const Text('ACEPTAR'),
                           onPressed: () {
                             if (_dateRange != null) {
-                              var range = DateTimeRange(
-                                  start: _dateRange!.start,
-                                  end: _dateRange!.end);
+                              var range =
+                                  DateTimeRange(start: _dateRange!.start, end: _dateRange!.end);
                               Navigator.pop(context, range);
                             } else {
                               var range = _initDateRange;
@@ -145,23 +136,24 @@ class _PageInputRangeState extends State<PageInputRange> {
     );
   }
 
-  _datePicker(BuildContext context, DatePickerEntryMode mode) async {
+  _datePicker(BuildContext context, DatePickerEntryMode mode, bool isDark) async {
     DateTimeRange? newRange = await showDateRangePicker(
       context: context,
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
+      //builder: (BuildContext context, Widget? child) {
+      //return child ?? const Text('');
+      /* return Theme(
           data: ThemeData(
             primarySwatch: Colors.blue,
             dialogBackgroundColor: Colors.white,
             appBarTheme: const AppBarTheme(
-              backgroundColor: blue,
+              backgroundColor: AppColor.azul,
               elevation: 10,
               foregroundColor: Color(0xFFFFFFFF),
             ),
           ),
           child: child ?? const Text(''),
-        );
-      },
+        ); */
+      //},
       initialDateRange: DateTimeRange(
         start: _initDateRange.start,
         end: _initDateRange.end,
@@ -180,6 +172,17 @@ class _PageInputRangeState extends State<PageInputRange> {
       errorFormatText: 'Formato no válido.',
       errorInvalidText: 'Fuera de rango.',
       errorInvalidRangeText: 'Período no válido.',
+
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            appBarTheme: AppBarTheme(
+              backgroundColor: isDark ? AppColor.boxDark : AppColor.light,
+            ),
+          ),
+          child: child ?? const Text(''),
+        );
+      },
     );
 
     if (newRange != null) {

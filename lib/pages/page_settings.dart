@@ -1,5 +1,6 @@
 import 'dart:io' show File;
 
+import 'package:carfoin/themes/theme_pref.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -11,10 +12,11 @@ import '../router/routes_const.dart';
 import '../services/exchange_api.dart';
 import '../services/preferences_service.dart';
 import '../services/share_csv.dart';
+import '../themes/styles_theme.dart';
+import '../themes/theme_provider.dart';
 import '../utils/fecha_util.dart';
 import '../utils/konstantes.dart';
 import '../utils/number_util.dart';
-import '../utils/styles.dart';
 import '../widgets/dialogs/custom_messenger.dart';
 import '../widgets/dialogs/full_screen_modal.dart';
 import '../widgets/my_drawer.dart';
@@ -29,6 +31,7 @@ class PageSettings extends StatefulWidget {
 
 class _PageSettingsState extends State<PageSettings> {
   late PreferencesProvider prefProvider;
+  late ThemeProvider themeProvider;
   bool onSyncExchange = false;
   String pathLogger = '';
 
@@ -39,6 +42,7 @@ class _PageSettingsState extends State<PageSettings> {
   @override
   void initState() {
     prefProvider = context.read<PreferencesProvider>();
+    themeProvider = context.read<ThemeProvider>();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       pathLogger = await getPathLogger();
     });
@@ -55,10 +59,8 @@ class _PageSettingsState extends State<PageSettings> {
         result = ResultStatus.nuevo;
         prefProvider.dateExchange = exchangeApi.date;
         prefProvider.rateExchange = exchangeApi.rate;
-        await PreferencesService.saveDateExchange(
-            keyDateExchange, exchangeApi.date);
-        await PreferencesService.saveRateExchange(
-            keyRateExchange, exchangeApi.rate);
+        await PreferencesService.saveDateExchange(keyDateExchange, exchangeApi.date);
+        await PreferencesService.saveRateExchange(keyRateExchange, exchangeApi.rate);
       }
     } else {
       result = ResultStatus.error;
@@ -68,18 +70,23 @@ class _PageSettingsState extends State<PageSettings> {
     } else if (result == ResultStatus.viejo) {
       _showMsg(msg: 'No se requiere actualización');
     } else if (result == ResultStatus.error) {
-      _showMsg(msg: 'Servicio no disponible', color: red900);
+      _showMsg(msg: 'Servicio no disponible', color: AppColor.rojo900);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
+    final TextStyle? titleMediumBold = Theme.of(context)
+        .textTheme
+        .titleMedium
+        ?.copyWith(fontWeight: FontWeight.bold, wordSpacing: 0);
+
     return WillPopScope(
       onWillPop: () async => false,
       child: Container(
-        decoration: scaffoldGradient,
+        decoration: darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           drawer: const MyDrawer(),
           appBar: AppBar(
             title: const Text('Ajustes'),
@@ -100,44 +107,61 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.currency_exchange, color: blue900),
-                title: const Text('Cotización USD EUR'),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.brightness_4),
+                title: Text('Tema Oscuro', style: titleMediumBold),
+                trailing: Switch(
+                  value: themeProvider.darkTheme,
+                  onChanged: (value) async {
+                    setState(() => themeProvider.darkTheme = value);
+                    await ThemePref().setTheme(value);
+                  },
+                ),
+              ),
+              ListTile(
+                dense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.currency_exchange),
+                title: Text('Cotización USD EUR', style: titleMediumBold),
                 subtitle: const Text('Pulsa para actualizar el tipo de cambio'),
                 trailing: onSyncExchange
                     ? const CircularProgressIndicator()
-                    : OutlinedButton(
+                    : ElevatedButton(
                         onPressed: () async {
                           setState(() => onSyncExchange = true);
                           await syncExchange();
                           setState(() => onSyncExchange = false);
                         },
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                          ),
-                          side: const BorderSide(color: blue, width: 2),
+                        style: ElevatedButton.styleFrom(
+                          //backgroundColor: Colors.white,
+                          shape: AppBox.roundBorder,
+                          side: BorderSide(
+                            width: 0.8,
+                            color: darkTheme ? AppColor.blanco : AppColor.light,
+                          ), // color: blue
                           elevation: 4,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 0, vertical: 4),
-                          shadowColor: Colors.grey,
+                          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+                          //shadowColor: Colors.grey,
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              FechaUtil.epochToString(
-                                  prefProvider.dateExchange),
-                              style: const TextStyle(
-                                  fontSize: 10, color: Colors.black),
+                              FechaUtil.epochToString(prefProvider.dateExchange),
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  color: darkTheme ? AppColor.blanco : AppColor.light900),
+                              //style: Theme.of(context).textTheme.bodySmall,
                             ),
                             FittedBox(
                                 fit: BoxFit.fill,
                                 child: Text(
-                                  NumberUtil.decimalFixed(
-                                      prefProvider.rateExchange,
-                                      decimals: 3),
+                                  NumberUtil.decimalFixed(prefProvider.rateExchange, decimals: 3),
+                                  style: TextStyle(
+                                    color: darkTheme ? AppColor.ambar : AppColor.light,
+                                  ),
                                 )),
                           ],
                         ),
@@ -146,11 +170,11 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.update, color: blue900),
-                title: const Text('Actualización automática'),
-                subtitle: const Text('El tipo de cambio se actualiza '
-                    'cuando se inicia la aplicación si hace más de un '
-                    'día desde la cotización almacenada'),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.update),
+                title: Text('Actualización automática', style: titleMediumBold),
+                subtitle: const Text('El tipo de cambio se actualiza si hace más de un día '
+                    'desde la cotización almacenada'),
                 trailing: Switch(
                   value: prefProvider.isAutoExchange,
                   onChanged: (value) {
@@ -159,7 +183,7 @@ class _PageSettingsState extends State<PageSettings> {
                   },
                 ),
               ),
-              const Divider(color: gris, height: 30, indent: 20, endIndent: 20),
+              const Divider(color: AppColor.gris, height: 30, indent: 20, endIndent: 20),
               const Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text('CARTERAS'),
@@ -167,8 +191,9 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.sort_by_alpha, color: blue900),
-                title: const Text('Ordenadas por nombre'),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.sort_by_alpha),
+                title: Text('Ordenadas por nombre', style: titleMediumBold),
                 trailing: Switch(
                   value: prefProvider.isByOrderCarteras,
                   onChanged: (value) {
@@ -180,8 +205,9 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.view_stream, color: blue900),
-                title: const Text('Modo presentación: detalle'),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.view_stream),
+                title: Text('Modo presentación: detalle', style: titleMediumBold),
                 subtitle: const Text('En caso contrario, vista compacta'),
                 trailing: Switch(
                   value: prefProvider.isViewDetalleCarteras,
@@ -194,21 +220,20 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.delete_forever, color: blue900),
-                title: const Text(
-                    'Confirmar antes de eliminar una cartera y sus fondos'),
-                subtitle: const Text(
-                    'Eliminar todas las carteras siempre requiere confirmación'),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.delete_forever),
+                title: Text('Confirmar antes de eliminar una cartera y sus fondos',
+                    style: titleMediumBold),
+                subtitle: const Text('Eliminar todas las carteras siempre requiere confirmación'),
                 trailing: Switch(
                   value: prefProvider.isConfirmDeleteCartera,
                   onChanged: (value) {
                     setState(() => prefProvider.isConfirmDeleteCartera = value);
-                    PreferencesService.saveBool(
-                        keyConfirmDeleteCarteraPref, value);
+                    PreferencesService.saveBool(keyConfirmDeleteCarteraPref, value);
                   },
                 ),
               ),
-              const Divider(color: gris, height: 30, indent: 20, endIndent: 20),
+              const Divider(color: AppColor.gris, height: 30, indent: 20, endIndent: 20),
               const Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text('FONDOS'),
@@ -216,10 +241,10 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.sort_by_alpha, color: blue900),
-                title: const Text('Ordenados por nombre'),
-                subtitle: const Text(
-                    'En caso contrario por fecha de creación o actualización'),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.sort_by_alpha),
+                title: Text('Ordenados por nombre', style: titleMediumBold),
+                subtitle: const Text('En caso contrario por fecha de creación o actualización'),
                 trailing: Switch(
                   value: prefProvider.isByOrderFondos,
                   onChanged: (value) {
@@ -231,8 +256,9 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.view_stream, color: blue900),
-                title: const Text('Modo presentación: detalle'),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.view_stream),
+                title: Text('Modo presentación: detalle', style: titleMediumBold),
                 subtitle: const Text('En caso contrario, vista compacta'),
                 trailing: Switch(
                   value: prefProvider.isViewDetalleFondos,
@@ -245,20 +271,20 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.delete_forever, color: blue900),
-                title: const Text('Confirmar antes de eliminar'),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.delete_forever),
+                title: Text('Confirmar antes de eliminar', style: titleMediumBold),
                 subtitle: const Text('Eliminar todos los fondos de una cartera '
                     'siempre requiere confirmación'),
                 trailing: Switch(
                   value: prefProvider.isConfirmDeleteFondo,
                   onChanged: (value) {
                     setState(() => prefProvider.isConfirmDeleteFondo = value);
-                    PreferencesService.saveBool(
-                        keyConfirmDeleteFondoPref, value);
+                    PreferencesService.saveBool(keyConfirmDeleteFondoPref, value);
                   },
                 ),
               ),
-              const Divider(color: gris, height: 30, indent: 20, endIndent: 20),
+              const Divider(color: AppColor.gris, height: 30, indent: 20, endIndent: 20),
               const Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text('VALORES'),
@@ -266,10 +292,10 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.refresh, color: blue900),
-                title: const Text('Actualizar último valor al añadir Fondo'),
-                subtitle: const Text(
-                    'Recomendado para obtener la divisa y el rating del fondo'),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.refresh),
+                title: Text('Actualizar último valor al añadir Fondo', style: titleMediumBold),
+                subtitle: const Text('Recomendado para obtener la divisa y el rating del fondo'),
                 trailing: Switch(
                   value: prefProvider.isAutoAudate,
                   onChanged: (value) {
@@ -278,7 +304,7 @@ class _PageSettingsState extends State<PageSettings> {
                   },
                 ),
               ),
-              const Divider(color: gris, height: 30, indent: 20, endIndent: 20),
+              const Divider(color: AppColor.gris, height: 30, indent: 20, endIndent: 20),
               const Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text('OPERACIONES'),
@@ -286,8 +312,9 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.delete_forever, color: blue900),
-                title: const Text('Confirmar antes de eliminar'),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.delete_forever),
+                title: Text('Confirmar antes de eliminar', style: titleMediumBold),
                 subtitle: const Text('Eliminar operaciones de suscripción '
                     'siempre requiere confirmación y conlleva la eliminación de '
                     'todos los reembolsos posteriores'),
@@ -302,8 +329,9 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.remove_shopping_cart, color: blue900),
-                title: const Text('Eliminar operaciones asociadas'),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.remove_shopping_cart),
+                title: Text('Eliminar operaciones asociadas', style: titleMediumBold),
                 subtitle: const Text('Cuando se eliminan valores en bloque, '
                     'eliminar también sus operaciones asociadas'),
                 trailing: Switch(
@@ -314,7 +342,7 @@ class _PageSettingsState extends State<PageSettings> {
                   },
                 ),
               ),
-              const Divider(color: gris, height: 30, indent: 20, endIndent: 20),
+              const Divider(color: AppColor.gris, height: 30, indent: 20, endIndent: 20),
               const Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text('MANTENIMIENTO'),
@@ -322,37 +350,40 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.memory, color: blue900),
-                title: const Text('Limpiar caché'),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.memory),
+                title: Text('Limpiar caché', style: titleMediumBold),
                 subtitle: const Text('Pulsa para eliminar archivos de carteras '
                     'compartidas almacenadas en caché'),
                 trailing: CircleAvatar(
-                  backgroundColor: blue,
-                  child: IconButton(
-                    icon: const Icon(Icons.cleaning_services,
-                        color: Colors.white),
-                    onPressed: () async {
-                      //await DefaultCacheManager().emptyCache();
-                      var clearCache = await ShareCsv.clearCache();
-                      if (clearCache) {
-                        _showMsg(msg: 'Memoria caché liberada');
-                      } else {
-                        _showMsg(
-                          msg: 'No ha sido posible liberar la memoria caché',
-                          color: red900,
-                        );
-                      }
-                    },
+                  radius: 21,
+                  backgroundColor: AppColor.blanco,
+                  child: CircleAvatar(
+                    child: IconButton(
+                      icon: const Icon(Icons.cleaning_services),
+                      onPressed: () async {
+                        //await DefaultCacheManager().emptyCache();
+                        var clearCache = await ShareCsv.clearCache();
+                        if (clearCache) {
+                          _showMsg(msg: 'Memoria caché liberada');
+                        } else {
+                          _showMsg(
+                            msg: 'No ha sido posible liberar la memoria caché',
+                            color: AppColor.rojo900,
+                          );
+                        }
+                      },
+                    ),
                   ),
                 ),
               ),
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.bug_report, color: blue900),
-                title: const Text('Activar Registro de errores'),
-                subtitle: const Text(
-                    'Registra posibles errores en un archicvo de texto. '
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.bug_report),
+                title: Text('Activar Registro de errores', style: titleMediumBold),
+                subtitle: const Text('Registra posibles errores en un archicvo de texto. '
                     'No almacena ninguna información personal ni envía ningún dato'),
                 trailing: Switch(
                   value: prefProvider.isStorageLogger,
@@ -365,59 +396,70 @@ class _PageSettingsState extends State<PageSettings> {
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.description, color: blue900),
-                title: const Text('Abrir Registro de errores'),
-                subtitle: const Text(
-                    'Pulsa para ver el contenido del archivo logfile.txt'),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.description),
+                title: Text('Abrir Registro de errores', style: titleMediumBold),
+                subtitle: const Text('Pulsa para ver el contenido del archivo logfile.txt'),
                 trailing: CircleAvatar(
-                  backgroundColor: blue,
-                  child: IconButton(
-                    icon: const Icon(Icons.find_in_page, color: Colors.white),
-                    onPressed: () async {
-                      await const Logger().read().then((value) {
-                        var data = Text(value,
-                            style: const TextStyle(
-                                color: Colors.red, fontSize: 14));
-                        Navigator.of(context).push(
-                            FullScreenModal(title: 'logfile.txt', data: data));
-                      });
-                    },
+                  radius: 21,
+                  backgroundColor: AppColor.blanco,
+                  child: CircleAvatar(
+                    child: IconButton(
+                      icon: const Icon(Icons.find_in_page),
+                      onPressed: () async {
+                        await const Logger().read().then((value) {
+                          var data = Text(
+                            value,
+                            style: const TextStyle(color: Colors.red, fontSize: 14),
+                          );
+                          Navigator.of(context)
+                              .push(FullScreenModal(title: 'logfile.txt', data: data));
+                        });
+                      },
+                    ),
                   ),
                 ),
               ),
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.send, color: blue900),
-                title: const Text('Enviar Registro de errores'),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.send),
+                title: Text('Enviar Registro de errores', style: titleMediumBold),
                 subtitle: const Text('Pulsa para reportar el archivo '
                     'logfile.txt al sistema de incidencias de la aplicación'),
                 trailing: CircleAvatar(
-                  backgroundColor: blue,
-                  child: IconButton(
-                    icon: const Icon(Icons.file_present, color: Colors.white),
-                    onPressed: () async => await _reportFileLogs(),
+                  radius: 21,
+                  backgroundColor: AppColor.blanco,
+                  child: CircleAvatar(
+                    child: IconButton(
+                      icon: const Icon(Icons.file_present),
+                      onPressed: () async => await _reportFileLogs(),
+                    ),
                   ),
                 ),
               ),
               ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.delete, color: blue900),
-                title: const Text('Eliminar Errores registrados'),
-                subtitle:
-                    const Text('Pulsa para eliminar el archivo logfile.txt'),
+                horizontalTitleGap: 0,
+                leading: const Icon(Icons.delete),
+                title: Text('Eliminar Errores registrados', style: titleMediumBold),
+                subtitle: const Text('Pulsa para eliminar el archivo logfile.txt'),
                 trailing: CircleAvatar(
-                  backgroundColor: blue,
-                  child: IconButton(
-                    icon: const Icon(Icons.restore_page, color: Colors.white),
-                    onPressed: () async {
-                      if (await const Logger().clear()) {
-                        _showMsg(msg: 'Archivo eliminado');
-                      } else {
-                        _showMsg(msg: 'Archivo no encontrado', color: red900);
-                      }
-                    },
+                  radius: 21,
+                  backgroundColor: AppColor.blanco,
+                  child: CircleAvatar(
+                    child: IconButton(
+                      icon: const Icon(Icons.restore_page),
+                      onPressed: () async {
+                        if (await const Logger().clear()) {
+                          _showMsg(msg: 'Archivo eliminado');
+                        } else {
+                          _showMsg(msg: 'Archivo no encontrado', color: AppColor.rojo900);
+                        }
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -440,14 +482,11 @@ class _PageSettingsState extends State<PageSettings> {
   _reportFileLogs() async {
     File file = await const Logger().localFile;
     if (!await file.exists()) {
-      _showMsg(msg: 'Sin registro de errores', color: red900);
+      _showMsg(msg: 'Sin registro de errores', color: AppColor.rojo900);
       return;
     }
     if (await _checkEnviado()) {
-      _showMsg(
-        msg: 'El registro de errores ya ha sido reportado',
-        color: red900,
-      );
+      _showMsg(msg: 'El registro de errores ya ha sido reportado', color: AppColor.rojo900);
       return;
     }
 
@@ -482,11 +521,10 @@ class _PageSettingsState extends State<PageSettings> {
               funcion: '_reportFileLogs',
               error: e,
               stackTrace: s));
-      _showMsg(msg: 'Error al reportar el registro de errores', color: red900);
+      _showMsg(msg: 'Error al reportar el registro de errores', color: AppColor.rojo900);
     }
   }
 
   void _showMsg({required String msg, Color? color}) =>
-      CustomMessenger(context: context, msg: msg, color: color)
-          .generateDialog();
+      CustomMessenger(context: context, msg: msg, color: color).generateDialog();
 }

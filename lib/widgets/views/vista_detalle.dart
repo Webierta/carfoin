@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/cartera.dart';
+import '../../themes/styles_theme.dart';
+import '../../themes/theme_provider.dart';
 import '../../utils/stats.dart';
-import '../../utils/styles.dart';
 import '../stepper_balance.dart';
 
 class VistaDetalle extends StatelessWidget {
@@ -23,6 +25,8 @@ class VistaDetalle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
+
     List<Fondo> fondos = cartera.fondos ?? [];
     double inversionCarteraEur = 0.0;
     double inversionCarteraUsd = 0.0;
@@ -141,10 +145,10 @@ class VistaDetalle extends StatelessWidget {
                 radius: 22,
                 backgroundColor: const Color(0xFFFFFFFF),
                 child: CircleAvatar(
-                  backgroundColor: amber,
+                  backgroundColor: AppColor.ambar,
                   child: IconButton(
                     onPressed: () => goCartera(context, cartera),
-                    icon: const Icon(Icons.business_center, color: blue900),
+                    icon: const Icon(Icons.business_center, color: AppColor.light900),
                   ),
                 ),
               ),
@@ -152,36 +156,24 @@ class VistaDetalle extends StatelessWidget {
                 cartera.name,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
-                style: styleTitle,
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
               trailing: PopupMenuButton(
-                color: blue,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                ),
-                icon: const Icon(Icons.more_vert, color: blue),
+                shape: AppBox.roundBorder,
+                icon: const Icon(Icons.more_vert),
                 itemBuilder: (context) => const [
                   PopupMenuItem(
                     value: 1,
                     child: ListTile(
-                      leading: Icon(Icons.edit, color: Color(0xFFFFFFFF)),
-                      title: Text(
-                        'Renombrar',
-                        style: TextStyle(color: Color(0xFFFFFFFF)),
-                      ),
+                      leading: Icon(Icons.edit),
+                      title: Text('Renombrar'),
                     ),
                   ),
                   PopupMenuItem(
                     value: 2,
                     child: ListTile(
-                      leading: Icon(
-                        Icons.delete_forever,
-                        color: Color(0xFFFFFFFF),
-                      ),
-                      title: Text(
-                        'Eliminar',
-                        style: TextStyle(color: Color(0xFFFFFFFF)),
-                      ),
+                      leading: Icon(Icons.delete_forever),
+                      title: Text('Eliminar'),
                     ),
                   )
                 ],
@@ -198,20 +190,14 @@ class VistaDetalle extends StatelessWidget {
               //padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
               child: Container(
-                padding: const EdgeInsets.only(right: 12),
-                decoration: boxDecoBlue,
+                padding: const EdgeInsets.fromLTRB(4, 4, 12, 4),
+                decoration: AppBox.buildBoxDecoration(darkTheme),
                 child: fondos.isNotEmpty
                     ? Theme(
                         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                         child: ExpansionTile(
-                          childrenPadding: const EdgeInsets.only(bottom: 5, left: 20),
                           expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                          expandedAlignment: Alignment.topLeft,
                           maintainState: true,
-                          iconColor: blue,
-                          collapsedIconColor: blue,
-                          tilePadding: const EdgeInsets.all(0.0),
-                          backgroundColor: blue100,
                           title: ChipFondo(lengthFondos: fondos.length),
                           children: [
                             for (var fondo in fondos)
@@ -221,12 +207,42 @@ class VistaDetalle extends StatelessWidget {
                                   fondo.name,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
-                                  style: const TextStyle(decoration: TextDecoration.underline),
+                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: AppColor.light),
                                 ),
                               )
                           ],
                         ),
                       )
+                    /* ? Theme(
+                        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                        child: ExpansionTile(
+                          childrenPadding: const EdgeInsets.only(bottom: 5, left: 20),
+                          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                          expandedAlignment: Alignment.topLeft,
+                          maintainState: true,
+                          iconColor: darkTheme ? AppColor.blanco : AppColor.light,
+                          collapsedIconColor: darkTheme ? AppColor.blanco : AppColor.light,
+                          tilePadding: const EdgeInsets.all(0.0),
+                          //backgroundColor: darkTheme ? AppColor.rojo : AppColor.azul100,
+                          title: ChipFondo(lengthFondos: fondos.length),
+                          children: [
+                            for (var fondo in fondos)
+                              TextButton(
+                                onPressed: () => goFondo(context, cartera, fondo),
+                                child: Text(
+                                  fondo.name,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: AppColor.light),
+                                ),
+                              )
+                          ],
+                        ),
+                      ) */
                     : const Padding(
                         padding: EdgeInsets.symmetric(vertical: 6),
                         child: ChipFondo(lengthFondos: null),
@@ -275,6 +291,7 @@ class ChipFondo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
     String title;
     if (lengthFondos == null || lengthFondos == 0) {
       title = 'Sin fondos';
@@ -283,16 +300,34 @@ class ChipFondo extends StatelessWidget {
     } else {
       title = '$lengthFondos Fondos';
     }
-    return Align(
+    /* return Align(
       alignment: Alignment.topLeft,
       child: Chip(
         padding: const EdgeInsets.only(left: 10, right: 20),
         backgroundColor: blue100,
+        side: const BorderSide(color: Colors.transparent, width: 0),
         avatar: const Icon(Icons.poll, color: blue900, size: 32),
         label: Text(
           title,
           style: const TextStyle(color: blue900, fontSize: 14),
         ),
+      ),
+    ); */
+    /* return ListTile(
+      leading: const Icon(Icons.poll),
+      title: Text(
+        title,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      horizontalTitleGap: 0,
+      dense: true,
+    ); */
+    return Align(
+      alignment: Alignment.topLeft,
+      child: TextButton.icon(
+        onPressed: () {},
+        icon: Icon(Icons.poll, color: darkTheme ? AppColor.blanco : AppColor.light),
+        label: Text(title, style: Theme.of(context).textTheme.titleMedium),
       ),
     );
   }

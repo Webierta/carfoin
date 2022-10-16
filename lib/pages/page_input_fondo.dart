@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show FilteringTextInputFormatter;
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
 import '../services/api_service.dart';
+import '../themes/styles_theme.dart';
+import '../themes/theme_provider.dart';
 import '../utils/fecha_util.dart';
-import '../utils/styles.dart';
 import '../widgets/dialogs/custom_messenger.dart';
 
 class PageInputFondo extends StatefulWidget {
@@ -40,117 +41,97 @@ class _PageInputFondoState extends State<PageInputFondo> {
 
   @override
   Widget build(BuildContext context) {
+    final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
     Cartera carteraSelect = context.read<CarteraProvider>().carteraSelect;
+
     return Container(
-      decoration: scaffoldGradient,
+      decoration: darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
       child: Scaffold(
-        backgroundColor: Colors.transparent,
         appBar: AppBar(title: const Text('Añadir Fondo')),
-        body: ListView(
-          //padding: const EdgeInsets.all(12),
+        body: Padding(
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-          children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  children: [
-                    ListTile(
-                      leading:
-                          const Icon(Icons.add_chart, size: 32, color: blue900),
-                      title: const Text(
-                        'Introduce el ISIN del nuevo Fondo',
-                        style: TextStyle(color: blue900),
-                      ),
-                      subtitle: Align(
-                        alignment: Alignment.centerLeft,
-                        child: InputChip(
-                          onPressed: () {},
-                          avatar:
-                              const Icon(Icons.business_center, color: blue900),
-                          backgroundColor: blue100,
-                          label: Text(
-                            carteraSelect.name,
-                            style: const TextStyle(color: blue900),
+          child: ListView(
+            children: [
+              Chip(
+                avatar: const Icon(Icons.business_center),
+                label: Text(carteraSelect.name),
+              ),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Introduce el ISIN del nuevo Fondo:'),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _controller,
+                              onChanged: (text) {
+                                setState(() {
+                                  _validIsin = null;
+                                  _errorDataApi = null;
+                                });
+                              },
+                              textCapitalization: TextCapitalization.characters,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9]'))
+                              ],
+                              decoration: const InputDecoration(
+                                hintText: 'ISIN',
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                    ListTile(
-                      title: TextField(
-                        controller: _controller,
-                        onChanged: (text) {
-                          setState(() {
-                            _validIsin = null;
-                            _errorDataApi = null;
-                          });
-                        },
-                        textCapitalization: TextCapitalization.characters,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp('[a-zA-Z0-9]'))
+                          _resultIsValid(),
                         ],
-                        decoration: const InputDecoration(
-                          hintText: 'ISIN',
-                          border: OutlineInputBorder(),
-                        ),
                       ),
-                      subtitle: Padding(
-                        padding: const EdgeInsets.only(top: 24),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton.icon(
-                              icon: const Icon(Icons.security, color: blue900),
-                              label: const Text(
-                                'Validar',
-                                style: TextStyle(color: blue900),
-                              ),
-                              onPressed: _controller.text.isNotEmpty
-                                  ? () => setState(() => _validIsin =
-                                      _checkIsin(_controller.value.text))
-                                  : null,
-                            ),
-                            ElevatedButton.icon(
-                              icon: const Icon(Icons.search, color: blue900),
-                              label: const Text(
-                                'Buscar',
-                                style: TextStyle(color: blue900),
-                              ),
-                              onPressed: _controller.text.isEmpty
-                                  ? null
-                                  : () async {
-                                      FocusManager.instance.primaryFocus
-                                          ?.unfocus();
-                                      if (_checkIsin(_controller.value.text)) {
-                                        setState(() {
-                                          _validIsin = true;
-                                          _buscando = true;
-                                        });
-                                        locatedFond = await _searchIsin(
-                                            _controller.value.text);
-                                        setState(() => _buscando = false);
-                                      } else {
-                                        setState(() => _validIsin = false);
-                                        showMsg(
-                                          msg: 'Código ISIN no válido',
-                                          color: red900,
-                                        );
-                                      }
-                                    },
-                            ),
-                          ],
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton.icon(
+                            icon: const Icon(Icons.security),
+                            label: const Text('Validar'),
+                            onPressed: _controller.text.isNotEmpty
+                                ? () =>
+                                    setState(() => _validIsin = _checkIsin(_controller.value.text))
+                                : null,
+                          ),
+                          TextButton.icon(
+                            icon: const Icon(Icons.search),
+                            label: const Text('Buscar'),
+                            onPressed: _controller.text.isEmpty
+                                ? null
+                                : () async {
+                                    FocusManager.instance.primaryFocus?.unfocus();
+                                    if (_checkIsin(_controller.value.text)) {
+                                      setState(() {
+                                        _validIsin = true;
+                                        _buscando = true;
+                                      });
+                                      locatedFond = await _searchIsin(_controller.value.text);
+                                      setState(() => _buscando = false);
+                                    } else {
+                                      setState(() => _validIsin = false);
+                                      showMsg(
+                                        msg: 'Código ISIN no válido',
+                                        color: AppColor.rojo900,
+                                      );
+                                    }
+                                  },
+                          ),
+                        ],
                       ),
-                      trailing: _resultIsValid(),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
-            _resultSearch(),
-          ],
+              const SizedBox(height: 10),
+              _resultSearch(),
+            ],
+          ),
         ),
       ),
     );
@@ -158,9 +139,9 @@ class _PageInputFondoState extends State<PageInputFondo> {
 
   Icon _resultIsValid() {
     if (_validIsin == true) {
-      return const Icon(Icons.check_box, color: green);
+      return const Icon(Icons.check_box, color: AppColor.verde);
     } else if (_validIsin == false) {
-      return const Icon(Icons.disabled_by_default, color: red);
+      return const Icon(Icons.disabled_by_default, color: AppColor.rojo);
     } else {
       return const Icon(Icons.check_box_outline_blank);
     }
@@ -172,12 +153,17 @@ class _PageInputFondoState extends State<PageInputFondo> {
     } else {
       if (_errorDataApi == false) {
         return Card(
-          child: ListTile(
-            leading: const Icon(Icons.assessment),
-            title: Text(locatedFond!.name),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(locatedFond!.name,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
                 const Text('¿Añadir a la cartera?'),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -262,10 +248,7 @@ class _PageInputFondoState extends State<PageInputFondo> {
       var date = FechaUtil.epochToEpochHms(getDataApi.epochSecs);
       var newValor = Valor(date: date, precio: getDataApi.price);
       return Fondo(
-          name: getDataApi.name,
-          isin: inputIsin,
-          divisa: getDataApi.market,
-          valores: [newValor]);
+          name: getDataApi.name, isin: inputIsin, divisa: getDataApi.market, valores: [newValor]);
     } else {
       setState(() => _errorDataApi = true);
       return Fondo(name: 'Fondo no encontrado', isin: inputIsin);
@@ -273,6 +256,5 @@ class _PageInputFondoState extends State<PageInputFondo> {
   }
 
   void showMsg({required String msg, Color? color}) =>
-      CustomMessenger(context: context, msg: msg, color: color)
-          .generateDialog();
+      CustomMessenger(context: context, msg: msg, color: color).generateDialog();
 }

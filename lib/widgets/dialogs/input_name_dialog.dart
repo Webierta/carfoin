@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/styles.dart';
-
 class RouterInputName {
   final String title;
   final String? label;
@@ -35,8 +33,7 @@ class RouterInputName {
 class InputNameDialog extends StatefulWidget {
   final String title;
   final String? label;
-  const InputNameDialog({Key? key, required this.title, this.label = ''})
-      : super(key: key);
+  const InputNameDialog({Key? key, required this.title, this.label = ''}) : super(key: key);
 
   @override
   State<InputNameDialog> createState() => _InputNameDialogState();
@@ -89,24 +86,18 @@ class _InputNameDialogState extends State<InputNameDialog> {
                     ),
                   ),
                   actions: [
-                    ElevatedButton(
+                    TextButton(
                       onPressed: () => Navigator.pop(context, null),
-                      child: const Text(
-                        'Cancelar',
-                        style: TextStyle(color: blue900),
-                      ),
+                      child: const Text('Cancelar'),
                     ),
-                    ElevatedButton(
+                    TextButton(
                       onPressed: _errorText == null
                           ? () {
                               String input = _controller.value.text.trim();
                               Navigator.pop(context, input);
                             }
                           : null,
-                      child: const Text(
-                        'Aceptar',
-                        style: TextStyle(color: blue900),
-                      ),
+                      child: const Text('Aceptar'),
                     ),
                   ],
                 ),

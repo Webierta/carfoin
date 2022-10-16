@@ -9,11 +9,12 @@ import '../../models/preferences_provider.dart';
 import '../../router/routes_const.dart';
 import '../../services/database_helper.dart';
 import '../../services/doc_cnmv.dart';
+import '../../themes/styles_theme.dart';
+import '../../themes/theme_provider.dart';
 import '../../utils/fecha_util.dart';
 import '../../utils/number_util.dart';
 import '../../utils/pdf_viewer.dart';
 import '../../utils/stats.dart';
-import '../../utils/styles.dart';
 import '../dialogs/confirm_dialog.dart';
 import '../dialogs/custom_messenger.dart';
 import '../hoja_calendario.dart';
@@ -91,13 +92,10 @@ class _MainFondoState extends State<MainFondo> {
 
   @override
   Widget build(BuildContext context) {
+    final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
     PreferencesProvider prefProvider = context.read<PreferencesProvider>();
     final List<Valor> valores = context.watch<CarteraProvider>().valores;
     final List<Valor> operaciones = context.watch<CarteraProvider>().operaciones;
-    /*stats = Stats(valores);
-    if (operaciones.isNotEmpty) {
-      calculateStats();
-    }*/
 
     double? getDiferencia() {
       if (valores.length > 1) {
@@ -133,7 +131,10 @@ class _MainFondoState extends State<MainFondo> {
           DataRow(cells: [
             DataCell(Align(
               alignment: Alignment.centerRight,
-              child: Text(FechaUtil.epochToString(op.date, formato: 'dd/MM/yy')),
+              child: Text(
+                FechaUtil.epochToString(op.date, formato: 'dd/MM/yy'),
+                style: TextStyle(color: darkTheme ? AppColor.blanco : AppColor.light900),
+              ),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
@@ -141,17 +142,22 @@ class _MainFondoState extends State<MainFondo> {
                 op.tipo == 1
                     ? NumberUtil.decimal(op.participaciones ?? 0, long: false)
                     : NumberUtil.decimal((op.participaciones ?? 0) * -1, long: false),
-                style: TextStyle(color: op.tipo == 1 ? green : red),
+                style: TextStyle(color: op.tipo == 1 ? AppColor.verde : AppColor.rojo),
               ),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
-              child: Text(NumberUtil.decimal(op.precio)),
+              child: Text(
+                NumberUtil.decimal(op.precio),
+                style: TextStyle(color: darkTheme ? AppColor.blanco : AppColor.light900),
+              ),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
-              child:
-                  Text(NumberUtil.decimalFixed((op.participaciones ?? 0) * op.precio, long: false)),
+              child: Text(
+                NumberUtil.decimalFixed((op.participaciones ?? 0) * op.precio, long: false),
+                style: TextStyle(color: darkTheme ? AppColor.blanco : AppColor.light900),
+              ),
             )),
             DataCell(IconButton(
               onPressed: () async {
@@ -176,13 +182,14 @@ class _MainFondoState extends State<MainFondo> {
             )),
           ]),
         DataRow(
-          color: MaterialStateColor.resolveWith((states) => Colors.blue),
+          color: MaterialStateColor.resolveWith(
+              (states) => darkTheme ? AppColor.boxDark : AppColor.light),
           cells: [
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
                 FechaUtil.epochToString(valores.first.date, formato: 'dd/MM/yy'),
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: AppColor.blanco),
               ),
             )),
             DataCell(Align(
@@ -275,7 +282,7 @@ class _MainFondoState extends State<MainFondo> {
       List<Icon> estrellas = [];
       int rating = fondoSelect.rating ?? 0;
       for (var i = 1; i < 6; i++) {
-        var icon = Icon(Icons.star, color: rating >= i ? Colors.greenAccent[400] : Colors.grey);
+        var icon = Icon(Icons.star, color: rating >= i ? AppColor.verdeAccent400 : AppColor.gris);
         estrellas.add(icon);
       }
       return estrellas;
@@ -307,11 +314,11 @@ class _MainFondoState extends State<MainFondo> {
                     fondoSelect.name,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 3,
-                    style: styleTitle,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                   subtitle: Text(
                     fondoSelect.isin,
-                    style: const TextStyle(fontSize: 14, color: blue900),
+                    style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ),
                 Column(
@@ -342,7 +349,7 @@ class _MainFondoState extends State<MainFondo> {
                           setState(() => openingPdf = false);
                           if (!mounted) return;
                           Navigator.of(context).pop();
-                          _showMsg(msg: 'Archivo no disponible', color: red900);
+                          _showMsg(msg: 'Archivo no disponible', color: AppColor.rojo900);
                           Logger.log(
                               dataLog: DataLog(
                                   msg: 'urlPdf is null',
@@ -369,7 +376,7 @@ class _MainFondoState extends State<MainFondo> {
                           setState(() => openingPdf = false);
                           if (!mounted) return;
                           Navigator.of(context).pop();
-                          _showMsg(msg: 'Archivo no disponible', color: red900);
+                          _showMsg(msg: 'Archivo no disponible', color: AppColor.rojo900);
                           Logger.log(
                               dataLog: DataLog(
                                   msg: 'informe is null',
@@ -393,7 +400,7 @@ class _MainFondoState extends State<MainFondo> {
                         padding: const EdgeInsets.only(left: 12, right: 12),
                         child: Container(
                           padding: const EdgeInsets.all(16),
-                          decoration: boxDecoBlue,
+                          decoration: AppBox.buildBoxDecoration(darkTheme),
                           child: Column(
                             children: [
                               IntrinsicHeight(
@@ -412,14 +419,10 @@ class _MainFondoState extends State<MainFondo> {
                                                   long: false),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w400,
-                                                color: blue900,
-                                              ),
+                                              style: Theme.of(context).textTheme.titleLarge,
                                             ),
                                             const SizedBox(width: 4),
-                                            const Icon(Icons.sell, color: blue),
+                                            const Icon(Icons.sell),
                                           ],
                                         ),
                                         if (getDiferencia() != null)
@@ -429,13 +432,16 @@ class _MainFondoState extends State<MainFondo> {
                                                 NumberUtil.compactFixed(getDiferencia()!),
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w400,
-                                                    color: textRedGreen(getDiferencia()!)),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleMedium
+                                                    ?.copyWith(
+                                                      color:
+                                                          AppColor.textRedGreen(getDiferencia()!),
+                                                    ),
                                               ),
                                               const SizedBox(width: 4),
-                                              const Icon(Icons.iso, color: blue),
+                                              const Icon(Icons.iso),
                                             ],
                                           ),
                                       ],
@@ -446,7 +452,7 @@ class _MainFondoState extends State<MainFondo> {
                                         child: Text(
                                           fondoSelect.divisa == 'EUR' ? '€' : '\$',
                                           textScaleFactor: 2.5,
-                                          style: const TextStyle(color: blue200),
+                                          style: const TextStyle(color: AppColor.light200),
                                         ),
                                       ),
                                   ],
@@ -502,24 +508,24 @@ class _MainFondoState extends State<MainFondo> {
                 ListTile(
                   //contentPadding: const EdgeInsets.all(12),
                   minLeadingWidth: 0,
-                  leading: const Icon(Icons.compare_arrows, size: 32, color: blue900),
-                  title: const FittedBox(
+                  leading: const Icon(Icons.compare_arrows, size: 32),
+                  title: FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'OPERACIONES',
                       //overflow: TextOverflow.ellipsis,
                       //maxLines: 1,
-                      style: TextStyle(fontSize: 18, color: blue900),
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
                   trailing: CircleAvatar(
                     radius: 22,
                     backgroundColor: const Color(0xFFFFFFFF),
                     child: CircleAvatar(
-                      backgroundColor: amber,
+                      backgroundColor: AppColor.ambar,
                       child: IconButton(
-                        icon: const Icon(Icons.shopping_cart, color: blue900),
+                        icon: const Icon(Icons.shopping_cart, color: AppColor.light900),
                         onPressed: () => context.go(mercadoPage),
                       ),
                     ),
@@ -540,21 +546,23 @@ class _MainFondoState extends State<MainFondo> {
                               fit: BoxFit.fill,
                               child: DataTable(
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: blue, width: 2),
+                                  border: Border.all(
+                                      color: darkTheme ? AppColor.boxDark : AppColor.light,
+                                      width: 2),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 //headingRowHeight: 0,
                                 columnSpacing: 20,
                                 dataRowHeight: 70,
                                 //horizontalMargin: 10,
-                                headingRowColor:
-                                    MaterialStateColor.resolveWith((states) => Colors.blue),
+                                headingRowColor: MaterialStateColor.resolveWith(
+                                    (states) => darkTheme ? AppColor.boxDark : AppColor.light),
                                 headingTextStyle: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
-                                dataTextStyle: const TextStyle(fontSize: 18, color: Colors.black),
+                                dataTextStyle: const TextStyle(fontSize: 18),
                                 columns: createColumns(),
                                 rows: createRows(),
                               ),
@@ -576,19 +584,16 @@ class _MainFondoState extends State<MainFondo> {
                 children: [
                   ListTile(
                     minLeadingWidth: 0,
-                    leading: const Icon(Icons.balance, size: 32, color: blue900), // Icons.balance
-                    title: const Text(
-                      'BALANCE',
-                      style: TextStyle(fontSize: 18, color: blue900),
-                    ),
+                    leading: const Icon(Icons.balance, size: 32),
+                    title: Text('BALANCE', style: Theme.of(context).textTheme.titleLarge),
                     trailing: CircleAvatar(
                       radius: 22,
                       backgroundColor: const Color(0xFFFFFFFF),
                       child: CircleAvatar(
-                        backgroundColor: amber,
+                        backgroundColor: AppColor.ambar,
                         child: IconButton(
                           onPressed: () => context.go(infoBalancePage),
-                          icon: const Icon(Icons.info_outline, color: blue900),
+                          icon: const Icon(Icons.info_outline, color: AppColor.light900),
                         ),
                       ),
                     ),
@@ -597,7 +602,7 @@ class _MainFondoState extends State<MainFondo> {
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Container(
                       padding: const EdgeInsets.all(16),
-                      decoration: boxDecoBlue,
+                      decoration: AppBox.buildBoxDecoration(darkTheme),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -606,19 +611,21 @@ class _MainFondoState extends State<MainFondo> {
                             RowBalance(
                               label: 'Inversión',
                               data: NumberUtil.decimalFixed(inversion!, long: false),
+                              color: darkTheme ? AppColor.blanco : AppColor.light900,
                             ),
                           if (resultado != null) const SizedBox(height: 10),
                           if (resultado != null)
                             RowBalance(
                               label: 'Resultado',
                               data: NumberUtil.decimalFixed(resultado!, long: false),
+                              color: darkTheme ? AppColor.blanco : AppColor.light900,
                             ),
                           if (rendimiento != null) const SizedBox(height: 10),
                           if (rendimiento != null)
                             RowBalance(
                               label: 'Rendimiento',
                               data: NumberUtil.decimalFixed(rendimiento!, long: false),
-                              color: textRedGreen(rendimiento!),
+                              color: AppColor.textRedGreen(rendimiento!),
                             ),
                           if (rentabilidad != null || twr != null || mwrAcum != null)
                             const SizedBox(height: 10),
@@ -629,9 +636,7 @@ class _MainFondoState extends State<MainFondo> {
                                   child: Divider(endIndent: 10, thickness: 1),
                                 ),
                                 Text('RENTABILIDAD'),
-                                Expanded(
-                                  child: Divider(indent: 10, thickness: 1),
-                                ),
+                                Expanded(child: Divider(indent: 10, thickness: 1)),
                               ],
                             ),
                           if (rentabilidad != null) const SizedBox(height: 10),
@@ -639,34 +644,30 @@ class _MainFondoState extends State<MainFondo> {
                             RowBalance(
                               label: 'Simple',
                               data: NumberUtil.percentCompact(rentabilidad!),
-                              color: textRedGreen(rentabilidad!),
+                              color: AppColor.textRedGreen(rentabilidad!),
                             ),
                           if (twr != null) const SizedBox(height: 10),
                           if (twr != null)
                             RowBalance(
                               label: 'TWR',
                               data: NumberUtil.percentCompact(twr!),
-                              color: textRedGreen(twr!),
+                              color: AppColor.textRedGreen(twr!),
                             ),
                           if (mwr != null) const SizedBox(height: 10),
                           if (mwrAcum != null)
                             RowBalance(
                               label: 'MWR Acum.',
                               data: NumberUtil.percentCompact(mwrAcum!),
-                              color: textRedGreen(mwrAcum!),
+                              color: AppColor.textRedGreen(mwrAcum!),
                             ),
                           if (rentAnual != null || tae != null || mwr != null)
                             const SizedBox(height: 10),
                           if (rentAnual != null || tae != null || mwr != null)
                             Row(
                               children: const [
-                                Expanded(
-                                  child: Divider(endIndent: 10, thickness: 1),
-                                ),
+                                Expanded(child: Divider(endIndent: 10, thickness: 1)),
                                 Text('RENTABILIDAD ANUAL'),
-                                Expanded(
-                                  child: Divider(indent: 10, thickness: 1),
-                                ),
+                                Expanded(child: Divider(indent: 10, thickness: 1)),
                               ],
                             ),
                           if (rentAnual != null) const SizedBox(height: 10),
@@ -674,21 +675,21 @@ class _MainFondoState extends State<MainFondo> {
                             RowBalance(
                               label: 'Simple Anual',
                               data: NumberUtil.percentCompact(rentAnual!),
-                              color: textRedGreen(rentAnual!),
+                              color: AppColor.textRedGreen(rentAnual!),
                             ),
                           if (tae != null) const SizedBox(height: 10),
                           if (tae != null)
                             RowBalance(
                               label: 'TWR (TAE)',
                               data: NumberUtil.percentCompact(tae!),
-                              color: textRedGreen(tae!),
+                              color: AppColor.textRedGreen(tae!),
                             ),
                           if (mwr != null) const SizedBox(height: 10),
                           if (mwr != null)
                             RowBalance(
                               label: 'MWR',
                               data: NumberUtil.percentCompact(mwr!),
-                              color: textRedGreen(mwr!),
+                              color: AppColor.textRedGreen(mwr!),
                             ),
                         ],
                       ),

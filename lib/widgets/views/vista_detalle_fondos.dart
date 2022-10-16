@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/cartera.dart';
+import '../../themes/styles_theme.dart';
+import '../../themes/theme_provider.dart';
 import '../../utils/number_util.dart';
 import '../../utils/stats.dart';
-import '../../utils/styles.dart';
 import '../hoja_calendario.dart';
 import '../stepper_balance.dart';
 
@@ -23,6 +25,7 @@ class VistaDetalleFondos extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
     List<Valor>? valores = fondo.valores;
     Stats? stats;
     double? inversion;
@@ -76,12 +79,12 @@ class VistaDetalleFondos extends StatelessWidget {
             ListTile(
               leading: CircleAvatar(
                 radius: 22,
-                backgroundColor: const Color(0xFFFFFFFF),
+                backgroundColor: AppColor.blanco,
                 child: CircleAvatar(
-                  backgroundColor: amber,
+                  backgroundColor: AppColor.ambar,
                   child: IconButton(
                     onPressed: () => goFondo(context, fondo),
-                    icon: const Icon(Icons.poll, color: blue900),
+                    icon: const Icon(Icons.poll, color: AppColor.light900),
                   ),
                 ),
               ),
@@ -89,49 +92,27 @@ class VistaDetalleFondos extends StatelessWidget {
                 fondo.name,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,
-                style: styleTitle16,
+                style: Theme.of(context).textTheme.titleSmall,
               ),
               subtitle: Text(
                 fondo.isin,
-                style: const TextStyle(fontSize: 14, color: blue900),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w300),
               ),
               trailing: PopupMenuButton(
-                color: blue,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                ),
-                icon: const Icon(Icons.more_vert, color: blue),
+                shape: AppBox.roundBorder,
+                icon: const Icon(Icons.more_vert),
                 itemBuilder: (context) => const [
                   PopupMenuItem(
                     value: 1,
-                    child: ListTile(
-                      leading: Icon(Icons.refresh, color: Color(0xFFFFFFFF)),
-                      title: Text(
-                        'Actualizar',
-                        style: TextStyle(color: Color(0xFFFFFFFF)),
-                      ),
-                    ),
+                    child: ListTile(leading: Icon(Icons.refresh), title: Text('Actualizar')),
                   ),
                   PopupMenuItem(
                     value: 2,
-                    child: ListTile(
-                      leading: Icon(
-                        Icons.delete_forever,
-                        color: Color(0xFFFFFFFF),
-                      ),
-                      title: Text(
-                        'Eliminar',
-                        style: TextStyle(color: Color(0xFFFFFFFF)),
-                      ),
-                    ),
+                    child: ListTile(leading: Icon(Icons.delete_forever), title: Text('Eliminar')),
                   )
                 ],
                 onSelected: (value) async {
-                  if (value == 1) {
-                    await updateFondo(fondo);
-                  } else if (value == 2) {
-                    await removeFondo(fondo);
-                  }
+                  value == 1 ? await updateFondo(fondo) : await removeFondo(fondo);
                 },
               ),
             ),
@@ -140,7 +121,7 @@ class VistaDetalleFondos extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  decoration: boxDecoBlue,
+                  decoration: AppBox.buildBoxDecoration(darkTheme),
                   child: IntrinsicHeight(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -163,14 +144,10 @@ class VistaDetalleFondos extends StatelessWidget {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   textAlign: TextAlign.end,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w400,
-                                    color: blue900,
-                                  ),
+                                  style: Theme.of(context).textTheme.titleLarge,
                                 ),
                                 const SizedBox(width: 4),
-                                const Icon(Icons.sell, color: blue),
+                                const Icon(Icons.sell),
                               ],
                             ),
                             subtitle: diferencia != null
@@ -182,21 +159,20 @@ class VistaDetalleFondos extends StatelessWidget {
                                         textAlign: TextAlign.end,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w400,
-                                          color: textRedGreen(diferencia),
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(color: AppColor.textRedGreen(diferencia)),
                                       ),
                                       const SizedBox(width: 4),
-                                      const Icon(Icons.iso, color: blue),
+                                      const Icon(Icons.iso),
                                     ],
                                   )
                                 : null,
                             trailing: Text(
                               symbolDivisa,
                               textScaleFactor: 2.5,
-                              style: const TextStyle(color: blue200),
+                              style: const TextStyle(color: AppColor.light200),
                             ),
                           ),
                         ),
@@ -235,7 +211,7 @@ class VistaDetalleFondos extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.w300,
-                          color: textRedGreen(tae),
+                          color: AppColor.textRedGreen(tae),
                         ),
                       ),
                     ),

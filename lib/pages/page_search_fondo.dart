@@ -2,9 +2,11 @@ import 'dart:convert' show json;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
-import '../utils/styles.dart';
+import '../themes/styles_theme.dart';
+import '../themes/theme_provider.dart';
 
 class PageSearchFondo extends StatefulWidget {
   const PageSearchFondo({Key? key}) : super(key: key);
@@ -37,22 +39,18 @@ class _PageSearchFondoState extends State<PageSearchFondo> {
         ? _allFondos
         : _allFondos
             .where((fondo) =>
-                fondo['name']
-                    ?.toUpperCase()
-                    .contains(enteredKeyword.toUpperCase()) ||
-                fondo['isin']
-                    ?.toUpperCase()
-                    .contains(enteredKeyword.toUpperCase()))
+                fondo['name']?.toUpperCase().contains(enteredKeyword.toUpperCase()) ||
+                fondo['isin']?.toUpperCase().contains(enteredKeyword.toUpperCase()))
             .toList();
     setState(() => _filterFondos = results);
   }
 
   @override
   Widget build(BuildContext context) {
+    final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
     return Container(
-      decoration: scaffoldGradient,
+      decoration: darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
       child: Scaffold(
-        backgroundColor: Colors.transparent,
         appBar: AppBar(title: const Text('Buscar Fondo')),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -63,7 +61,8 @@ class _PageSearchFondoState extends State<PageSearchFondo> {
                 textCapitalization: TextCapitalization.characters,
                 decoration: const InputDecoration(
                   labelText: 'Busca por ISIN o por nombre',
-                  suffixIcon: Icon(Icons.search, color: blue900),
+                  suffixIcon: Icon(Icons.search),
+                  //labelStyle: TextStyle(color: darkTheme ? AppColor.gris300 : AppColor.light900),
                 ),
               ),
               const SizedBox(height: 20),
@@ -75,13 +74,18 @@ class _PageSearchFondoState extends State<PageSearchFondo> {
                             itemCount: _filterFondos.length,
                             itemBuilder: (context, index) => Card(
                               key: ValueKey(_filterFondos[index]['isin']),
-                              color: amber,
+                              color: AppColor.ambar,
                               elevation: 4,
                               margin: const EdgeInsets.symmetric(vertical: 10),
                               child: ListTile(
-                                title: Text(_filterFondos[index]['name']),
+                                title: Text(
+                                  _filterFondos[index]['name'],
+                                  style: const TextStyle(color: AppColor.negro),
+                                ),
                                 subtitle: Text(
-                                    _filterFondos[index]['isin'].toString()),
+                                  _filterFondos[index]['isin'].toString(),
+                                  style: const TextStyle(color: AppColor.gris700),
+                                ),
                                 onTap: () {
                                   var fondo = Fondo(
                                       name: _filterFondos[index]['name'],

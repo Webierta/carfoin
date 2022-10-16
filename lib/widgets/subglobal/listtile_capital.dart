@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../themes/styles_theme.dart';
 import '../../utils/number_util.dart';
-import '../../utils/styles.dart';
 
 class ListTileCapital extends StatelessWidget {
   final double inversion;
   final double capital;
   final double balance;
   const ListTileCapital(
-      {Key? key,
-      required this.inversion,
-      required this.capital,
-      required this.balance})
+      {Key? key, required this.inversion, required this.capital, required this.balance})
       : super(key: key);
 
   @override
@@ -21,7 +18,7 @@ class ListTileCapital extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.euro, color: blue900),
+          const Icon(Icons.euro),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -31,13 +28,13 @@ class ListTileCapital extends StatelessWidget {
                   '${NumberUtil.decimalFixed(capital, long: false)} €',
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
-                  style: const TextStyle(fontSize: 16),
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
                 Text(
                   '${NumberUtil.decimalFixed(inversion, long: false)} €',
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
-                  style: const TextStyle(color: Colors.black54),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColor.negro54),
                 ),
               ],
             ),
@@ -47,7 +44,9 @@ class ListTileCapital extends StatelessWidget {
             '${NumberUtil.decimalFixed(balance, long: false, limit: 100000)} €',
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
-            style: TextStyle(fontSize: 16, color: textRedGreen(balance)),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: AppColor.textRedGreen(balance),
+                ),
           ),
         ],
       ),

@@ -1,10 +1,10 @@
-import 'package:carfoin/utils/styles.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/cartera.dart';
 import '../../models/cartera_provider.dart';
+import '../../themes/styles_theme.dart';
 import '../../utils/fecha_util.dart';
 import '../../utils/number_util.dart';
 
@@ -25,6 +25,14 @@ class GraficoFondo extends StatefulWidget {
 class _GraficoFondoState extends State<GraficoFondo> {
   int filtroTempSelect = filtroTemp.values.first;
 
+  TextStyle labelGrafico = TextStyle(
+    fontWeight: FontWeight.bold,
+    background: Paint()
+      ..color = const Color(0xFFFFFFFF)
+      ..strokeWidth = 17
+      ..style = PaintingStyle.stroke,
+  );
+
   @override
   Widget build(BuildContext context) {
     final valores = context.watch<CarteraProvider>().valores;
@@ -36,8 +44,7 @@ class _GraficoFondoState extends State<GraficoFondo> {
       var lastEpoch = FechaUtil.dateToEpoch(lastTime);
       valoresFilter = valores.where((v) => v.date > lastEpoch).toList();
     }
-    final List<double> precios =
-        valoresFilter.reversed.map((v) => v.precio).toList();
+    final List<double> precios = valoresFilter.reversed.map((v) => v.precio).toList();
     final List<int> fechas = valoresFilter.reversed.map((v) => v.date).toList();
 
     double precioMedio = 0;
@@ -58,22 +65,20 @@ class _GraficoFondoState extends State<GraficoFondo> {
       fechaMin = FechaUtil.epochToString(fechas[precios.indexOf(precioMin)]);
       //epochMax = fechas[precios.indexOf(precioMax)];
       //epochMin = fechas[precios.indexOf(precioMin)];
-      timestamp = FechaUtil.epochToDate(fechas.last)
-          .difference(FechaUtil.epochToDate(fechas.first))
-          .inDays;
+      timestamp =
+          FechaUtil.epochToDate(fechas.last).difference(FechaUtil.epochToDate(fechas.first)).inDays;
     }
 
     var mapData = {for (var valor in valoresFilter) valor.date: valor.precio};
     final spots = <FlSpot>[
-      for (final entry in mapData.entries)
-        FlSpot(entry.key.toDouble(), entry.value)
+      for (final entry in mapData.entries) FlSpot(entry.key.toDouble(), entry.value)
     ];
 
     List<VerticalLine> getVerticalLines() {
       List<VerticalLine> verticalLines = [];
       for (var valor in valoresFilter) {
         if (valor.tipo == 0 || valor.tipo == 1) {
-          var color = valor.tipo == 0 ? Colors.red : Colors.green;
+          var color = valor.tipo == 0 ? AppColor.rojo : AppColor.verde;
           double date = valor.date.toDouble();
           verticalLines.add(VerticalLine(
             x: date,
@@ -84,8 +89,7 @@ class _GraficoFondoState extends State<GraficoFondo> {
               show: true,
               alignment: Alignment.topRight,
               style: const TextStyle(fontSize: 12),
-              labelResolver: (line) =>
-                  'Part: ${valor.participaciones}\nImporte: '
+              labelResolver: (line) => 'Part: ${valor.participaciones}\nImporte: '
                   '${NumberUtil.currency(valor.participaciones! * valor.precio)}',
             ),
           ));
@@ -96,12 +100,12 @@ class _GraficoFondoState extends State<GraficoFondo> {
 
     getDotPainter(int index) {
       if (valoresFilter[index].tipo == 0 || valoresFilter[index].tipo == 1) {
-        var color = valoresFilter[index].tipo == 0 ? Colors.red : Colors.green;
+        var color = valoresFilter[index].tipo == 0 ? AppColor.rojo : AppColor.verde;
         return FlDotSquarePainter(
           size: 10,
           color: color,
           strokeWidth: 5,
-          strokeColor: Colors.blue[900],
+          strokeColor: AppColor.light900,
         );
       }
       return FlDotCirclePainter(
@@ -118,8 +122,7 @@ class _GraficoFondoState extends State<GraficoFondo> {
           isCurved: false,
           dotData: FlDotData(
             show: true,
-            getDotPainter: (spot, percent, barData, index) =>
-                getDotPainter(index),
+            getDotPainter: (spot, percent, barData, index) => getDotPainter(index),
           ),
           belowBarData: BarAreaData(show: true, color: const Color(0x802196F3)),
         ),
@@ -135,17 +138,14 @@ class _GraficoFondoState extends State<GraficoFondo> {
           getTooltipItems: (touchedSpots) {
             return touchedSpots.map((LineBarSpot touchedSpot) {
               var epoch = touchedSpot.x.toInt();
-              DateTime dateTime =
-                  DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
+              DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
               var fecha = FechaUtil.dateToString(date: dateTime);
               final textStyle = TextStyle(
-                color: touchedSpot.bar.gradient?.colors[0] ??
-                    touchedSpot.bar.color,
+                color: touchedSpot.bar.gradient?.colors[0] ?? touchedSpot.bar.color,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               );
-              return LineTooltipItem(
-                  '${touchedSpot.y.toStringAsFixed(2)}\n$fecha', textStyle);
+              return LineTooltipItem('${touchedSpot.y.toStringAsFixed(2)}\n$fecha', textStyle);
             }).toList();
           },
         ),
@@ -206,8 +206,7 @@ class _GraficoFondoState extends State<GraficoFondo> {
               /*if (epoch.toInt() % 25 != 0) {
                 return const Text('');
               }*/
-              return Text(
-                  FechaUtil.dateToString(date: dateTime, formato: 'MM/yy'));
+              return Text(FechaUtil.dateToString(date: dateTime, formato: 'MM/yy'));
             },
           ),
         ),
@@ -233,8 +232,7 @@ class _GraficoFondoState extends State<GraficoFondo> {
               ),*/
               style: labelGrafico,
               alignment: Alignment.topRight,
-              labelResolver: (line) =>
-                  'Media: ${NumberUtil.decimalFixed(precioMedio)}',
+              labelResolver: (line) => 'Media: ${NumberUtil.decimalFixed(precioMedio)}',
             ),
           ),
           HorizontalLine(
@@ -258,7 +256,7 @@ class _GraficoFondoState extends State<GraficoFondo> {
           ),
           HorizontalLine(
             y: precioMin,
-            color: const Color(0xFFF44336),
+            color: AppColor.rojo,
             strokeWidth: 2,
             dashArray: [2, 2],
             label: HorizontalLineLabel(
@@ -303,8 +301,7 @@ class _GraficoFondoState extends State<GraficoFondo> {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Container(
-                padding: const EdgeInsets.only(
-                    top: 30, left: 5, right: 5, bottom: 10),
+                padding: const EdgeInsets.only(top: 30, left: 5, right: 5, bottom: 10),
                 /*width: spots.length < 100 && timestamp < 100
                     //|| (filtroTempSelect != 0 && filtroTempSelect < 30 * 60)
                     ? MediaQuery.of(context).size.width

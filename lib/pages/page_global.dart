@@ -6,8 +6,9 @@ import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
 import '../models/preferences_provider.dart';
 import '../router/routes_const.dart';
+import '../themes/styles_theme.dart';
+import '../themes/theme_provider.dart';
 import '../utils/stats_global.dart';
-import '../utils/styles.dart';
 import '../widgets/my_drawer.dart';
 import '../widgets/subglobal/listtile_capital.dart';
 import '../widgets/subglobal/listtile_destacado.dart';
@@ -27,6 +28,7 @@ class _PageGlobalState extends State<PageGlobal> {
 
   @override
   Widget build(BuildContext context) {
+    final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
     CarteraProvider carteraProvider = context.read<CarteraProvider>();
     PreferencesProvider prefProvider = context.read<PreferencesProvider>();
     final List<Cartera> carteras = carteraProvider.carteras;
@@ -42,9 +44,8 @@ class _PageGlobalState extends State<PageGlobal> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Container(
-        decoration: scaffoldGradient,
+        decoration: darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           drawer: const MyDrawer(),
           appBar: AppBar(
             title: const Text('Posición Global'),
@@ -61,35 +62,26 @@ class _PageGlobalState extends State<PageGlobal> {
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
                       'Resumen global de tu portafolio: empieza creando una cartera',
-                      style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 20),
+                      style: TextStyle(color: AppColor.blanco, fontSize: 20),
                       textAlign: TextAlign.center,
                     ),
                   ),
                 )
               : Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   child: ListView(
                     children: [
                       const Text('PORTAFOLIO', textAlign: TextAlign.start),
                       Wrap(
                         alignment: WrapAlignment.spaceBetween,
                         children: [
-                          InputChip(
-                            onPressed: () {},
-                            backgroundColor: blue100,
-                            avatar: const Icon(Icons.business_center,
-                                color: blue900),
+                          Chip(
+                            avatar: const Icon(Icons.business_center),
                             label: Text('${carteras.length} Carteras'),
-                            labelStyle: const TextStyle(fontSize: 16),
                           ),
-                          InputChip(
-                            onPressed: () {},
-                            backgroundColor: blue100,
-                            avatar:
-                                const Icon(Icons.assessment, color: blue900),
+                          Chip(
+                            avatar: const Icon(Icons.assessment),
                             label: Text('${_statsGlobal.nFondos} Fondos'),
-                            labelStyle: const TextStyle(fontSize: 16),
                           ),
                         ],
                       ),
@@ -103,14 +95,14 @@ class _PageGlobalState extends State<PageGlobal> {
                             ),
                             const SizedBox(width: 10),
                             DropdownButton<CriterioPie>(
+                              dropdownColor: darkTheme ? AppColor.boxDark : AppColor.blanco,
                               value: criterioPie,
                               onChanged: (CriterioPie? value) {
                                 if (value! != criterioPie) {
                                   setState(() => criterioPie = value);
                                 }
                               },
-                              items: CriterioPie.values
-                                  .map((CriterioPie criterioPie) {
+                              items: CriterioPie.values.map((CriterioPie criterioPie) {
                                 return DropdownMenuItem<CriterioPie>(
                                   value: criterioPie,
                                   child: Text(
@@ -121,7 +113,9 @@ class _PageGlobalState extends State<PageGlobal> {
                               }).toList(),
                             ),
                           ],
-                        ),
+                        )
+                      else
+                        const SizedBox(height: 10),
                       if (_statsGlobal.nFondos > 0)
                         PieChartGlobal(
                           carteras: carteras,
@@ -130,7 +124,7 @@ class _PageGlobalState extends State<PageGlobal> {
                           statsGlobal: _statsGlobal,
                         ),
                       const LineDivider(),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       const Text('CAPITAL: VALOR / INVERSIÓN'),
                       if (_statsGlobal.inversionGlobal > 0)
                         ListTileCapital(
@@ -141,10 +135,9 @@ class _PageGlobalState extends State<PageGlobal> {
                       if (_statsGlobal.inversionGlobal == 0)
                         const Padding(
                             padding: EdgeInsets.all(10),
-                            child:
-                                Text('No se ha encontrado ninguna inversión')),
+                            child: Text('No se ha encontrado ninguna inversión')),
                       const LineDivider(),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       const Text('FONDOS DESTACADOS (TAE)'),
                       if (_statsGlobal.destacados.isNotEmpty)
                         ListTileDestacado(
@@ -158,25 +151,20 @@ class _PageGlobalState extends State<PageGlobal> {
                             goFondo: goFondo),
                       if (_statsGlobal.destacados.isEmpty)
                         const Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: Text('Nada que destacar')),
+                            padding: EdgeInsets.all(10.0), child: Text('Nada que destacar')),
                       const LineDivider(),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       const Text('ÚLTIMAS OPERACIONES'),
                       if (_statsGlobal.lastOps.isNotEmpty)
-                        ListTileLastOp(
-                            lastOp: _statsGlobal.lastOps.last,
-                            goFondo: goFondo),
+                        ListTileLastOp(lastOp: _statsGlobal.lastOps.last, goFondo: goFondo),
                       if (_statsGlobal.lastOps.length > 1)
                         ListTileLastOp(
-                            lastOp: _statsGlobal
-                                .lastOps[_statsGlobal.lastOps.length - 2],
+                            lastOp: _statsGlobal.lastOps[_statsGlobal.lastOps.length - 2],
                             goFondo: goFondo),
                       if (_statsGlobal.lastOps.isEmpty)
                         const Padding(
                             padding: EdgeInsets.all(10.0),
-                            child:
-                                Text('No se ha encontrado ninguna operación')),
+                            child: Text('No se ha encontrado ninguna operación')),
                     ],
                   ),
                 ),
@@ -190,7 +178,6 @@ class LineDivider extends StatelessWidget {
   const LineDivider({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return const Divider(
-        color: gris, height: 0, thickness: 0.5, indent: 8, endIndent: 8);
+    return const Divider(color: AppColor.gris, height: 0, thickness: 0.5, indent: 8, endIndent: 8);
   }
 }

@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../router/routes_const.dart';
-import '../utils/styles.dart';
+import '../themes/styles_theme.dart';
+import '../themes/theme_provider.dart';
 
 class PageInfoBalance extends StatelessWidget {
   const PageInfoBalance({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
     return WillPopScope(
       onWillPop: () async => false,
       child: Container(
-        decoration: scaffoldGradient,
+        decoration: darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           appBar: AppBar(
             leading: IconButton(
               onPressed: () => context.go(fondoPage),
@@ -23,10 +25,11 @@ class PageInfoBalance extends StatelessWidget {
             ),
             title: const Text('ÍNDICES Y CÁLCULOS'),
           ),
-          body: const Padding(
-            padding: EdgeInsets.all(8.0),
+          body: Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Markdown(
               data: mdstring,
+              styleSheet: AppMarkdown.buildMarkdownStyleSheet(darkTheme),
             ),
           ),
         ),

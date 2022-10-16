@@ -15,21 +15,24 @@ PopupMenuItem<Enum> buildMenuItem(Enum menu, IconData iconData,
         ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 2),
           dense: true,
-          leading: Icon(iconData, color: const Color(0xFFFFFFFF)),
+          leading: Icon(
+            iconData,
+            //color: const Color(0xFFFFFFFF),
+          ),
           title: Text(
             '${menu.name[0].toUpperCase()}${menu.name.substring(1)}',
-            style: const TextStyle(color: Color(0xFFFFFFFF)),
+            //style: const TextStyle(color: Color(0xFFFFFFFF)),
             maxLines: 1,
           ),
           trailing: menu == Menu.ordenar || menu == MenuCartera.ordenar
               ? Icon(
                   isOrder ? Icons.check_box : Icons.check_box_outline_blank,
-                  color: const Color(0xFFFFFFFF),
+                  //color: const Color(0xFFFFFFFF),
                 )
               : null,
         ),
-        if (divider == true)
-          const Divider(color: Color(0xFFFFFFFF)), // PopMenuDivider
+        //if (divider == true) const Divider(color: AppColor.gris),
+        if (divider == true) const Divider(), // PopMenuDivider
       ],
     ),
   );

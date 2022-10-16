@@ -12,9 +12,10 @@ import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../services/doc_cnmv.dart';
+import '../themes/styles_theme.dart';
+import '../themes/theme_provider.dart';
 import '../utils/fecha_util.dart';
 import '../utils/status_api_service.dart';
-import '../utils/styles.dart';
 import '../widgets/dialogs/confirm_dialog.dart';
 import '../widgets/dialogs/custom_messenger.dart';
 import '../widgets/loading_progress.dart';
@@ -29,8 +30,7 @@ class PageFondo extends StatefulWidget {
   State<PageFondo> createState() => _PageFondoState();
 }
 
-class _PageFondoState extends State<PageFondo>
-    with SingleTickerProviderStateMixin {
+class _PageFondoState extends State<PageFondo> with SingleTickerProviderStateMixin {
   DatabaseHelper database = DatabaseHelper();
   late CarteraProvider carteraProvider;
   late Cartera carteraSelect;
@@ -47,8 +47,7 @@ class _PageFondoState extends State<PageFondo>
       fondo.valores = carteraProvider.valores;
       valoresSelect = carteraProvider.valores;
 
-      carteraProvider.operaciones =
-          await database.getOperaciones(cartera, fondo);
+      carteraProvider.operaciones = await database.getOperaciones(cartera, fondo);
       operacionesSelect = carteraProvider.operaciones;
     } catch (e) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -65,9 +64,7 @@ class _PageFondoState extends State<PageFondo>
     fondoSelect = carteraProvider.fondoSelect;
     prefProvider = context.read<PreferencesProvider>();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      database
-          .createTableFondo(carteraSelect, fondoSelect)
-          .whenComplete(() async {
+      database.createTableFondo(carteraSelect, fondoSelect).whenComplete(() async {
         await setValores(carteraSelect, fondoSelect);
       });
     });
@@ -90,6 +87,8 @@ class _PageFondoState extends State<PageFondo>
 
   @override
   Widget build(BuildContext context) {
+    final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
+
     return FutureBuilder(
       future: database.getValores(carteraSelect, fondoSelect),
       builder: (BuildContext context, AsyncSnapshot<List<Valor>> snapshot) {
@@ -99,10 +98,9 @@ class _PageFondoState extends State<PageFondo>
         return WillPopScope(
           onWillPop: () async => false,
           child: Container(
-            decoration: scaffoldGradient,
+            //decoration: scaffoldGradient,
+            decoration: darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
             child: Scaffold(
-              backgroundColor: Colors.transparent,
-              //backgroundColor: Color(0x80000000),
               appBar: AppBar(
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
@@ -121,18 +119,16 @@ class _PageFondoState extends State<PageFondo>
                     fondoSelect.name,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    style: const TextStyle(color: blue900),
                   ),
                   subtitle: Row(
                     children: [
-                      const Icon(Icons.business_center, color: blue900),
+                      const Icon(Icons.business_center, size: 18),
                       const SizedBox(width: 10),
                       Flexible(
                         child: Text(
                           carteraSelect.name,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
-                          style: const TextStyle(color: blue900),
                         ),
                       ),
                     ],
@@ -145,11 +141,8 @@ class _PageFondoState extends State<PageFondo>
                   ),
                   PopupMenuButton(
                     icon: const Icon(Icons.more_vert),
-                    color: blue,
                     offset: Offset(0.0, AppBar().preferredSize.height),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                    ),
+                    shape: AppBox.roundBorder,
                     itemBuilder: (ctx) => [
                       buildMenuItem(MenuFondo.mercado, Icons.shopping_cart),
                       buildMenuItem(MenuFondo.eliminar, Icons.delete_forever),
@@ -165,12 +158,13 @@ class _PageFondoState extends State<PageFondo>
                           if (prefProvider.isDeleteOperaciones == true &&
                               carteraProvider.operaciones.isNotEmpty) {
                             content = '¿Eliminar todos los valores del fondo y '
-                                'las operaciones asociadas? (puedes cambiarlo desde Ajustes)';
-                          } else if (prefProvider.isDeleteOperaciones ==
-                                  false &&
+                                'las operaciones asociadas? (en Ajustes puedes configurar esta '
+                                'acción para mantener esas operaciones)';
+                          } else if (prefProvider.isDeleteOperaciones == false &&
                               carteraProvider.operaciones.isNotEmpty) {
                             content = '¿Eliminar todos los valores del fondo '
-                                'manteniendo las operaciones asociadas? (puedes cambiarlo desde Ajustes)';
+                                'manteniendo las operaciones asociadas? (en Ajustes puedes configurar '
+                                'esta acción para eliminar también esas operaciones)';
                           }
                           bool? resp = await ConfirmDialog(
                             context: context,
@@ -179,11 +173,9 @@ class _PageFondoState extends State<PageFondo>
                           ).generateDialog();
                           if (resp == true) {
                             if (prefProvider.isDeleteOperaciones == true) {
-                              await database.deleteAllValores(
-                                  carteraSelect, fondoSelect);
+                              await database.deleteAllValores(carteraSelect, fondoSelect);
                             } else {
-                              await database.deleteOnlyValores(
-                                  carteraSelect, fondoSelect);
+                              await database.deleteOnlyValores(carteraSelect, fondoSelect);
                             }
                             await setValores(carteraSelect, fondoSelect);
                           }
@@ -199,7 +191,7 @@ class _PageFondoState extends State<PageFondo>
                 children: const [MainFondo(), TablaFondo(), GraficoFondo()],
               ),
               bottomNavigationBar: BottomAppBar(
-                color: blue900,
+                color: darkTheme ? AppColor.dark900 : AppColor.light900,
                 //shape: const CircularNotchedRectangle(),
                 clipBehavior: Clip.antiAlias,
                 //notchMargin: 5,
@@ -212,7 +204,7 @@ class _PageFondoState extends State<PageFondo>
                     unselectedLabelColor: const Color(0x62FFFFFF),
                     indicatorSize: TabBarIndicatorSize.tab,
                     indicatorPadding: const EdgeInsets.all(5.0),
-                    indicatorColor: blue,
+                    indicatorColor: AppColor.light,
                     tabs: const [
                       Tab(icon: Icon(Icons.assessment, size: 32)),
                       Tab(icon: Icon(Icons.table_rows_outlined, size: 32)),
@@ -221,8 +213,7 @@ class _PageFondoState extends State<PageFondo>
                   ),
                 ),
               ),
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.endDocked,
+              floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
               floatingActionButton: ExpandableFab(
                 isEndDocked: true,
                 children: [
@@ -296,12 +287,12 @@ class _PageFondoState extends State<PageFondo>
     } else {
       _pop();
       if (apiService.status == StatusApiService.okHttp) {
-        showMsg(msg: 'Error al escribir en la base de datos', color: red900);
+        showMsg(msg: 'Error al escribir en la base de datos', color: AppColor.rojo900);
       } else {
         String msg = apiService.status.msg == ''
             ? 'Fondo no actualizado: Error en la descarga de datos'
             : apiService.status.msg;
-        showMsg(msg: msg, color: red900);
+        showMsg(msg: msg, color: AppColor.rojo900);
       }
     }
   }
@@ -323,8 +314,7 @@ class _PageFondoState extends State<PageFondo>
         date: range.end,
         formato: 'yyyy-MM-dd',
       );
-      final getDateApiRange =
-          await apiService.getDataApiRange(fondoSelect.isin, to, from);
+      final getDateApiRange = await apiService.getDataApiRange(fondoSelect.isin, to, from);
       var newListValores = <Valor>[];
       if (getDateApiRange != null) {
         for (var dataApi in getDateApiRange) {
@@ -340,14 +330,13 @@ class _PageFondoState extends State<PageFondo>
         showMsg(msg: 'Descarga de datos completada.');
       } else {
         _pop();
-        showMsg(msg: 'Error en la descarga de datos.', color: red900);
+        showMsg(msg: 'Error en la descarga de datos.', color: AppColor.rojo900);
       }
     }
   }
 
   void showMsg({required String msg, Color? color}) =>
-      CustomMessenger(context: context, msg: msg, color: color)
-          .generateDialog();
+      CustomMessenger(context: context, msg: msg, color: color).generateDialog();
 
   void _pop() {
     if (!mounted) return;

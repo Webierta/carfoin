@@ -2,7 +2,7 @@ import 'dart:async' show Timer;
 
 import 'package:flutter/material.dart';
 
-import '../../utils/styles.dart';
+import '../../themes/styles_theme.dart';
 
 class CustomMessenger {
   final BuildContext context;
@@ -29,9 +29,9 @@ class CustomMessenger {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Material(
-                  color: color ?? blue900,
+                  color: color ?? AppColor.gris700,
                   elevation: 10,
-                  textStyle: const TextStyle(color: Colors.white),
+                  textStyle: const TextStyle(color: AppColor.blanco),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5),
                   ),

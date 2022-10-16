@@ -6,8 +6,7 @@ import 'package:flutter/material.dart';
 import '../../models/cartera.dart';
 import '../../utils/number_util.dart';
 import '../../utils/stats_global.dart';
-import '../../utils/styles.dart';
-import 'bar_chart_balance.dart';
+import 'bar_chart_balance.dart' show BarChartBalance;
 
 enum CriterioPie { Fondos, Inversion, Valor, Balance }
 
@@ -15,8 +14,7 @@ class DataPie {
   final String nameCartera;
   final double data;
   final Color color;
-  const DataPie(
-      {required this.nameCartera, required this.data, required this.color});
+  const DataPie({required this.nameCartera, required this.data, required this.color});
 }
 
 class PieChartGlobal extends StatelessWidget {
@@ -45,19 +43,16 @@ class PieChartGlobal extends StatelessWidget {
         children.add(child);
       }
     } else if (criterioPie == CriterioPie.Inversion) {
-      var child = Text(
-          'Inversión: ${NumberUtil.currency(statsGlobalCartera.inversionGlobal)} €');
+      var child = Text('Inversión: ${NumberUtil.currency(statsGlobalCartera.inversionGlobal)} €');
       children.add(child);
     } else if (criterioPie == CriterioPie.Valor) {
-      var child = Text(
-          'Valor: ${NumberUtil.currency(statsGlobalCartera.valorGlobal)} €');
+      var child = Text('Valor: ${NumberUtil.currency(statsGlobalCartera.valorGlobal)} €');
       children.add(child);
     }
     return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
           return SimpleDialog(
-            backgroundColor: blue100,
             titlePadding: const EdgeInsets.fromLTRB(20, 20, 0, 10),
             contentPadding: const EdgeInsets.fromLTRB(20, 0, 0, 10),
             title: Text(cartera.name),
@@ -68,8 +63,7 @@ class PieChartGlobal extends StatelessWidget {
 
   Color getColor() {
     final random = Random();
-    return Color.fromARGB(
-        255, random.nextInt(256), random.nextInt(256), random.nextInt(256));
+    return Color.fromARGB(255, random.nextInt(256), random.nextInt(256), random.nextInt(256));
   }
 
   @override
@@ -129,8 +123,7 @@ class PieChartGlobal extends StatelessWidget {
             var index = response!.touchedSection!.touchedSectionIndex;
             Cartera? carteraTouch;
             try {
-              var carterasConFondos =
-                  carteras.where((c) => c.fondos!.isNotEmpty).toList();
+              var carterasConFondos = carteras.where((c) => c.fondos!.isNotEmpty).toList();
               carteraTouch = carterasConFondos[index];
             } catch (e) {
               carteraTouch = null;

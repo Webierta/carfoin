@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../themes/styles_theme.dart';
 import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
-import '../utils/styles.dart';
 
 class StepperBalance extends StatelessWidget {
   final double input;
@@ -51,26 +51,23 @@ class StepperBalance extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Expanded(
-                child:
-                    Divider(thickness: 1, indent: 0, endIndent: 4, color: gris),
+                child: Divider(thickness: 1, indent: 0, endIndent: 4, color: AppColor.gris),
               ),
               Chip(
                 backgroundColor: const Color(0xFFFFFFFF),
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 visualDensity: const VisualDensity(vertical: -4),
-                shape: const StadiumBorder(side: BorderSide(color: gris)),
-                label: Text(
-                    '${NumberUtil.decimalFixed(balance, long: false)}$spaceDivisa'),
+                shape: const StadiumBorder(side: BorderSide(color: AppColor.gris)),
+                label: Text('${NumberUtil.decimalFixed(balance, long: false)}$spaceDivisa'),
                 labelStyle: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: textRedGreen(balance),
+                  color: AppColor.textRedGreen(balance),
                 ),
               ),
               const Expanded(
-                child:
-                    Divider(thickness: 1, indent: 4, endIndent: 4, color: gris),
-              ),
+                child: Divider(thickness: 1, indent: 4, endIndent: 4, color: AppColor.gris),
+              )
             ],
           ),
           Transform.translate(

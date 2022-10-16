@@ -2,16 +2,17 @@ import 'package:flutter/gestures.dart' show TapGestureRecognizer;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../router/routes_const.dart';
-import '../utils/styles.dart';
+import '../themes/styles_theme.dart';
+import '../themes/theme_provider.dart';
 import '../widgets/dialogs/custom_messenger.dart';
 import '../widgets/my_drawer.dart';
 
 const String btcAddress = '15ZpNzqbYFx9P7wg4U438JMwZr2q3W6fkS';
-const String urlPayPal =
-    'https://www.paypal.com/donate?hosted_button_id=986PSAHLH6N4L';
+const String urlPayPal = 'https://www.paypal.com/donate?hosted_button_id=986PSAHLH6N4L';
 const String urlGitHub = 'https://github.com/Webierta/carfoin/issues';
 
 class PageSupport extends StatelessWidget {
@@ -19,14 +20,16 @@ class PageSupport extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Provider.of<ThemeProvider>(context);
+
     void launchweb(url) async {
-      if (!await launchUrl(Uri.parse(url),
-          mode: LaunchMode.externalApplication)) throw 'Could not launch $url';
+      if (!await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication)) {
+        throw 'Could not launch $url';
+      }
     }
 
     void showMsg({required String msg, Color? color}) =>
-        CustomMessenger(context: context, msg: msg, color: color)
-            .generateDialog();
+        CustomMessenger(context: context, msg: msg, color: color).generateDialog();
 
     clipboard() async {
       await Clipboard.setData(const ClipboardData(text: btcAddress));
@@ -36,9 +39,8 @@ class PageSupport extends StatelessWidget {
     return WillPopScope(
       onWillPop: () async => false,
       child: Container(
-        decoration: scaffoldGradient,
+        decoration: theme.darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           drawer: const MyDrawer(),
           appBar: AppBar(
             title: const Text('Buy Me a Coffee'),
@@ -50,8 +52,7 @@ class PageSupport extends StatelessWidget {
             ],
           ),
           body: SingleChildScrollView(
-            padding:
-                const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 40),
+            padding: const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 40),
             child: Column(
               children: [
                 const Align(
@@ -76,8 +77,7 @@ class PageSupport extends StatelessWidget {
                           decoration: TextDecoration.underline,
                         ),
                         text: 'GitHub issues.',
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () => launchweb(urlGitHub),
+                        recognizer: TapGestureRecognizer()..onTap = () => launchweb(urlGitHub),
                       ),
                     ],
                   ),
@@ -119,47 +119,50 @@ class PageSupport extends StatelessWidget {
                   fit: BoxFit.fitWidth,
                   child: Container(
                     decoration: BoxDecoration(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(8.0)),
+                        borderRadius: AppBox.borderRadius8,
                         border: Border.all(
                           color: Colors.black12,
                           style: BorderStyle.solid,
                         )),
-                    child: Row(
-                      children: [
-                        Container(
-                          height: 50,
-                          padding: const EdgeInsets.all(8.0),
-                          decoration: const ShapeDecoration(
-                            color: Color(0xFFF5F5F5),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(8),
-                                topLeft: Radius.circular(8),
-                                bottomRight: Radius.zero,
-                                topRight: Radius.zero,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: AppBox.borderRadius8,
+                        border: Border.all(color: const Color(0xFFFFFFFF), width: 1),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            height: 50,
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: const ShapeDecoration(
+                              color: Color(0xFFF5F5F5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(8),
+                                  topLeft: Radius.circular(8),
+                                  bottomRight: Radius.zero,
+                                  topRight: Radius.zero,
+                                ),
+                                side: BorderSide(color: Colors.transparent),
+                              ),
+                            ),
+                            child: const Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                btcAddress,
+                                style: TextStyle(color: AppColor.dark700),
                               ),
                             ),
                           ),
-                          child: const Align(
-                            alignment: Alignment.center,
-                            child: Text(btcAddress),
+                          SizedBox(
+                            height: 50,
+                            child: IconButton(
+                              icon: const Icon(Icons.copy),
+                              onPressed: () => clipboard(),
+                            ),
                           ),
-                        ),
-                        Container(
-                          height: 50,
-                          decoration: const BoxDecoration(
-                            border: Border(
-                                left: BorderSide(
-                                    color: Colors.black12,
-                                    style: BorderStyle.solid)),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.copy),
-                            onPressed: () => clipboard(),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

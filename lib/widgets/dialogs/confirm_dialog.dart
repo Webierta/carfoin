@@ -7,10 +7,7 @@ class ConfirmDialog {
   final String? falseButton;
 
   const ConfirmDialog(
-      {required this.context,
-      required this.title,
-      required this.content,
-      this.falseButton});
+      {required this.context, required this.title, required this.content, this.falseButton});
 
   generateDialog() {
     return showDialog<bool>(
@@ -34,10 +31,6 @@ class ConfirmDialog {
                     child: Text(falseButton!),
                   ),
                 TextButton(
-                  /*style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFFFFFFFF),
-                    backgroundColor: red,
-                  ),*/
                   onPressed: () => Navigator.pop(context, true),
                   child: const Text('Aceptar'),
                 ),

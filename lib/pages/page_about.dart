@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../router/routes_const.dart';
+import '../themes/styles_theme.dart';
+import '../themes/theme_provider.dart';
 import '../utils/konstantes.dart';
-import '../utils/styles.dart';
 import '../widgets/my_drawer.dart';
 
 class PageAbout extends StatelessWidget {
@@ -13,17 +15,19 @@ class PageAbout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
+
     void launchweb(url) async {
-      if (!await launchUrl(Uri.parse(url),
-          mode: LaunchMode.externalApplication)) throw 'Could not launch $url';
+      if (!await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication)) {
+        throw 'Could not launch $url';
+      }
     }
 
     return WillPopScope(
       onWillPop: () async => false,
       child: Container(
-        decoration: scaffoldGradient,
+        decoration: darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           appBar: AppBar(
             title: const Text('ABOUT'),
             actions: [
@@ -45,11 +49,7 @@ class PageAbout extends StatelessWidget {
                 }
               },
               data: mdstring,
-              styleSheet: MarkdownStyleSheet(
-                h1: const TextStyle(color: blue, fontSize: 40),
-                h2: const TextStyle(color: blue, fontSize: 22),
-                p: const TextStyle(fontSize: 18),
-              ),
+              styleSheet: AppMarkdown.buildMarkdownStyleSheet(darkTheme),
             ),
           ),
         ),

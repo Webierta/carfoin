@@ -8,9 +8,10 @@ import '../models/cartera_provider.dart';
 import '../router/routes_const.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
+import '../themes/styles_theme.dart';
+import '../themes/theme_provider.dart';
 import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
-import '../utils/styles.dart';
 import '../widgets/dialogs/confirm_dialog.dart';
 import '../widgets/dialogs/custom_messenger.dart';
 import '../widgets/dialogs/full_screen_modal.dart';
@@ -102,12 +103,12 @@ class _MercadoState extends State<PageMercado> {
 
   @override
   Widget build(BuildContext context) {
+    final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
     return WillPopScope(
       onWillPop: () async => false,
       child: Container(
-        decoration: scaffoldGradient,
+        decoration: darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           appBar: AppBar(
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
@@ -127,19 +128,12 @@ class _MercadoState extends State<PageMercado> {
               padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
               children: [
                 Center(
-                  child: Text(
-                    fondoSelect.name,
-                    style: const TextStyle(color: blue900),
-                  ),
+                  child: Text(fondoSelect.name),
                 ),
                 Center(
-                  child: InputChip(
+                  child: Chip(
                     label: Text(carteraSelect.name),
-                    labelStyle: const TextStyle(color: blue900),
-                    avatar: const Icon(Icons.business_center, color: blue900),
-                    //iconTheme: const IconThemeData(color: blue900),
-                    backgroundColor: blue100,
-                    onPressed: () {},
+                    avatar: const Icon(Icons.business_center),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -151,11 +145,11 @@ class _MercadoState extends State<PageMercado> {
                       renderBorder: false,
                       constraints: BoxConstraints.expand(width: constraints.maxWidth / 2),
                       isSelected: _isSelected,
-                      color: gris,
-                      selectedColor: blue100,
-                      fillColor: blue900,
-                      borderColor: gris,
-                      selectedBorderColor: blue,
+                      //color: AppColor.gris,
+                      //selectedColor: AppColor.azul100,
+                      //fillColor: AppColor.azul900,
+                      //borderColor: AppColor.gris,
+                      //selectedBorderColor: AppColor.azul,
                       borderRadius: const BorderRadius.all(Radius.circular(4)),
                       onPressed: (int index) {
                         setState(() {
@@ -264,7 +258,7 @@ class _MercadoState extends State<PageMercado> {
                             errorStyle: const TextStyle(fontSize: 0, height: 0),
                             labelText: 'Precio',
                             suffixIcon: IconButton(
-                              icon: const Icon(Icons.download, color: blue),
+                              icon: const Icon(Icons.download),
                               onPressed: () async {
                                 var precioApi = await _dialogProgress(context, fondoSelect);
                                 if (!mounted) return;
@@ -277,7 +271,7 @@ class _MercadoState extends State<PageMercado> {
                                   if (!mounted) return;
                                   _showMsg(
                                     msg: 'Dato no disponible. Introduce el precio manualmente',
-                                    color: red900,
+                                    color: AppColor.rojo900,
                                   );
                                 }
                               },
@@ -314,7 +308,7 @@ class _MercadoState extends State<PageMercado> {
                           decoration: const InputDecoration(
                             labelText: 'Importe',
                             border: OutlineInputBorder(),
-                            fillColor: Color(0xFFD5D5D5),
+                            //fillColor: Color(0xFFD5D5D5),
                             filled: true,
                           ),
                           child: Align(
@@ -340,10 +334,7 @@ class _MercadoState extends State<PageMercado> {
                         widthFactor: 0.6,
                         child: ElevatedButton(
                           onPressed: _isValido == true ? () => _submit(context) : null,
-                          child: const Text(
-                            'ORDENAR',
-                            style: TextStyle(color: blue900),
-                          ),
+                          child: const Text('ORDENAR'),
                         ),
                       ),
                     ],
@@ -463,7 +454,7 @@ class _MercadoState extends State<PageMercado> {
         _showMsg(
             msg: 'No se puede hacer un reembolso de participaciones no '
                 'disponibles ni operaciones sin ninguna participación',
-            color: red900);
+            color: AppColor.rojo900);
         return;
       }
       if (minusPart) {
@@ -485,6 +476,26 @@ class _MercadoState extends State<PageMercado> {
       //initialDatePickerMode: DatePickerMode.day,
       firstDate: DateTime(1997, 1, 1),
       lastDate: DateTime.now(),
+      /* builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppColor.light,
+              onPrimary: AppColor.blanco,
+              onSurface: AppColor.light900,
+            ),
+            textTheme: const TextTheme(
+              bodySmall: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColor.light900, // button text color
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      }, */
     );
     if (picked != null) {
       return FechaUtil.dateToDateHms(picked);

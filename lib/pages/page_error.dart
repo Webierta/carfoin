@@ -3,6 +3,7 @@ import 'package:restart_app/restart_app.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../services/database_helper.dart';
+import '../themes/styles_theme.dart';
 
 class PageError extends StatelessWidget {
   const PageError({Key? key}) : super(key: key);
@@ -21,7 +22,7 @@ class PageError extends StatelessWidget {
               const Center(
                 child: Text(
                   'ERROR: ARCHIVO NO VÁLIDO',
-                  style: TextStyle(fontSize: 18, color: Colors.red),
+                  style: TextStyle(fontSize: 18, color: AppColor.rojo),
                 ),
               ),
               const SizedBox(height: 20),

@@ -2,7 +2,7 @@ import 'package:carfoin/widgets/background_dismissible.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/cartera.dart';
-import '../../utils/styles.dart';
+import '../../themes/styles_theme.dart';
 
 class VistaCompacta extends StatelessWidget {
   final Cartera cartera;
@@ -33,11 +33,9 @@ class VistaCompacta extends StatelessWidget {
         icon: Icons.delete,
       ),
       onDismissed: (direction) {
-        if (direction == DismissDirection.endToStart) {
-          delete(cartera);
-        } else {
-          rename(context, cartera: cartera);
-        }
+        direction == DismissDirection.endToStart
+            ? delete(cartera)
+            : rename(context, cartera: cartera);
       },
       child: Card(
         child: ListTile(
@@ -47,19 +45,18 @@ class VistaCompacta extends StatelessWidget {
             radius: 22,
             backgroundColor: const Color(0xFFFFFFFF),
             child: CircleAvatar(
-              backgroundColor: amber,
+              backgroundColor: AppColor.ambar,
               child: Text(
                 cartera.name[0],
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22,
-                  color: blue900,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineLarge
+                    ?.copyWith(color: AppColor.light900, fontWeight: FontWeight.bold),
               ),
             ),
           ),
-          title: Text(cartera.name, style: styleTitleCompact),
-          trailing: const Icon(Icons.swipe, color: blue100),
+          title: Text(cartera.name, style: Theme.of(context).textTheme.headlineMedium),
+          trailing: const Icon(Icons.swipe, color: AppColor.light100),
         ),
       ),
     );

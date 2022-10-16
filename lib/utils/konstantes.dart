@@ -20,6 +20,8 @@ const double rateExchangeInit = 0.99512;
 
 const String keyStorageLoggerPref = 'isStorageLogger';
 
+const String keyDarkTheme = 'isDarkTheme';
+
 // ISIN TEST
 const String isinTest = '01001101 01000100 01011010 01101000 01001111 01010111 01000101 00110100 '
     '01001101 01000111 01001101 01110111 01001111 01000111 00110001 01111010 01100001 01000111 '

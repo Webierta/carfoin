@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/styles.dart';
+import '../../themes/styles_theme.dart';
 
 class FullScreenModal extends ModalRoute {
   final String title;
@@ -26,26 +26,25 @@ class FullScreenModal extends ModalRoute {
   bool get maintainState => true;
 
   @override
-  Widget buildPage(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation) {
+  Widget buildPage(
+      BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
     return Material(
       type: MaterialType.transparency,
       child: Scaffold(
-        backgroundColor: Colors.transparent,
         appBar: AppBar(
           leading: IconButton(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(Icons.arrow_back, color: Colors.white)),
-          //iconTheme: IconThemeData(color: Colors.white),
-          backgroundColor: blue900,
-          foregroundColor: Colors.white,
+            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(Icons.arrow_back, color: AppColor.blanco),
+          ),
+          backgroundColor: AppColor.negro,
+          foregroundColor: AppColor.blanco,
           //iconTheme: IconThemeData(color: Colors.white),
           //actionsIconTheme: IconThemeData(color: Colors.white),
           //titleTextStyle: const TextStyle(color: Colors.white, fontSize: 14),
           title: Text(title),
         ),
         body: DefaultTextStyle(
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: AppColor.blanco),
           child: ListView(
             padding: const EdgeInsets.all(10),
             children: [data],
@@ -61,8 +60,7 @@ class FullScreenModal extends ModalRoute {
     return FadeTransition(
       opacity: animation,
       child: SlideTransition(
-        position: Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero)
-            .animate(animation),
+        position: Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero).animate(animation),
         child: ScaleTransition(scale: animation, child: child),
       ),
     );

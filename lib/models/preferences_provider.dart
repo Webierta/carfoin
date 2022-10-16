@@ -93,4 +93,11 @@ class PreferencesProvider with ChangeNotifier {
     _rateExchange = value;
     notifyListeners();
   }
+
+  /* bool? _isDarkTheme;
+  bool get isDarkTheme => _isDarkTheme ?? false;
+  set isDarkTheme(bool value) {
+    _isDarkTheme = value;
+    notifyListeners();
+  } */
 }

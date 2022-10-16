@@ -44,10 +44,7 @@ class BackgroundDismissible extends StatelessWidget {
             Icon(icon, color: Colors.white),
             Text(
               ' $label',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
               textAlign: textAlign,
             ),
             if (slide == Slide.left) const SizedBox(width: 20),

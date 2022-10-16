@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/cartera.dart';
-import '../../utils/styles.dart';
+import '../../themes/styles_theme.dart';
 import '../background_dismissible.dart';
 
 class VistaCompactaFondos extends StatelessWidget {
@@ -32,11 +32,9 @@ class VistaCompactaFondos extends StatelessWidget {
         icon: Icons.delete,
       ),
       onDismissed: (direction) async {
-        if (direction == DismissDirection.endToStart) {
-          await removeFondo(fondo);
-        } else {
-          await updateFondo(fondo);
-        }
+        direction == DismissDirection.endToStart
+            ? await removeFondo(fondo)
+            : await updateFondo(fondo);
       },
       child: Card(
         child: ListTile(
@@ -46,19 +44,18 @@ class VistaCompactaFondos extends StatelessWidget {
             radius: 22,
             backgroundColor: const Color(0xFFFFFFFF),
             child: CircleAvatar(
-              backgroundColor: amber,
+              backgroundColor: AppColor.ambar,
               child: Text(
                 fondo.name[0],
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22,
-                  color: blue900,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineLarge
+                    ?.copyWith(color: AppColor.light900, fontWeight: FontWeight.bold),
               ),
             ),
           ),
-          title: Text(fondo.name, style: styleTitle),
-          trailing: const Icon(Icons.swipe, color: blue100),
+          title: Text(fondo.name, style: Theme.of(context).textTheme.titleMedium),
+          trailing: const Icon(Icons.swipe, color: AppColor.light100),
         ),
       ),
     );

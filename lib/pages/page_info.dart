@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../router/routes_const.dart';
-import '../utils/styles.dart';
+import '../themes/styles_theme.dart';
+import '../themes/theme_provider.dart';
 import '../widgets/my_drawer.dart';
 
 class PageInfo extends StatelessWidget {
@@ -13,12 +15,12 @@ class PageInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Provider.of<ThemeProvider>(context);
     return WillPopScope(
       onWillPop: () async => false,
       child: Container(
-        decoration: scaffoldGradient,
+        decoration: theme.darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           drawer: const MyDrawer(),
           appBar: AppBar(
             title: const Text('INFO'),
@@ -33,11 +35,7 @@ class PageInfo extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Markdown(
               data: mdstring,
-              styleSheet: MarkdownStyleSheet(
-                h1: const TextStyle(color: blue, fontSize: 40),
-                h2: const TextStyle(color: blue, fontSize: 22),
-                p: const TextStyle(fontSize: 18),
-              ),
+              styleSheet: AppMarkdown.buildMarkdownStyleSheet(theme.darkTheme),
             ),
           ),
         ),

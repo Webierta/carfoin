@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../themes/styles_theme.dart';
 import '../../utils/number_util.dart';
-import '../../utils/styles.dart';
 import 'models.dart';
 
 class ListTileDestacado extends StatelessWidget {
@@ -9,10 +9,7 @@ class ListTileDestacado extends StatelessWidget {
   final IconData icon;
   final Function goFondo;
   const ListTileDestacado(
-      {Key? key,
-      required this.destacado,
-      required this.icon,
-      required this.goFondo})
+      {Key? key, required this.destacado, required this.icon, required this.goFondo})
       : super(key: key);
 
   @override
@@ -22,38 +19,45 @@ class ListTileDestacado extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: blue900),
+          Icon(icon),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 InkWell(
-                  onTap: () =>
-                      goFondo(context, destacado.cartera, destacado.fondo),
+                  onTap: () => goFondo(context, destacado.cartera, destacado.fondo),
                   child: Text(
                     destacado.fondo.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          decoration: TextDecoration.underline,
+                          decorationColor: AppColor.light,
+                          //color: Colors.transparent,
+                          //shadows: [const Shadow(offset: Offset(0, -4), color: Colors.black)],
+                        ),
+                    /* style: const TextStyle(
                       fontSize: 16,
                       decoration: TextDecoration.underline,
                       decorationColor: blue,
                       color: Colors.transparent,
-                      shadows: [
-                        Shadow(offset: Offset(0, -4), color: Colors.black)
-                      ],
-                    ),
+                      shadows: [Shadow(offset: Offset(0, -4), color: Colors.black)],
+                    ), */
                   ),
                 ),
                 Row(
                   children: [
-                    const Icon(Icons.business_center, color: Colors.black54),
+                    const Icon(Icons.business_center, color: AppColor.negro54),
                     const SizedBox(width: 4),
-                    Text(destacado.cartera.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Colors.black54)),
+                    Text(
+                      destacado.cartera.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            color: AppColor.negro54,
+                          ),
+                    ),
                   ],
                 ),
               ],
@@ -64,7 +68,7 @@ class ListTileDestacado extends StatelessWidget {
             NumberUtil.percentCompact(destacado.tae),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 16, color: textRedGreen(destacado.tae)),
+            style: TextStyle(fontSize: 16, color: AppColor.textRedGreen(destacado.tae)),
           ),
         ],
       ),
