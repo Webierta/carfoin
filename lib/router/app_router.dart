@@ -11,6 +11,7 @@ import '../pages/page_info_balance.dart';
 import '../pages/page_input_fondo.dart';
 import '../pages/page_input_range.dart';
 import '../pages/page_mercado.dart';
+import '../pages/page_pdf.dart';
 import '../pages/page_search_fondo.dart';
 import '../pages/page_settings.dart';
 import '../pages/page_support.dart';
@@ -62,6 +63,13 @@ class AppRouter {
       GoRoute(
         path: AppPage.mercado.routePath,
         builder: (context, state) => const PageMercado(),
+      ),
+      GoRoute(
+        path: AppPage.pdf.routePath,
+        builder: (context, state) {
+          FondoDoc fondoDoc = state.extra as FondoDoc;
+          return PagePdf(fondoDoc: fondoDoc);
+        },
       ),
       GoRoute(
         path: AppPage.settings.routePath,

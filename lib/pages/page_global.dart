@@ -16,14 +16,14 @@ import '../widgets/subglobal/listtile_lastop.dart';
 import '../widgets/subglobal/pie_chart_global.dart';
 
 class PageGlobal extends StatefulWidget {
-  const PageGlobal({Key? key}) : super(key: key);
+  const PageGlobal({super.key});
 
   @override
   State<PageGlobal> createState() => _PageGlobalState();
 }
 
 class _PageGlobalState extends State<PageGlobal> {
-  var criterioPie = CriterioPie.Fondos;
+  var criterioPie = CriterioPie.fondos;
   late StatsGlobal _statsGlobal;
 
   @override
@@ -41,8 +41,9 @@ class _PageGlobalState extends State<PageGlobal> {
       context.go(fondoPage);
     }
 
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) => false,
       child: Container(
         decoration: darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
         child: Scaffold(
@@ -68,7 +69,8 @@ class _PageGlobalState extends State<PageGlobal> {
                   ),
                 )
               : Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   child: ListView(
                     children: [
                       const Text('PORTAFOLIO', textAlign: TextAlign.start),
@@ -95,14 +97,17 @@ class _PageGlobalState extends State<PageGlobal> {
                             ),
                             const SizedBox(width: 10),
                             DropdownButton<CriterioPie>(
-                              dropdownColor: darkTheme ? AppColor.boxDark : AppColor.blanco,
+                              dropdownColor: darkTheme
+                                  ? AppColor.boxDark
+                                  : AppColor.blanco,
                               value: criterioPie,
                               onChanged: (CriterioPie? value) {
                                 if (value! != criterioPie) {
                                   setState(() => criterioPie = value);
                                 }
                               },
-                              items: CriterioPie.values.map((CriterioPie criterioPie) {
+                              items: CriterioPie.values
+                                  .map((CriterioPie criterioPie) {
                                 return DropdownMenuItem<CriterioPie>(
                                   value: criterioPie,
                                   child: Text(
@@ -125,7 +130,10 @@ class _PageGlobalState extends State<PageGlobal> {
                         ),
                       const LineDivider(),
                       const SizedBox(height: 10),
-                      const Text('CAPITAL: VALOR / INVERSIÓN'),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [Text('CAPITAL'), Text('BALANCE')],
+                      ),
                       if (_statsGlobal.inversionGlobal > 0)
                         ListTileCapital(
                           inversion: _statsGlobal.inversionGlobal,
@@ -135,7 +143,8 @@ class _PageGlobalState extends State<PageGlobal> {
                       if (_statsGlobal.inversionGlobal == 0)
                         const Padding(
                             padding: EdgeInsets.all(10),
-                            child: Text('No se ha encontrado ninguna inversión')),
+                            child:
+                                Text('No se ha encontrado ninguna inversión')),
                       const LineDivider(),
                       const SizedBox(height: 10),
                       const Text('FONDOS DESTACADOS (TAE)'),
@@ -151,20 +160,25 @@ class _PageGlobalState extends State<PageGlobal> {
                             goFondo: goFondo),
                       if (_statsGlobal.destacados.isEmpty)
                         const Padding(
-                            padding: EdgeInsets.all(10.0), child: Text('Nada que destacar')),
+                            padding: EdgeInsets.all(10.0),
+                            child: Text('Nada que destacar')),
                       const LineDivider(),
                       const SizedBox(height: 10),
                       const Text('ÚLTIMAS OPERACIONES'),
                       if (_statsGlobal.lastOps.isNotEmpty)
-                        ListTileLastOp(lastOp: _statsGlobal.lastOps.last, goFondo: goFondo),
+                        ListTileLastOp(
+                            lastOp: _statsGlobal.lastOps.last,
+                            goFondo: goFondo),
                       if (_statsGlobal.lastOps.length > 1)
                         ListTileLastOp(
-                            lastOp: _statsGlobal.lastOps[_statsGlobal.lastOps.length - 2],
+                            lastOp: _statsGlobal
+                                .lastOps[_statsGlobal.lastOps.length - 2],
                             goFondo: goFondo),
                       if (_statsGlobal.lastOps.isEmpty)
                         const Padding(
                             padding: EdgeInsets.all(10.0),
-                            child: Text('No se ha encontrado ninguna operación')),
+                            child:
+                                Text('No se ha encontrado ninguna operación')),
                     ],
                   ),
                 ),
@@ -175,9 +189,14 @@ class _PageGlobalState extends State<PageGlobal> {
 }
 
 class LineDivider extends StatelessWidget {
-  const LineDivider({Key? key}) : super(key: key);
+  const LineDivider({super.key});
   @override
   Widget build(BuildContext context) {
-    return const Divider(color: AppColor.gris, height: 0, thickness: 0.5, indent: 8, endIndent: 8);
+    return const Divider(
+        color: AppColor.gris,
+        height: 0,
+        thickness: 0.5,
+        indent: 8,
+        endIndent: 8);
   }
 }

@@ -6,7 +6,7 @@ import '../services/database_helper.dart';
 import '../themes/styles_theme.dart';
 
 class PageError extends StatelessWidget {
-  const PageError({Key? key}) : super(key: key);
+  const PageError({super.key});
 
   @override
   Widget build(BuildContext context) {

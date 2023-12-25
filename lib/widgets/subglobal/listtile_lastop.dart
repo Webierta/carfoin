@@ -7,7 +7,8 @@ import 'models.dart';
 class ListTileLastOp extends StatelessWidget {
   final LastOp lastOp;
   final Function goFondo;
-  const ListTileLastOp({Key? key, required this.lastOp, required this.goFondo}) : super(key: key);
+  const ListTileLastOp(
+      {super.key, required this.lastOp, required this.goFondo});
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +35,6 @@ class ListTileLastOp extends StatelessWidget {
                           //color: Colors.transparent,
                           //shadows: [const Shadow(offset: Offset(0, -4), color: Colors.black)],
                         ),
-                    /* style: const TextStyle(
-                      fontSize: 16,
-                      decoration: TextDecoration.underline,
-                      decorationColor: blue,
-                      color: Colors.transparent,
-                      shadows: [Shadow(offset: Offset(0, -4), color: Colors.black)],
-                    ), */
                   ),
                 ),
                 Row(

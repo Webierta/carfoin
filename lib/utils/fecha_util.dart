@@ -28,4 +28,8 @@ class FechaUtil {
     date = dateToDateHms(date);
     return dateToEpoch(date);
   }
+
+  /* static DateTime stringToDate(String fecha) {
+    return DateFormat('d/M/y').parse(fecha);
+  } */
 }

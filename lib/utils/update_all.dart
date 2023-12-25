@@ -3,9 +3,9 @@ import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
-import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../services/doc_cnmv.dart';
+import '../services/yahoo_finance.dart';
 import 'fecha_util.dart';
 
 class Update {
@@ -45,7 +45,7 @@ class UpdateAll {
   }
 
   Future<List<Update>> updateCarteras() async {
-    ApiService apiService = ApiService();
+    //ApiService apiService = ApiService();
     DatabaseHelper database = DatabaseHelper();
     setStateDialog('Conectando...');
     List<Update> updates = [];
@@ -57,11 +57,10 @@ class UpdateAll {
           for (var fondo in fondos) {
             setStateDialog('${fondo.name}\n${cartera.name}');
             await database.createTableFondo(cartera, fondo);
-            final getDataApi = await apiService.getDataApi(fondo.isin);
-            if (getDataApi != null) {
-              var date = FechaUtil.epochToEpochHms(getDataApi.epochSecs);
-              var newValor = Valor(date: date, precio: getDataApi.price);
-              fondo.divisa = getDataApi.market;
+            final newValores =
+                await YahooFinance().getYahooFinanceResponse(fondo);
+            if (newValores != null && newValores.isNotEmpty) {
+              var newValor = newValores[0];
               int rating = await _updateRating(fondo);
               if (rating != 0) {
                 fondo.rating = rating;
@@ -86,7 +85,6 @@ class UpdateAll {
   }
 
   Future<List<Update>> updateFondos(Cartera cartera, List<Fondo> fondos) async {
-    ApiService apiService = ApiService();
     DatabaseHelper database = DatabaseHelper();
     setStateDialog('Conectando...');
     List<Update> updates = [];
@@ -94,11 +92,9 @@ class UpdateAll {
       for (var fondo in fondos) {
         setStateDialog(fondo.name);
         await database.createTableFondo(cartera, fondo);
-        final getDataApi = await apiService.getDataApi(fondo.isin);
-        if (getDataApi != null) {
-          var date = FechaUtil.epochToEpochHms(getDataApi.epochSecs);
-          var newValor = Valor(date: date, precio: getDataApi.price);
-          fondo.divisa = getDataApi.market;
+        final newValores = await YahooFinance().getYahooFinanceResponse(fondo);
+        if (newValores != null && newValores.isNotEmpty) {
+          var newValor = newValores[0];
           int rating = await _updateRating(fondo);
           if (rating != 0) {
             fondo.rating = rating;

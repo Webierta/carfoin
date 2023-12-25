@@ -8,13 +8,14 @@ import '../themes/styles_theme.dart';
 import '../themes/theme_provider.dart';
 
 class PageInfoBalance extends StatelessWidget {
-  const PageInfoBalance({Key? key}) : super(key: key);
+  const PageInfoBalance({super.key});
 
   @override
   Widget build(BuildContext context) {
     final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) => false,
       child: Container(
         decoration: darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
         child: Scaffold(

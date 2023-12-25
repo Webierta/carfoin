@@ -1,8 +1,8 @@
-import 'package:carfoin/widgets/background_dismissible.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/cartera.dart';
 import '../../themes/styles_theme.dart';
+import '../background_dismissible.dart';
 
 class VistaCompacta extends StatelessWidget {
   final Cartera cartera;
@@ -10,12 +10,11 @@ class VistaCompacta extends StatelessWidget {
   final Function rename;
   final Function goCartera;
   const VistaCompacta(
-      {Key? key,
+      {super.key,
       required this.cartera,
       required this.delete,
       required this.rename,
-      required this.goCartera})
-      : super(key: key);
+      required this.goCartera});
 
   @override
   Widget build(BuildContext context) {
@@ -48,14 +47,13 @@ class VistaCompacta extends StatelessWidget {
               backgroundColor: AppColor.ambar,
               child: Text(
                 cartera.name[0],
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineLarge
-                    ?.copyWith(color: AppColor.light900, fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                    color: AppColor.light900, fontWeight: FontWeight.bold),
               ),
             ),
           ),
-          title: Text(cartera.name, style: Theme.of(context).textTheme.headlineMedium),
+          title: Text(cartera.name,
+              style: Theme.of(context).textTheme.headlineMedium),
           trailing: const Icon(Icons.swipe, color: AppColor.light100),
         ),
       ),

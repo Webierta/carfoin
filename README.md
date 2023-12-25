@@ -16,7 +16,7 @@ copias de seguridad y compartir carteras con otros usuarios.
      alt="Get it on F-Droid"
      height="80">](https://f-droid.org/packages/com.github.webierta.carfoin/)
 
-or get it from the [Releases section](https://github.com/Webierta/carfoin/releases/latest).
+Get it on F-Droid or from the [Releases section](https://github.com/Webierta/carfoin/releases/latest).
 
 ## Funciones principales:
 

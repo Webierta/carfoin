@@ -14,8 +14,9 @@ class InfoDialog {
       useSafeArea: true,
       context: context,
       builder: (context) {
-        return WillPopScope(
-          onWillPop: () async => false,
+        return PopScope(
+          canPop: false,
+          onPopInvoked: (didPop) => false,
           child: SingleChildScrollView(
             child: AlertDialog(
               // insetPadding: const EdgeInsets.all(10),

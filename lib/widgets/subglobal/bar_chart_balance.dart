@@ -9,8 +9,8 @@ import '../../utils/stats_global.dart';
 class BarChartBalance extends StatelessWidget {
   final List<Cartera> carteras;
   final double rateExchange;
-  const BarChartBalance({Key? key, required this.carteras, required this.rateExchange})
-      : super(key: key);
+  const BarChartBalance(
+      {super.key, required this.carteras, required this.rateExchange});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,9 @@ class BarChartBalance extends StatelessWidget {
           BarChartRodData(
             toY: statsGlobalCartera.valorGlobal,
             borderRadius: const BorderRadius.all(Radius.zero),
-            color: statsGlobalCartera.balanceGlobal > 0 ? AppColor.verde : AppColor.rojo,
+            color: statsGlobalCartera.balanceGlobal > 0
+                ? AppColor.verde
+                : AppColor.rojo,
           ),
         ],
       );
@@ -53,9 +55,10 @@ class BarChartBalance extends StatelessWidget {
           ),
           titlesData: FlTitlesData(
             show: true,
-            topTitles: AxisTitles(),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            leftTitles: AxisTitles(),
+            topTitles: const AxisTitles(),
+            rightTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles: const AxisTitles(),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
@@ -70,8 +73,8 @@ class BarChartBalance extends StatelessWidget {
           gridData: FlGridData(
             show: true,
             drawVerticalLine: false,
-            getDrawingHorizontalLine: (value) => FlLine(
-              color: const Color(0xFFececec),
+            getDrawingHorizontalLine: (value) => const FlLine(
+              color: Color(0xFFececec),
               dashArray: null,
               strokeWidth: 1,
             ),
@@ -86,7 +89,8 @@ class BarChartBalance extends StatelessWidget {
                 int rodIndex,
               ) {
                 var cartera = carteras[groupIndex];
-                var statsGlobalCartera = StatsGlobal(rateExchange: rateExchange);
+                var statsGlobalCartera =
+                    StatsGlobal(rateExchange: rateExchange);
                 statsGlobalCartera.calcular([cartera]);
                 double balance = statsGlobalCartera.balanceGlobal;
                 return BarTooltipItem(

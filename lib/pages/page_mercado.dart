@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
 import '../router/routes_const.dart';
-import '../services/api_service.dart';
 import '../services/database_helper.dart';
+import '../services/yahoo_finance.dart';
 import '../themes/styles_theme.dart';
 import '../themes/theme_provider.dart';
 import '../utils/fecha_util.dart';
@@ -18,7 +18,7 @@ import '../widgets/dialogs/full_screen_modal.dart';
 import '../widgets/loading_progress.dart';
 
 class PageMercado extends StatefulWidget {
-  const PageMercado({Key? key}) : super(key: key);
+  const PageMercado({super.key});
 
   @override
   State<PageMercado> createState() => _MercadoState();
@@ -32,7 +32,7 @@ class _MercadoState extends State<PageMercado> {
   late List<Valor> valoresSelect;
   late List<Valor> operacionesSelect;
 
-  late ApiService apiService;
+  late YahooFinance yahooFinance;
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _partController = TextEditingController();
   final TextEditingController _precioController = TextEditingController();
@@ -60,7 +60,7 @@ class _MercadoState extends State<PageMercado> {
     operacionesSelect = context.read<CarteraProvider>().operaciones;
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      apiService = ApiService();
+      yahooFinance = YahooFinance();
       _dateController.text = FechaUtil.epochToString(_date);
       _partController.text = _participaciones.toString();
       _precioController.text = _precio.toString();
@@ -69,7 +69,8 @@ class _MercadoState extends State<PageMercado> {
   }
 
   _resetControllers() {
-    _dateController.text = FechaUtil.epochToString(DateTime.now().millisecondsSinceEpoch ~/ 1000);
+    _dateController.text =
+        FechaUtil.epochToString(DateTime.now().millisecondsSinceEpoch ~/ 1000);
     _partController.text = '0.0';
     _precioController.text = '0.0';
   }
@@ -83,7 +84,8 @@ class _MercadoState extends State<PageMercado> {
   }
 
   _dialogMercado(BuildContext context) async {
-    const String txt = 'Todas las operaciones de suscripción y reembolso son simulaciones para '
+    const String txt =
+        'Todas las operaciones de suscripción y reembolso son simulaciones para '
         'ser comparadas con transacciones reales, ficticias o potenciales.\n\n'
         'Cuando se realiza una operación en una fecha en la que existe otra, '
         'la app consulta si se quiere sobrescribir la primera o combinar ambas '
@@ -98,21 +100,25 @@ class _MercadoState extends State<PageMercado> {
       padding: EdgeInsets.all(8.0),
       child: Text(txt, style: TextStyle(fontSize: 16)),
     );
-    await Navigator.of(context).push(FullScreenModal(title: 'Operaciones', data: data));
+    await Navigator.of(context)
+        .push(FullScreenModal(title: 'Operaciones', data: data));
   }
 
   @override
   Widget build(BuildContext context) {
     final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) => false,
       child: Container(
         decoration: darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
         child: Scaffold(
           appBar: AppBar(
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () => context.go(fondoPage),
+              onPressed: () {
+                context.go(fondoPage);
+              },
             ),
             title: const Text('MERCADO'),
             actions: [
@@ -143,7 +149,8 @@ class _MercadoState extends State<PageMercado> {
                   child: LayoutBuilder(builder: (context, constraints) {
                     return ToggleButtons(
                       renderBorder: false,
-                      constraints: BoxConstraints.expand(width: constraints.maxWidth / 2),
+                      constraints: BoxConstraints.expand(
+                          width: constraints.maxWidth / 2),
                       isSelected: _isSelected,
                       //color: AppColor.gris,
                       //selectedColor: AppColor.azul100,
@@ -165,7 +172,9 @@ class _MercadoState extends State<PageMercado> {
                             padding: const EdgeInsets.symmetric(horizontal: 4),
                             child: Text('SUSCRIBIR',
                                 style: TextStyle(
-                                    fontWeight: _tipo ? FontWeight.bold : FontWeight.w300)),
+                                    fontWeight: _tipo
+                                        ? FontWeight.bold
+                                        : FontWeight.w300)),
                           ),
                         ),
                         FittedBox(
@@ -173,7 +182,9 @@ class _MercadoState extends State<PageMercado> {
                             padding: const EdgeInsets.symmetric(horizontal: 4),
                             child: Text('REEMBOLSAR',
                                 style: TextStyle(
-                                    fontWeight: !_tipo ? FontWeight.bold : FontWeight.w300)),
+                                    fontWeight: !_tipo
+                                        ? FontWeight.bold
+                                        : FontWeight.w300)),
                           ),
                         ),
                       ],
@@ -183,7 +194,8 @@ class _MercadoState extends State<PageMercado> {
                 const SizedBox(height: 20),
                 Form(
                   key: _formKey,
-                  onChanged: () => setState(() => _isValido = _formKey.currentState?.validate()),
+                  onChanged: () => setState(
+                      () => _isValido = _formKey.currentState?.validate()),
                   child: Column(
                     children: [
                       FractionallySizedBox(
@@ -198,7 +210,9 @@ class _MercadoState extends State<PageMercado> {
                           ),
                           controller: _dateController,
                           validator: (value) {
-                            return (value == null || value.isEmpty) ? 'Campo requerido' : null;
+                            return (value == null || value.isEmpty)
+                                ? 'Campo requerido'
+                                : null;
                           },
                           readOnly: true,
                           onTap: () async {
@@ -211,7 +225,8 @@ class _MercadoState extends State<PageMercado> {
                                 //_date = timeZone.millisecondsSinceEpoch ~/ 1000;
                                 _date = FechaUtil.dateToEpoch(fecha);
                                 _date = FechaUtil.epochToEpochHms(_date);
-                                _dateController.text = FechaUtil.dateToString(date: fecha);
+                                _dateController.text =
+                                    FechaUtil.dateToString(date: fecha);
                               });
                             }
                           },
@@ -225,13 +240,15 @@ class _MercadoState extends State<PageMercado> {
                           decoration: InputDecoration(
                             errorStyle: const TextStyle(fontSize: 0, height: 0),
                             labelText: 'Participaciones',
-                            suffixIcon:
-                                Icon(_tipo ? Icons.add_shopping_cart : Icons.currency_exchange),
+                            suffixIcon: Icon(_tipo
+                                ? Icons.add_shopping_cart
+                                : Icons.currency_exchange),
                             border: const OutlineInputBorder(),
                           ),
                           controller: _partController,
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'(^\-?\d*\.?\d*)'))
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'(^\-?\d*\.?\d*)'))
                           ],
                           keyboardType: TextInputType.number,
                           validator: (inputPart) {
@@ -245,7 +262,8 @@ class _MercadoState extends State<PageMercado> {
                           },
                           onTap: () => _partController.clear(),
                           onChanged: (value) {
-                            setState(() => _participaciones = double.tryParse(value) ?? 0);
+                            setState(() =>
+                                _participaciones = double.tryParse(value) ?? 0);
                           },
                         ),
                       ),
@@ -260,17 +278,20 @@ class _MercadoState extends State<PageMercado> {
                             suffixIcon: IconButton(
                               icon: const Icon(Icons.download),
                               onPressed: () async {
-                                var precioApi = await _dialogProgress(context, fondoSelect);
+                                var precioApi =
+                                    await _dialogProgress(context, fondoSelect);
                                 if (!mounted) return;
                                 if (precioApi != null) {
                                   setState(() {
                                     _precio = precioApi;
-                                    _precioController.text = precioApi.toString();
+                                    _precioController.text =
+                                        precioApi.toString();
                                   });
                                 } else {
                                   if (!mounted) return;
                                   _showMsg(
-                                    msg: 'Dato no disponible. Introduce el precio manualmente',
+                                    msg:
+                                        'Dato no disponible. Introduce el precio manualmente',
                                     color: AppColor.rojo900,
                                   );
                                 }
@@ -280,7 +301,8 @@ class _MercadoState extends State<PageMercado> {
                           ),
                           controller: _precioController,
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'(^\-?\d*\.?\d*)'))
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'(^\-?\d*\.?\d*)'))
                           ],
                           keyboardType: TextInputType.number,
                           validator: (inputPrecio) {
@@ -297,8 +319,8 @@ class _MercadoState extends State<PageMercado> {
                               _precioController.clear();
                             }
                           },
-                          onChanged: (value) =>
-                              setState(() => _precio = double.tryParse(value) ?? 0),
+                          onChanged: (value) => setState(
+                              () => _precio = double.tryParse(value) ?? 0),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -317,7 +339,8 @@ class _MercadoState extends State<PageMercado> {
                               fit: BoxFit.scaleDown,
                               child: Text(
                                 _isValido == true
-                                    ? NumberUtil.currency(_participaciones * _precio)
+                                    ? NumberUtil.currency(
+                                        _participaciones * _precio)
                                     : '0.0',
                                 maxLines: 1,
                                 style: const TextStyle(
@@ -333,7 +356,8 @@ class _MercadoState extends State<PageMercado> {
                       FractionallySizedBox(
                         widthFactor: 0.6,
                         child: ElevatedButton(
-                          onPressed: _isValido == true ? () => _submit(context) : null,
+                          onPressed:
+                              _isValido == true ? () => _submit(context) : null,
                           child: const Text('ORDENAR'),
                         ),
                       ),
@@ -365,11 +389,15 @@ class _MercadoState extends State<PageMercado> {
   _submit(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       Valor newOp = Valor(
-          tipo: _tipo ? 1 : 0, date: _date, participaciones: _participaciones, precio: _precio);
+          tipo: _tipo ? 1 : 0,
+          date: _date,
+          participaciones: _participaciones,
+          precio: _precio);
       bool opCheck = false;
       bool minusPart = false;
 
-      var valorDb = await database.getValorByDate(carteraSelect, fondoSelect, newOp);
+      var valorDb =
+          await database.getValorByDate(carteraSelect, fondoSelect, newOp);
       if (valorDb != null && valorDb.date == newOp.date && valorDb.tipo != -1) {
         String tipoOp = valorDb.tipo == 1 ? 'una suscripción' : 'un reembolso';
         String content = 'En esa fecha ya existe una operación: '
@@ -378,6 +406,7 @@ class _MercadoState extends State<PageMercado> {
             'Si el resultado es un reembolso o una reducción de participaciones, '
             'se eliminarán los reembolsos posteriores, si existen.\n\n'
             '¿Combinar ambas operaciones?';
+        if (!context.mounted) return;
         bool? combinarOp = await ConfirmDialog(
           context: context,
           title: '¡Operación concurrente!',
@@ -386,9 +415,12 @@ class _MercadoState extends State<PageMercado> {
         ).generateDialog();
 
         if (combinarOp == true) {
-          double partValordb =
-              valorDb.tipo == 0 ? -valorDb.participaciones! : valorDb.participaciones!;
-          double partNewValor = newOp.tipo == 0 ? -newOp.participaciones! : newOp.participaciones!;
+          double partValordb = valorDb.tipo == 0
+              ? -valorDb.participaciones!
+              : valorDb.participaciones!;
+          double partNewValor = newOp.tipo == 0
+              ? -newOp.participaciones!
+              : newOp.participaciones!;
           double partComb = partValordb + partNewValor;
           int tipoComb = partComb > 0 ? 1 : 0;
           partComb = partComb.abs();
@@ -458,7 +490,8 @@ class _MercadoState extends State<PageMercado> {
         return;
       }
       if (minusPart) {
-        await database.deleteAllReembolsosPosteriores(carteraSelect, fondoSelect, newOp);
+        await database.deleteAllReembolsosPosteriores(
+            carteraSelect, fondoSelect, newOp);
       }
       // INSERT O UPDATE OP ?? (SET VALORES PARA UPDATE UI ??)
       await database.insertValor(carteraSelect, fondoSelect, newOp);
@@ -517,16 +550,18 @@ class _MercadoState extends State<PageMercado> {
   }
 
   Future<double?>? _getPrecioApi(BuildContext context, Fondo fondo) async {
-    String fromAndTo = FechaUtil.epochToString(_date, formato: 'yyyy-MM-dd');
-    final getDateApiRange = await apiService.getDataApiRange(fondo.isin, fromAndTo, fromAndTo);
-    if (getDateApiRange != null && getDateApiRange.isNotEmpty) {
-      return getDateApiRange.first.price;
+    DateTime fromAndTo = FechaUtil.epochToDate(_date);
+    final newValores =
+        await yahooFinance.getYahooFinanceResponse(fondo, fromAndTo, fromAndTo);
+    if (newValores != null && newValores.isNotEmpty) {
+      return newValores.first.precio;
     }
     return null;
   }
 
   void _showMsg({required String msg, Color? color}) =>
-      CustomMessenger(context: context, msg: msg, color: color).generateDialog();
+      CustomMessenger(context: context, msg: msg, color: color)
+          .generateDialog();
 
   void _pop() {
     if (!mounted) return;

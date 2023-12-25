@@ -12,6 +12,7 @@ enum AppPage {
   inputFondo,
   inputRange,
   infoBalance,
+  pdf,
   mercado,
   info,
   about,
@@ -23,58 +24,39 @@ enum AppPage {
 
 extension AppPageExtension on AppPage {
   String get routePath {
-    switch (this) {
-      case AppPage.home:
-        return homePage;
-      case AppPage.cartera:
-        return carteraPage;
-      case AppPage.fondo:
-        return fondoPage;
-      case AppPage.mercado:
-        return mercadoPage;
-      case AppPage.infoBalance:
-        return infoBalancePage;
-      case AppPage.info:
-        return infoPage;
-      case AppPage.about:
-        return aboutPage;
-      case AppPage.support:
-        return supportPage;
-      case AppPage.settings:
-        return settingsPage;
-      case AppPage.global:
-        return globalPage;
-      case AppPage.error:
-        return errorPage;
-      default:
-        return homePage;
-    }
+    return switch (this) {
+      AppPage.home => homePage,
+      AppPage.cartera => carteraPage,
+      AppPage.fondo => fondoPage,
+      AppPage.pdf => pdfPage,
+      AppPage.mercado => mercadoPage,
+      AppPage.infoBalance => infoBalancePage,
+      AppPage.info => infoPage,
+      AppPage.about => aboutPage,
+      AppPage.support => supportPage,
+      AppPage.settings => settingsPage,
+      AppPage.global => globalPage,
+      AppPage.error => errorPage,
+      _ => homePage
+    };
   }
 
   String get subRoutePath {
-    switch (this) {
-      case AppPage.searchFondo:
-        return searchFondoSub;
-      case AppPage.inputFondo:
-        return inputFondoSub;
-      case AppPage.inputRange:
-        return inputRangeSub;
-      default:
-        return '/';
-    }
+    return switch (this) {
+      AppPage.searchFondo => searchFondoSub,
+      AppPage.inputFondo => inputFondoSub,
+      AppPage.inputRange => inputRangeSub,
+      _ => '/'
+    };
   }
 
   get routeClass {
-    switch (this) {
-      case AppPage.inputFondo:
-        return const PageInputFondo();
-      case AppPage.searchFondo:
-        return const PageSearchFondo();
-      case AppPage.inputRange:
-        return const PageInputRange();
-      default:
-        return const ErrorScreen();
-    }
+    return switch (this) {
+      AppPage.inputFondo => const PageInputFondo(),
+      AppPage.searchFondo => const PageSearchFondo(),
+      AppPage.inputRange => const PageInputRange(),
+      _ => const ErrorScreen()
+    };
   }
 
 /* String get routeName {

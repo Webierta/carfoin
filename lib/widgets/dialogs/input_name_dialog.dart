@@ -33,7 +33,7 @@ class RouterInputName {
 class InputNameDialog extends StatefulWidget {
   final String title;
   final String? label;
-  const InputNameDialog({Key? key, required this.title, this.label = ''}) : super(key: key);
+  const InputNameDialog({super.key, required this.title, this.label = ''});
 
   @override
   State<InputNameDialog> createState() => _InputNameDialogState();

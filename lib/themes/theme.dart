@@ -24,7 +24,8 @@ class AppTheme {
       onError: AppColor.blanco,
     );
 
-    IconThemeData iconTheme = IconThemeData(color: isDark ? AppColor.blanco : AppColor.light900);
+    IconThemeData iconTheme =
+        IconThemeData(color: isDark ? AppColor.blanco : AppColor.light900);
 
     Typography typography = Typography(
       black: AppText.textTheme(AppColor.light900),
@@ -36,7 +37,8 @@ class AppTheme {
     AppBarTheme appBarTheme = AppBarTheme(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      iconTheme: IconThemeData(color: isDark ? AppColor.blanco : AppColor.light900),
+      iconTheme:
+          IconThemeData(color: isDark ? AppColor.blanco : AppColor.light900),
       foregroundColor: isDark ? AppColor.blanco : AppColor.light900,
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: isDark ? AppColor.blanco : AppColor.light900,
@@ -62,7 +64,8 @@ class AppTheme {
       elevation: 10,
     );
 
-    TextButtonThemeData textButtonTheme = TextButtonThemeData(style: ButtonStyle(
+    TextButtonThemeData textButtonTheme =
+        TextButtonThemeData(style: ButtonStyle(
       foregroundColor: MaterialStateColor.resolveWith((state) {
         if (state.contains(MaterialState.disabled)) {
           return AppColor.gris;
@@ -94,21 +97,27 @@ class AppTheme {
 
     ChipThemeData chipTheme = ChipThemeData(
       backgroundColor: isDark ? AppColor.dark700 : AppColor.light100,
-      labelStyle: TextStyle(color: isDark ? AppColor.dark100 : AppColor.light900),
-      iconTheme: IconThemeData(color: isDark ? AppColor.dark100 : AppColor.light900),
+      labelStyle:
+          TextStyle(color: isDark ? AppColor.dark100 : AppColor.light900),
+      iconTheme:
+          IconThemeData(color: isDark ? AppColor.dark100 : AppColor.light900),
       brightness: isDark ? Brightness.dark : Brightness.light,
-      side: BorderSide(color: isDark ? AppColor.dark100 : AppColor.light900, width: 0.7),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0))),
+      side: BorderSide(
+          color: isDark ? AppColor.dark100 : AppColor.light900, width: 0.7),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(4.0))),
       padding: const EdgeInsets.only(left: 4),
     );
 
     PopupMenuThemeData popupMenuTheme = PopupMenuThemeData(
       color: isDark ? AppColor.boxDark : AppColor.blanco,
-      textStyle: TextStyle(color: isDark ? AppColor.dark100 : AppColor.light900),
+      textStyle:
+          TextStyle(color: isDark ? AppColor.dark100 : AppColor.light900),
       elevation: 10,
     );
 
-    FloatingActionButtonThemeData floatingActionButtonTheme = const FloatingActionButtonThemeData(
+    FloatingActionButtonThemeData floatingActionButtonTheme =
+        const FloatingActionButtonThemeData(
       backgroundColor: AppColor.ambar,
       foregroundColor: AppColor.light900,
     );

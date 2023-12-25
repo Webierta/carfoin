@@ -9,8 +9,10 @@ class ListTileDestacado extends StatelessWidget {
   final IconData icon;
   final Function goFondo;
   const ListTileDestacado(
-      {Key? key, required this.destacado, required this.icon, required this.goFondo})
-      : super(key: key);
+      {super.key,
+      required this.destacado,
+      required this.icon,
+      required this.goFondo});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,8 @@ class ListTileDestacado extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 InkWell(
-                  onTap: () => goFondo(context, destacado.cartera, destacado.fondo),
+                  onTap: () =>
+                      goFondo(context, destacado.cartera, destacado.fondo),
                   child: Text(
                     destacado.fondo.name,
                     maxLines: 1,
@@ -37,13 +40,6 @@ class ListTileDestacado extends StatelessWidget {
                           //color: Colors.transparent,
                           //shadows: [const Shadow(offset: Offset(0, -4), color: Colors.black)],
                         ),
-                    /* style: const TextStyle(
-                      fontSize: 16,
-                      decoration: TextDecoration.underline,
-                      decorationColor: blue,
-                      color: Colors.transparent,
-                      shadows: [Shadow(offset: Offset(0, -4), color: Colors.black)],
-                    ), */
                   ),
                 ),
                 Row(
@@ -68,7 +64,8 @@ class ListTileDestacado extends StatelessWidget {
             NumberUtil.percentCompact(destacado.tae),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 16, color: AppColor.textRedGreen(destacado.tae)),
+            style: TextStyle(
+                fontSize: 16, color: AppColor.textRedGreen(destacado.tae)),
           ),
         ],
       ),

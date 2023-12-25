@@ -12,34 +12,39 @@ import '../widgets/dialogs/custom_messenger.dart';
 import '../widgets/my_drawer.dart';
 
 const String btcAddress = '15ZpNzqbYFx9P7wg4U438JMwZr2q3W6fkS';
-const String urlPayPal = 'https://www.paypal.com/donate?hosted_button_id=986PSAHLH6N4L';
+const String urlPayPal =
+    'https://www.paypal.com/donate?hosted_button_id=986PSAHLH6N4L';
 const String urlGitHub = 'https://github.com/Webierta/carfoin/issues';
 
 class PageSupport extends StatelessWidget {
-  const PageSupport({Key? key}) : super(key: key);
+  const PageSupport({super.key});
 
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context);
 
     void launchweb(url) async {
-      if (!await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication)) {
+      if (!await launchUrl(Uri.parse(url),
+          mode: LaunchMode.externalApplication)) {
         throw 'Could not launch $url';
       }
     }
 
     void showMsg({required String msg, Color? color}) =>
-        CustomMessenger(context: context, msg: msg, color: color).generateDialog();
+        CustomMessenger(context: context, msg: msg, color: color)
+            .generateDialog();
 
     clipboard() async {
       await Clipboard.setData(const ClipboardData(text: btcAddress));
       showMsg(msg: 'BTC Address copied to Clipboard');
     }
 
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) => false,
       child: Container(
-        decoration: theme.darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
+        decoration:
+            theme.darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
         child: Scaffold(
           drawer: const MyDrawer(),
           appBar: AppBar(
@@ -52,7 +57,8 @@ class PageSupport extends StatelessWidget {
             ],
           ),
           body: SingleChildScrollView(
-            padding: const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 40),
+            padding:
+                const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 40),
             child: Column(
               children: [
                 const Align(
@@ -77,7 +83,8 @@ class PageSupport extends StatelessWidget {
                           decoration: TextDecoration.underline,
                         ),
                         text: 'GitHub issues.',
-                        recognizer: TapGestureRecognizer()..onTap = () => launchweb(urlGitHub),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () => launchweb(urlGitHub),
                       ),
                     ],
                   ),
@@ -127,7 +134,8 @@ class PageSupport extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: AppBox.borderRadius8,
-                        border: Border.all(color: const Color(0xFFFFFFFF), width: 1),
+                        border: Border.all(
+                            color: const Color(0xFFFFFFFF), width: 1),
                       ),
                       child: Row(
                         children: [

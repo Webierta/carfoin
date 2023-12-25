@@ -10,12 +10,11 @@ class VistaCompactaFondos extends StatelessWidget {
   final Function removeFondo;
   final Function goFondo;
   const VistaCompactaFondos(
-      {Key? key,
+      {super.key,
       required this.fondo,
       required this.updateFondo,
       required this.removeFondo,
-      required this.goFondo})
-      : super(key: key);
+      required this.goFondo});
 
   @override
   Widget build(BuildContext context) {
@@ -47,14 +46,13 @@ class VistaCompactaFondos extends StatelessWidget {
               backgroundColor: AppColor.ambar,
               child: Text(
                 fondo.name[0],
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineLarge
-                    ?.copyWith(color: AppColor.light900, fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                    color: AppColor.light900, fontWeight: FontWeight.bold),
               ),
             ),
           ),
-          title: Text(fondo.name, style: Theme.of(context).textTheme.titleMedium),
+          title:
+              Text(fondo.name, style: Theme.of(context).textTheme.titleMedium),
           trailing: const Icon(Icons.swipe, color: AppColor.light100),
         ),
       ),

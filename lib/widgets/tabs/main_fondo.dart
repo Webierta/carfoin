@@ -6,22 +6,20 @@ import '../../models/cartera.dart';
 import '../../models/cartera_provider.dart';
 import '../../models/logger.dart';
 import '../../models/preferences_provider.dart';
+import '../../pages/page_pdf.dart';
 import '../../router/routes_const.dart';
 import '../../services/database_helper.dart';
-import '../../services/doc_cnmv.dart';
 import '../../themes/styles_theme.dart';
 import '../../themes/theme_provider.dart';
 import '../../utils/fecha_util.dart';
 import '../../utils/number_util.dart';
-import '../../utils/pdf_viewer.dart';
 import '../../utils/stats.dart';
 import '../dialogs/confirm_dialog.dart';
 import '../dialogs/custom_messenger.dart';
 import '../hoja_calendario.dart';
-import '../loading_progress.dart';
 
 class MainFondo extends StatefulWidget {
-  const MainFondo({Key? key}) : super(key: key);
+  const MainFondo({super.key});
 
   @override
   State<MainFondo> createState() => _MainFondoState();
@@ -34,8 +32,6 @@ class _MainFondoState extends State<MainFondo> {
   late Fondo fondoSelect;
   late List<Valor> valoresSelect;
   late List<Valor> operacionesSelect;
-
-  bool openingPdf = false;
 
   Stats stats = const Stats([]); //late Stats stats;
   double? inversion;
@@ -95,7 +91,8 @@ class _MainFondoState extends State<MainFondo> {
     final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
     PreferencesProvider prefProvider = context.read<PreferencesProvider>();
     final List<Valor> valores = context.watch<CarteraProvider>().valores;
-    final List<Valor> operaciones = context.watch<CarteraProvider>().operaciones;
+    final List<Valor> operaciones =
+        context.watch<CarteraProvider>().operaciones;
 
     double? getDiferencia() {
       if (valores.length > 1) {
@@ -133,7 +130,9 @@ class _MainFondoState extends State<MainFondo> {
               alignment: Alignment.centerRight,
               child: Text(
                 FechaUtil.epochToString(op.date, formato: 'dd/MM/yy'),
-                style: TextStyle(color: darkTheme ? AppColor.blanco : AppColor.light900),
+                style: TextStyle(
+                  color: darkTheme ? AppColor.blanco : AppColor.light900,
+                ),
               ),
             )),
             DataCell(Align(
@@ -141,22 +140,29 @@ class _MainFondoState extends State<MainFondo> {
               child: Text(
                 op.tipo == 1
                     ? NumberUtil.decimal(op.participaciones ?? 0, long: false)
-                    : NumberUtil.decimal((op.participaciones ?? 0) * -1, long: false),
-                style: TextStyle(color: op.tipo == 1 ? AppColor.verde : AppColor.rojo),
+                    : NumberUtil.decimal((op.participaciones ?? 0) * -1,
+                        long: false),
+                style: TextStyle(
+                  color: op.tipo == 1 ? AppColor.verde : AppColor.rojo,
+                ),
               ),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
                 NumberUtil.decimal(op.precio),
-                style: TextStyle(color: darkTheme ? AppColor.blanco : AppColor.light900),
+                style: TextStyle(
+                  color: darkTheme ? AppColor.blanco : AppColor.light900,
+                ),
               ),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
-                NumberUtil.decimalFixed((op.participaciones ?? 0) * op.precio, long: false),
-                style: TextStyle(color: darkTheme ? AppColor.blanco : AppColor.light900),
+                NumberUtil.decimalFixed((op.participaciones ?? 0) * op.precio,
+                    long: false),
+                style: TextStyle(
+                    color: darkTheme ? AppColor.blanco : AppColor.light900),
               ),
             )),
             DataCell(IconButton(
@@ -188,24 +194,29 @@ class _MainFondoState extends State<MainFondo> {
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
-                FechaUtil.epochToString(valores.first.date, formato: 'dd/MM/yy'),
-                style: const TextStyle(fontWeight: FontWeight.bold, color: AppColor.blanco),
+                FechaUtil.epochToString(valores.first.date,
+                    formato: 'dd/MM/yy'),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, color: AppColor.blanco),
               ),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
                 stats.totalParticipaciones() != null
-                    ? NumberUtil.decimalFixed(stats.totalParticipaciones()!, long: false)
+                    ? NumberUtil.decimalFixed(stats.totalParticipaciones()!,
+                        long: false)
                     : '',
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
               ),
             )),
             DataCell(Align(
               alignment: Alignment.centerRight,
               child: Text(
                 NumberUtil.decimal(valores.first.precio),
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
               ),
             )),
             DataCell(Align(
@@ -214,7 +225,8 @@ class _MainFondoState extends State<MainFondo> {
                 stats.resultado() != null
                     ? NumberUtil.decimalFixed(stats.resultado()!, long: false)
                     : '',
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, color: Color(0xFFFFFFFF)),
               ),
             )),
             const DataCell(Text('')),
@@ -265,36 +277,16 @@ class _MainFondoState extends State<MainFondo> {
       return true;
     }
 
-    showDialogLoading(BuildContext context) async {
-      return await showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return const SizedBox(
-              width: double.infinity,
-              height: double.infinity,
-              child: LoadingProgress(titulo: 'Cargando documento...'),
-            );
-          });
-    }
-
     List<Icon> getStarRating() {
       List<Icon> estrellas = [];
       int rating = fondoSelect.rating ?? 0;
       for (var i = 1; i < 6; i++) {
-        var icon = Icon(Icons.star, color: rating >= i ? AppColor.verdeAccent400 : AppColor.gris);
+        var icon = Icon(Icons.star,
+            color: rating >= i ? AppColor.verdeAccent400 : AppColor.gris);
         estrellas.add(icon);
       }
       return estrellas;
     }
-
-    if (openingPdf) {
-      Future.delayed(Duration.zero, () => showDialogLoading(context));
-    }
-
-    /*if (operaciones.isNotEmpty && allStatsIsNull()) {
-      return const Center(child: CircularProgressIndicator());
-    }*/
 
     return ListView(
       shrinkWrap: true,
@@ -338,52 +330,42 @@ class _MainFondoState extends State<MainFondo> {
                   child: Row(children: [
                     TextButton.icon(
                       onPressed: () async {
-                        setState(() => openingPdf = true);
-                        var docCnmv = DocCnmv(isin: fondoSelect.isin);
-                        String? urlPdf = await docCnmv.getUrlFolleto();
-                        if (urlPdf != null) {
-                          String filename = 'folleto_${fondoSelect.isin}.pdf';
-                          if (!mounted) return;
-                          await openPdfViewer(context, filename, urlPdf);
-                        } else {
-                          setState(() => openingPdf = false);
-                          if (!mounted) return;
-                          Navigator.of(context).pop();
-                          _showMsg(msg: 'Archivo no disponible', color: AppColor.rojo900);
-                          Logger.log(
-                              dataLog: DataLog(
-                                  msg: 'urlPdf is null',
-                                  file: 'main_fondo.dart',
-                                  clase: '_MainFondoState',
-                                  funcion: 'build'));
+                        final bool? showPdf = await context.push<bool>(pdfPage,
+                            extra: FondoDoc(
+                              fondo: fondoSelect,
+                              pdfDoc: PdfDoc.folleto,
+                            ));
+                        if (showPdf == null || showPdf == false) {
+                          showPdfFalse(msg: 'error folleto');
                         }
+                        /* context.go(
+                          pdfPage,
+                          extra: FondoDoc(
+                            fondo: fondoSelect,
+                            pdfDoc: PdfDoc.folleto,
+                          ),
+                        ); */
                       },
                       icon: Image.asset('assets/pdf.gif'),
                       label: const Text('Folleto'),
                     ),
                     TextButton.icon(
                       onPressed: () async {
-                        setState(() => openingPdf = true);
-                        var docCnmv = DocCnmv(isin: fondoSelect.isin);
-                        Informe? informe = await docCnmv.getUrlInforme();
-                        if (informe != null) {
-                          var name = informe.name;
-                          var urlPdf = informe.url;
-                          String filename = '${name}_${fondoSelect.isin}.pdf';
-                          if (!mounted) return;
-                          await openPdfViewer(context, filename, urlPdf);
-                        } else {
-                          setState(() => openingPdf = false);
-                          if (!mounted) return;
-                          Navigator.of(context).pop();
-                          _showMsg(msg: 'Archivo no disponible', color: AppColor.rojo900);
-                          Logger.log(
-                              dataLog: DataLog(
-                                  msg: 'informe is null',
-                                  file: 'main_fondo.dart',
-                                  clase: '_MainFondoState',
-                                  funcion: 'build'));
+                        final bool? showPdf = await context.push<bool>(pdfPage,
+                            extra: FondoDoc(
+                              fondo: fondoSelect,
+                              pdfDoc: PdfDoc.informe,
+                            ));
+                        if (showPdf == null || showPdf == false) {
+                          showPdfFalse(msg: 'error informe');
                         }
+                        /* context.go(
+                          pdfPage,
+                          extra: FondoDoc(
+                            fondo: fondoSelect,
+                            pdfDoc: PdfDoc.informe,
+                          ),
+                        ); */
                       },
                       icon: Image.asset('assets/pdf.gif'),
                       label: const Text('Informe'),
@@ -409,17 +391,22 @@ class _MainFondoState extends State<MainFondo> {
                                     DiaCalendario(epoch: valores.first.date),
                                     const Spacer(),
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Row(
                                           children: [
                                             Text(
-                                              NumberUtil.decimalFixed(valores.first.precio,
+                                              NumberUtil.decimalFixed(
+                                                  valores.first.precio,
                                                   long: false),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
-                                              style: Theme.of(context).textTheme.titleLarge,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge,
                                             ),
                                             const SizedBox(width: 4),
                                             const Icon(Icons.sell),
@@ -429,7 +416,8 @@ class _MainFondoState extends State<MainFondo> {
                                           Row(
                                             children: [
                                               Text(
-                                                NumberUtil.compactFixed(getDiferencia()!),
+                                                NumberUtil.compactFixed(
+                                                    getDiferencia()!),
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: Theme.of(context)
@@ -437,7 +425,8 @@ class _MainFondoState extends State<MainFondo> {
                                                     .titleMedium
                                                     ?.copyWith(
                                                       color:
-                                                          AppColor.textRedGreen(getDiferencia()!),
+                                                          AppColor.textRedGreen(
+                                                              getDiferencia()!),
                                                     ),
                                               ),
                                               const SizedBox(width: 4),
@@ -446,24 +435,33 @@ class _MainFondoState extends State<MainFondo> {
                                           ),
                                       ],
                                     ),
-                                    if (fondoSelect.divisa == 'EUR' || fondoSelect.divisa == 'USD')
+                                    if (fondoSelect.divisa == 'EUR' ||
+                                        fondoSelect.divisa == 'USD')
                                       Padding(
-                                        padding: const EdgeInsets.only(left: 10),
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
                                         child: Text(
-                                          fondoSelect.divisa == 'EUR' ? '€' : '\$',
-                                          textScaleFactor: 2.5,
-                                          style: const TextStyle(color: AppColor.light200),
+                                          fondoSelect.divisa == 'EUR'
+                                              ? '€'
+                                              : '\$',
+                                          textScaler:
+                                              const TextScaler.linear(2.5),
+                                          //textScaleFactor: 2.5,
+                                          style: const TextStyle(
+                                              color: AppColor.light200),
                                         ),
                                       ),
                                   ],
                                 ),
                               ),
-                              if (valores.isNotEmpty) const SizedBox(height: 10),
+                              if (valores.isNotEmpty)
+                                const SizedBox(height: 10),
                               if (valores.length > 1)
                                 Row(
                                   children: [
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                             'Mínimo  \t\t (${fechaPrecio(stats.datePrecioMinimo())})'),
@@ -475,16 +473,21 @@ class _MainFondoState extends State<MainFondo> {
                                     ),
                                     const Spacer(),
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
                                       children: [
-                                        Text(NumberUtil.decimal(stats.precioMinimo() ?? 0)),
-                                        Text(NumberUtil.decimal(stats.precioMaximo() ?? 0)),
+                                        Text(NumberUtil.decimal(
+                                            stats.precioMinimo() ?? 0)),
+                                        Text(NumberUtil.decimal(
+                                            stats.precioMaximo() ?? 0)),
                                         Text(stats.precioMedio() != null
-                                            ? NumberUtil.decimalFixed(stats.precioMedio()!,
+                                            ? NumberUtil.decimalFixed(
+                                                stats.precioMedio()!,
                                                 long: false)
                                             : ''),
                                         Text(stats.volatilidad() != null
-                                            ? NumberUtil.decimalFixed(stats.volatilidad()!,
+                                            ? NumberUtil.decimalFixed(
+                                                stats.volatilidad()!,
                                                 long: false)
                                             : ''),
                                       ],
@@ -525,8 +528,13 @@ class _MainFondoState extends State<MainFondo> {
                     child: CircleAvatar(
                       backgroundColor: AppColor.ambar,
                       child: IconButton(
-                        icon: const Icon(Icons.shopping_cart, color: AppColor.light900),
-                        onPressed: () => context.go(mercadoPage),
+                        icon: const Icon(
+                          Icons.shopping_cart,
+                          color: AppColor.light900,
+                        ),
+                        onPressed: () {
+                          context.go(mercadoPage);
+                        },
                       ),
                     ),
                   ),
@@ -547,16 +555,21 @@ class _MainFondoState extends State<MainFondo> {
                               child: DataTable(
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                      color: darkTheme ? AppColor.boxDark : AppColor.light,
+                                      color: darkTheme
+                                          ? AppColor.boxDark
+                                          : AppColor.light,
                                       width: 2),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 //headingRowHeight: 0,
                                 columnSpacing: 20,
-                                dataRowHeight: 70,
+                                dataRowMaxHeight: 70,
+                                //dataRowHeight: 70,
                                 //horizontalMargin: 10,
                                 headingRowColor: MaterialStateColor.resolveWith(
-                                    (states) => darkTheme ? AppColor.boxDark : AppColor.light),
+                                    (states) => darkTheme
+                                        ? AppColor.boxDark
+                                        : AppColor.light),
                                 headingTextStyle: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
@@ -585,7 +598,8 @@ class _MainFondoState extends State<MainFondo> {
                   ListTile(
                     minLeadingWidth: 0,
                     leading: const Icon(Icons.balance, size: 32),
-                    title: Text('BALANCE', style: Theme.of(context).textTheme.titleLarge),
+                    title: Text('BALANCE',
+                        style: Theme.of(context).textTheme.titleLarge),
                     trailing: CircleAvatar(
                       radius: 22,
                       backgroundColor: const Color(0xFFFFFFFF),
@@ -593,7 +607,8 @@ class _MainFondoState extends State<MainFondo> {
                         backgroundColor: AppColor.ambar,
                         child: IconButton(
                           onPressed: () => context.go(infoBalancePage),
-                          icon: const Icon(Icons.info_outline, color: AppColor.light900),
+                          icon: const Icon(Icons.info_outline,
+                              color: AppColor.light900),
                         ),
                       ),
                     ),
@@ -606,37 +621,57 @@ class _MainFondoState extends State<MainFondo> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          if (allStatsIsNull()) const Text('Error en los cálculos'),
+                          if (allStatsIsNull())
+                            const Text('Error en los cálculos'),
                           if (inversion != null)
                             RowBalance(
                               label: 'Inversión',
-                              data: NumberUtil.decimalFixed(inversion!, long: false),
-                              color: darkTheme ? AppColor.blanco : AppColor.light900,
+                              data: NumberUtil.decimalFixed(inversion!,
+                                  long: false),
+                              color: darkTheme
+                                  ? AppColor.blanco
+                                  : AppColor.light900,
                             ),
                           if (resultado != null) const SizedBox(height: 10),
                           if (resultado != null)
                             RowBalance(
                               label: 'Resultado',
-                              data: NumberUtil.decimalFixed(resultado!, long: false),
-                              color: darkTheme ? AppColor.blanco : AppColor.light900,
+                              data: NumberUtil.decimalFixed(resultado!,
+                                  long: false),
+                              color: darkTheme
+                                  ? AppColor.blanco
+                                  : AppColor.light900,
                             ),
                           if (rendimiento != null) const SizedBox(height: 10),
                           if (rendimiento != null)
                             RowBalance(
                               label: 'Rendimiento',
-                              data: NumberUtil.decimalFixed(rendimiento!, long: false),
+                              data: NumberUtil.decimalFixed(rendimiento!,
+                                  long: false),
                               color: AppColor.textRedGreen(rendimiento!),
                             ),
-                          if (rentabilidad != null || twr != null || mwrAcum != null)
+                          if (rentabilidad != null ||
+                              twr != null ||
+                              mwrAcum != null)
                             const SizedBox(height: 10),
-                          if (rentabilidad != null || twr != null || mwrAcum != null)
-                            Row(
-                              children: const [
+                          if (rentabilidad != null ||
+                              twr != null ||
+                              mwrAcum != null)
+                            const Row(
+                              children: [
                                 Expanded(
-                                  child: Divider(endIndent: 10, thickness: 1),
+                                  child: Divider(
+                                    endIndent: 10,
+                                    thickness: 1,
+                                  ),
                                 ),
                                 Text('RENTABILIDAD'),
-                                Expanded(child: Divider(indent: 10, thickness: 1)),
+                                Expanded(
+                                  child: Divider(
+                                    indent: 10,
+                                    thickness: 1,
+                                  ),
+                                ),
                               ],
                             ),
                           if (rentabilidad != null) const SizedBox(height: 10),
@@ -663,11 +698,15 @@ class _MainFondoState extends State<MainFondo> {
                           if (rentAnual != null || tae != null || mwr != null)
                             const SizedBox(height: 10),
                           if (rentAnual != null || tae != null || mwr != null)
-                            Row(
-                              children: const [
-                                Expanded(child: Divider(endIndent: 10, thickness: 1)),
+                            const Row(
+                              children: [
+                                Expanded(
+                                  child: Divider(endIndent: 10, thickness: 1),
+                                ),
                                 Text('RENTABILIDAD ANUAL'),
-                                Expanded(child: Divider(indent: 10, thickness: 1)),
+                                Expanded(
+                                  child: Divider(indent: 10, thickness: 1),
+                                ),
                               ],
                             ),
                           if (rentAnual != null) const SizedBox(height: 10),
@@ -703,21 +742,23 @@ class _MainFondoState extends State<MainFondo> {
     );
   }
 
-  openPdfViewer(BuildContext context, String fileName, String url) async {
-    await Navigator.of(context)
-        .push(MaterialPageRoute(
-            builder: (context) => PdfViewer(
-                  fileName: fileName,
-                  url: url,
-                )))
-        .whenComplete(() {
-      setState(() => openingPdf = false);
-      Navigator.of(context).pop();
-    });
+  void showPdfFalse({required String msg}) {
+    Logger.log(
+      dataLog: DataLog(
+        msg: msg,
+        file: 'main_fondo.dart',
+        clase: '_MainFondoState',
+        funcion: 'onPressed TextButton',
+      ),
+    );
+    _showMsg();
   }
 
-  void _showMsg({required String msg, Color? color}) =>
-      CustomMessenger(context: context, msg: msg, color: color).generateDialog();
+  void _showMsg() => CustomMessenger(
+        context: context,
+        msg: 'Archivo no disponible',
+        color: AppColor.rojo900,
+      ).generateDialog();
 }
 
 class RowBalance extends StatelessWidget {
@@ -726,11 +767,11 @@ class RowBalance extends StatelessWidget {
   final Color color;
 
   const RowBalance({
-    Key? key,
+    super.key,
     required this.label,
     required this.data,
     this.color = Colors.black,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

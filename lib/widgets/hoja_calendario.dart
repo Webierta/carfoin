@@ -5,14 +5,15 @@ import '../utils/fecha_util.dart';
 
 class DiaCalendario extends StatelessWidget {
   final int epoch;
-  const DiaCalendario({Key? key, required this.epoch}) : super(key: key);
+  const DiaCalendario({super.key, required this.epoch});
 
   @override
   Widget build(BuildContext context) {
     int dia = FechaUtil.epochToDate(epoch).day;
     String mesYear = FechaUtil.epochToString(epoch, formato: 'MMM yy');
     return Container(
-      decoration: const BoxDecoration(color: AppColor.blanco, shape: BoxShape.rectangle),
+      decoration: const BoxDecoration(
+          color: AppColor.blanco, shape: BoxShape.rectangle),
       child: FittedBox(
         fit: BoxFit.fill,
         child: Column(

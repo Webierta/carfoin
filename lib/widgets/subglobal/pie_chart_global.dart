@@ -8,13 +8,14 @@ import '../../utils/number_util.dart';
 import '../../utils/stats_global.dart';
 import 'bar_chart_balance.dart' show BarChartBalance;
 
-enum CriterioPie { Fondos, Inversion, Valor, Balance }
+enum CriterioPie { fondos, inversion, valor, balance }
 
 class DataPie {
   final String nameCartera;
   final double data;
   final Color color;
-  const DataPie({required this.nameCartera, required this.data, required this.color});
+  const DataPie(
+      {required this.nameCartera, required this.data, required this.color});
 }
 
 class PieChartGlobal extends StatelessWidget {
@@ -23,18 +24,17 @@ class PieChartGlobal extends StatelessWidget {
   final StatsGlobal statsGlobal;
   final double rateExchange;
   const PieChartGlobal(
-      {Key? key,
+      {super.key,
       required this.carteras,
       required this.statsGlobal,
       required this.criterioPie,
-      required this.rateExchange})
-      : super(key: key);
+      required this.rateExchange});
 
   _dialogPie(BuildContext context, Cartera cartera) async {
     var statsGlobalCartera = StatsGlobal(rateExchange: rateExchange);
     statsGlobalCartera.calcular([cartera]);
     List<Widget> children = [];
-    if (criterioPie == CriterioPie.Fondos) {
+    if (criterioPie == CriterioPie.fondos) {
       for (var fondo in cartera.fondos!) {
         var child = Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -42,11 +42,13 @@ class PieChartGlobal extends StatelessWidget {
         );
         children.add(child);
       }
-    } else if (criterioPie == CriterioPie.Inversion) {
-      var child = Text('Inversión: ${NumberUtil.currency(statsGlobalCartera.inversionGlobal)} €');
+    } else if (criterioPie == CriterioPie.inversion) {
+      var child = Text(
+          'Inversión: ${NumberUtil.currency(statsGlobalCartera.inversionGlobal)} €');
       children.add(child);
-    } else if (criterioPie == CriterioPie.Valor) {
-      var child = Text('Valor: ${NumberUtil.currency(statsGlobalCartera.valorGlobal)} €');
+    } else if (criterioPie == CriterioPie.valor) {
+      var child = Text(
+          'Valor: ${NumberUtil.currency(statsGlobalCartera.valorGlobal)} €');
       children.add(child);
     }
     return showDialog<void>(
@@ -63,15 +65,16 @@ class PieChartGlobal extends StatelessWidget {
 
   Color getColor() {
     final random = Random();
-    return Color.fromARGB(255, random.nextInt(256), random.nextInt(256), random.nextInt(256));
+    return Color.fromARGB(
+        255, random.nextInt(256), random.nextInt(256), random.nextInt(256));
   }
 
   @override
   Widget build(BuildContext context) {
-    if (criterioPie != CriterioPie.Fondos && statsGlobal.inversionGlobal == 0) {
+    if (criterioPie != CriterioPie.fondos && statsGlobal.inversionGlobal == 0) {
       return const PieChartNull();
     }
-    if (criterioPie == CriterioPie.Balance && statsGlobal.inversionGlobal > 0) {
+    if (criterioPie == CriterioPie.balance && statsGlobal.inversionGlobal > 0) {
       return BarChartBalance(carteras: carteras, rateExchange: rateExchange);
     }
     final List<DataPie> dataPies = [];
@@ -81,12 +84,12 @@ class PieChartGlobal extends StatelessWidget {
       statsGlobalCartera.calcular([cartera]);
       double data = 0.0;
       Color color = getColor();
-      if (criterioPie == CriterioPie.Fondos) {
+      if (criterioPie == CriterioPie.fondos) {
         List<Fondo>? fondos = cartera.fondos;
         data = fondos?.length.toDouble() ?? 0.0;
-      } else if (criterioPie == CriterioPie.Inversion) {
+      } else if (criterioPie == CriterioPie.inversion) {
         data = statsGlobalCartera.inversionGlobal;
-      } else if (criterioPie == CriterioPie.Valor) {
+      } else if (criterioPie == CriterioPie.valor) {
         data = statsGlobalCartera.valorGlobal;
       }
       dataPies.add(
@@ -123,7 +126,8 @@ class PieChartGlobal extends StatelessWidget {
             var index = response!.touchedSection!.touchedSectionIndex;
             Cartera? carteraTouch;
             try {
-              var carterasConFondos = carteras.where((c) => c.fondos!.isNotEmpty).toList();
+              var carterasConFondos =
+                  carteras.where((c) => c.fondos!.isNotEmpty).toList();
               carteraTouch = carterasConFondos[index];
             } catch (e) {
               carteraTouch = null;
@@ -151,7 +155,7 @@ class PieChartGlobal extends StatelessWidget {
 }
 
 class PieChartNull extends StatelessWidget {
-  const PieChartNull({Key? key}) : super(key: key);
+  const PieChartNull({super.key});
   @override
   Widget build(BuildContext context) {
     return const Center(

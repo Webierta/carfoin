@@ -6,9 +6,12 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 class AppText {
   static textTheme(Color color) {
     return TextTheme(
-      headlineLarge: TextStyle(color: color, fontSize: 32, fontWeight: FontWeight.w200),
-      headlineMedium: TextStyle(color: color, fontSize: 28, fontWeight: FontWeight.w200),
-      headlineSmall: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.w300),
+      headlineLarge:
+          TextStyle(color: color, fontSize: 32, fontWeight: FontWeight.w200),
+      headlineMedium:
+          TextStyle(color: color, fontSize: 28, fontWeight: FontWeight.w200),
+      headlineSmall:
+          TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.w300),
       titleLarge: TextStyle(color: color),
       titleMedium: TextStyle(color: color),
       titleSmall: TextStyle(color: color),
@@ -91,14 +94,16 @@ class AppColor {
 /* BOX DECORATION */
 
 class AppBox {
-  static const BorderRadius borderRadius8 = BorderRadius.all(Radius.circular(8.0));
+  static const BorderRadius borderRadius8 =
+      BorderRadius.all(Radius.circular(8.0));
 
   static const roundBorder = RoundedRectangleBorder(
     borderRadius: BorderRadius.all(Radius.circular(8.0)),
   );
 
   static BoxDecoration buildBoxDecoration(bool darkTheme) {
-    var color = darkTheme ? AppColor.gradientDark2 : AppColor.boxLight; // light100
+    var color =
+        darkTheme ? AppColor.gradientDark2 : AppColor.boxLight; // light100
     var colorBorder = darkTheme ? AppColor.gris : AppColor.blanco;
     return BoxDecoration(
       color: color,
@@ -144,6 +149,7 @@ class AppMarkdown {
     return MarkdownStyleSheet(
       h1: TextStyle(color: colorH, fontSize: 40),
       h2: TextStyle(color: colorH, fontSize: 22),
+      h3: TextStyle(color: colorH, fontSize: 20),
       p: const TextStyle(fontSize: 18),
       blockquoteDecoration: BoxDecoration(
         color: darkTheme ? AppColor.dark : AppColor.blanco,

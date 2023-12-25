@@ -7,7 +7,7 @@ import '../themes/theme_provider.dart';
 class LoadingProgress extends StatelessWidget {
   final String titulo;
   final String subtitulo;
-  const LoadingProgress({Key? key, required this.titulo, this.subtitulo = ''}) : super(key: key);
+  const LoadingProgress({super.key, required this.titulo, this.subtitulo = ''});
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +18,14 @@ class LoadingProgress extends StatelessWidget {
 class Loading extends StatelessWidget {
   final String titulo;
   final String subtitulo;
-  const Loading({Key? key, required this.titulo, this.subtitulo = ''}) : super(key: key);
+  const Loading({super.key, required this.titulo, this.subtitulo = ''});
 
   @override
   Widget build(BuildContext context) {
     final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) => false,
       child: Scaffold(
         backgroundColor: darkTheme ? AppColor.gradientDark2 : AppColor.blanco,
         body: Center(

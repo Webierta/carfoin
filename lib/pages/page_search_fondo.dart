@@ -5,11 +5,12 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:provider/provider.dart';
 
 import '../models/cartera.dart';
+import '../services/yahoo_finance.dart';
 import '../themes/styles_theme.dart';
 import '../themes/theme_provider.dart';
 
 class PageSearchFondo extends StatefulWidget {
-  const PageSearchFondo({Key? key}) : super(key: key);
+  const PageSearchFondo({super.key});
   @override
   State<PageSearchFondo> createState() => _PageSearchFondoState();
 }
@@ -39,8 +40,12 @@ class _PageSearchFondoState extends State<PageSearchFondo> {
         ? _allFondos
         : _allFondos
             .where((fondo) =>
-                fondo['name']?.toUpperCase().contains(enteredKeyword.toUpperCase()) ||
-                fondo['isin']?.toUpperCase().contains(enteredKeyword.toUpperCase()))
+                fondo['name']
+                    ?.toUpperCase()
+                    .contains(enteredKeyword.toUpperCase()) ||
+                fondo['isin']
+                    ?.toUpperCase()
+                    .contains(enteredKeyword.toUpperCase()))
             .toList();
     setState(() => _filterFondos = results);
   }
@@ -84,12 +89,30 @@ class _PageSearchFondoState extends State<PageSearchFondo> {
                                 ),
                                 subtitle: Text(
                                   _filterFondos[index]['isin'].toString(),
-                                  style: const TextStyle(color: AppColor.gris700),
+                                  style:
+                                      const TextStyle(color: AppColor.gris700),
                                 ),
-                                onTap: () {
-                                  var fondo = Fondo(
-                                      name: _filterFondos[index]['name'],
-                                      isin: _filterFondos[index]['isin']);
+                                onTap: () async {
+                                  /* String name = _filterFondos[index]['name'];
+                                  String isin = _filterFondos[index]['isin'];
+                                  var fondo = Fondo(name: name, isin: isin);
+                                  fondo.divisa = await YahooFinance()
+                                      .searchDivisa(name, isin); */
+                                  String name = _filterFondos[index]['name'];
+                                  String isin = _filterFondos[index]['isin'];
+                                  Fondo? getFondoByIsin =
+                                      await YahooFinance().getFondoByIsin(isin);
+                                  Fondo fondo;
+                                  if (getFondoByIsin != null &&
+                                      getFondoByIsin.divisa != null) {
+                                    fondo = Fondo(
+                                        isin: isin,
+                                        name: getFondoByIsin.name,
+                                        divisa: getFondoByIsin.divisa);
+                                  } else {
+                                    fondo = Fondo(isin: isin, name: name);
+                                  }
+                                  if (!context.mounted) return;
                                   Navigator.pop(context, fondo);
                                 },
                               ),

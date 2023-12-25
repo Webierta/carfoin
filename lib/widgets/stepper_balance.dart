@@ -12,14 +12,13 @@ class StepperBalance extends StatelessWidget {
   final int firstDate;
   final int lastDate;
   const StepperBalance(
-      {Key? key,
+      {super.key,
       required this.input,
       required this.output,
       required this.balance,
       required this.divisa,
       required this.firstDate,
-      required this.lastDate})
-      : super(key: key);
+      required this.lastDate});
 
   @override
   Widget build(BuildContext context) {
@@ -51,14 +50,20 @@ class StepperBalance extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Expanded(
-                child: Divider(thickness: 1, indent: 0, endIndent: 4, color: AppColor.gris),
+                child: Divider(
+                    thickness: 1,
+                    indent: 0,
+                    endIndent: 4,
+                    color: AppColor.gris),
               ),
               Chip(
                 backgroundColor: const Color(0xFFFFFFFF),
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 visualDensity: const VisualDensity(vertical: -4),
-                shape: const StadiumBorder(side: BorderSide(color: AppColor.gris)),
-                label: Text('${NumberUtil.decimalFixed(balance, long: false)}$spaceDivisa'),
+                shape:
+                    const StadiumBorder(side: BorderSide(color: AppColor.gris)),
+                label: Text(
+                    '${NumberUtil.decimalFixed(balance, long: false)}$spaceDivisa'),
                 labelStyle: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -66,7 +71,11 @@ class StepperBalance extends StatelessWidget {
                 ),
               ),
               const Expanded(
-                child: Divider(thickness: 1, indent: 4, endIndent: 4, color: AppColor.gris),
+                child: Divider(
+                    thickness: 1,
+                    indent: 4,
+                    endIndent: 4,
+                    color: AppColor.gris),
               )
             ],
           ),

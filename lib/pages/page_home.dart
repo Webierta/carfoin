@@ -1,4 +1,3 @@
-import 'package:carfoin/widgets/flutter_expandable_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:go_router/go_router.dart';
@@ -10,7 +9,6 @@ import '../models/cartera_provider.dart';
 import '../models/logger.dart';
 import '../models/preferences_provider.dart';
 import '../router/routes_const.dart';
-import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../services/exchange_api.dart';
 import '../services/preferences_service.dart';
@@ -25,6 +23,7 @@ import '../widgets/dialogs/confirm_dialog.dart';
 import '../widgets/dialogs/custom_messenger.dart';
 import '../widgets/dialogs/info_dialog.dart';
 import '../widgets/dialogs/input_name_dialog.dart';
+import '../widgets/flutter_expandable_fab.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
 import '../widgets/my_drawer.dart';
@@ -32,7 +31,7 @@ import '../widgets/views/vista_compacta.dart';
 import '../widgets/views/vista_detalle.dart';
 
 class PageHome extends StatefulWidget {
-  const PageHome({Key? key}) : super(key: key);
+  const PageHome({super.key});
   @override
   State<PageHome> createState() => _PageHomeState();
 }
@@ -41,7 +40,7 @@ class _PageHomeState extends State<PageHome> {
   late PreferencesProvider prefProvider;
   late CarteraProvider carteraProvider;
   DatabaseHelper database = DatabaseHelper();
-  late ApiService apiService;
+  //late YahooFinance yahooFinance;
   final GlobalKey _dialogKey = GlobalKey();
   String _loadingText = '';
   bool cargandoShare = false;
@@ -78,16 +77,20 @@ class _PageHomeState extends State<PageHome> {
           await database.getCarteras(byOrder: prefProvider.isByOrderCarteras);
       for (var cartera in carteraProvider.carteras) {
         await database.createTableCartera(cartera).whenComplete(() async {
-          carteraProvider.fondos =
-              await database.getFondos(cartera, byOrder: prefProvider.isByOrderFondos);
+          carteraProvider.fondos = await database.getFondos(cartera,
+              byOrder: prefProvider.isByOrderFondos);
           cartera.fondos = carteraProvider.fondos;
         });
         if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
           for (var fondo in cartera.fondos!) {
-            await database.createTableFondo(cartera, fondo).whenComplete(() async {
-              carteraProvider.valores = await database.getValores(cartera, fondo);
+            await database
+                .createTableFondo(cartera, fondo)
+                .whenComplete(() async {
+              carteraProvider.valores =
+                  await database.getValores(cartera, fondo);
               fondo.valores = carteraProvider.valores;
-              carteraProvider.operaciones = await database.getOperaciones(cartera, fondo);
+              carteraProvider.operaciones =
+                  await database.getOperaciones(cartera, fondo);
             });
           }
         }
@@ -105,8 +108,10 @@ class _PageHomeState extends State<PageHome> {
       if (prefProvider.dateExchange < exchangeApi.date) {
         prefProvider.rateExchange = exchangeApi.rate;
         prefProvider.dateExchange = exchangeApi.date;
-        await PreferencesService.saveDateExchange(keyDateExchange, exchangeApi.date);
-        await PreferencesService.saveRateExchange(keyRateExchange, exchangeApi.rate);
+        await PreferencesService.saveDateExchange(
+            keyDateExchange, exchangeApi.date);
+        await PreferencesService.saveRateExchange(
+            keyRateExchange, exchangeApi.rate);
       }
     }
   }
@@ -119,27 +124,34 @@ class _PageHomeState extends State<PageHome> {
       await getSharedPrefs();
       await setCarteras();
     });
-    apiService = ApiService();
+    //yahooFinance = YahooFinance();
     super.initState();
   }
 
   _ordenarCarteras() async {
     prefProvider.isByOrderCarteras = !prefProvider.isByOrderCarteras;
     await setCarteras();
-    PreferencesService.saveBool(keyByOrderCarterasPref, prefProvider.isByOrderCarteras);
+    PreferencesService.saveBool(
+        keyByOrderCarterasPref, prefProvider.isByOrderCarteras);
   }
 
   _viewCarteras() async {
-    setState(() => prefProvider.isViewDetalleCarteras = !prefProvider.isViewDetalleCarteras);
-    PreferencesService.saveBool(keyViewCarterasPref, prefProvider.isViewDetalleCarteras);
+    setState(() => prefProvider.isViewDetalleCarteras =
+        !prefProvider.isViewDetalleCarteras);
+    PreferencesService.saveBool(
+        keyViewCarterasPref, prefProvider.isViewDetalleCarteras);
   }
 
-  final List<Icon> options = const [Icon(Icons.edit), Icon(Icons.delete_forever)];
+  final List<Icon> options = const [
+    Icon(Icons.edit),
+    Icon(Icons.delete_forever)
+  ];
 
   _sharedCartera(BuildContext context) async {
     int index = 0;
     if (carteraProvider.carteras.isNotEmpty) {
-      var carterasConIndex = carteraProvider.carteras.where((item) => item.id != null).toList();
+      var carterasConIndex =
+          carteraProvider.carteras.where((item) => item.id != null).toList();
       carterasConIndex.sort((a, b) => a.id!.compareTo(b.id!));
       if (carterasConIndex.isNotEmpty) {
         index = carterasConIndex.last.id!;
@@ -178,12 +190,13 @@ class _PageHomeState extends State<PageHome> {
         if (snapshot.connectionState != ConnectionState.done) {
           return const LoadingProgress(titulo: 'Cargando carteras...');
         }
-
-        return WillPopScope(
-          onWillPop: () async => false,
+        return PopScope(
+          canPop: false,
+          onPopInvoked: (didPop) => false,
           child: Center(
             child: Container(
-              decoration: darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
+              decoration:
+                  darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
               child: Scaffold(
                 drawer: const MyDrawer(),
                 appBar: AppBar(
@@ -205,9 +218,11 @@ class _PageHomeState extends State<PageHome> {
                       shape: AppBox.roundBorder,
                       itemBuilder: (ctx) => [
                         buildMenuItem(Menu.ordenar, Icons.sort_by_alpha,
-                            divider: true, isOrder: prefProvider.isByOrderCarteras),
+                            divider: true,
+                            isOrder: prefProvider.isByOrderCarteras),
                         buildMenuItem(Menu.exportar, Icons.save),
-                        buildMenuItem(Menu.importar, Icons.file_download, divider: true),
+                        buildMenuItem(Menu.importar, Icons.file_download,
+                            divider: true),
                         buildMenuItem(Menu.eliminar, Icons.delete_forever),
                       ],
                       onSelected: (item) async {
@@ -250,7 +265,8 @@ class _PageHomeState extends State<PageHome> {
                             padding: EdgeInsets.symmetric(horizontal: 12),
                             child: Text(
                               'Empieza creando una cartera',
-                              style: TextStyle(color: AppColor.blanco, fontSize: 22),
+                              style: TextStyle(
+                                  color: AppColor.blanco, fontSize: 22),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -338,6 +354,7 @@ class _PageHomeState extends State<PageHome> {
     _pop();
     if (updateResultados.isNotEmpty) {
       List<ListTile> contentWidgets = _buildChildrenContent(updateResultados);
+      if (!context.mounted) return;
       await InfoDialog(
         context: context,
         title: 'Resultado',
@@ -385,8 +402,12 @@ class _PageHomeState extends State<PageHome> {
           content += '\n\n${resultExport.msg}';
         }
       }
-      await InfoDialog(context: context, title: 'Resultado', content: Text(content))
-          .generateDialog();
+      if (!context.mounted) return;
+      await InfoDialog(
+        context: context,
+        title: 'Resultado',
+        content: Text(content),
+      ).generateDialog();
     }
   }
 
@@ -395,9 +416,9 @@ class _PageHomeState extends State<PageHome> {
         'La nueva base de datos sobreescribirá los datos actuales, que se perderán y no podrán ser recuperados.\n\n'
         'Se recomienda exportar una copia de seguridad antes de importar una nueva base de datos.\n\n'
         '¿Quieres continuar con el proceso de importación?';
-    bool? isConfirm =
-        await ConfirmDialog(context: context, title: 'Importar Base de Datos', content: content)
-            .generateDialog();
+    bool? isConfirm = await ConfirmDialog(
+            context: context, title: 'Importar Base de Datos', content: content)
+        .generateDialog();
     if (isConfirm == null || isConfirm == false) return;
     var resultImport = await FileUtil.importar();
     String contentInfo = '';
@@ -415,6 +436,7 @@ class _PageHomeState extends State<PageHome> {
         contentInfo += '\n\n${resultImport.msg}';
       }
     }
+    if (!context.mounted) return;
     await InfoDialog(
       context: context,
       title: 'Resultado',
@@ -427,7 +449,8 @@ class _PageHomeState extends State<PageHome> {
 
   Future<void> _inputName(BuildContext context, {Cartera? cartera}) async {
     String title = cartera?.name ?? 'Nueva Cartera';
-    String? input = await Navigator.of(context).push(RouterInputName(title: title).builder());
+    String? input = await Navigator.of(context)
+        .push(RouterInputName(title: title).builder());
     if (input != null) {
       _submit(cartera, input);
     } else {
@@ -436,10 +459,11 @@ class _PageHomeState extends State<PageHome> {
   }
 
   _loadCartera(Cartera cartera) async {
-    var existe =
-        [for (var cartera in carteraProvider.carteras) cartera.name].contains(cartera.name);
+    var existe = [for (var cartera in carteraProvider.carteras) cartera.name]
+        .contains(cartera.name);
     if (existe) {
-      showMsg(msg: 'Ya existe una cartera con ese nombre', color: AppColor.rojo900);
+      showMsg(
+          msg: 'Ya existe una cartera con ese nombre', color: AppColor.rojo900);
       return;
     } else {
       try {
@@ -448,7 +472,8 @@ class _PageHomeState extends State<PageHome> {
         });
       } catch (e, s) {
         showMsg(
-            msg: 'Proceso interrumpido: Error en la carga del archivo', color: AppColor.rojo900);
+            msg: 'Proceso interrumpido: Error en la carga del archivo',
+            color: AppColor.rojo900);
         Logger.log(
             dataLog: DataLog(
                 msg: 'Catch create table cartera + insert cartera',
@@ -463,7 +488,9 @@ class _PageHomeState extends State<PageHome> {
       try {
         if (cartera.fondos != null && cartera.fondos!.isNotEmpty) {
           for (var fondo in cartera.fondos!) {
-            await database.createTableFondo(cartera, fondo).whenComplete(() async {
+            await database
+                .createTableFondo(cartera, fondo)
+                .whenComplete(() async {
               await database.insertFondo(
                   cartera,
                   Fondo(
@@ -483,7 +510,8 @@ class _PageHomeState extends State<PageHome> {
         await setCarteras();
       } catch (e, s) {
         showMsg(
-            msg: 'Proceso interrumpido: Error en la carga del archivo', color: AppColor.rojo900);
+            msg: 'Proceso interrumpido: Error en la carga del archivo',
+            color: AppColor.rojo900);
         Logger.log(
             dataLog: DataLog(
                 msg: 'Catch create table fondo + insert fondo',
@@ -498,9 +526,11 @@ class _PageHomeState extends State<PageHome> {
   }
 
   void _submit(Cartera? cartera, String input) async {
-    var existe = [for (var cartera in carteraProvider.carteras) cartera.name].contains(input);
+    var existe = [for (var cartera in carteraProvider.carteras) cartera.name]
+        .contains(input);
     if (existe) {
-      showMsg(msg: 'Ya existe una cartera con ese nombre', color: AppColor.rojo900);
+      showMsg(
+          msg: 'Ya existe una cartera con ese nombre', color: AppColor.rojo900);
     } else if (cartera != null) {
       cartera.name = input;
       await database.updateCartera(cartera);
@@ -570,7 +600,8 @@ class _PageHomeState extends State<PageHome> {
   }
 
   void showMsg({required String msg, Color? color}) =>
-      CustomMessenger(context: context, msg: msg, color: color).generateDialog();
+      CustomMessenger(context: context, msg: msg, color: color)
+          .generateDialog();
 
   void _pop() {
     if (!mounted) return;

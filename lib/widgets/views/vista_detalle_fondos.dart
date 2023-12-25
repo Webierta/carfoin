@@ -16,12 +16,12 @@ class VistaDetalleFondos extends StatelessWidget {
   final Function goFondo;
 
   const VistaDetalleFondos({
-    Key? key,
+    super.key,
     required this.fondo,
     required this.updateFondo,
     required this.removeFondo,
     required this.goFondo,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +96,10 @@ class VistaDetalleFondos extends StatelessWidget {
               ),
               subtitle: Text(
                 fondo.isin,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w300),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(fontWeight: FontWeight.w300),
               ),
               trailing: PopupMenuButton(
                 shape: AppBox.roundBorder,
@@ -104,15 +107,21 @@ class VistaDetalleFondos extends StatelessWidget {
                 itemBuilder: (context) => const [
                   PopupMenuItem(
                     value: 1,
-                    child: ListTile(leading: Icon(Icons.refresh), title: Text('Actualizar')),
+                    child: ListTile(
+                        leading: Icon(Icons.refresh),
+                        title: Text('Actualizar')),
                   ),
                   PopupMenuItem(
                     value: 2,
-                    child: ListTile(leading: Icon(Icons.delete_forever), title: Text('Eliminar')),
+                    child: ListTile(
+                        leading: Icon(Icons.delete_forever),
+                        title: Text('Eliminar')),
                   )
                 ],
                 onSelected: (value) async {
-                  value == 1 ? await updateFondo(fondo) : await removeFondo(fondo);
+                  value == 1
+                      ? await updateFondo(fondo)
+                      : await removeFondo(fondo);
                 },
               ),
             ),
@@ -133,7 +142,8 @@ class VistaDetalleFondos extends StatelessWidget {
                         Expanded(
                           child: ListTile(
                             dense: true,
-                            contentPadding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                            contentPadding:
+                                const EdgeInsets.fromLTRB(0, 0, 8, 0),
                             //minLeadingWidth: 0,
                             horizontalTitleGap: 0,
                             title: Row(
@@ -162,7 +172,9 @@ class VistaDetalleFondos extends StatelessWidget {
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleMedium
-                                            ?.copyWith(color: AppColor.textRedGreen(diferencia)),
+                                            ?.copyWith(
+                                                color: AppColor.textRedGreen(
+                                                    diferencia)),
                                       ),
                                       const SizedBox(width: 4),
                                       const Icon(Icons.iso),
@@ -171,7 +183,8 @@ class VistaDetalleFondos extends StatelessWidget {
                                 : null,
                             trailing: Text(
                               symbolDivisa,
-                              textScaleFactor: 2.5,
+                              textScaler: const TextScaler.linear(2.5),
+                              //textScaleFactor: 2.5,
                               style: const TextStyle(color: AppColor.light200),
                             ),
                           ),

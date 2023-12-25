@@ -8,8 +8,10 @@ class ListTileCapital extends StatelessWidget {
   final double capital;
   final double balance;
   const ListTileCapital(
-      {Key? key, required this.inversion, required this.capital, required this.balance})
-      : super(key: key);
+      {super.key,
+      required this.inversion,
+      required this.capital,
+      required this.balance});
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +33,13 @@ class ListTileCapital extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 Text(
-                  '${NumberUtil.decimalFixed(inversion, long: false)} €',
+                  'INVERSIÓN: ${NumberUtil.decimalFixed(inversion, long: false)} €',
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColor.negro54),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(color: AppColor.negro54),
                 ),
               ],
             ),

@@ -15,13 +15,13 @@ class VistaDetalle extends StatelessWidget {
   final Function goFondo;
 
   const VistaDetalle({
-    Key? key,
+    super.key,
     required this.cartera,
     required this.delete,
     required this.goCartera,
     required this.inputName,
     required this.goFondo,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -113,21 +113,27 @@ class VistaDetalle extends StatelessWidget {
     }
 
     bool isTrueDivisaEur() {
-      if (isTrueInversionCarteraEur && isTrueCapitalCarteraEur && isTrueRendCarteraEur) {
+      if (isTrueInversionCarteraEur &&
+          isTrueCapitalCarteraEur &&
+          isTrueRendCarteraEur) {
         return true;
       }
       return false;
     }
 
     bool isTrueDivisaUsd() {
-      if (isTrueInversionCarteraUsd && isTrueCapitalCarteraUsd && isTrueRendCarteraUsd) {
+      if (isTrueInversionCarteraUsd &&
+          isTrueCapitalCarteraUsd &&
+          isTrueRendCarteraUsd) {
         return true;
       }
       return false;
     }
 
     bool isTrueDivisaOtra() {
-      if (isTrueInversionCarteraOtra && isTrueCapitalCarteraOtra && isTrueRendCarteraOtra) {
+      if (isTrueInversionCarteraOtra &&
+          isTrueCapitalCarteraOtra &&
+          isTrueRendCarteraOtra) {
         return true;
       }
       return false;
@@ -148,7 +154,8 @@ class VistaDetalle extends StatelessWidget {
                   backgroundColor: AppColor.ambar,
                   child: IconButton(
                     onPressed: () => goCartera(context, cartera),
-                    icon: const Icon(Icons.business_center, color: AppColor.light900),
+                    icon: const Icon(Icons.business_center,
+                        color: AppColor.light900),
                   ),
                 ),
               ),
@@ -194,7 +201,8 @@ class VistaDetalle extends StatelessWidget {
                 decoration: AppBox.buildBoxDecoration(darkTheme),
                 child: fondos.isNotEmpty
                     ? Theme(
-                        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                        data: Theme.of(context)
+                            .copyWith(dividerColor: Colors.transparent),
                         child: ExpansionTile(
                           expandedCrossAxisAlignment: CrossAxisAlignment.start,
                           maintainState: true,
@@ -202,14 +210,18 @@ class VistaDetalle extends StatelessWidget {
                           children: [
                             for (var fondo in fondos)
                               TextButton(
-                                onPressed: () => goFondo(context, cartera, fondo),
+                                onPressed: () =>
+                                    goFondo(context, cartera, fondo),
                                 child: Text(
                                   fondo.name,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
-                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: AppColor.light),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleSmall
+                                      ?.copyWith(
+                                          decoration: TextDecoration.underline,
+                                          decorationColor: AppColor.light),
                                 ),
                               )
                           ],
@@ -287,7 +299,7 @@ class VistaDetalle extends StatelessWidget {
 class ChipFondo extends StatelessWidget {
   final int? lengthFondos;
 
-  const ChipFondo({Key? key, this.lengthFondos}) : super(key: key);
+  const ChipFondo({super.key, this.lengthFondos});
 
   @override
   Widget build(BuildContext context) {
@@ -326,7 +338,8 @@ class ChipFondo extends StatelessWidget {
       alignment: Alignment.topLeft,
       child: TextButton.icon(
         onPressed: () {},
-        icon: Icon(Icons.poll, color: darkTheme ? AppColor.blanco : AppColor.light),
+        icon: Icon(Icons.poll,
+            color: darkTheme ? AppColor.blanco : AppColor.light),
         label: Text(title, style: Theme.of(context).textTheme.titleMedium),
       ),
     );

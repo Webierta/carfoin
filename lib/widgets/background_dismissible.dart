@@ -9,12 +9,12 @@ class BackgroundDismissible extends StatelessWidget {
   final double marginVertical;
 
   const BackgroundDismissible({
-    Key? key,
+    super.key,
     required this.slide,
     required this.label,
     required this.icon,
     this.marginVertical = 4.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +44,8 @@ class BackgroundDismissible extends StatelessWidget {
             Icon(icon, color: Colors.white),
             Text(
               ' $label',
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.w700),
               textAlign: textAlign,
             ),
             if (slide == Slide.left) const SizedBox(width: 20),

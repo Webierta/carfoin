@@ -22,6 +22,7 @@ class Fondo {
   String? divisa;
   List<Valor>? valores;
   int? rating;
+  String? ticker;
   Fondo(
       {required this.isin,
       required this.name,

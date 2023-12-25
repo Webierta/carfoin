@@ -10,14 +10,15 @@ import '../themes/theme_provider.dart';
 import '../utils/konstantes.dart';
 
 class MyDrawer extends StatelessWidget {
-  const MyDrawer({Key? key}) : super(key: key);
+  const MyDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context);
     return Drawer(
       child: Container(
-        decoration: theme.darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
+        decoration:
+            theme.darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
         child: Column(
           children: [
             Expanded(
@@ -40,7 +41,10 @@ class MyDrawer extends StatelessWidget {
                             fit: BoxFit.fitWidth,
                             child: Text(
                               'CARFOIN',
-                              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .displaySmall
+                                  ?.copyWith(
                                     color: const Color(0xFFFFFFFF),
                                     fontWeight: FontWeight.w100,
                                   ),

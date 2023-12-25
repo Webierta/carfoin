@@ -84,7 +84,7 @@ class ExpandableFab extends StatefulWidget {
   final bool? isEndDocked;
 
   const ExpandableFab({
-    Key? key,
+    super.key,
     this.distance = 70.0, // 100
     this.duration = const Duration(milliseconds: 250),
     this.fanAngle = 90,
@@ -102,7 +102,7 @@ class ExpandableFab extends StatefulWidget {
       color: Color(0x80000000),
     ),
     this.isEndDocked = false,
-  }) : super(key: key);
+  });
 
   @override
   State<ExpandableFab> createState() => ExpandableFabState();

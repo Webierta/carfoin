@@ -26,8 +26,8 @@ class FullScreenModal extends ModalRoute {
   bool get maintainState => true;
 
   @override
-  Widget buildPage(
-      BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
+  Widget buildPage(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation) {
     return Material(
       type: MaterialType.transparency,
       child: Scaffold(
@@ -60,7 +60,8 @@ class FullScreenModal extends ModalRoute {
     return FadeTransition(
       opacity: animation,
       child: SlideTransition(
-        position: Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero).animate(animation),
+        position: Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero)
+            .animate(animation),
         child: ScaleTransition(scale: animation, child: child),
       ),
     );

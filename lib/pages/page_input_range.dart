@@ -8,7 +8,7 @@ import '../themes/theme_provider.dart';
 import '../utils/fecha_util.dart';
 
 class PageInputRange extends StatefulWidget {
-  const PageInputRange({Key? key}) : super(key: key);
+  const PageInputRange({super.key});
   @override
   State<PageInputRange> createState() => _PageInputRangeState();
 }
@@ -64,8 +64,8 @@ class _PageInputRangeState extends State<PageInputRange> {
                         contentPadding: const EdgeInsets.all(12.0),
                         title: InkWell(
                           onTap: () async {
-                            var newRange = await _datePicker(
-                                context, DatePickerEntryMode.inputOnly, darkTheme);
+                            var newRange = await _datePicker(context,
+                                DatePickerEntryMode.inputOnly, darkTheme);
                             if (newRange != null) {
                               setState(() => _dateRange = newRange);
                             }
@@ -77,13 +77,15 @@ class _PageInputRangeState extends State<PageInputRange> {
                             ),
                             child: FittedBox(
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     '${DateFormat('dd/MM/yyyy').format(_dateRange?.start ?? _initDateRange.start)} - '
                                     '${DateFormat('dd/MM/yyyy').format(_dateRange?.end ?? _initDateRange.end)}',
                                   ),
-                                  const Icon(Icons.arrow_drop_down, color: AppColor.light),
+                                  const Icon(Icons.arrow_drop_down,
+                                      color: AppColor.light),
                                 ],
                               ),
                             ),
@@ -92,10 +94,11 @@ class _PageInputRangeState extends State<PageInputRange> {
                         trailing: CircleAvatar(
                           backgroundColor: AppColor.ambar,
                           child: IconButton(
-                            icon: const Icon(Icons.date_range, color: AppColor.light900),
+                            icon: const Icon(Icons.date_range,
+                                color: AppColor.light900),
                             onPressed: () async {
-                              var newRange = await _datePicker(
-                                  context, DatePickerEntryMode.calendarOnly, darkTheme);
+                              var newRange = await _datePicker(context,
+                                  DatePickerEntryMode.calendarOnly, darkTheme);
                               if (newRange != null) {
                                 setState(() => _dateRange = newRange);
                               }
@@ -115,8 +118,9 @@ class _PageInputRangeState extends State<PageInputRange> {
                           child: const Text('ACEPTAR'),
                           onPressed: () {
                             if (_dateRange != null) {
-                              var range =
-                                  DateTimeRange(start: _dateRange!.start, end: _dateRange!.end);
+                              var range = DateTimeRange(
+                                  start: _dateRange!.start,
+                                  end: _dateRange!.end);
                               Navigator.pop(context, range);
                             } else {
                               var range = _initDateRange;
@@ -136,7 +140,8 @@ class _PageInputRangeState extends State<PageInputRange> {
     );
   }
 
-  _datePicker(BuildContext context, DatePickerEntryMode mode, bool isDark) async {
+  _datePicker(
+      BuildContext context, DatePickerEntryMode mode, bool isDark) async {
     DateTimeRange? newRange = await showDateRangePicker(
       context: context,
       //builder: (BuildContext context, Widget? child) {

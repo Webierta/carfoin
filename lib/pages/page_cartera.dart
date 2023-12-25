@@ -1,6 +1,5 @@
 import 'dart:io' show File;
 
-import 'package:carfoin/widgets/flutter_expandable_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:go_router/go_router.dart';
@@ -13,33 +12,33 @@ import '../models/logger.dart';
 import '../models/preferences_provider.dart';
 import '../router/router_utils.dart';
 import '../router/routes_const.dart';
-import '../services/api_service.dart';
 import '../services/database_helper.dart';
 import '../services/doc_cnmv.dart';
 import '../services/preferences_service.dart';
 import '../services/share_csv.dart';
+import '../services/yahoo_finance.dart';
 import '../themes/styles_theme.dart';
 import '../themes/theme_provider.dart';
-import '../utils/fecha_util.dart';
 import '../utils/konstantes.dart';
 import '../utils/status_api_service.dart';
 import '../utils/update_all.dart';
 import '../widgets/dialogs/confirm_dialog.dart';
 import '../widgets/dialogs/custom_messenger.dart';
 import '../widgets/dialogs/info_dialog.dart';
+import '../widgets/flutter_expandable_fab.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
 import '../widgets/views/vista_compacta_fondos.dart';
 import '../widgets/views/vista_detalle_fondos.dart';
 
 class PageCartera extends StatefulWidget {
-  const PageCartera({Key? key}) : super(key: key);
+  const PageCartera({super.key});
   @override
   State<PageCartera> createState() => _PageCarteraState();
 }
 
 class _PageCarteraState extends State<PageCartera> {
-  late ApiService apiService;
+  late YahooFinance yahooFinance;
   DatabaseHelper database = DatabaseHelper();
 
   late CarteraProvider carteraProvider;
@@ -53,14 +52,15 @@ class _PageCarteraState extends State<PageCartera> {
 
   setFondos(Cartera cartera) async {
     try {
-      carteraProvider.fondos =
-          await database.getFondos(cartera, byOrder: prefProvider.isByOrderFondos);
+      carteraProvider.fondos = await database.getFondos(cartera,
+          byOrder: prefProvider.isByOrderFondos);
       carteraSelect.fondos = carteraProvider.fondos;
       for (var fondo in carteraProvider.fondos) {
         await database.createTableFondo(cartera, fondo).whenComplete(() async {
           carteraProvider.valores = await database.getValores(cartera, fondo);
           fondo.valores = carteraProvider.valores;
-          carteraProvider.operaciones = await database.getOperaciones(cartera, fondo);
+          carteraProvider.operaciones =
+              await database.getOperaciones(cartera, fondo);
         });
       }
     } catch (e) {
@@ -80,52 +80,35 @@ class _PageCarteraState extends State<PageCartera> {
         await setFondos(carteraSelect);
       });
     });
-    apiService = ApiService();
+    yahooFinance = YahooFinance();
     super.initState();
   }
 
   _ordenarFondos() async {
     prefProvider.isByOrderFondos = !prefProvider.isByOrderFondos;
     await setFondos(carteraSelect);
-    PreferencesService.saveBool(keyByOrderFondosPref, prefProvider.isByOrderFondos);
+    PreferencesService.saveBool(
+        keyByOrderFondosPref, prefProvider.isByOrderFondos);
   }
 
   _viewFondos() async {
-    setState(() => prefProvider.isViewDetalleFondos = !prefProvider.isViewDetalleFondos);
-    PreferencesService.saveBool(keyViewFondosPref, prefProvider.isViewDetalleFondos);
+    setState(() =>
+        prefProvider.isViewDetalleFondos = !prefProvider.isViewDetalleFondos);
+    PreferencesService.saveBool(
+        keyViewFondosPref, prefProvider.isViewDetalleFondos);
   }
 
   _searchFondo(BuildContext context, AppPage page) async {
-    final newFondo =
-        await Navigator.push(context, MaterialPageRoute(builder: (context) => page.routeClass));
+    final newFondo = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => page.routeClass));
     newFondo != null
         ? _addFondo(newFondo as Fondo, page)
         : _showMsg(msg: 'Sin cambios en la cartera.');
   }
 
   _onShare(Cartera cartera, File file) async {
-    //final box = context.findRenderObject() as RenderBox?;
     if (file.path.isNotEmpty) {
-      await Share.shareFiles(
-        [file.path],
-        text: cartera.name,
-        //sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
-      );
-      /*.whenComplete(() async {
-        try {         
-          //await file.delete();
-          //await ShareCsv.clearCache();
-        } catch (e, s) {
-          Logger.log(
-              dataLog: DataLog(
-                  msg: 'Catch clear cache',
-                  file: 'page_cartera.dart',
-                  clase: '_PageCarteraState',
-                  funcion: '_onShare',
-                  error: e,
-                  stackTrace: s));
-        }
-      });*/
+      await Share.shareXFiles([XFile(file.path)], text: cartera.name);
     } else {
       _showMsg(
         msg: 'Error generando archivo para compartir cartera',
@@ -139,13 +122,15 @@ class _PageCarteraState extends State<PageCartera> {
     final darkTheme = Provider.of<ThemeProvider>(context).darkTheme;
     if (addingFondo) return const LoadingProgress(titulo: 'Añadiendo fondo...');
     return FutureBuilder(
-      future: database.getFondos(carteraSelect, byOrder: prefProvider.isByOrderFondos),
+      future: database.getFondos(carteraSelect,
+          byOrder: prefProvider.isByOrderFondos),
       builder: (BuildContext context, AsyncSnapshot<List<Fondo>> snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const LoadingProgress(titulo: 'Cargando fondos...');
         }
-        return WillPopScope(
-          onWillPop: () async => false,
+        return PopScope(
+          canPop: false,
+          onPopInvoked: (didPop) => false,
           child: Container(
             decoration: darkTheme ? AppBox.darkGradient : AppBox.lightGradient,
             child: Scaffold(
@@ -183,13 +168,15 @@ class _PageCarteraState extends State<PageCartera> {
                       if (item == MenuCartera.ordenar) {
                         _ordenarFondos();
                       } else if (item == MenuCartera.compartir) {
-                        File? fileCartera = await ShareCsv.shareCartera(carteraSelect);
+                        File? fileCartera =
+                            await ShareCsv.shareCartera(carteraSelect);
                         if (fileCartera != null) {
                           //if (!mounted) return;
                           await _onShare(carteraSelect, fileCartera);
                         } else {
                           _showMsg(
-                            msg: 'Error generando archivo para compartir cartera',
+                            msg:
+                                'Error generando archivo para compartir cartera',
                             color: AppColor.rojo900,
                           );
                         }
@@ -205,7 +192,7 @@ class _PageCarteraState extends State<PageCartera> {
                 children: [
                   ChildFab(
                     icon: const Icon(Icons.search),
-                    label: 'Buscar online por ISIN',
+                    label: 'Buscar Online',
                     onPressed: () => _searchFondo(context, AppPage.inputFondo),
                   ),
                   ChildFab(
@@ -226,7 +213,8 @@ class _PageCarteraState extends State<PageCartera> {
                           padding: EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
                             'Añade fondos a esta cartera',
-                            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 22),
+                            style: TextStyle(
+                                color: Color(0xFFFFFFFF), fontSize: 22),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -305,8 +293,10 @@ class _PageCarteraState extends State<PageCartera> {
     );
     List<Update> updateResultados = [];
     if (carteraSelect.fondos != null && carteraSelect.fondos!.isNotEmpty) {
-      var updateAll = UpdateAll(context: context, setStateDialog: _setStateDialog);
-      updateResultados = await updateAll.updateFondos(carteraSelect, carteraSelect.fondos!);
+      var updateAll =
+          UpdateAll(context: context, setStateDialog: _setStateDialog);
+      updateResultados =
+          await updateAll.updateFondos(carteraSelect, carteraSelect.fondos!);
       if (updateResultados.isNotEmpty) {
         await setFondos(carteraSelect);
       }
@@ -314,6 +304,7 @@ class _PageCarteraState extends State<PageCartera> {
     _pop();
     if (updateResultados.isNotEmpty) {
       List<ListTile> contentWidgets = _buildChildrenContent(updateResultados);
+      if (!context.mounted) return;
       await InfoDialog(
         context: context,
         title: 'Resultado',
@@ -353,12 +344,10 @@ class _PageCarteraState extends State<PageCartera> {
 
   Future<bool> _getDataApi(Fondo fondo) async {
     await database.createTableFondo(carteraSelect, fondo);
-    final getDataApi = await apiService.getDataApi(fondo.isin);
-    if (getDataApi != null) {
-      var date = FechaUtil.epochToEpochHms(getDataApi.epochSecs);
-      var newValor = Valor(date: date, precio: getDataApi.price);
-      fondo.divisa = getDataApi.market;
-      fondo.valores = [newValor];
+    final newValores = await yahooFinance.getYahooFinanceResponse(fondo);
+    if (newValores != null && newValores.isNotEmpty) {
+      var newValor = newValores[0];
+      fondo.valores = [newValor]; // TODO: fondo.valores.add(newValor) ???
       return _insertFondoDb(fondo);
     } else {
       return false;
@@ -382,12 +371,14 @@ class _PageCarteraState extends State<PageCartera> {
       _showMsg(msg: 'Fondo actualizado');
     } else {
       setState(() {});
-      if (apiService.status == StatusApiService.okHttp) {
-        _showMsg(msg: 'Error al escribir en la base de datos', color: AppColor.rojo900);
+      if (yahooFinance.status == StatusApiService.okHttp) {
+        _showMsg(
+            msg: 'Error al escribir en la base de datos',
+            color: AppColor.rojo900);
       } else {
-        String msg = apiService.status.msg == ''
+        String msg = yahooFinance.status.msg == ''
             ? 'Fondo no actualizado: Error en la descarga de datos'
-            : apiService.status.msg;
+            : yahooFinance.status.msg;
         _showMsg(msg: msg, color: AppColor.rojo900);
       }
     }
@@ -409,19 +400,22 @@ class _PageCarteraState extends State<PageCartera> {
     if (update) {
       _showMsg(msg: 'Fondo actualizado');
     } else {
-      if (apiService.status == StatusApiService.okHttp) {
-        _showMsg(msg: 'Error al escribir en la base de datos', color: AppColor.rojo900);
+      if (yahooFinance.status == StatusApiService.okHttp) {
+        _showMsg(
+            msg: 'Error al escribir en la base de datos',
+            color: AppColor.rojo900);
       } else {
-        String msg = apiService.status.msg == ''
+        String msg = yahooFinance.status.msg == ''
             ? 'Fondo no actualizado: Error en la descarga de datos'
-            : apiService.status.msg;
+            : yahooFinance.status.msg;
         _showMsg(msg: msg, color: AppColor.rojo900);
       }
     }
   }
 
   _addFondo(Fondo newFondo, AppPage page) async {
-    var existe = [for (var fondo in carteraProvider.fondos) fondo.isin].contains(newFondo.isin);
+    var existe = [for (var fondo in carteraProvider.fondos) fondo.isin]
+        .contains(newFondo.isin);
     if (existe) {
       _showMsg(
         msg: 'El fondo con ISIN ${newFondo.isin} ya existe en esta cartera.',
@@ -462,7 +456,8 @@ class _PageCarteraState extends State<PageCartera> {
               bool insertFondo = await _insertFondoDb(newFondo);
               insertFondo
                   ? _showMsg(msg: 'Fondo añadido')
-                  : _showMsg(msg: 'Error al añadir el Fondo', color: AppColor.rojo900);
+                  : _showMsg(
+                      msg: 'Error al añadir el Fondo', color: AppColor.rojo900);
             } else {
               await _dialogAutoUpdate(context, newFondo);
             }
@@ -518,7 +513,8 @@ class _PageCarteraState extends State<PageCartera> {
       bool? resp = await ConfirmDialog(
         context: context,
         title: 'Eliminar fondos',
-        content: '¿Eliminar todos los fondos y sus valores en la cartera ${carteraSelect.name}?',
+        content:
+            '¿Eliminar todos los fondos y sus valores en la cartera ${carteraSelect.name}?',
       ).generateDialog();
       if (resp == null || resp == false) {
         setState(() {});
@@ -529,7 +525,8 @@ class _PageCarteraState extends State<PageCartera> {
   }
 
   void _showMsg({required String msg, Color? color}) =>
-      CustomMessenger(context: context, msg: msg, color: color).generateDialog();
+      CustomMessenger(context: context, msg: msg, color: color)
+          .generateDialog();
 
   void _pop() {
     if (!mounted) return;
