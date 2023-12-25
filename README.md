@@ -12,11 +12,7 @@ Permite operaciones simuladas de suscripción y reembolso para seguir la evoluci
 invertido y su rentabilidad. También presenta una visión global del portafolio y permite hacer
 copias de seguridad y compartir carteras con otros usuarios.
 
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-     alt="Get it on F-Droid"
-     height="80">](https://f-droid.org/packages/com.github.webierta.carfoin/)
-
-Get it on F-Droid or from the [Releases section](https://github.com/Webierta/carfoin/releases/latest).
+Coming soon on F-Droid or get it from the [Releases section](https://github.com/Webierta/carfoin/releases/latest).
 
 ## Funciones principales:
 
