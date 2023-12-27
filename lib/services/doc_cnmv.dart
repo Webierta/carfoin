@@ -38,13 +38,21 @@ class DocCnmv {
     try {
       Document? document = await _getDoc(url);
       if (document != null) {
-        List<Element?>? selectElements = document
+        /* List<Element?>? selectElements = document
             .getElementById('ctl00_ContentPrincipal_gridDatos')
             ?.getElementsByTagName('td')
             .where((element) => element.attributes['data-th'] == 'Folleto')
             .map((item) => item.querySelector('a'))
             .toList();
-        if (selectElements != null && selectElements.isNotEmpty) {
+          print(selectElements); 
+          if (selectElements != null && selectElements.isNotEmpty){...}
+        */
+        List<Element?> selectElements = document
+            .getElementsByTagName('td')
+            .where((element) => element.attributes['data-th'] == 'Folleto')
+            .map((item) => item.querySelector('a'))
+            .toList();
+        if (selectElements.isNotEmpty) {
           href = selectElements.first?.attributes['href'];
           if (href != null) {
             return href;

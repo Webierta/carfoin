@@ -275,7 +275,14 @@ class _PageFondoState extends State<PageFondo>
   void _getDataApi(BuildContext context) async {
     _dialogProgress(context);
     await _updateRating();
-    final newValores = await yahooFinance.getYahooFinanceResponse(fondoSelect);
+    final yahooFinanceResponse =
+        await yahooFinance.getYahooFinanceResponse(fondoSelect);
+    //final newValores = await yahooFinance.getYahooFinanceResponse(fondoSelect);
+    if (yahooFinanceResponse.$2 != null) {
+      fondoSelect.ticker = yahooFinanceResponse.$2;
+      await database.updateFondo(carteraSelect, fondoSelect);
+    }
+    final newValores = yahooFinanceResponse.$1;
     if (newValores != null && newValores.isNotEmpty) {
       var newValor = newValores[0];
       await database.updateFondo(carteraSelect, fondoSelect);
@@ -307,11 +314,16 @@ class _PageFondoState extends State<PageFondo>
       if (!mounted) return;
       _dialogProgress(context);
       var range = newRange as DateTimeRange;
-      final newValores = await yahooFinance.getYahooFinanceResponse(
+      final yahooFinanceResponse = await yahooFinance.getYahooFinanceResponse(
         fondoSelect,
         range.end,
         range.start,
       );
+      if (yahooFinanceResponse.$2 != null) {
+        fondoSelect.ticker = yahooFinanceResponse.$2;
+        await database.updateFondo(carteraSelect, fondoSelect);
+      }
+      final newValores = yahooFinanceResponse.$1;
       if (newValores != null && newValores.isNotEmpty) {
         for (var valor in newValores) {
           await database.updateOperacion(carteraSelect, fondoSelect, valor);

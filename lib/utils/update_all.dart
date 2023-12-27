@@ -57,8 +57,13 @@ class UpdateAll {
           for (var fondo in fondos) {
             setStateDialog('${fondo.name}\n${cartera.name}');
             await database.createTableFondo(cartera, fondo);
-            final newValores =
+            final yahooFinanceResponse =
                 await YahooFinance().getYahooFinanceResponse(fondo);
+            if (yahooFinanceResponse.$2 != null) {
+              fondo.ticker = yahooFinanceResponse.$2;
+              await database.updateFondo(cartera, fondo);
+            }
+            final newValores = yahooFinanceResponse.$1;
             if (newValores != null && newValores.isNotEmpty) {
               var newValor = newValores[0];
               int rating = await _updateRating(fondo);
@@ -92,7 +97,13 @@ class UpdateAll {
       for (var fondo in fondos) {
         setStateDialog(fondo.name);
         await database.createTableFondo(cartera, fondo);
-        final newValores = await YahooFinance().getYahooFinanceResponse(fondo);
+        final yahooFinanceResponse =
+            await YahooFinance().getYahooFinanceResponse(fondo);
+        if (yahooFinanceResponse.$2 != null) {
+          fondo.ticker = yahooFinanceResponse.$2;
+          await database.updateFondo(cartera, fondo);
+        }
+        final newValores = yahooFinanceResponse.$1;
         if (newValores != null && newValores.isNotEmpty) {
           var newValor = newValores[0];
           int rating = await _updateRating(fondo);

@@ -159,24 +159,26 @@ class YahooFinance {
     }
   }
 
-  Future<List<Valor>?> getYahooFinanceResponse(Fondo fondo,
+  //Future<List<Valor>?>
+  Future<(List<Valor>?, String?)> getYahooFinanceResponse(Fondo fondo,
       [DateTime? to, DateTime? from]) async {
+    String? newTicker;
     DateTime? date1;
     DateTime? date2;
     if (to != null && from != null) {
       date1 = FechaUtil.dateToDateHms(from);
       date2 = FechaUtil.dateToDateHms(to);
     }
-
-    if (fondo.ticker == null || fondo.ticker!.isEmpty) {
-      fondo.ticker = await getTickerYahoo(fondo.isin);
-      // TODO: guardar en database
-    }
-
     //fondo.ticker ??= await getTickerYahoo(fondo.isin);
     if (fondo.ticker == null || fondo.ticker!.isEmpty) {
-      return null;
+      fondo.ticker = await getTickerYahoo(fondo.isin);
+      if (fondo.ticker == null || fondo.ticker!.isEmpty) {
+        return (null, newTicker);
+      } else {
+        newTicker = fondo.ticker;
+      }
     }
+
     YahooFinanceResponse response;
     try {
       response = await const YahooFinanceDailyReader(
@@ -184,11 +186,11 @@ class YahooFinance {
       ).getDailyDTOs(fondo.ticker!, startDate: date1);
     } catch (e) {
       status = StatusApiService.errorHttp;
-      return null;
+      return (null, newTicker);
     }
     if (response.candlesData.isEmpty) {
       status = StatusApiService.errorHttp;
-      return null;
+      return (null, newTicker);
     }
     status = StatusApiService.okHttp;
     List<YahooFinanceCandleData> candlesData = response.candlesData;
@@ -203,7 +205,7 @@ class YahooFinance {
           precio: candle.close,
         ),
       );
-      return valores;
+      return (valores, newTicker);
     }
 
     List<YahooFinanceCandleData> candlesPeriodo = [];
@@ -222,7 +224,7 @@ class YahooFinance {
         ),
       );
     }
-    return valores;
+    return (valores, newTicker);
   }
 
   Future<List<Fondo>> getFondosByName(String termino) async {

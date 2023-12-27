@@ -344,7 +344,13 @@ class _PageCarteraState extends State<PageCartera> {
 
   Future<bool> _getDataApi(Fondo fondo) async {
     await database.createTableFondo(carteraSelect, fondo);
-    final newValores = await yahooFinance.getYahooFinanceResponse(fondo);
+    final yahooFinanceResponse =
+        await yahooFinance.getYahooFinanceResponse(fondo);
+    if (yahooFinanceResponse.$2 != null) {
+      fondo.ticker = yahooFinanceResponse.$2;
+      await database.updateFondo(carteraSelect, fondo);
+    }
+    final newValores = yahooFinanceResponse.$1;
     if (newValores != null && newValores.isNotEmpty) {
       var newValor = newValores[0];
       fondo.valores = [newValor]; // TODO: fondo.valores.add(newValor) ???

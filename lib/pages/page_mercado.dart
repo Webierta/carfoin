@@ -551,8 +551,9 @@ class _MercadoState extends State<PageMercado> {
 
   Future<double?>? _getPrecioApi(BuildContext context, Fondo fondo) async {
     DateTime fromAndTo = FechaUtil.epochToDate(_date);
-    final newValores =
+    final yahooFinanceResponse =
         await yahooFinance.getYahooFinanceResponse(fondo, fromAndTo, fromAndTo);
+    final newValores = yahooFinanceResponse.$1;
     if (newValores != null && newValores.isNotEmpty) {
       return newValores.first.precio;
     }
