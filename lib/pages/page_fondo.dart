@@ -321,7 +321,10 @@ class _PageFondoState extends State<PageFondo>
         showMsg(msg: 'Descarga de datos completada.');
       } else {
         _pop();
-        showMsg(msg: 'Error en la descarga de datos.', color: AppColor.rojo900);
+        showMsg(
+            msg:
+                'Error en la descarga de datos. Es posible que no existan datos para esas fechas.',
+            color: AppColor.rojo900);
       }
     }
   }

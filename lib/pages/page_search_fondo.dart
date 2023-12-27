@@ -106,9 +106,11 @@ class _PageSearchFondoState extends State<PageSearchFondo> {
                                   if (getFondoByIsin != null &&
                                       getFondoByIsin.divisa != null) {
                                     fondo = Fondo(
-                                        isin: isin,
-                                        name: getFondoByIsin.name,
-                                        divisa: getFondoByIsin.divisa);
+                                      isin: isin,
+                                      name: getFondoByIsin.name,
+                                      divisa: getFondoByIsin.divisa,
+                                      ticker: getFondoByIsin.ticker,
+                                    );
                                   } else {
                                     fondo = Fondo(isin: isin, name: name);
                                   }

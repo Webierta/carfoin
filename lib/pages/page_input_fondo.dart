@@ -198,16 +198,19 @@ class _PageInputFondoState extends State<PageInputFondo> {
                                 FocusManager.instance.primaryFocus?.unfocus();
                                 if (controllerName.text.trim().length > 3) {
                                   setState(() => searchingNames = true);
-                                  List<String> listaFondos =
+                                  /* List<String> listaFondos =
                                       await YahooFinance().getFondoByName(
                                           controllerName.text.trim());
                                   if (listaFondos.isNotEmpty) {
                                     List<Fondo> searchIsinYahoo =
                                         await YahooFinance()
-                                            .searchIsin(listaFondos);
-                                    setState(() =>
-                                        fondosSugeridos = searchIsinYahoo);
-                                  }
+                                            .searchIsin(listaFondos); */
+                                  List<Fondo> listaFondos = await YahooFinance()
+                                      .getFondosByName(
+                                          controllerName.text.trim());
+                                  //if (listaFondos.isNotEmpty) {
+                                  setState(() => fondosSugeridos = listaFondos);
+                                  //}
                                   setState(() => searchingNames = false);
                                 } else {
                                   showMsg(
@@ -331,10 +334,12 @@ class _PageInputFondoState extends State<PageInputFondo> {
                         child: const Text('Aceptar'),
                         onPressed: () {
                           var fondo = Fondo(
-                              name: locatedFond!.name,
-                              isin: locatedFond!.isin,
-                              divisa: locatedFond!.divisa,
-                              valores: locatedFond!.valores);
+                            name: locatedFond!.name,
+                            isin: locatedFond!.isin,
+                            divisa: locatedFond!.divisa,
+                            valores: locatedFond!.valores,
+                            ticker: locatedFond!.ticker,
+                          );
                           Navigator.pop(context, fondo);
                         }),
                   ],

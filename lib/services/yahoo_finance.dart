@@ -1,3 +1,27 @@
+/*
+1. BUSCAR POR ISIN
+   symbolYahoo = https://query1.finance.yahoo.com/v1/finance/search
+    ?q=ES0152743003
+    &quotesCount=1
+    &newsCount=0
+    &listsCount=0
+    &typeDisp=Fund
+    &quotesQueryId=tss_match_phrase_query
+
+2. BUSCAR POR SYMBOL
+   dataYahoo = https://query1.finance.yahoo.com/v7/finance/options/0P0000A9EK.F
+
+3. BUSCAR POR NOMBRE
+   listaFondos = YahooFinance().getFondoByName(termino)
+   https://query1.finance.yahoo.com/v1/finance/search?q=naranja
+
+   fondosSugeridos = YahooFinance().searchIsin(listaFondos)
+   YahooFinance().getIsinByName(nombreFondo)
+   https://markets.ft.com/data/search?query=Naranja+Renta+Fija+Corto+Plazo
+
+   https://markets.ft.com/data/search?query=ING+Direc&country=SP&assetClass=Fund
+*/
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -25,6 +49,7 @@ class YahooFinance {
       'quotesCount': '1',
       'newsCount': '0',
       'listsCount': '0',
+      'typeDisp': 'Fund',
       'quotesQueryId': 'tss_match_phrase_query',
     };
     final uri = Uri.https(
@@ -50,15 +75,19 @@ class YahooFinance {
         if (response2.statusCode == 200) {
           DataYahoo dataYahoo = DataYahoo.fromJson(
               jsonDecode(response2.body) as Map<String, dynamic>);
-          Fondo newFondo =
-              Fondo(isin: isin, name: dataYahoo.name, divisa: dataYahoo.divisa);
+          Fondo newFondo = Fondo(
+            isin: isin,
+            name: dataYahoo.name,
+            divisa: dataYahoo.divisa,
+            ticker: dataYahoo.symbol,
+          );
           newFondo.valores = [
             Valor(
               date: FechaUtil.epochToEpochHms(dataYahoo.fecha),
               precio: dataYahoo.valor,
             )
           ];
-          newFondo.ticker = dataYahoo.symbol;
+          //newFondo.ticker = dataYahoo.symbol;
           return newFondo;
         } else {
           //response2.statusCode != 200
@@ -139,8 +168,13 @@ class YahooFinance {
       date2 = FechaUtil.dateToDateHms(to);
     }
 
-    fondo.ticker ??= await getTickerYahoo(fondo.isin);
-    if (fondo.ticker == null) {
+    if (fondo.ticker == null || fondo.ticker!.isEmpty) {
+      fondo.ticker = await getTickerYahoo(fondo.isin);
+      // TODO: guardar en database
+    }
+
+    //fondo.ticker ??= await getTickerYahoo(fondo.isin);
+    if (fondo.ticker == null || fondo.ticker!.isEmpty) {
       return null;
     }
     YahooFinanceResponse response;
@@ -191,7 +225,69 @@ class YahooFinance {
     return valores;
   }
 
-  Future<List<String>> getFondoByName(String termino) async {
+  Future<List<Fondo>> getFondosByName(String termino) async {
+    List<Fondo> fondos = [];
+    const Map<String, String> headers = {
+      'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.109 Safari/537.36',
+      'HttpHeaders.contentTypeHeader': 'application/json',
+    };
+    final Map<String, String> queryParameters = {
+      'q': termino,
+      'newsCount': '0',
+      'listsCount': '0',
+      'quotesQueryId': 'tss_match_phrase_query',
+    };
+    final uri = Uri.https(
+      'query1.finance.yahoo.com',
+      '/v1/finance/search',
+      queryParameters,
+    );
+
+    try {
+      final response = await http.get(uri, headers: headers);
+      if (response.statusCode == 200) {
+        SearchNameSymbol searchNameSymbol = SearchNameSymbol.fromJson(
+            jsonDecode(response.body) as Map<String, dynamic>);
+        Map<String, String> mapSymbolName = searchNameSymbol.mapSymbolName;
+        if (mapSymbolName.isEmpty) {
+          return [];
+        }
+        var client = http.Client();
+        for (var item in mapSymbolName.entries) {
+          try {
+            String getIsin = await getIsinByName(client, item.value);
+            /* if (getIsin.isEmpty) {
+              continue;
+            } */
+            int indice = getIsin.indexOf(':');
+            String isin = '';
+            String divisa = '';
+            if (indice != -1) {
+              isin = getIsin.substring(0, indice);
+              divisa = getIsin.substring(indice + 1);
+            }
+            fondos.add(Fondo(
+              isin: isin,
+              name: item.value,
+              divisa: divisa,
+              ticker: item.key,
+            ));
+          } catch (e) {
+            return [];
+          }
+        }
+        client.close();
+        return fondos;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+/*   Future<List<String>> getFondoByName(String termino) async {
     const Map<String, String> headers = {
       'User-Agent':
           'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.109 Safari/537.36',
@@ -224,9 +320,9 @@ class YahooFinance {
       //print(e.toString());
       return [];
     }
-  }
+  } */
 
-  Future<List<Fondo>> searchIsin(List<String> nameFondos) async {
+/*   Future<List<Fondo>> searchIsin(List<String> nameFondos) async {
     List<Fondo> fondos = [];
     var client = http.Client();
     for (var name in nameFondos) {
@@ -246,7 +342,7 @@ class YahooFinance {
     }
     client.close();
     return fondos;
-  }
+  } */
 
   Future<String> getIsinByName(http.Client client, String nameFondo) async {
     const Map<String, String> headers = {

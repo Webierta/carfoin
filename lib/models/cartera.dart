@@ -23,15 +23,18 @@ class Fondo {
   List<Valor>? valores;
   int? rating;
   String? ticker;
+
   Fondo(
       {required this.isin,
       required this.name,
       this.divisa,
       this.valores,
-      this.rating}) {
+      this.rating,
+      this.ticker}) {
     divisa ??= '';
     valores ??= [];
     rating ??= 0;
+    ticker ??= '';
   }
 
   Fondo.fromMap(Map<String, dynamic> map)
@@ -39,10 +42,17 @@ class Fondo {
         name = map['name'],
         divisa = map['divisa'],
         valores = map['valores'],
-        rating = map['rating'];
+        rating = map['rating'],
+        ticker = map['ticker'];
 
   Map<String, Object?> toDb() {
-    return {'isin': isin, 'name': name, 'divisa': divisa, 'rating': rating};
+    return {
+      'isin': isin,
+      'name': name,
+      'divisa': divisa,
+      'rating': rating,
+      'ticker': ticker
+    };
   }
 }
 

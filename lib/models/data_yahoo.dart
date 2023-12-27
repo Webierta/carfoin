@@ -8,6 +8,28 @@ class SymbolYahoo {
   }
 }
 
+class SearchNameSymbol {
+  final Map<String, String> mapSymbolName;
+  SearchNameSymbol({required this.mapSymbolName});
+
+  factory SearchNameSymbol.fromJson(Map<String, dynamic> json) {
+    var listaFondos = [];
+    final listaQuotes = json['quotes'];
+    for (var quote in listaQuotes) {
+      if (quote['typeDisp'] == 'Fund') {
+        listaFondos.add(quote);
+      }
+    }
+    //List<String> nombreFondos = [];
+    Map<String, String> symbolName = {};
+    for (var quote in listaFondos) {
+      //nombreFondos.add(quote['longname']);
+      symbolName[quote['symbol']] = quote['longname'];
+    }
+    return SearchNameSymbol(mapSymbolName: symbolName);
+  }
+}
+
 class SearchByName {
   final List<String> listaFondos;
   SearchByName({required this.listaFondos});

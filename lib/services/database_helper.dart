@@ -9,7 +9,7 @@ import '../models/logger.dart';
 class DatabaseHelper {
   // DATABASE
   static const _databaseName = 'database.db';
-  static const _databaseVersion = 2;
+  static const _databaseVersion = 3;
   // TABLA CARFOIN DE CARTERAS
   static const table = 'carfoin';
   static const columnId = 'id';
@@ -19,6 +19,7 @@ class DatabaseHelper {
   static const columnNameFondo = 'name';
   static const columnDivisa = 'divisa';
   static const columnRating = 'rating';
+  static const columnTicker = 'ticker';
   // TABLA _CARTERA.ID + FONDO.ISIN DE VALORES
   static const columnDate = 'date';
   static const columnPrecio = 'precio';
@@ -218,7 +219,8 @@ class DatabaseHelper {
       $columnIsin TEXT PRIMARY KEY,
       $columnNameCartera TEXT NOT NULL,
       $columnDivisa TEXT,
-      $columnRating INTEGER)
+      $columnRating INTEGER,
+      $columnTicker TEXT)
     ''');
   }
 
