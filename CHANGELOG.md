@@ -2,6 +2,22 @@
 
 Este archivo registra y documenta los cambios más notables a lo largo del desarrollo del proyecto.
 
+## [3.1.0] - 2023-12-27
+
+### Added
+
+- Add this CHANGELOG file.
+- Los fondos sin ticker, se actualizan en la base de datos con nuevo ticker.
+
+### Changed
+
+- Database versión 3: almacén del ticker de cada fondo (posible incompatibilidad con versiones anteriores).
+- Consulta optimizada de precios por el ticker de Yahoo Finance.
+
+### Fixed
+
+- Corregidos varios errores.
+
 ## [3.0.0] - 2023-12-25
 
 ### Added
@@ -58,11 +74,11 @@ Este archivo registra y documenta los cambios más notables a lo largo del desar
 
 - Reducción de dependencia de librerías de terceros.
 - Código optimizado con importante reducción de tamaño de APK.
-- Retoques de UI (adaptación a Material 3 en progreso)
+- Retoques de UI (adaptación a Material 3 en progreso).
 
 ### Fixed
 
-- Corregidos errores y mejorada estabilidad
+- Corregidos errores y mejorada estabilidad.
 
 ## [1.3.0] - 2022-09-26
 
@@ -113,6 +129,7 @@ Este archivo registra y documenta los cambios más notables a lo largo del desar
 - First beta release.
 - Adaptación a Android de la idea del Proyecto del mismo autor [Carfoin$](https://github.com/Webierta/carfoins).
 
+[3.1.0]: https://github.com/Webierta/carfoin/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/Webierta/carfoin/compare/v2.0.4...v3.0.0
 [2.0.4]: https://github.com/Webierta/carfoin/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/Webierta/carfoin/compare/v2.0.2...v2.0.3
