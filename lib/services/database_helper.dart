@@ -1,10 +1,13 @@
 import 'dart:io' show Directory;
 
+import 'package:go_router/go_router.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../models/cartera.dart';
 import '../models/logger.dart';
+import '../router/app_router.dart';
+import '../router/routes_const.dart';
 
 class DatabaseHelper {
   // DATABASE
@@ -28,6 +31,8 @@ class DatabaseHelper {
 
   Future<Database>? _database;
 
+  bool onUpgradeFrom2To3 = false;
+
   get database async {
     _database ??= _initDb();
     return _database;
@@ -49,22 +54,28 @@ class DatabaseHelper {
           $columnNameCartera TEXT NOT NULL)
         ''');
       },
-      onUpgrade: _onUpgrade,
+      onUpgrade: (Database db, int oldVersion, int newVersion) async {
+        if (oldVersion < newVersion) {
+          if (oldVersion == 2) {
+            onUpgradeFrom2To3 = true;
+          } else {
+            Logger.log(
+                dataLog: DataLog(
+                    msg: 'Check Version Database',
+                    file: 'database_helper.dart',
+                    clase: 'DatabaseHelper',
+                    funcion: '_initDb'));
+            db.close();
+            //final String dbPath = await getDatabasePath();
+            //await deleteDatabase(dbPath);
+            final context = navigatorKey.currentContext;
+            if (context != null) {
+              context.go(errorPage);
+            }
+          }
+        }
+      },
     );
-  }
-
-  void _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < newVersion) {
-      db.close();
-      Logger.log(
-          dataLog: DataLog(
-              msg: 'Check Version Database',
-              file: 'database_helper.dart',
-              clase: 'DatabaseHelper',
-              funcion: '_initDb'));
-      final String dbPath = await getDatabasePath();
-      deleteDatabase(dbPath);
-    }
   }
 
   getDatabaseFolder() async {
@@ -222,6 +233,9 @@ class DatabaseHelper {
       $columnRating INTEGER,
       $columnTicker TEXT)
     ''');
+    if (onUpgradeFrom2To3 == true) {
+      await db.execute("ALTER TABLE $nameTable ADD $columnTicker TEXT");
+    }
   }
 
   dropTableCartera(Cartera cartera) async {

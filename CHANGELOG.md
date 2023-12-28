@@ -2,6 +2,12 @@
 
 Este archivo registra y documenta los cambios más notables a lo largo del desarrollo del proyecto.
 
+## [3.1.1] - 2023-12-28
+
+### Fixed
+
+- Corregida migración de la base de datos desde versión 2 a 3 (ahora es compatible con la versión anterior).
+
 ## [3.1.0] - 2023-12-27
 
 ### Added
@@ -129,6 +135,7 @@ Este archivo registra y documenta los cambios más notables a lo largo del desar
 - First beta release.
 - Adaptación a Android de la idea del Proyecto del mismo autor [Carfoin$](https://github.com/Webierta/carfoins).
 
+[3.1.1]: https://github.com/Webierta/carfoin/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/Webierta/carfoin/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/Webierta/carfoin/compare/v2.0.4...v3.0.0
 [2.0.4]: https://github.com/Webierta/carfoin/compare/v2.0.3...v2.0.4

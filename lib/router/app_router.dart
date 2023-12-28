@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../pages/page_about.dart';
@@ -18,10 +19,13 @@ import '../pages/page_support.dart';
 import 'error_screen.dart';
 import 'router_utils.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class AppRouter {
   get router => _router;
 
   final _router = GoRouter(
+    navigatorKey: navigatorKey,
     initialLocation: '/',
     routes: [
       GoRoute(
