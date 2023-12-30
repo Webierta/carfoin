@@ -1,4 +1,4 @@
-import 'dart:io' show File;
+import 'dart:io' show File, Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show SchedulerBinding;
@@ -171,8 +171,16 @@ class _PageCarteraState extends State<PageCartera> {
                         File? fileCartera =
                             await ShareCsv.shareCartera(carteraSelect);
                         if (fileCartera != null) {
+                          // ANDROID: /data/user/0/com.github.webierta.carfoin/cache/carfoin/Test Android.cfi
                           //if (!mounted) return;
-                          await _onShare(carteraSelect, fileCartera);
+                          if (Platform.isLinux) {
+                            _showMsg(
+                              msg:
+                                  'La cartera se ha guardado en ${fileCartera.path}',
+                            );
+                          } else {
+                            await _onShare(carteraSelect, fileCartera);
+                          }
                         } else {
                           _showMsg(
                             msg:

@@ -1,5 +1,5 @@
 import 'dart:convert' show utf8;
-import 'dart:io' show File, Directory;
+import 'dart:io';
 
 import 'package:csv/csv.dart' show ListToCsvConverter, CsvToListConverter;
 import 'package:file_picker/file_picker.dart';
@@ -49,8 +49,13 @@ class ShareCsv {
     try {
       Directory? tempDir = await getTemporaryDirectory();
       String tempPath = tempDir.path;
+
+      var directoryCarfoin =
+          await Directory('$tempPath/carfoin').create(recursive: true);
+      String carfoinPath = directoryCarfoin.path;
+
       String nameFile = '${nameCartera.trim()}.cfi'; // csv
-      String filePath = '$tempPath/$nameFile';
+      String filePath = '$carfoinPath/$nameFile';
       file = File(filePath);
       await file.writeAsString(csv);
     } catch (e, s) {
@@ -175,7 +180,13 @@ class ShareCsv {
 
   static Future<bool> clearCache() async {
     try {
-      final cacheDir = await getTemporaryDirectory();
+      var cacheDir = await getTemporaryDirectory();
+
+      if (Platform.isLinux){
+        String tempPath = cacheDir.path;
+        cacheDir = Directory('$tempPath/carfoin');
+      }
+
       if (cacheDir.existsSync()) {
         cacheDir.deleteSync(recursive: true);
       }

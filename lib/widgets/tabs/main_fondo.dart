@@ -338,13 +338,6 @@ class _MainFondoState extends State<MainFondo> {
                         if (showPdf == null || showPdf == false) {
                           showPdfFalse(msg: 'error folleto');
                         }
-                        /* context.go(
-                          pdfPage,
-                          extra: FondoDoc(
-                            fondo: fondoSelect,
-                            pdfDoc: PdfDoc.folleto,
-                          ),
-                        ); */
                       },
                       icon: Image.asset('assets/pdf.gif'),
                       label: const Text('Folleto'),
@@ -359,13 +352,6 @@ class _MainFondoState extends State<MainFondo> {
                         if (showPdf == null || showPdf == false) {
                           showPdfFalse(msg: 'error informe');
                         }
-                        /* context.go(
-                          pdfPage,
-                          extra: FondoDoc(
-                            fondo: fondoSelect,
-                            pdfDoc: PdfDoc.informe,
-                          ),
-                        ); */
                       },
                       icon: Image.asset('assets/pdf.gif'),
                       label: const Text('Informe'),

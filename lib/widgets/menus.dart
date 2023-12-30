@@ -37,3 +37,35 @@ PopupMenuItem<Enum> buildMenuItem(Enum menu, IconData iconData,
     ),
   );
 }
+
+enum MenuUpdate { actualizar, historico }
+
+PopupMenuItem<Enum> buildMenuItemUpdate(Enum menu, IconData icon) {
+  return PopupMenuItem(
+    value: menu,
+    child: Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: ListTile(
+            //contentPadding: const EdgeInsets.symmetric(horizontal: 2),
+            dense: true,
+            title: Text(
+              '${menu.name[0].toUpperCase()}${menu.name.substring(1)}',
+              maxLines: 1,
+            ),
+            trailing: Container(
+              //margin: const EdgeInsets.only(left: 10),
+              padding: const EdgeInsets.all(10),
+              decoration: const BoxDecoration(
+                color: Color(0xFFFFC107),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              ),
+              child: Icon(icon, color: const Color(0xFF0D47A1)),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}

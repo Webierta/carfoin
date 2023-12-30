@@ -1,7 +1,7 @@
 name: carfoin
 description: Gestor de Carteras de Fondos de Inversión
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 3.1.1+22
+version: 3.2.0+23
 
 environment:
   sdk: ">=3.2.3 <4.0.0"
@@ -22,16 +22,16 @@ dependencies:
   path_provider: ^2.1.1
   provider: ^6.1.1
   shared_preferences: ^2.2.2
-  sqflite: ^2.3.0
-  fl_chart: ^0.65.0
+  sqflite: ^2.3.0  
+  fl_chart: ^0.66.0
   url_launcher: ^6.2.2
   permission_handler: ^11.1.0
   share_plus: ^7.2.1
   html: ^0.15.4
   yahoo_finance_data_reader: ^1.0.8
   printing: ^5.11.1
-  sentry: ^7.14.0
-  restart_app: ^1.2.1
+  sentry: ^7.14.0  
+  sqflite_common_ffi: ^2.3.1  
 
 dev_dependencies:
   flutter_test:

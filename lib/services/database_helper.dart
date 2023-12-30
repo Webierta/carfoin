@@ -1,8 +1,7 @@
-import 'dart:io' show Directory;
-
 import 'package:go_router/go_router.dart';
 import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../models/cartera.dart';
 import '../models/logger.dart';
@@ -39,13 +38,17 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDb() async {
-    final dbFolder = await getDatabasesPath();
+    /* final dbFolder = await getDatabasesPath();
     if (!await Directory(dbFolder).exists()) {
       await Directory(dbFolder).create(recursive: true);
     }
-    final String dbPath = join(dbFolder, _databaseName);
+    final String dbPath = join(dbFolder, _databaseName); */
+
+    final documentsDirectory = await getApplicationDocumentsDirectory();
+    final path = join(documentsDirectory.path, _databaseName);
+
     return await openDatabase(
-      dbPath,
+      path,
       version: _databaseVersion,
       onCreate: (Database db, int version) async {
         await db.execute('''
@@ -78,7 +81,7 @@ class DatabaseHelper {
     );
   }
 
-  getDatabaseFolder() async {
+  /* getDatabaseFolder() async {
     final dbFolder = await getDatabasesPath();
     if (!await Directory(dbFolder).exists()) {
       await Directory(dbFolder).create(recursive: true);
@@ -90,11 +93,15 @@ class DatabaseHelper {
     final dbFolder = await getDatabasesPath();
     final String dbPath = join(dbFolder, _databaseName);
     return dbPath;
-  }
+  } */
 
-  deleteDatabase(String path) async {
+  eliminarDatabase() async {
     try {
+      final documentsDirectory = await getApplicationDocumentsDirectory();
+      final path = join(documentsDirectory.path, _databaseName);
+      //await deleteDatabase(path);
       await deleteDatabase(path);
+      // TODO: eliminar archivo ??
     } catch (e, s) {
       Logger.log(
           dataLog: DataLog(

@@ -127,7 +127,7 @@ class _PageSettingsState extends State<PageSettings> {
                 //horizontalTitleGap: 0,
                 leading: const Icon(Icons.currency_exchange),
                 title: Text('Cotización USD EUR', style: titleMediumBold),
-                subtitle: const Text('Pulsa para actualizar el tipo de cambio'),
+                subtitle: const Text('Actualizar el tipo de cambio'),
                 trailing: onSyncExchange
                     ? const CircularProgressIndicator()
                     : ElevatedButton(
@@ -382,7 +382,7 @@ class _PageSettingsState extends State<PageSettings> {
                 //horizontalTitleGap: 0,
                 leading: const Icon(Icons.memory),
                 title: Text('Limpiar caché', style: titleMediumBold),
-                subtitle: const Text('Pulsa para eliminar archivos de carteras '
+                subtitle: const Text('Eliminar archivos de carteras '
                     'compartidas almacenadas en caché'),
                 trailing: CircleAvatar(
                   radius: 21,
@@ -412,7 +412,7 @@ class _PageSettingsState extends State<PageSettings> {
                 //horizontalTitleGap: 0,
                 leading: const Icon(Icons.bug_report),
                 title:
-                    Text('Activar Registro de errores', style: titleMediumBold),
+                    Text('Activar registro de errores', style: titleMediumBold),
                 subtitle: const Text(
                     'Registra posibles errores en un archicvo de texto. '
                     'No almacena ninguna información personal ni envía ningún dato'),
@@ -430,9 +430,9 @@ class _PageSettingsState extends State<PageSettings> {
                 //horizontalTitleGap: 0,
                 leading: const Icon(Icons.description),
                 title:
-                    Text('Abrir Registro de errores', style: titleMediumBold),
-                subtitle: const Text(
-                    'Pulsa para ver el contenido del archivo logfile.txt'),
+                    Text('Abrir registro de errores', style: titleMediumBold),
+                subtitle:
+                    const Text('Muestra el contenido del archivo logfile.txt'),
                 trailing: CircleAvatar(
                   radius: 21,
                   backgroundColor: AppColor.blanco,
@@ -460,9 +460,10 @@ class _PageSettingsState extends State<PageSettings> {
                 //horizontalTitleGap: 0,
                 leading: const Icon(Icons.send),
                 title:
-                    Text('Enviar Registro de errores', style: titleMediumBold),
-                subtitle: const Text('Pulsa para reportar el archivo '
-                    'logfile.txt al sistema de incidencias de la aplicación'),
+                    Text('Enviar registro de errores', style: titleMediumBold),
+                subtitle:
+                    const Text('Reportar el archivo logfile.txt al sistema '
+                        'de incidencias de la aplicación'),
                 trailing: CircleAvatar(
                   radius: 21,
                   backgroundColor: AppColor.blanco,
@@ -479,10 +480,9 @@ class _PageSettingsState extends State<PageSettings> {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 //horizontalTitleGap: 0,
                 leading: const Icon(Icons.delete),
-                title: Text('Eliminar Errores registrados',
+                title: Text('Eliminar registro de errores',
                     style: titleMediumBold),
-                subtitle:
-                    const Text('Pulsa para eliminar el archivo logfile.txt'),
+                subtitle: const Text('Elimina el archivo logfile.txt'),
                 trailing: CircleAvatar(
                   radius: 21,
                   backgroundColor: AppColor.blanco,

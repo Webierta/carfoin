@@ -194,7 +194,6 @@ class VistaDetalle extends StatelessWidget {
               ),
             ),
             Padding(
-              //padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
               child: Container(
                 padding: const EdgeInsets.fromLTRB(4, 4, 12, 4),
@@ -227,34 +226,6 @@ class VistaDetalle extends StatelessWidget {
                           ],
                         ),
                       )
-                    /* ? Theme(
-                        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                        child: ExpansionTile(
-                          childrenPadding: const EdgeInsets.only(bottom: 5, left: 20),
-                          expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                          expandedAlignment: Alignment.topLeft,
-                          maintainState: true,
-                          iconColor: darkTheme ? AppColor.blanco : AppColor.light,
-                          collapsedIconColor: darkTheme ? AppColor.blanco : AppColor.light,
-                          tilePadding: const EdgeInsets.all(0.0),
-                          //backgroundColor: darkTheme ? AppColor.rojo : AppColor.azul100,
-                          title: ChipFondo(lengthFondos: fondos.length),
-                          children: [
-                            for (var fondo in fondos)
-                              TextButton(
-                                onPressed: () => goFondo(context, cartera, fondo),
-                                child: Text(
-                                  fondo.name,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: AppColor.light),
-                                ),
-                              )
-                          ],
-                        ),
-                      ) */
                     : const Padding(
                         padding: EdgeInsets.symmetric(vertical: 6),
                         child: ChipFondo(lengthFondos: null),
@@ -288,7 +259,6 @@ class VistaDetalle extends StatelessWidget {
                 firstDate: firstDate,
                 lastDate: lastDate,
               ),
-            //const SizedBox(height: 10),
           ],
         ),
       ),
@@ -312,28 +282,7 @@ class ChipFondo extends StatelessWidget {
     } else {
       title = '$lengthFondos Fondos';
     }
-    /* return Align(
-      alignment: Alignment.topLeft,
-      child: Chip(
-        padding: const EdgeInsets.only(left: 10, right: 20),
-        backgroundColor: blue100,
-        side: const BorderSide(color: Colors.transparent, width: 0),
-        avatar: const Icon(Icons.poll, color: blue900, size: 32),
-        label: Text(
-          title,
-          style: const TextStyle(color: blue900, fontSize: 14),
-        ),
-      ),
-    ); */
-    /* return ListTile(
-      leading: const Icon(Icons.poll),
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      horizontalTitleGap: 0,
-      dense: true,
-    ); */
+
     return Align(
       alignment: Alignment.topLeft,
       child: TextButton.icon(

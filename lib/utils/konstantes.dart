@@ -1,4 +1,4 @@
-const String kVersion = '3.1.1';
+const String kVersion = '3.2.0';
 
 // KEYS SHARED PREFERENCES SERVICE
 const String keyByOrderCarterasPref = 'isByOrderCarteras';
@@ -21,3 +21,5 @@ const double rateExchangeInit = 0.99512;
 const String keyStorageLoggerPref = 'isStorageLogger';
 
 const String keyDarkTheme = 'isDarkTheme';
+
+const String keyDateSinceNotice = 'isDateSinceNotice';

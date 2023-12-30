@@ -17,7 +17,6 @@ import '../utils/fecha_util.dart';
 import '../utils/status_api_service.dart';
 import '../widgets/dialogs/confirm_dialog.dart';
 import '../widgets/dialogs/custom_messenger.dart';
-import '../widgets/flutter_expandable_fab.dart';
 import '../widgets/loading_progress.dart';
 import '../widgets/menus.dart';
 import '../widgets/tabs/grafico_fondo.dart';
@@ -195,26 +194,68 @@ class _PageFondoState extends State<PageFondo>
                   //shape: const CircularNotchedRectangle(),
                   clipBehavior: Clip.antiAlias,
                   //notchMargin: 5,
-                  child: FractionallySizedBox(
-                    widthFactor: 0.7,
-                    alignment: FractionalOffset.bottomLeft,
-                    child: TabBar(
-                      controller: _tabController,
-                      labelColor: const Color(0xFFFFFFFF),
-                      unselectedLabelColor: const Color(0x62FFFFFF),
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      indicatorPadding: const EdgeInsets.all(5.0),
-                      indicatorColor: AppColor.light,
-                      tabs: const [
-                        Tab(icon: Icon(Icons.assessment, size: 32)),
-                        Tab(icon: Icon(Icons.table_rows_outlined, size: 32)),
-                        Tab(icon: Icon(Icons.timeline, size: 32)),
-                      ],
-                    ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: FractionallySizedBox(
+                          widthFactor: 0.7,
+                          alignment: FractionalOffset.bottomLeft,
+                          child: TabBar(
+                            controller: _tabController,
+                            labelColor: const Color(0xFFFFFFFF),
+                            unselectedLabelColor: const Color(0x62FFFFFF),
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            indicatorPadding: const EdgeInsets.all(5.0),
+                            indicatorColor: AppColor.light,
+                            tabs: const [
+                              Tab(icon: Icon(Icons.assessment, size: 32)),
+                              Tab(
+                                  icon: Icon(Icons.table_rows_outlined,
+                                      size: 32)),
+                              Tab(icon: Icon(Icons.timeline, size: 32)),
+                            ],
+                          ),
+                        ),
+                      ),
+                      PopupMenuButton(
+                        elevation: 20,
+                        //offset: const Offset(0, 0),
+                        tooltip: 'Actualizar',
+                        shape: AppBox.roundBorder,
+                        onSelected: (value) {
+                          if (value == MenuUpdate.actualizar) {
+                            _getDataApi(context);
+                          } else if (value == MenuUpdate.historico) {
+                            _getRangeApi(context);
+                          }
+                        },
+                        itemBuilder: (BuildContext context) {
+                          return <PopupMenuEntry<Enum>>[
+                            buildMenuItemUpdate(
+                                MenuUpdate.actualizar, Icons.update),
+                            buildMenuItemUpdate(
+                                MenuUpdate.historico, Icons.date_range),
+                          ];
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFFC107),
+                            borderRadius: BorderRadius.all(Radius.circular(14)),
+                          ),
+                          child: const Icon(
+                            Icons.refresh,
+                            color: Color(0xFF0D47A1),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                floatingActionButtonLocation:
-                    FloatingActionButtonLocation.endDocked,
+                // ERROR GO ROUTER EN LINUX
+                //floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+                /* floatingActionButtonLocation:
+                    FloatingActionButtonLocation.endFloat,
                 floatingActionButton: ExpandableFab(
                   isEndDocked: true,
                   children: [
@@ -230,7 +271,7 @@ class _PageFondoState extends State<PageFondo>
                     ),
                   ],
                   child: const Icon(Icons.refresh),
-                ),
+                ), */
               ),
             ),
           );

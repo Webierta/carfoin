@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:restart_app/restart_app.dart';
 
 import '../models/cartera.dart';
 import '../models/cartera_provider.dart';
@@ -45,6 +44,8 @@ class _PageHomeState extends State<PageHome> {
   String _loadingText = '';
   bool cargandoShare = false;
 
+  bool isBadgeVisible = false;
+
   getSharedPrefs() async {
     await PreferencesService.getBool(keyByOrderCarterasPref)
         .then((value) => prefProvider.isByOrderCarteras = value);
@@ -68,6 +69,18 @@ class _PageHomeState extends State<PageHome> {
     int difDays = now.difference(dateRate).inDays;
     if (prefProvider.isAutoExchange && difDays > 1) {
       await syncExchange();
+    }
+
+    int dateSinceNotice =
+        await PreferencesService.getDateSinceNotice(keyDateSinceNotice);
+    if (dateSinceNotice == 0) {
+      isBadgeVisible = true;
+    } else {
+      DateTime dateNotice = FechaUtil.epochToDate(dateSinceNotice);
+      int difDaysNotice = now.difference(dateNotice).inDays;
+      if (difDaysNotice > 30) {
+        isBadgeVisible = true;
+      }
     }
   }
 
@@ -202,6 +215,49 @@ class _PageHomeState extends State<PageHome> {
                 appBar: AppBar(
                   title: const Text('Carteras'),
                   actions: [
+                    if (isBadgeVisible)
+                      Badge(
+                        child: IconButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (context) => Container(
+                                padding: const EdgeInsets.all(40),
+                                child: Column(
+                                  children: [
+                                    const Text('NOTA'),
+                                    const SizedBox(height: 20),
+                                    const Text(
+                                        'Recuerda guardar regularmente una copia de seguridad '
+                                        'de la base de datos con la opción EXPORTAR. Después '
+                                        'puedes recuperarla con la opción IMPORTAR.'),
+                                    const SizedBox(height: 20),
+                                    const Text(
+                                        'También puedes salvar cada cartera por separado con la '
+                                        'opción COMPARTIR y recuperarla desde la página principal '
+                                        'como una nueva cartera compartida.'),
+                                    const Spacer(),
+                                    TextButton(
+                                      onPressed: () async {
+                                        setState(() => isBadgeVisible = false);
+                                        await PreferencesService
+                                            .saveDateSinceNotice(
+                                          keyDateSinceNotice,
+                                          FechaUtil.dateToEpoch(DateTime.now()),
+                                        );
+                                        if (!context.mounted) return;
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('Cerrar'),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.feedback),
+                        ),
+                      ),
                     IconButton(
                       icon: const Icon(Icons.refresh),
                       onPressed: () async => await _dialogUpdateAll(context),
@@ -430,20 +486,28 @@ class _PageHomeState extends State<PageHome> {
       contentInfo = 'Proceso abortado';
     }
     if (resultImport.requiredRestart == true) {
-      contentInfo += '\n\nLa app se reiniciará.';
+      //contentInfo += '\n\nLa app se reiniciará.';
     } else {
       if (resultImport.msg != null) {
         contentInfo += '\n\n${resultImport.msg}';
       }
     }
+    //setState(() {});
     if (!context.mounted) return;
     await InfoDialog(
       context: context,
       title: 'Resultado',
       content: Text(contentInfo),
     ).generateDialog();
+
     if (resultImport.requiredRestart == true) {
-      Restart.restartApp();
+      setState(() {});
+      if (!context.mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const PageHome()),
+      );
+      // TODO: REVISAR SIN REINICIAR
     }
   }
 

@@ -2,6 +2,27 @@
 
 Este archivo registra y documenta los cambios más notables a lo largo del desarrollo del proyecto.
 
+## [3.2.0] - 2023-12-30
+
+### Added
+
+- Añadida compatibilidad con sistemas Linux (esto ha supuesto, entre otras cosas, el cambio de la ubicación de la base de datos para mayor estabilidad y rendimiento, por lo que es necesario tener una COPIA DE SEGURIDAD ANTES DE ACTUALIZAR).
+- Nuevo sistema de notas como recordatorio periódico para hacer copias de seguridad.
+
+### Fixed
+
+- Corregido refresco de pantalla después de importar base de datos.
+
+### Changed
+
+- Actualizadas dependencias.
+- Dependencias adapatadas a Linux (base de datos, manejo de permisos, reiniciar aplicación, compartir archivos, limpiar caché).
+- Código saneado.
+
+### Removed
+
+- Eliminadas dependencias para reiniciar la aplicación.
+
 ## [3.1.1] - 2023-12-28
 
 ### Fixed
@@ -135,6 +156,7 @@ Este archivo registra y documenta los cambios más notables a lo largo del desar
 - First beta release.
 - Adaptación a Android de la idea del Proyecto del mismo autor [Carfoin$](https://github.com/Webierta/carfoins).
 
+[3.2.0]: https://github.com/Webierta/carfoin/compare/v3.1.1...v3.2.0
 [3.1.1]: https://github.com/Webierta/carfoin/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/Webierta/carfoin/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/Webierta/carfoin/compare/v2.0.4...v3.0.0

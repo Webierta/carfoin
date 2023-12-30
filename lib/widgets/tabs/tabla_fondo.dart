@@ -192,16 +192,9 @@ class _TablaFondoState extends State<TablaFondo> {
                                     style: const TextStyle(fontSize: 16),
                                   )),
                               Expanded(
-                                  flex: 2, child: diferencia(valores[index])),
-                              /*Expanded(
-                              flex: 1,
-                              child: IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () {
-                                  print('EDITAR');
-                                },
+                                flex: 2,
+                                child: diferencia(valores[index]),
                               ),
-                            )*/
                             ],
                           ),
                         ));

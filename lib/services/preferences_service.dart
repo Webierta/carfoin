@@ -45,4 +45,17 @@ class PreferencesService {
     }
     return rateExchangeInit;
   }
+
+  static Future<bool> saveDateSinceNotice(String key, int value) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return await sharedPreferences.setInt(key, value);
+  }
+
+  static Future<int> getDateSinceNotice(String key) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if (sharedPreferences.containsKey(key)) {
+      return sharedPreferences.getInt(key) ?? 0;
+    }
+    return 0;
+  }
 }
