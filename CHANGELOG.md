@@ -16,7 +16,7 @@ Este archivo registra y documenta los cambios más notables a lo largo del desar
 ### Changed
 
 - Actualizadas dependencias.
-- Dependencias adapatadas a Linux (base de datos, manejo de permisos, reiniciar aplicación, compartir archivos, limpiar caché).
+- Dependencias adaptadas a Linux (base de datos, manejo de permisos, reiniciar aplicación, compartir archivos, limpiar caché).
 - Código saneado.
 
 ### Removed
