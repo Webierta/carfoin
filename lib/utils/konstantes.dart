@@ -1,4 +1,4 @@
-const String kVersion = '3.2.0';
+const String kVersion = '3.2.1';
 
 // KEYS SHARED PREFERENCES SERVICE
 const String keyByOrderCarterasPref = 'isByOrderCarteras';

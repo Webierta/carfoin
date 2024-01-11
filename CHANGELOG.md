@@ -2,6 +2,12 @@
 
 Este archivo registra y documenta los cambios más notables a lo largo del desarrollo del proyecto.
 
+## [3.2.1] - 2024-01-11
+
+### Changed
+
+- Nueva firma de aplicación: Para aumentar la seguridad, se ha sustituido una clave de depuración temporal por una clave adecuada para su publicación. Esto supone que para actualizar desde una versión anterior es necesario desinstalar primero la vieja versión antes de instalar esta nueva versión.
+
 ## [3.2.0] - 2023-12-30
 
 ### Added
@@ -156,6 +162,7 @@ Este archivo registra y documenta los cambios más notables a lo largo del desar
 - First beta release.
 - Adaptación a Android de la idea del Proyecto del mismo autor [Carfoin$](https://github.com/Webierta/carfoins).
 
+[3.2.1]: https://github.com/Webierta/carfoin/compare/v3.2.0...v3.2.1
 [3.2.0]: https://github.com/Webierta/carfoin/compare/v3.1.1...v3.2.0
 [3.1.1]: https://github.com/Webierta/carfoin/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/Webierta/carfoin/compare/v3.0.0...v3.1.0

@@ -1,7 +1,7 @@
 name: carfoin
 description: Gestor de Carteras de Fondos de Inversión
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 3.2.0+23
+version: 3.2.1+24
 
 environment:
   sdk: ">=3.2.3 <4.0.0"
