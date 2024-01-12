@@ -12,6 +12,10 @@ Permite operaciones simuladas de suscripción y reembolso para seguir la evoluci
 invertido y su rentabilidad. También presenta una visión global del portafolio y permite hacer
 copias de seguridad y compartir carteras con otros usuarios.
 
+[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png"
+     alt="Get it on IzzyOnDroid"
+     height="80">](https://apt.izzysoft.de/fdroid/index/apk/com.github.webierta.carfoin)
+
 Coming soon on F-Droid or get it from the [Releases section](https://github.com/Webierta/carfoin/releases/latest).
 
 ## Funciones principales:
