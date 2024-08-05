@@ -142,7 +142,7 @@ class _GraficoFondoState extends State<GraficoFondo> {
       //maxY: (((((precioMax - precioMax.truncate()) * 10).floor()) / 10) + precioMax.floor()).ceilToDouble(),
       lineTouchData: LineTouchData(
         touchTooltipData: LineTouchTooltipData(
-          tooltipBgColor: const Color(0xFF000000), // red.withOpacity(0.8),
+          //tooltipBgColor: const Color(0xFF000000), // red.withOpacity(0.8),
           getTooltipItems: (touchedSpots) {
             return touchedSpots.map((LineBarSpot touchedSpot) {
               var epoch = touchedSpot.x.toInt();

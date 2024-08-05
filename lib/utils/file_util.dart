@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../models/logger.dart';
 import '../services/database_helper.dart';
@@ -65,7 +64,7 @@ class FileUtil {
     }
   }
 
-  static Future<bool> _requestPermission(Permission permission) async {
+  /*static Future<bool> _requestPermission(Permission permission) async {
     if (await permission.isGranted) {
       return true;
     } else {
@@ -75,7 +74,7 @@ class FileUtil {
       }
     }
     return false;
-  }
+  }*/
 
   static Future<Resultado> savePdf(String filename, List<int> pdfBytes) async {
     //String filePath = '';
@@ -86,24 +85,24 @@ class FileUtil {
     //filePath = '$selectedDirectory/$filename';
     File file = File('$selectedDirectory/$filename');
 
-    if (Platform.isLinux || await _requestPermission(Permission.storage)) {
-      try {
-        await file.writeAsBytes(pdfBytes);
-        return Resultado(Status.ok, msg: file.path);
-      } catch (e, s) {
-        Logger.log(
-            dataLog: DataLog(
-                msg: 'Catch Write Pdf',
-                file: 'file_util.dart',
-                clase: 'FileUtil',
-                funcion: 'savePdf',
-                error: e,
-                stackTrace: s));
-        return Resultado(Status.error, msg: e.toString());
-      }
-    } else {
-      return Resultado(Status.abortado, msg: 'Permiso denegado');
+    //if (Platform.isLinux || await _requestPermission(Permission.storage)) {
+    try {
+      await file.writeAsBytes(pdfBytes);
+      return Resultado(Status.ok, msg: file.path);
+    } catch (e, s) {
+      Logger.log(
+          dataLog: DataLog(
+              msg: 'Catch Write Pdf',
+              file: 'file_util.dart',
+              clase: 'FileUtil',
+              funcion: 'savePdf',
+              error: e,
+              stackTrace: s));
+      return Resultado(Status.error, msg: e.toString());
     }
+    /*} else {
+      return Resultado(Status.abortado, msg: 'Permiso denegado');
+    }*/
   }
 
   static Future<Resultado> exportar(String nombreDb) async {
@@ -140,23 +139,23 @@ class FileUtil {
     filePath = '$selectedDirectory/$nombreDb';
     File file = File(filePath);
 
-    if (Platform.isLinux || await _requestPermission(Permission.storage)) {
-      try {
-        await file.writeAsBytes(dbAsBytes);
-        return Resultado(Status.ok, msg: filePath);
-      } catch (e, s) {
-        Logger.log(
-            dataLog: DataLog(
-                msg: 'Catch Write File',
-                file: 'file_util.dart',
-                clase: 'FileUtil',
-                funcion: 'exportar',
-                error: e,
-                stackTrace: s));
-        return Resultado(Status.error, msg: e.toString());
-      }
-    } else {
-      return Resultado(Status.abortado, msg: 'Permiso denegado');
+    //if (Platform.isLinux || await _requestPermission(Permission.storage)) {
+    try {
+      await file.writeAsBytes(dbAsBytes);
+      return Resultado(Status.ok, msg: filePath);
+    } catch (e, s) {
+      Logger.log(
+          dataLog: DataLog(
+              msg: 'Catch Write File',
+              file: 'file_util.dart',
+              clase: 'FileUtil',
+              funcion: 'exportar',
+              error: e,
+              stackTrace: s));
+      return Resultado(Status.error, msg: e.toString());
     }
+    /*} else {
+      return Resultado(Status.abortado, msg: 'Permiso denegado');
+    }*/
   }
 }

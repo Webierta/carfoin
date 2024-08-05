@@ -352,7 +352,7 @@ class _PageFondoState extends State<PageFondo>
       MaterialPageRoute(builder: (context) => AppPage.inputRange.routeClass),
     );
     if (newRange != null) {
-      if (!mounted) return;
+      if (!context.mounted) return;
       _dialogProgress(context);
       var range = newRange as DateTimeRange;
       final yahooFinanceResponse = await yahooFinance.getYahooFinanceResponse(

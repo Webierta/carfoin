@@ -67,14 +67,44 @@ class YahooFinance {
         SymbolYahoo symbolYahoo = SymbolYahoo.fromJson(
             jsonDecode(response.body) as Map<String, dynamic>);
         var symbol = symbolYahoo.symbol;
-        final uri2 = Uri.https(
+        /* final uri2 = Uri.https(
           'query1.finance.yahoo.com',
           '/v7/finance/options/$symbol',
+        ); */
+        final uri2 = Uri.https(
+          'query1.finance.yahoo.com',
+          '/v6/finance/options/$symbol',
         );
+        /*final Map<String, String> queryParameters = {
+          'q': symbol,
+          'quotesCount': '1',
+          'newsCount': '0',
+          'listsCount': '0',
+          'typeDisp': 'Fund',
+          'quotesQueryId': 'tss_match_phrase_query',
+        };
+        final uri2 = Uri.https(
+          'query1.finance.yahoo.com',
+          '/v1/finance/search',
+          queryParameters,
+        );*/
+
         final response2 = await client.get(uri2, headers: headers);
         if (response2.statusCode == 200) {
           DataYahoo dataYahoo = DataYahoo.fromJson(
               jsonDecode(response2.body) as Map<String, dynamic>);
+          /*String? name = jsonDecode(response2.body)['quotes'][0]['longname'];
+          //String? divisa = jsonDecode(response2.body)['quotes'][0]['currency'];
+          String? ticker = jsonDecode(response2.body)['quotes'][0]['symbol'];
+          if (name == null || ticker == null) {
+            return null;
+          }
+          Fondo newFondo = Fondo(
+            isin: isin,
+            name: name,
+            //divisa: divisa,
+            ticker: ticker,
+          );*/
           Fondo newFondo = Fondo(
             isin: isin,
             name: dataYahoo.name,
@@ -87,6 +117,12 @@ class YahooFinance {
               precio: dataYahoo.valor,
             )
           ];
+          /* newFondo.valores = [
+            Valor(
+              date: FechaUtil.epochToEpochHms(dataYahoo.fecha),
+              precio: dataYahoo.valor,
+            )
+          ]; */
           //newFondo.ticker = dataYahoo.symbol;
           return newFondo;
         } else {

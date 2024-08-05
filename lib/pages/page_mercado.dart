@@ -496,7 +496,7 @@ class _MercadoState extends State<PageMercado> {
       // INSERT O UPDATE OP ?? (SET VALORES PARA UPDATE UI ??)
       await database.insertValor(carteraSelect, fondoSelect, newOp);
       carteraProvider.addValor(carteraSelect, fondoSelect, newOp);
-      if (!mounted) return;
+      if (!context.mounted) return;
       context.go(fondoPage);
     }
   }

@@ -68,7 +68,7 @@ class _PageInputFondoState extends State<PageInputFondo> {
                 width: double.infinity,
                 child: SegmentedButton(
                   style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),

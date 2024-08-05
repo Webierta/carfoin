@@ -188,7 +188,7 @@ class _MainFondoState extends State<MainFondo> {
             )),
           ]),
         DataRow(
-          color: MaterialStateColor.resolveWith(
+          color: WidgetStateColor.resolveWith(
               (states) => darkTheme ? AppColor.boxDark : AppColor.light),
           cells: [
             DataCell(Align(
@@ -552,7 +552,7 @@ class _MainFondoState extends State<MainFondo> {
                                 dataRowMaxHeight: 70,
                                 //dataRowHeight: 70,
                                 //horizontalMargin: 10,
-                                headingRowColor: MaterialStateColor.resolveWith(
+                                headingRowColor: WidgetStateColor.resolveWith(
                                     (states) => darkTheme
                                         ? AppColor.boxDark
                                         : AppColor.light),

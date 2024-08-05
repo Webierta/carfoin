@@ -15,12 +15,12 @@ class AppTheme {
       primary: isDark ? AppColor.dark : AppColor.light,
       secondary: AppColor.ambar,
       surface: isDark ? AppColor.dark700 : AppColor.light,
-      background: Colors.transparent,
+      //background: Colors.transparent,
       error: AppColor.rojo900,
       onPrimary: AppColor.blanco,
       onSecondary: AppColor.light900,
       onSurface: isDark ? AppColor.blanco : AppColor.light900,
-      onBackground: isDark ? AppColor.blanco : AppColor.light900,
+      //onBackground: isDark ? AppColor.blanco : AppColor.light900,
       onError: AppColor.blanco,
     );
 
@@ -66,8 +66,8 @@ class AppTheme {
 
     TextButtonThemeData textButtonTheme =
         TextButtonThemeData(style: ButtonStyle(
-      foregroundColor: MaterialStateColor.resolveWith((state) {
-        if (state.contains(MaterialState.disabled)) {
+      foregroundColor: WidgetStateColor.resolveWith((state) {
+        if (state.contains(WidgetState.disabled)) {
           return AppColor.gris;
         }
         return isDark ? AppColor.blanco : AppColor.light900;
@@ -81,14 +81,14 @@ class AppTheme {
     );
 
     SwitchThemeData switchTheme = SwitchThemeData(
-      thumbColor: MaterialStateProperty.resolveWith((state) {
-        if (state.contains(MaterialState.selected)) {
+      thumbColor: WidgetStateProperty.resolveWith((state) {
+        if (state.contains(WidgetState.selected)) {
           return isDark ? AppColor.ambarAccent : AppColor.lightAccent;
         }
         return AppColor.blanco;
       }),
-      trackColor: MaterialStateProperty.resolveWith((state) {
-        if (state.contains(MaterialState.selected)) {
+      trackColor: WidgetStateProperty.resolveWith((state) {
+        if (state.contains(WidgetState.selected)) {
           return isDark ? AppColor.ambar : AppColor.light;
         }
         return AppColor.gris;

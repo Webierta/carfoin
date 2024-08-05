@@ -2,6 +2,17 @@
 
 Este archivo registra y documenta los cambios más notables a lo largo del desarrollo del proyecto.
 
+## [3.2.2] - 2024-08-05
+
+### Fixed
+
+- Buscar por ISIN.
+- Exportar base de datos.
+
+### Changed
+
+- Actualizadas dependencias.
+
 ## [3.2.1] - 2024-01-11
 
 ### Changed
@@ -162,6 +173,7 @@ Este archivo registra y documenta los cambios más notables a lo largo del desar
 - First beta release.
 - Adaptación a Android de la idea del Proyecto del mismo autor [Carfoin$](https://github.com/Webierta/carfoins).
 
+[3.2.2]: https://github.com/Webierta/carfoin/compare/v3.2.1...v3.2.2
 [3.2.1]: https://github.com/Webierta/carfoin/compare/v3.2.0...v3.2.1
 [3.2.0]: https://github.com/Webierta/carfoin/compare/v3.1.1...v3.2.0
 [3.1.1]: https://github.com/Webierta/carfoin/compare/v3.1.0...v3.1.1
